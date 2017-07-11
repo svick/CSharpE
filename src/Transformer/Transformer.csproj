@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyName>CSharpE.Transformer</AssemblyName>
+    <RootNamespace>CSharpE.Transformer</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Syntax\Syntax.csproj" />
+    <ProjectReference Include="..\Transform\Transform.csproj" />
+  </ItemGroup>
+
+</Project>

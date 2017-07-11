@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <AssemblyName>CSharpE.Extensions.Actor</AssemblyName>
+    <RootNamespace>CSharpE.Extensions.Actor</RootNamespace>
+  </PropertyGroup>
+
+</Project>
