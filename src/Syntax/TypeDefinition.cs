@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis;
+using CSharpE.Core;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -10,11 +11,42 @@ namespace CSharpE.Syntax
     {
         private TypeDeclarationSyntax syntax;
         private SourceFile containingFile;
+        
+        private List<MemberDefinition> members;
 
         internal TypeDefinition(TypeDeclarationSyntax typeDeclarationSyntax, SourceFile containingFile)
         {
             syntax = typeDeclarationSyntax;
             this.containingFile = containingFile;
+        }
+
+        private List<MemberDefinition> MembersList
+        {
+            get
+            {
+                if (members == null)
+                    members = syntax.Members.Select(mds => MemberDefinition.Create(mds, containingFile)).ToList();
+
+                return members;
+            }
+        }
+
+        public IList<MemberDefinition> Members
+        {
+            get => MembersList;
+            set => members = value.ToList();
+        }
+
+        public IList<MethodDefinition> Methods
+        {
+            get => FilteredList.Create<MemberDefinition, MethodDefinition>(MembersList);
+            set => FilteredList.Set(MembersList, value);
+        }
+
+        public IList<MethodDefinition> PublicMethods
+        {
+            get => FilteredList.Create(MembersList, (MethodDefinition method) => method.Accessibility == Accessibility.Public);
+            set => FilteredList.Set(MembersList, method => method.Accessibility == Accessibility.Public, value);
         }
 
         public bool HasAttribute<T>() => HasAttribute(typeof(T));
@@ -43,6 +75,13 @@ namespace CSharpE.Syntax
             }
 
             return false;
+        }
+
+        public FieldDefinition Field(FieldModifiers modifiers, Type type, string name, Expression initializer)
+        {
+            var field = new FieldDefinition(modifiers, type, name, initializer);
+            this.Members.Add(field);
+            return field;
         }
     }
 }

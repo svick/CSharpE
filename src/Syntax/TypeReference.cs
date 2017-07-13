@@ -4,6 +4,12 @@ namespace CSharpE.Syntax
 {
     public class TypeReference
     {
-        public string FullName => throw new NotImplementedException();
+        public string FullName { get; }
+        
+        public TypeReference(Type type)
+        {
+            // TODO: what about assembly?
+            FullName = type.FullName;
+        }
     }
 }
