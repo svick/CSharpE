@@ -19,11 +19,6 @@ namespace CSharpE.Syntax
             this.containingFile = containingFile;
         }
 
-        public FieldDefinition(FieldModifiers modifiers, Type type, string name, Expression initializer)
-            : this(modifiers, new TypeReference(type), name, initializer)
-        {
-        }
-
         public FieldDefinition(FieldModifiers modifiers, TypeReference type, string name, Expression initializer)
         {
             this.modifiers = modifiers;

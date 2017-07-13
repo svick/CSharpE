@@ -6,7 +6,10 @@ namespace CSharpE.Syntax
     {
         public static FieldModifiers ReadOnly => FieldModifiers.ReadOnly;
 
-        public static NewExpression New(Type type, params Expression[] arguments) => New(new TypeReference(type), arguments);
+        public static TypeReference TypeReference(Type type) => type;
+
+        public static TypeReference TypeReference(TypeReference openGenericType, params TypeReference[] typeParameters) =>
+            new TypeReference(openGenericType, typeParameters);
 
         public static NewExpression New(TypeReference type, params Expression[] arguments) => new NewExpression(type, arguments);
 

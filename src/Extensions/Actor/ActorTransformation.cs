@@ -18,7 +18,7 @@ namespace CSharpE.Extensions.Actor
 
                 foreach (var method in type.PublicMethods)
                 {
-                    method.ReturnType = GenericTypeReference(typeof(Task<>), method.ReturnType);
+                    method.ReturnType = TypeReference(typeof(Task<>), method.ReturnType);
 
                     method.Body = new Statement[]
                     {

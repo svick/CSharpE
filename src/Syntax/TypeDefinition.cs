@@ -51,8 +51,6 @@ namespace CSharpE.Syntax
 
         public bool HasAttribute<T>() => HasAttribute(typeof(T));
 
-        public bool HasAttribute(Type attributeType) => HasAttribute(attributeType.FullName);
-
         public bool HasAttribute(TypeReference attributeType) => HasAttribute(attributeType.FullName);
         
         private bool HasAttribute(string attributeTypeFullName)
@@ -77,7 +75,7 @@ namespace CSharpE.Syntax
             return false;
         }
 
-        public FieldDefinition Field(FieldModifiers modifiers, Type type, string name, Expression initializer)
+        public FieldDefinition Field(FieldModifiers modifiers, TypeReference type, string name, Expression initializer)
         {
             var field = new FieldDefinition(modifiers, type, name, initializer);
             this.Members.Add(field);
