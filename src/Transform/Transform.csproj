@@ -6,4 +6,8 @@
     <RootNamespace>CSharpE.Transform</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Syntax\Syntax.csproj" />
+  </ItemGroup>
+
 </Project>

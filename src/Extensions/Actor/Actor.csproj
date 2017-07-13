@@ -6,4 +6,9 @@
     <RootNamespace>CSharpE.Extensions.Actor</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Syntax\Syntax.csproj" />
+    <ProjectReference Include="..\..\Transform\Transform.csproj" />
+  </ItemGroup>
+
 </Project>
