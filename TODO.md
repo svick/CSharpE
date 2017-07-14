@@ -1,2 +1,5 @@
+- make using modifiers easier by adding bool properties for them
+  - should be different for each kind of member
 - consider creating code from "template" lambda or local function  
-  basically automatic code quoter
+  - basically automatic code quoter
+  - "lambda" parameters for inlining other code blocks

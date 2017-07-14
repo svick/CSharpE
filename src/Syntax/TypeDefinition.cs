@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Core;
 using Microsoft.CodeAnalysis.CSharp;
@@ -12,20 +11,32 @@ namespace CSharpE.Syntax
         private TypeDeclarationSyntax syntax;
         private SourceFile containingFile;
         
-        private List<MemberDefinition> members;
-
         internal TypeDefinition(TypeDeclarationSyntax typeDeclarationSyntax, SourceFile containingFile)
         {
             syntax = typeDeclarationSyntax;
             this.containingFile = containingFile;
         }
 
+        private string name;
+        public string Name
+        {
+            get
+            {
+                if (name == null)
+                    name = syntax.Identifier.ValueText;
+                
+                return name;
+            }
+            set => name = value;
+        }
+
+        private List<MemberDefinition> members;
         private List<MemberDefinition> MembersList
         {
             get
             {
                 if (members == null)
-                    members = syntax.Members.Select(mds => MemberDefinition.Create(mds, containingFile)).ToList();
+                    members = syntax.Members.Select(mds => MemberDefinition.Create(mds, this)).ToList();
 
                 return members;
             }
@@ -45,8 +56,8 @@ namespace CSharpE.Syntax
 
         public IList<MethodDefinition> PublicMethods
         {
-            get => FilteredList.Create(MembersList, (MethodDefinition method) => method.Accessibility == Accessibility.Public);
-            set => FilteredList.Set(MembersList, method => method.Accessibility == Accessibility.Public, value);
+            get => FilteredList.Create(MembersList, (MethodDefinition method) => method.Modifiers.Accessibility() == MemberModifiers.Public);
+            set => FilteredList.Set(MembersList, method => method.Modifiers.Accessibility() == MemberModifiers.Public, value);
         }
 
         public bool HasAttribute<T>() => HasAttribute(typeof(T));
@@ -75,11 +86,13 @@ namespace CSharpE.Syntax
             return false;
         }
 
-        public FieldDefinition Field(FieldModifiers modifiers, TypeReference type, string name, Expression initializer)
+        public FieldDefinition Field(MemberModifiers modifiers, TypeReference type, string name, Expression initializer)
         {
             var field = new FieldDefinition(modifiers, type, name, initializer);
             this.Members.Add(field);
             return field;
         }
+        
+        public static implicit operator IdentifierExpression(TypeDefinition typeDefinition) => new IdentifierExpression(typeDefinition.Name);
     }
 }

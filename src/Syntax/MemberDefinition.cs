@@ -5,12 +5,12 @@ namespace CSharpE.Syntax
 {
     public abstract class MemberDefinition
     {
-        public static MemberDefinition Create(MemberDeclarationSyntax memberDeclarationSyntax, SourceFile containingFile)
+        public static MemberDefinition Create(MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType)
         {
             switch (memberDeclarationSyntax)
             {
                 case FieldDeclarationSyntax fieldDeclarationSyntax:
-                    return new FieldDefinition(fieldDeclarationSyntax, containingFile);
+                    return new FieldDefinition(fieldDeclarationSyntax, containingType);
                 default:
                     throw new NotImplementedException();
             }

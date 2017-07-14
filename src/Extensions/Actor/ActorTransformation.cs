@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CSharpE.Syntax;
 using CSharpE.Transform;
 using static CSharpE.Syntax.SyntaxFactory;
+using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Extensions.Actor
 {

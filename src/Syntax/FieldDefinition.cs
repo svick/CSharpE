@@ -1,30 +1,36 @@
-﻿using System;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
     public class FieldDefinition : MemberDefinition
     {
         private FieldDeclarationSyntax syntax;
-        private SourceFile containingFile;
 
-        private FieldModifiers modifiers;
-        private TypeReference type;
-        private string name;
-        private Expression initializer;
+        public MemberModifiers Modifiers { get; set; }
+        
+        public TypeReference Type { get; set; }
+        
+        public string Name { get; set; }
 
-        public FieldDefinition(FieldDeclarationSyntax syntax, SourceFile containingFile)
+        public Expression Initializer { get; set; }
+
+        public TypeDefinition ContaingingType { get; internal set; }
+
+        internal FieldDefinition(FieldDeclarationSyntax syntax, TypeDefinition containgingType)
         {
             this.syntax = syntax;
-            this.containingFile = containingFile;
+            ContaingingType = containgingType;
         }
 
-        public FieldDefinition(FieldModifiers modifiers, TypeReference type, string name, Expression initializer)
+        public FieldDefinition(MemberModifiers modifiers, TypeReference type, string name, Expression initializer)
         {
-            this.modifiers = modifiers;
-            this.type = type;
-            this.name = name;
-            this.initializer = initializer;
+            Modifiers = modifiers;
+            Type = type;
+            Name = name;
+            Initializer = initializer;
         }
+        
+        public static implicit operator MemberAccessExpression(FieldDefinition fieldDefinition) =>
+            new MemberAccessExpression(fieldDefinition);
     }
 }
