@@ -5,6 +5,8 @@ namespace CSharpE.Syntax
 {
     public abstract class MemberDefinition
     {
+        public MemberModifiers Modifiers { get; set; }
+
         public static MemberDefinition Create(MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType)
         {
             switch (memberDeclarationSyntax)

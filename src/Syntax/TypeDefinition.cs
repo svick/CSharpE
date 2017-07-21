@@ -56,8 +56,8 @@ namespace CSharpE.Syntax
 
         public IList<MethodDefinition> PublicMethods
         {
-            get => FilteredList.Create(MembersList, (MethodDefinition method) => method.Modifiers.Accessibility() == MemberModifiers.Public);
-            set => FilteredList.Set(MembersList, method => method.Modifiers.Accessibility() == MemberModifiers.Public, value);
+            get => FilteredList.Create(MembersList, (MethodDefinition method) => method.IsPublic);
+            set => FilteredList.Set(MembersList, method => method.IsPublic, value);
         }
 
         public bool HasAttribute<T>() => HasAttribute(typeof(T));
