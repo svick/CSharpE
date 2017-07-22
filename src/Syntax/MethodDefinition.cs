@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static CSharpE.Syntax.MemberModifiers;
@@ -7,6 +8,17 @@ namespace CSharpE.Syntax
     public class MethodDefinition : MemberDefinition
     {
         #region Modifiers
+
+        private const MemberModifiers ValidMethodModifiers =
+            AccessModifiersMask | New | Static | Unsafe | Abstract | Sealed | Virtual | Override | Extern | Partial |
+            Async;
+        
+        protected override void ValidateModifiers(MemberModifiers value)
+        {
+            var invalidModifiers = value & ~ValidMethodModifiers;
+            if (invalidModifiers != 0)
+                throw new ArgumentException(nameof(value), $"The modifiers {invalidModifiers} are not valid for a method.");
+        }
 
         public MemberModifiers Accessibility
         {

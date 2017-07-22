@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
@@ -6,8 +7,8 @@ namespace CSharpE.Syntax
     {
         private FieldDeclarationSyntax syntax;
 
-        public MemberModifiers Modifiers { get; set; }
-        
+        protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
+
         public TypeReference Type { get; set; }
         
         public string Name { get; set; }

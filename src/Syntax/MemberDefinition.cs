@@ -5,7 +5,18 @@ namespace CSharpE.Syntax
 {
     public abstract class MemberDefinition
     {
-        public MemberModifiers Modifiers { get; set; }
+        private MemberModifiers modifiers;
+        public MemberModifiers Modifiers
+        {
+            get => modifiers;
+            set
+            {
+                ValidateModifiers(value);
+                modifiers = value;
+            }
+        }
+
+        protected abstract void ValidateModifiers(MemberModifiers modifiers);
 
         public static MemberDefinition Create(MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType)
         {
