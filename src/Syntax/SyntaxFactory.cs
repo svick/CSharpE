@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CSharpE.Syntax
 {
@@ -24,6 +25,30 @@ namespace CSharpE.Syntax
         
         public static ThisExpression This() => new ThisExpression();
         
+        public static AwaitExpression Await(Expression operand) => new AwaitExpression(operand);
+
+        #endregion
+
+        #region Statements
+
+        public static TryStatement TryCatchFinally(
+            IEnumerable<Statement> tryStatements, IEnumerable<CatchClause> catchClauses,
+            IEnumerable<Statement> finallyStatements) =>
+            new TryStatement(tryStatements, catchClauses, finallyStatements);
+
+        public static TryStatement TryCatch(
+            IEnumerable<Statement> tryStatements, IEnumerable<CatchClause> catchClauses) =>
+            new TryStatement(tryStatements, catchClauses);
+
+        public static TryStatement TryCatch(
+            IEnumerable<Statement> tryStatements, params CatchClause[] catchClauses) =>
+            new TryStatement(tryStatements, catchClauses);
+
+        public static TryStatement TryFinally(
+            IEnumerable<Statement> tryStatements, IEnumerable<Statement> finallyStatements) =>
+            new TryStatement(tryStatements, finallyStatements);
+        
         #endregion
     }
 }
+ 
