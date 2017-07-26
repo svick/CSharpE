@@ -26,6 +26,10 @@ namespace CSharpE.Syntax
         
         public Project(IEnumerable<SourceFile> sourceFiles) => SourceFiles = sourceFiles.ToList();
 
+        public Project(params SourceFile[] sourceFiles)
+            : this(sourceFiles.AsEnumerable())
+        { }
+
         public IEnumerable<TypeDefinition> TypesWithAttribute<T>() where T : Attribute
         {
             foreach (var sourceFile in SourceFiles)
