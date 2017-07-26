@@ -11,7 +11,7 @@ namespace CSharpE.Syntax
         public MemberAccessExpression(FieldDefinition fieldDefinition)
         {
             if (fieldDefinition.Modifiers.Contains(MemberModifiers.Static))
-                Receiver = fieldDefinition.ContaingingType;
+                Receiver = fieldDefinition.ContainingType;
             else
                 Receiver = This();
 

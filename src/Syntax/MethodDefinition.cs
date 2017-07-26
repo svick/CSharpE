@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Syntax
@@ -97,7 +98,16 @@ namespace CSharpE.Syntax
 
         public TypeReference ReturnType { get; set; }
 
+        private MethodDeclarationSyntax syntax;
+        
         private List<Statement> body;
+
+        public MethodDefinition(MethodDeclarationSyntax syntax, TypeDefinition containingType)
+        {
+            this.syntax = syntax;
+            ContainingType = containingType;
+        }
+
         public IList<Statement> Body
         {
             get => body;

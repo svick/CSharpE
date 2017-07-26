@@ -1,13 +1,22 @@
 ﻿using System;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Syntax
 {
     public class FieldDefinition : MemberDefinition
     {
-        private FieldDeclarationSyntax syntax;
+        private const MemberModifiers ValidFieldModifiers =
+            AccessModifiersMask | New | Static | Unsafe | Const | ReadOnly | Volatile;
 
-        protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
+        protected override void ValidateModifiers(MemberModifiers value)
+        {
+            var invalidModifiers = value & ~ValidFieldModifiers;
+            if (invalidModifiers != 0)
+                throw new ArgumentException(nameof(value), $"The modifiers {invalidModifiers} are not valid for a field.");
+        }
+
+        private FieldDeclarationSyntax syntax;
 
         public TypeReference Type { get; set; }
         
@@ -15,12 +24,10 @@ namespace CSharpE.Syntax
 
         public Expression Initializer { get; set; }
 
-        public TypeDefinition ContaingingType { get; internal set; }
-
-        internal FieldDefinition(FieldDeclarationSyntax syntax, TypeDefinition containgingType)
+        internal FieldDefinition(FieldDeclarationSyntax syntax, TypeDefinition containingType)
         {
             this.syntax = syntax;
-            ContaingingType = containgingType;
+            ContainingType = containingType;
         }
 
         public FieldDefinition(MemberModifiers modifiers, TypeReference type, string name, Expression initializer)
