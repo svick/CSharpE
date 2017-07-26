@@ -48,7 +48,7 @@ class C
 
             var transformation = new ActorTransformation();
             
-            Assert.Equal(ProcessSingleFile(input, transformation), expectedOutput);
+            Assert.Equal(ProcessSingleFile(input, transformation, typeof(ActorAttribute)), expectedOutput);
         }
     }
 }

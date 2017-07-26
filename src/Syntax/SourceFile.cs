@@ -17,15 +17,15 @@ namespace CSharpE.Syntax
         internal CSharpSyntaxTree Tree { get; }
 
         public string GetText() => Tree.ToString();
-        
-        internal Project Project { get; set; }
+
+        public Project Project { get; internal set; }
 
         private SemanticModel semanticModel;
         internal SemanticModel SemanticModel
         {
             get
             {
-                if (semanticModel != null)
+                if (semanticModel == null)
                     semanticModel = Project.Compilation.GetSemanticModel(Tree);
                 
                 return semanticModel;
@@ -42,7 +42,7 @@ namespace CSharpE.Syntax
             {
                 if (types == null)
                     types = Tree.GetCompilationUnitRoot()
-                        .DescendantNodes(node => node is NamespaceDeclarationSyntax)
+                        .DescendantNodes(node => node is CompilationUnitSyntax || node is NamespaceDeclarationSyntax)
                         .OfType<TypeDeclarationSyntax>()
                         .Select(tds => new TypeDefinition(tds, this))
                         .ToList();

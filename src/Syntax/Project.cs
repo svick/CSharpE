@@ -7,7 +7,12 @@ namespace CSharpE.Syntax
 {
     public class Project
     {
+        // TODO
+        private static readonly Reference[] DefaultReferences = { new AssemblyReference(typeof(object)) };
+        
         public IList<SourceFile> SourceFiles { get; }
+        
+        public IList<Reference> References { get; }
 
         private CSharpCompilation compilation;
         
@@ -16,18 +21,39 @@ namespace CSharpE.Syntax
             get
             {
                 if (compilation == null)
-                    compilation = CSharpCompilation.Create(null, SourceFiles.Select(file => file.Tree));
-                
+                    compilation = CSharpCompilation.Create(
+                        null, SourceFiles.Select(file => file.Tree), References.Select(r => r.GetMetadataReference()));
+
                 return compilation;
             }
         }
 
-        public Project() => SourceFiles = new List<SourceFile>();
-        
-        public Project(IEnumerable<SourceFile> sourceFiles) => SourceFiles = sourceFiles.ToList();
+        public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<Reference> additionalReferences)
+        {
+            SourceFiles = sourceFiles.ToList();
+
+            foreach (var sourceFile in SourceFiles)
+            {
+                sourceFile.Project = this;
+            }
+
+            References = DefaultReferences.Concat(additionalReferences).ToList();
+        }
+
+        public Project(IEnumerable<SourceFile> sourceFiles)
+            : this(sourceFiles, Array.Empty<Reference>())
+        { }
+
+        public Project()
+            : this(Array.Empty<SourceFile>())
+        { }
 
         public Project(params SourceFile[] sourceFiles)
             : this(sourceFiles.AsEnumerable())
+        { }
+
+        public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<Type> additionalReferencesRepresentatives)
+            : this(sourceFiles, additionalReferencesRepresentatives.Select(t => new AssemblyReference(t)))
         { }
 
         public IEnumerable<TypeDefinition> TypesWithAttribute<T>() where T : Attribute
