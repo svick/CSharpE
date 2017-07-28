@@ -3,9 +3,9 @@ using System.Linq;
 using CSharpE.Syntax;
 using CSharpE.Transform;
 
-namespace Actor.Tests
+namespace TestUtilities
 {
-    static class TestUtils
+    public static class TestUtils
     {
         public static string ProcessSingleFile(string code, ITransformation transformation, params Type[] additionalReferencesRepresentatives)
         {

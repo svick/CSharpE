@@ -1,6 +1,6 @@
 using CSharpE.Extensions.Actor;
 using Xunit;
-using static Actor.Tests.TestUtils;
+using static TestUtilities.TestUtils;
 
 namespace Actor.Tests
 {

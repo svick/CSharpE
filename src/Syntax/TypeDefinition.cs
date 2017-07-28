@@ -86,13 +86,17 @@ namespace CSharpE.Syntax
             return false;
         }
 
-        public FieldDefinition Field(MemberModifiers modifiers, TypeReference type, string name, Expression initializer)
+        public FieldDefinition AddField(
+            MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null)
         {
             var field = new FieldDefinition(modifiers, type, name, initializer);
             this.Members.Add(field);
             return field;
         }
-        
+
+        public FieldDefinition AddField(TypeReference type, string name, Expression initializer = null) =>
+            AddField(MemberModifiers.None, type, name, initializer);
+
         public static implicit operator IdentifierExpression(TypeDefinition typeDefinition) => new IdentifierExpression(typeDefinition.Name);
     }
 }

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.5</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Syntax\Syntax.csproj" />
+    <ProjectReference Include="..\..\src\Transform\Transform.csproj" />
+  </ItemGroup>
+
+</Project>
