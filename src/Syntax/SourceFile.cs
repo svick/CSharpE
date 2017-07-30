@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace CSharpE.Syntax
 {
-    public class SourceFile
+    public class SourceFile : ITypeContainer
     {
         public string Path { get; }
 
@@ -50,6 +50,29 @@ namespace CSharpE.Syntax
                 return types;
             }
             set => types = value.ToList();
+        }
+
+        IEnumerable<TypeDefinition> ITypeContainer.Types => Types;
+
+        public IEnumerable<TypeDefinition> AllTypes
+        {
+            get
+            {
+                IEnumerable<TypeDefinition> AllNestedTypes(ITypeContainer container)
+                {
+                    foreach (var directType in container.Types)
+                    {
+                        yield return directType;
+                        
+                        foreach (var indirectType in AllNestedTypes(directType))
+                        {
+                            yield return indirectType;
+                        }
+                    }
+                }
+
+                return AllNestedTypes(this);
+            }
         }
 
         private SourceFile(string path, SyntaxTree syntaxTree)

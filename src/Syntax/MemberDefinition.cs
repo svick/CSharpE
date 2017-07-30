@@ -1,9 +1,10 @@
 using System;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
-    public abstract class MemberDefinition
+    public abstract class MemberDefinition : ISyntaxWrapper<MemberDeclarationSyntax>
     {
         private MemberModifiers modifiers;
         public MemberModifiers Modifiers
@@ -32,5 +33,13 @@ namespace CSharpE.Syntax
                     throw new NotImplementedException();
             }
         }
+
+        protected abstract MemberDeclarationSyntax GetSyntaxImpl();
+        
+        public MemberDeclarationSyntax GetSyntax() => GetSyntaxImpl();
+
+        protected abstract MemberDeclarationSyntax GetChangedSyntaxOrNullImpl();
+        
+        public MemberDeclarationSyntax GetChangedSyntaxOrNull() => GetChangedSyntaxOrNullImpl();
     }
 }

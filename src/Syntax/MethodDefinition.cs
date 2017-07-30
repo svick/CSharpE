@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Syntax
 {
-    public class MethodDefinition : MemberDefinition
+    public class MethodDefinition : MemberDefinition, ISyntaxWrapper<MethodDeclarationSyntax>
     {
         #region Modifiers
 
@@ -113,5 +114,14 @@ namespace CSharpE.Syntax
             get => body;
             set => body = value.ToList();
         }
+
+        public new MethodDeclarationSyntax GetSyntax() => throw new NotImplementedException();
+
+        public new MethodDeclarationSyntax GetChangedSyntaxOrNull() => throw new NotImplementedException();
+
+        protected override MemberDeclarationSyntax GetSyntaxImpl() => GetSyntax();
+
+        protected override MemberDeclarationSyntax GetChangedSyntaxOrNullImpl() => GetChangedSyntaxOrNull();
+
     }
 }

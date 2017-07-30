@@ -1,19 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using CSharpE.Core;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class TypeDefinition
+    public class TypeDefinition : MemberDefinition, ISyntaxWrapper<TypeDeclarationSyntax>, ITypeContainer
     {
-        private TypeDeclarationSyntax syntax;
+        private readonly SyntaxNodeWrapperHelper<TypeDefinition, TypeDeclarationSyntax> wrapperHelper;
+        
+        private TypeDeclarationSyntax syntaxNode;
         private SourceFile containingFile;
         
         internal TypeDefinition(TypeDeclarationSyntax typeDeclarationSyntax, SourceFile containingFile)
         {
-            syntax = typeDeclarationSyntax;
+            wrapperHelper = new SyntaxNodeWrapperHelper<TypeDefinition, TypeDeclarationSyntax>();
+            
+            syntaxNode = typeDeclarationSyntax;
             this.containingFile = containingFile;
         }
 
@@ -23,20 +29,21 @@ namespace CSharpE.Syntax
             get
             {
                 if (name == null)
-                    name = syntax.Identifier.ValueText;
+                    name = syntaxNode.Identifier.ValueText;
                 
                 return name;
             }
-            set => name = value;
+            set => wrapperHelper.SetField(ref name, value);
         }
 
-        private List<MemberDefinition> members;
-        private List<MemberDefinition> MembersList
+        private SyntaxListWrapper<MemberDefinition, MemberDeclarationSyntax> members;
+
+        private SyntaxListWrapper<MemberDefinition, MemberDeclarationSyntax> MembersList
         {
             get
             {
                 if (members == null)
-                    members = syntax.Members.Select(mds => MemberDefinition.Create(mds, this)).ToList();
+                    members = syntaxNode.Members.Select(mds => MemberDefinition.Create(mds, this)).ToWrapperList<MemberDefinition, MemberDeclarationSyntax>();
 
                 return members;
             }
@@ -45,7 +52,7 @@ namespace CSharpE.Syntax
         public IList<MemberDefinition> Members
         {
             get => MembersList;
-            set => members = value.ToList();
+            set => members = value.ToWrapperList<MemberDefinition, MemberDeclarationSyntax>();
         }
 
         public IList<MethodDefinition> Methods
@@ -60,13 +67,21 @@ namespace CSharpE.Syntax
             set => FilteredList.Set(MembersList, method => method.IsPublic, value);
         }
 
+        public IList<TypeDefinition> Types
+        {
+            get => FilteredList.Create<MemberDefinition, TypeDefinition>(MembersList);
+            set => FilteredList.Set(MembersList, value);
+        }
+
+        IEnumerable<TypeDefinition> ITypeContainer.Types => Types;
+
         public bool HasAttribute<T>() => HasAttribute(typeof(T));
 
         public bool HasAttribute(TypeReference attributeType) => HasAttribute(attributeType.FullName);
         
         private bool HasAttribute(string attributeTypeFullName)
         {
-            var attributeLists = syntax.AttributeLists;
+            var attributeLists = syntaxNode.AttributeLists;
             
             if (!attributeLists.Any())
                 return false;
@@ -98,5 +113,35 @@ namespace CSharpE.Syntax
             AddField(MemberModifiers.None, type, name, initializer);
 
         public static implicit operator IdentifierExpression(TypeDefinition typeDefinition) => new IdentifierExpression(typeDefinition.Name);
+
+        // TODO: modifiers stuff
+        protected override void ValidateModifiers(MemberModifiers modifiers) => throw new System.NotImplementedException();
+
+        private static readonly Func<TypeDefinition, TypeDeclarationSyntax> SyntaxNodeGenerator = self =>
+        {
+            var members = self.members == null
+                ? self.syntaxNode.Members
+                : CSharpSyntaxFactory.List(self.members.Select(m => m.GetSyntax()));
+
+            return CSharpSyntaxFactory.ClassDeclaration(self.Name).WithMembers(members);
+        };
+
+        public new TypeDeclarationSyntax GetSyntax() => wrapperHelper.GetSyntaxNode(ref syntaxNode, this, SyntaxNodeGenerator);
+
+        public new TypeDeclarationSyntax GetChangedSyntaxOrNull()
+        {
+            var members = this.members?.GetChangedSyntaxOrNull();
+
+            if (members == null && !wrapperHelper.Changed)
+                return syntaxNode;
+            
+            wrapperHelper.ResetChanged();
+
+            return CSharpSyntaxFactory.ClassDeclaration(Name).WithMembers(members ?? syntaxNode.Members);
+        }
+
+        protected override MemberDeclarationSyntax GetSyntaxImpl() => GetSyntax();
+        
+        protected override MemberDeclarationSyntax GetChangedSyntaxOrNullImpl() => GetChangedSyntaxOrNull();
     }
 }

@@ -3,29 +3,29 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CSharpE.Core
+namespace CSharpE.Syntax.Internals
 {
     public static class FilteredList
     {
-        public static IList<TTarget> Create<TSource, TTarget>(List<TSource> sourceList)
+        public static IList<TTarget> Create<TSource, TTarget>(IList<TSource> sourceList)
             where TTarget : TSource
         {
             return new FilteredList<TSource, TTarget>(sourceList);
         }
 
-        public static IList<TTarget> Create<TSource, TTarget>(List<TSource> sourceList, Func<TTarget, bool> filter)
+        public static IList<TTarget> Create<TSource, TTarget>(IList<TSource> sourceList, Func<TTarget, bool> filter)
             where TTarget : TSource
         {
             return new FilteredList<TSource, TTarget>(sourceList, filter);
         }
 
-        public static IList<T> Create<T>(List<T> sourceList, Func<T, bool> filter)
+        public static IList<T> Create<T>(IList<T> sourceList, Func<T, bool> filter)
         {
             return new FilteredList<T, T>(sourceList, filter);
         }
 
         public static void Set<TSource, TTarget>(
-            List<TSource> sourceList, Func<TTarget, bool> filter, IList<TTarget> values)
+            IList<TSource> sourceList, Func<TTarget, bool> filter, IList<TTarget> values)
             where TTarget : TSource
         {
             var filteredList = Create(sourceList, filter);
@@ -33,7 +33,7 @@ namespace CSharpE.Core
             sourceList.AddRange((IEnumerable<TSource>)values);
         }
 
-        public static void Set<TSource, TTarget>(List<TSource> sourceList, IList<TTarget> values)
+        public static void Set<TSource, TTarget>(IList<TSource> sourceList, IList<TTarget> values)
             where TTarget : TSource
         {
             Set(sourceList, null, values);
@@ -43,10 +43,10 @@ namespace CSharpE.Core
     // Note: this type is currently mostly not optimized for perf.
     class FilteredList<TSource, TTarget> : IList<TTarget> where TTarget : TSource
     {
-        private readonly List<TSource> sourceList;
+        private readonly IList<TSource> sourceList;
         private readonly Func<TTarget, bool> filter;
 
-        public FilteredList(List<TSource> sourceList, Func<TTarget, bool> filter = null)
+        public FilteredList(IList<TSource> sourceList, Func<TTarget, bool> filter = null)
         {
             this.sourceList = sourceList;
             this.filter = filter;
@@ -57,7 +57,7 @@ namespace CSharpE.Core
             IEnumerable<TTarget> enumerable;
 
             if (typeof(TSource) == typeof(TTarget))
-                enumerable = (IEnumerable<TTarget>)sourceList;
+                enumerable = (IEnumerable<TTarget>)(object)sourceList;
             else
                 enumerable = sourceList.OfType<TTarget>();
 
@@ -92,7 +92,7 @@ namespace CSharpE.Core
                 else
                     predicate = item => item is TTarget castedItem && filter(castedItem);
             }
-
+            
             sourceList.RemoveAll(predicate);
         }
 

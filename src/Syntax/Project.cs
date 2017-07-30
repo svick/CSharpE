@@ -78,5 +78,16 @@ namespace CSharpE.Syntax
                 }
             }
         }
+
+        public IEnumerable<TypeDefinition> AllTypes()
+        {
+            foreach (var sourceFile in SourceFiles)
+            {
+                foreach (var type in sourceFile.AllTypes)
+                {
+                    yield return type;
+                }
+            }
+        }
     }
 }

@@ -1,10 +1,11 @@
 ﻿using System;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Syntax
 {
-    public class FieldDefinition : MemberDefinition
+    public class FieldDefinition : MemberDefinition, ISyntaxWrapper<FieldDeclarationSyntax>
     {
         private const MemberModifiers ValidFieldModifiers =
             AccessModifiersMask | New | Static | Unsafe | Const | ReadOnly | Volatile;
@@ -40,5 +41,13 @@ namespace CSharpE.Syntax
         
         public static implicit operator MemberAccessExpression(FieldDefinition fieldDefinition) =>
             new MemberAccessExpression(fieldDefinition);
+
+        public new FieldDeclarationSyntax GetSyntax() => throw new NotImplementedException();
+
+        public new FieldDeclarationSyntax GetChangedSyntaxOrNull() => throw new NotImplementedException();
+
+        protected override MemberDeclarationSyntax GetSyntaxImpl() => GetSyntax();
+
+        protected override MemberDeclarationSyntax GetChangedSyntaxOrNullImpl() => GetChangedSyntaxOrNull();
     }
 }
