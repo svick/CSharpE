@@ -119,25 +119,25 @@ namespace CSharpE.Syntax
 
         private static readonly Func<TypeDefinition, TypeDeclarationSyntax> SyntaxNodeGenerator = self =>
         {
-            var members = self.members == null
+            var membersSyntax = self.members == null
                 ? self.syntaxNode.Members
                 : CSharpSyntaxFactory.List(self.members.Select(m => m.GetSyntax()));
 
-            return CSharpSyntaxFactory.ClassDeclaration(self.Name).WithMembers(members);
+            return CSharpSyntaxFactory.ClassDeclaration(self.Name).WithMembers(membersSyntax);
         };
 
         public new TypeDeclarationSyntax GetSyntax() => wrapperHelper.GetSyntaxNode(ref syntaxNode, this, SyntaxNodeGenerator);
 
         public new TypeDeclarationSyntax GetChangedSyntaxOrNull()
         {
-            var members = this.members?.GetChangedSyntaxOrNull();
+            var membersSyntax = members?.GetChangedSyntaxOrNull();
 
-            if (members == null && !wrapperHelper.Changed)
+            if (membersSyntax == null && !wrapperHelper.Changed)
                 return syntaxNode;
             
             wrapperHelper.ResetChanged();
 
-            return CSharpSyntaxFactory.ClassDeclaration(Name).WithMembers(members ?? syntaxNode.Members);
+            return CSharpSyntaxFactory.ClassDeclaration(Name).WithMembers(membersSyntax ?? syntaxNode.Members);
         }
 
         protected override MemberDeclarationSyntax GetSyntaxImpl() => GetSyntax();
