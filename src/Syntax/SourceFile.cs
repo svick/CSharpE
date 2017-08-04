@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class SourceFile : ITypeContainer
+    public class SourceFile : ISyntaxWrapper<CSharpSyntaxTree>, ITypeContainer
     {
+        private readonly SyntaxNodeWrapperHelper<SourceFile, CSharpSyntaxTree> wrapperHelper =
+            new SyntaxNodeWrapperHelper<SourceFile, CSharpSyntaxTree>();
+
         public string Path { get; }
 
-        internal CSharpSyntaxTree Tree { get; }
+        private CSharpSyntaxTree tree;
+        internal CSharpSyntaxTree Tree => tree;
 
         public string GetText() => Tree.ToString();
 
@@ -32,10 +38,7 @@ namespace CSharpE.Syntax
             }
         }
 
-        public bool IsModified => throw new NotImplementedException();
-
-        private List<TypeDefinition> types;
-
+        private List<TypeDefinition> types; // TODO: wrapper list over (string namespace, TypeDeclarationSyntax)
         public IList<TypeDefinition> Types
         {
             get
@@ -78,7 +81,7 @@ namespace CSharpE.Syntax
         private SourceFile(string path, SyntaxTree syntaxTree)
         {
             Path = path;
-            Tree = (CSharpSyntaxTree)syntaxTree;
+            tree = (CSharpSyntaxTree)syntaxTree;
         }
 
         public SourceFile(string path, string text)
@@ -96,5 +99,53 @@ namespace CSharpE.Syntax
                 return new SourceFile(path, syntaxTree);
             }
         }
+
+        private static readonly Func<SourceFile, CSharpSyntaxTree> TreeGenerator = self =>
+        {
+            var namespaces = new List<MemberDeclarationSyntax>();
+
+            string lastNamespace = null;
+        };
+
+        public CSharpSyntaxTree GetSyntax() => wrapperHelper.GetSyntaxNode(ref tree, this, TreeGenerator);
+
+        public CSharpSyntaxTree GetChangedSyntaxOrNull()
+        {
+            throw new NotImplementedException();
+        }
+
+        /*
+         *         private static ClassDeclarationSyntax CreateSyntax(
+            string name, SyntaxList<MemberDeclarationSyntax> membersSyntax) =>
+            CSharpSyntaxFactory.ClassDeclaration(name).WithMembers(membersSyntax);
+
+        private static readonly Func<TypeDefinition, TypeDeclarationSyntax> SyntaxNodeGenerator = self =>
+        {
+            var membersSyntax = self.members == null
+                ? self.syntaxNode.Members
+                : CSharpSyntaxFactory.List(self.members.Select(m => m.GetSyntax()));
+
+            return CreateSyntax(self.Name, membersSyntax);
+        };
+
+        public new TypeDeclarationSyntax GetSyntax() => wrapperHelper.GetSyntaxNode(ref syntaxNode, this, SyntaxNodeGenerator);
+
+        public new TypeDeclarationSyntax GetChangedSyntaxOrNull()
+        {
+            var membersSyntax = members?.GetChangedSyntaxOrNull();
+
+            if (membersSyntax == null && !wrapperHelper.Changed)
+                return syntaxNode;
+            
+            wrapperHelper.ResetChanged();
+
+            return CreateSyntax(Name, membersSyntax ?? syntaxNode.Members);
+        }
+*/
+    }
+
+    public class NamespaceDefinition
+    {
     }
 }
+ 

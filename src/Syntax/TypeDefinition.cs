@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -10,15 +12,14 @@ namespace CSharpE.Syntax
 {
     public class TypeDefinition : MemberDefinition, ISyntaxWrapper<TypeDeclarationSyntax>, ITypeContainer
     {
-        private readonly SyntaxNodeWrapperHelper<TypeDefinition, TypeDeclarationSyntax> wrapperHelper;
+        private readonly SyntaxNodeWrapperHelper<TypeDefinition, TypeDeclarationSyntax> wrapperHelper =
+            new SyntaxNodeWrapperHelper<TypeDefinition, TypeDeclarationSyntax>();
         
         private TypeDeclarationSyntax syntaxNode;
         private SourceFile containingFile;
         
         internal TypeDefinition(TypeDeclarationSyntax typeDeclarationSyntax, SourceFile containingFile)
         {
-            wrapperHelper = new SyntaxNodeWrapperHelper<TypeDefinition, TypeDeclarationSyntax>();
-            
             syntaxNode = typeDeclarationSyntax;
             this.containingFile = containingFile;
         }
@@ -36,14 +37,69 @@ namespace CSharpE.Syntax
             set => wrapperHelper.SetField(ref name, value);
         }
 
-        private SyntaxListWrapper<MemberDefinition, MemberDeclarationSyntax> members;
+        private string ns;
+        public string Namespace
+        {
+            get
+            {
+                if (ns == null)
+                {
+                    string ComputeNamespace(NamespaceDeclarationSyntax namespaceDeclaration)
+                    {
+                        var result = new StringBuilder(namespaceDeclaration.Name.ToString());
 
+                        namespaceDeclaration = (NamespaceDeclarationSyntax)namespaceDeclaration.Parent;
+
+                        while (namespaceDeclaration != null)
+                        {
+                            result.Insert(0, '.');
+                            result.Insert(0, namespaceDeclaration.ToString());
+                        }
+
+                        return result.ToString();
+                    }
+
+                    switch (syntaxNode.Parent)
+                    {
+                        case null:
+                            throw new InvalidOperationException(); // TODO: ???
+                        case CompilationUnitSyntax _:
+                            ns = string.Empty;
+                            break;
+                        case NamespaceDeclarationSyntax nds:
+                            ns = ComputeNamespace(nds);
+                            break;
+                        case TypeDeclarationSyntax _:
+                            throw new NotImplementedException();
+                        default:
+                            throw new InvalidOperationException();
+                    }
+                }
+
+                return ns;
+            }
+            set => wrapperHelper.SetField(ref ns, value);
+        }
+
+        public string FullName
+        {
+            get
+            {
+                if (Namespace == null)
+                    return Name;
+
+                return Namespace + "." + Name;
+            }
+        }
+
+        private SyntaxListWrapper<MemberDefinition, MemberDeclarationSyntax> members;
         private SyntaxListWrapper<MemberDefinition, MemberDeclarationSyntax> MembersList
         {
             get
             {
                 if (members == null)
-                    members = syntaxNode.Members.Select(mds => MemberDefinition.Create(mds, this)).ToWrapperList<MemberDefinition, MemberDeclarationSyntax>();
+                    members = syntaxNode.Members.Select(mds => MemberDefinition.Create(mds, this))
+                        .ToWrapperList<MemberDefinition, MemberDeclarationSyntax>();
 
                 return members;
             }
@@ -117,13 +173,17 @@ namespace CSharpE.Syntax
         // TODO: modifiers stuff
         protected override void ValidateModifiers(MemberModifiers modifiers) => throw new System.NotImplementedException();
 
+        private static ClassDeclarationSyntax CreateSyntax(
+            string name, SyntaxList<MemberDeclarationSyntax> membersSyntax) =>
+            CSharpSyntaxFactory.ClassDeclaration(name).WithMembers(membersSyntax);
+
         private static readonly Func<TypeDefinition, TypeDeclarationSyntax> SyntaxNodeGenerator = self =>
         {
             var membersSyntax = self.members == null
                 ? self.syntaxNode.Members
                 : CSharpSyntaxFactory.List(self.members.Select(m => m.GetSyntax()));
 
-            return CSharpSyntaxFactory.ClassDeclaration(self.Name).WithMembers(membersSyntax);
+            return CreateSyntax(self.Name, membersSyntax);
         };
 
         public new TypeDeclarationSyntax GetSyntax() => wrapperHelper.GetSyntaxNode(ref syntaxNode, this, SyntaxNodeGenerator);
@@ -137,7 +197,7 @@ namespace CSharpE.Syntax
             
             wrapperHelper.ResetChanged();
 
-            return CSharpSyntaxFactory.ClassDeclaration(Name).WithMembers(membersSyntax ?? syntaxNode.Members);
+            return CreateSyntax(Name, membersSyntax ?? syntaxNode.Members);
         }
 
         protected override MemberDeclarationSyntax GetSyntaxImpl() => GetSyntax();
