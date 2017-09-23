@@ -20,9 +20,8 @@ namespace CSharpE.Syntax
         public string Path { get; }
 
         private CSharpSyntaxTree tree;
-        internal CSharpSyntaxTree Tree => tree;
 
-        public string GetText() => Tree.ToString();
+        public string GetText() => GetSyntax().ToString();
 
         public Project Project { get; internal set; }
 
@@ -32,7 +31,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (semanticModel == null)
-                    semanticModel = Project.Compilation.GetSemanticModel(Tree);
+                    semanticModel = Project.Compilation.GetSemanticModel(GetSyntax());
                 
                 return semanticModel;
             }
@@ -44,7 +43,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (types == null)
-                    types = Tree.GetCompilationUnitRoot()
+                    types = tree.GetCompilationUnitRoot()
                         .DescendantNodes(node => node is CompilationUnitSyntax || node is NamespaceDeclarationSyntax)
                         .OfType<TypeDeclarationSyntax>()
                         .Select(tds => new TypeDefinition(tds, this))
@@ -89,6 +88,12 @@ namespace CSharpE.Syntax
         {
         }
 
+        public SourceFile(string path)
+        {
+            Path = path;
+            Types = new List<TypeDefinition>();
+        }
+
         public static async Task<SourceFile> OpenAsync(string path)
         {
             using (var stream = File.OpenRead(path))
@@ -102,9 +107,36 @@ namespace CSharpE.Syntax
 
         private static readonly Func<SourceFile, CSharpSyntaxTree> TreeGenerator = self =>
         {
-            var namespaces = new List<MemberDeclarationSyntax>();
+            var fileMembers = new List<MemberDeclarationSyntax>();
 
-            string lastNamespace = null;
+            string currentNamespace = null;
+            var currentNamespaceTypes = new List<TypeDeclarationSyntax>();
+
+            void FinishCurrentNamespace()
+            {
+                if (currentNamespace == null)
+                    fileMembers.AddRange(currentNamespaceTypes);
+                else
+                    fileMembers.Add(
+                        CSharpSyntaxFactory.NamespaceDeclaration(CSharpSyntaxFactory.ParseName(currentNamespace))
+                            .AddMembers(currentNamespaceTypes.ToArray<MemberDeclarationSyntax>()));
+
+                currentNamespaceTypes.Clear();
+                currentNamespace = null;
+            }
+
+            foreach (var type in self.Types)
+            {
+                if (type.Namespace != currentNamespace)
+                    FinishCurrentNamespace();
+
+                currentNamespace = type.Namespace;
+                currentNamespaceTypes.Add(type.GetSyntax());
+            }
+
+            FinishCurrentNamespace();
+
+            return (CSharpSyntaxTree)CSharpSyntaxFactory.SyntaxTree(CSharpSyntaxFactory.CompilationUnit().AddMembers(fileMembers.ToArray()));
         };
 
         public CSharpSyntaxTree GetSyntax() => wrapperHelper.GetSyntaxNode(ref tree, this, TreeGenerator);
@@ -142,6 +174,8 @@ namespace CSharpE.Syntax
             return CreateSyntax(Name, membersSyntax ?? syntaxNode.Members);
         }
 */
+
+        public bool Changed => wrapperHelper.Changed;
     }
 
     public class NamespaceDefinition

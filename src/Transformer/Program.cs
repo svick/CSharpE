@@ -44,7 +44,7 @@ namespace CSharpE.Transformer
 
             foreach (var sourceFile in project.SourceFiles)
             {
-                if (sourceFile.IsModified)
+                if (sourceFile.Changed)
                 {
                     if (Path.GetExtension(sourceFile.Path) != ".cse")
                     {
