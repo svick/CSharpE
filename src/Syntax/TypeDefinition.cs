@@ -10,11 +10,9 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class TypeDefinition : MemberDefinition, ISyntaxWrapper<TypeDeclarationSyntax>, ITypeContainer
+    public class TypeDefinition : MemberDefinition, ITypeContainer
     {
-        private readonly SyntaxNodeWrapperHelper<TypeDefinition, TypeDeclarationSyntax> wrapperHelper =
-            new SyntaxNodeWrapperHelper<TypeDefinition, TypeDeclarationSyntax>();
-        
+        private bool changed;
         private TypeDeclarationSyntax syntaxNode;
         private SourceFile containingFile;
         
@@ -34,7 +32,11 @@ namespace CSharpE.Syntax
                 
                 return name;
             }
-            set => wrapperHelper.SetField(ref name, value);
+            set
+            {
+                changed = true;
+                name = value;
+            }
         }
 
         private string ns;
@@ -78,7 +80,11 @@ namespace CSharpE.Syntax
 
                 return ns;
             }
-            set => wrapperHelper.SetField(ref ns, value);
+            set
+            {
+                changed = true;
+                ns = value;
+            }
         }
 
         public string FullName

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CSharpE.Syntax.Internals
 {
-    static class ListExtensions
+    internal static class ListExtensions
     {
         public static void AddRange<T>(this IList<T> list, IEnumerable<T> collection)
         {

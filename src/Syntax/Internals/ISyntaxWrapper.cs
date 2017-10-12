@@ -1,10 +1,13 @@
-﻿namespace CSharpE.Syntax.Internals
-{
-    internal interface ISyntaxWrapper<out T>
-    {
-        T GetSyntax();
+﻿using Microsoft.CodeAnalysis;
 
-        // should be more efficient that asking for Changed; also resets private changed flag
-        T GetChangedSyntaxOrNull();
+namespace CSharpE.Syntax.Internals
+{
+    /// <remarks>
+    /// Requires that any type that implements <c>ISyntaxWrapper&lt;TSyntax&gt;</c>
+    /// also has a constructor that takes <see cref="TSyntax"/>.
+    /// </remarks>
+    public interface ISyntaxWrapper<TSyntax>
+    {
+        TSyntax GetWrapped();
     }
 }
