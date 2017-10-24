@@ -42,12 +42,11 @@ namespace CSharpE.Syntax
         public static implicit operator MemberAccessExpression(FieldDefinition fieldDefinition) =>
             new MemberAccessExpression(fieldDefinition);
 
-        public new FieldDeclarationSyntax GetSyntax() => throw new NotImplementedException();
+        public new FieldDeclarationSyntax GetWrapped()
+        {
+            throw new NotImplementedException();
+        }
 
-        public new FieldDeclarationSyntax GetChangedSyntaxOrNull() => throw new NotImplementedException();
-
-        protected override MemberDeclarationSyntax GetSyntaxImpl() => GetSyntax();
-
-        protected override MemberDeclarationSyntax GetChangedSyntaxOrNullImpl() => GetChangedSyntaxOrNull();
+        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
     }
 }

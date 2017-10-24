@@ -34,12 +34,8 @@ namespace CSharpE.Syntax
             }
         }
 
-        protected abstract MemberDeclarationSyntax GetSyntaxImpl();
-        
-        public MemberDeclarationSyntax GetSyntax() => GetSyntaxImpl();
+        public MemberDeclarationSyntax GetWrapped() => GetWrappedImpl();
 
-        protected abstract MemberDeclarationSyntax GetChangedSyntaxOrNullImpl();
-        
-        public MemberDeclarationSyntax GetChangedSyntaxOrNull() => GetChangedSyntaxOrNullImpl();
+        protected abstract MemberDeclarationSyntax GetWrappedImpl();
     }
 }
