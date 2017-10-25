@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.CodeAnalysis;
 using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Syntax
@@ -58,6 +59,11 @@ namespace CSharpE.Syntax
                 throw new ArgumentException(nameof(accessModifier));
 
             return (modifiers & ~AccessModifiersMask) | accessModifier;
+        }
+
+        internal static SyntaxTokenList GetWrapped(this MemberModifiers modifiers)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,7 +6,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class TypeReference : ISyntaxWrapper<TypeSyntax>
+    public class TypeReference
     {
         private TypeSyntax syntax;
         private SyntaxContext context;
@@ -61,7 +61,7 @@ namespace CSharpE.Syntax
 
         public static implicit operator TypeReference(Type type) => new TypeReference(type);
 
-        public TypeSyntax GetWrapped()
+        internal TypeSyntax GetWrapped()
         {
             // don't have to do anything if either both are null or both are non-null and equal
             if (syntaxFullName != fullName)

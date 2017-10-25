@@ -37,6 +37,8 @@ namespace CSharpE.Syntax
             }
         }
 
+        internal SyntaxContext Context => new SyntaxContext(SemanticModel);
+
         private List<TypeDefinition> types; // TODO: wrapper list over (string namespace, TypeDeclarationSyntax)
         public IList<TypeDefinition> Types
         {

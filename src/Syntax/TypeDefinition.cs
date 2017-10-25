@@ -22,6 +22,8 @@ namespace CSharpE.Syntax
             this.containingFile = containingFile;
         }
 
+        internal SyntaxContext Context => containingFile.Context;
+
         private string name;
         public string Name
         {

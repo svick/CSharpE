@@ -34,7 +34,7 @@ namespace CSharpE.Syntax
             }
         }
 
-        public MemberDeclarationSyntax GetWrapped() => GetWrappedImpl();
+        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped() => GetWrappedImpl();
 
         protected abstract MemberDeclarationSyntax GetWrappedImpl();
     }
