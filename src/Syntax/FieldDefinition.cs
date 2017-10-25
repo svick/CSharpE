@@ -104,23 +104,18 @@ namespace CSharpE.Syntax
             var newName = name.GetWrapped();
             var newInitializer = initializerSet ? initializer?.GetWrapped() : declarator.Initializer?.Value;
 
-            if (syntax != null)
+            if (syntax == null ||
+                FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || syntax.Declaration.Type != newType ||
+                declarator.Identifier != newName || declarator.Initializer?.Value != newInitializer)
             {
-                if (FromRoslyn.MemberModifiers(syntax.Modifiers) == newModifiers &&
-                    syntax.Declaration.Type == newType && declarator.Identifier == newName &&
-                    declarator.Initializer?.Value == newInitializer)
-                {
-                    return syntax;
-                }
+                var equalsValueClause =
+                    newInitializer == null ? null : CSharpSyntaxFactory.EqualsValueClause(newInitializer);
+
+                syntax = CSharpSyntaxFactory.FieldDeclaration(
+                    default, newModifiers.GetWrapped(), CSharpSyntaxFactory.VariableDeclaration(
+                        newType, CSharpSyntaxFactory.SingletonSeparatedList(
+                            CSharpSyntaxFactory.VariableDeclarator(newName, null, equalsValueClause))));
             }
-
-            var equalsValueClause =
-                newInitializer == null ? null : CSharpSyntaxFactory.EqualsValueClause(newInitializer);
-
-            syntax = CSharpSyntaxFactory.FieldDeclaration(
-                default, newModifiers.GetWrapped(), CSharpSyntaxFactory.VariableDeclaration(
-                    newType, CSharpSyntaxFactory.SingletonSeparatedList(
-                        CSharpSyntaxFactory.VariableDeclarator(newName, null, equalsValueClause))));
 
             return syntax;
         }
