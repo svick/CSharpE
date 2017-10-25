@@ -95,7 +95,7 @@ namespace CSharpE.Syntax
         public static implicit operator MemberAccessExpression(FieldDefinition fieldDefinition) =>
             new MemberAccessExpression(fieldDefinition);
 
-        internal FieldDeclarationSyntax GetWrapped()
+        internal new FieldDeclarationSyntax GetWrapped()
         {
             var declarator = syntax.Declaration.Variables.Single();
 

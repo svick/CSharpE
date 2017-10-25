@@ -100,14 +100,14 @@ namespace CSharpE.Syntax
             }
         }
 
-        private SyntaxListWrapper<MemberDefinition, MemberDeclarationSyntax> members;
-        private SyntaxListWrapper<MemberDefinition, MemberDeclarationSyntax> MembersList
+        private SyntaxList<MemberDefinition, MemberDeclarationSyntax> members;
+        private SyntaxList<MemberDefinition, MemberDeclarationSyntax> MembersList
         {
             get
             {
                 if (members == null)
-                    members = syntaxNode.Members.Select(mds => MemberDefinition.Create(mds, this))
-                        .ToWrapperList<MemberDefinition, MemberDeclarationSyntax>();
+                    members = new SyntaxList<MemberDefinition, MemberDeclarationSyntax>(
+                        syntaxNode.Members, mds => FromRoslyn.MemberDefinition(mds, this));
 
                 return members;
             }
@@ -116,7 +116,7 @@ namespace CSharpE.Syntax
         public IList<MemberDefinition> Members
         {
             get => MembersList;
-            set => members = value.ToWrapperList<MemberDefinition, MemberDeclarationSyntax>();
+            set => members = new SyntaxList<MemberDefinition, MemberDeclarationSyntax>(value);
         }
 
         public IList<MethodDefinition> Methods
@@ -178,8 +178,7 @@ namespace CSharpE.Syntax
 
         public static implicit operator IdentifierExpression(TypeDefinition typeDefinition) => new IdentifierExpression(typeDefinition.Name);
 
-        // TODO: modifiers stuff
-        protected override void ValidateModifiers(MemberModifiers modifiers) => throw new System.NotImplementedException();
+        protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
 
         private static ClassDeclarationSyntax CreateSyntax(
             string name, SyntaxList<MemberDeclarationSyntax> membersSyntax) =>
@@ -189,27 +188,13 @@ namespace CSharpE.Syntax
         {
             var membersSyntax = self.members == null
                 ? self.syntaxNode.Members
-                : CSharpSyntaxFactory.List(self.members.Select(m => m.GetSyntax()));
+                : CSharpSyntaxFactory.List(self.members.Select(m => m.GetWrapped()));
 
             return CreateSyntax(self.Name, membersSyntax);
         };
 
-        public new TypeDeclarationSyntax GetSyntax() => wrapperHelper.GetSyntaxNode(ref syntaxNode, this, SyntaxNodeGenerator);
+        internal new TypeDeclarationSyntax GetWrapped() => throw new NotImplementedException();
 
-        public new TypeDeclarationSyntax GetChangedSyntaxOrNull()
-        {
-            var membersSyntax = members?.GetChangedSyntaxOrNull();
-
-            if (membersSyntax == null && !wrapperHelper.Changed)
-                return syntaxNode;
-            
-            wrapperHelper.ResetChanged();
-
-            return CreateSyntax(Name, membersSyntax ?? syntaxNode.Members);
-        }
-
-        protected override MemberDeclarationSyntax GetSyntaxImpl() => GetSyntax();
-        
-        protected override MemberDeclarationSyntax GetChangedSyntaxOrNullImpl() => GetChangedSyntaxOrNull();
+        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
     }
 }

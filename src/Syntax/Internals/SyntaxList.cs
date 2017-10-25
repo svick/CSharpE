@@ -16,12 +16,17 @@ namespace CSharpE.Syntax.Internals
         // Each item is either TSyntax or TRoslynSyntax. If it's TRoslynSyntax, it's converted to TSyntax when reading.
         private readonly List<object> list;
 
+        private readonly Func<TRoslynSyntax, TSyntax> wrapperFactory;
+
         public SyntaxList() => list = new List<object>();
 
-        public SyntaxList(Roslyn::SyntaxList<TRoslynSyntax> syntaxList)
+        public SyntaxList(IEnumerable<TSyntax> list) => this.list = new List<object>(list);
+
+        public SyntaxList(Roslyn::SyntaxList<TRoslynSyntax> syntaxList, Func<TRoslynSyntax, TSyntax> wrapperFactory = null)
         {
             roslynList = syntaxList;
             list = new List<object>(syntaxList);
+            this.wrapperFactory = wrapperFactory ?? SyntaxWrapper<TSyntax, TRoslynSyntax>.Constructor;
         }
 
         public IEnumerator<TSyntax> GetEnumerator()
@@ -75,7 +80,7 @@ namespace CSharpE.Syntax.Internals
                     return node;
                 }
 
-                node = SyntaxWrapper<TSyntax, TRoslynSyntax>.Create((TRoslynSyntax)value);
+                node = wrapperFactory((TRoslynSyntax)value);
                 list[index] = node;
 
                 return node;

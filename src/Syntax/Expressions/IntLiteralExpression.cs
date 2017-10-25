@@ -1,4 +1,6 @@
-﻿namespace CSharpE.Syntax
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace CSharpE.Syntax
 {
     public class IntLiteralExpression : LiteralExpression
     {
@@ -9,6 +11,11 @@
         public IntLiteralExpression(int value)
         {
             Value = value;
+        }
+
+        internal override ExpressionSyntax GetWrapped()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

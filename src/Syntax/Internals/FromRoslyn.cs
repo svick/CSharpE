@@ -21,5 +21,19 @@ namespace CSharpE.Syntax.Internals
         {
             throw new NotImplementedException();
         }
+
+        public static MemberDefinition MemberDefinition(MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType)
+        {
+            switch (memberDeclarationSyntax)
+            {
+                case FieldDeclarationSyntax fieldDeclarationSyntax:
+                    return new FieldDefinition(fieldDeclarationSyntax, containingType);
+                case MethodDeclarationSyntax methodDeclarationSyntax:
+                    return new MethodDefinition(methodDeclarationSyntax, containingType);
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
     }
 }

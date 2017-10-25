@@ -1,4 +1,5 @@
-﻿using static CSharpE.Syntax.SyntaxFactory;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static CSharpE.Syntax.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
@@ -16,6 +17,11 @@ namespace CSharpE.Syntax
                 Receiver = This();
 
             MemberName = fieldDefinition.Name;
+        }
+
+        internal override ExpressionSyntax GetWrapped()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

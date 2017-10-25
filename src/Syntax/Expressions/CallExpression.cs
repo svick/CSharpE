@@ -1,4 +1,6 @@
-﻿namespace CSharpE.Syntax
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace CSharpE.Syntax
 {
     public class CallExpression : Expression
     {
@@ -11,6 +13,11 @@
             this.receiver = receiver;
             this.methodName = methodName;
             this.arguments = arguments;
+        }
+
+        internal override ExpressionSyntax GetWrapped()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

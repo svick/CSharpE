@@ -16,8 +16,6 @@ namespace CSharpE.Syntax.Internals
             return lambda.Compile();
         }
 
-        private static readonly Func<TSyntax, TSyntaxWrapper> Constructor = CreateConstructor();
-
-        public static TSyntaxWrapper Create(TSyntax wrapped) => Constructor(wrapped);
+        public static Func<TSyntax, TSyntaxWrapper> Constructor { get; } = CreateConstructor();
     }
 }

@@ -12,16 +12,13 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class SourceFile : ISyntaxWrapper<CSharpSyntaxTree>, ITypeContainer
+    public class SourceFile : ITypeContainer
     {
-        private readonly SyntaxNodeWrapperHelper<SourceFile, CSharpSyntaxTree> wrapperHelper =
-            new SyntaxNodeWrapperHelper<SourceFile, CSharpSyntaxTree>();
-
         public string Path { get; }
 
         private CSharpSyntaxTree tree;
 
-        public string GetText() => GetSyntax().ToString();
+        public string GetText() => GetWrapped().ToString();
 
         public Project Project { get; internal set; }
 
@@ -31,7 +28,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (semanticModel == null)
-                    semanticModel = Project.Compilation.GetSemanticModel(GetSyntax());
+                    semanticModel = Project.Compilation.GetSemanticModel(GetWrapped());
                 
                 return semanticModel;
             }
@@ -133,7 +130,7 @@ namespace CSharpE.Syntax
                     FinishCurrentNamespace();
 
                 currentNamespace = type.Namespace;
-                currentNamespaceTypes.Add(type.GetSyntax());
+                currentNamespaceTypes.Add(type.GetWrapped());
             }
 
             FinishCurrentNamespace();
@@ -141,9 +138,7 @@ namespace CSharpE.Syntax
             return (CSharpSyntaxTree)CSharpSyntaxFactory.SyntaxTree(CSharpSyntaxFactory.CompilationUnit().AddMembers(fileMembers.ToArray()));
         };
 
-        public CSharpSyntaxTree GetSyntax() => wrapperHelper.GetSyntaxNode(ref tree, this, TreeGenerator);
-
-        public CSharpSyntaxTree GetChangedSyntaxOrNull()
+        public CSharpSyntaxTree GetWrapped()
         {
             throw new NotImplementedException();
         }
@@ -176,8 +171,6 @@ namespace CSharpE.Syntax
             return CreateSyntax(Name, membersSyntax ?? syntaxNode.Members);
         }
 */
-
-        public bool Changed => wrapperHelper.Changed;
     }
 
     public class NamespaceDefinition

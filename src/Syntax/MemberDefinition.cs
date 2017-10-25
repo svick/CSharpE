@@ -1,4 +1,3 @@
-using System;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -21,20 +20,9 @@ namespace CSharpE.Syntax
 
         public TypeDefinition ContainingType { get; internal set; }
 
-        public static MemberDefinition Create(MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType)
-        {
-            switch (memberDeclarationSyntax)
-            {
-                case FieldDeclarationSyntax fieldDeclarationSyntax:
-                    return new FieldDefinition(fieldDeclarationSyntax, containingType);
-                case MethodDeclarationSyntax methodDeclarationSyntax:
-                    return new MethodDefinition(methodDeclarationSyntax, containingType);
-                default:
-                    throw new NotImplementedException();
-            }
-        }
+        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped() => GetWrapped();
 
-        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped() => GetWrappedImpl();
+        internal MemberDeclarationSyntax GetWrapped() => GetWrappedImpl();
 
         protected abstract MemberDeclarationSyntax GetWrappedImpl();
     }

@@ -1,4 +1,6 @@
-﻿namespace CSharpE.Syntax
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace CSharpE.Syntax
 {
     public class NewExpression : Expression
     {
@@ -9,6 +11,11 @@
         {
             this.type = type;
             this.arguments = arguments;
+        }
+
+        internal override ExpressionSyntax GetWrapped()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
