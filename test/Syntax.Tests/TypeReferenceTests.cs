@@ -9,7 +9,7 @@ namespace CSharpE.Syntax.Tests
         [Fact]
         public void SimpleTypeCtor()
         {
-            var typeReference = new TypeReference(typeof(Array));
+            var typeReference = new NamedTypeReference(typeof(Array));
             
             Assert.Equal("System.Array", typeReference.FullName);
             Assert.Empty(typeReference.TypeParameters);
@@ -18,19 +18,19 @@ namespace CSharpE.Syntax.Tests
         [Fact]
         public void ClosedGenericTypeCtor()
         {
-            var typeReference = new TypeReference(typeof(List<int>));
+            var typeReference = new NamedTypeReference(typeof(List<int>));
 
-            Assert.Equal("System.Collections.Generic.List`1", typeReference.FullName);
-            Assert.Equal(1, typeReference.TypeParameters.Length);
-            Assert.Equal("System.Int32", typeReference.TypeParameters[0].FullName);
+            Assert.Equal("System.Collections.Generic.List", typeReference.FullName);
+            Assert.Equal(1, typeReference.TypeParameters.Count);
+            Assert.Equal("System.Int32", typeReference.TypeParameters[0].ToString());
         }
 
         [Fact]
         public void OpenGenericTypeCtor()
         {
-            var typeReference = new TypeReference(typeof(List<>));
+            var typeReference = new NamedTypeReference(typeof(List<>));
 
-            Assert.Equal("System.Collections.Generic.List`1", typeReference.FullName);
+            Assert.Equal("System.Collections.Generic.List", typeReference.FullName);
             Assert.Empty(typeReference.TypeParameters);
         }
     }

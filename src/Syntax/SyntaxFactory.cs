@@ -9,8 +9,8 @@ namespace CSharpE.Syntax
 
         public static TypeReference TypeReference(Type type) => type;
 
-        public static TypeReference TypeReference(TypeReference openGenericType, params TypeReference[] typeParameters) =>
-            new TypeReference(openGenericType, typeParameters);
+        public static NamedTypeReference TypeReference(NamedTypeReference openGenericType, params TypeReference[] typeParameters) =>
+            new NamedTypeReference(openGenericType.FullName, typeParameters);
 
         #endregion
 

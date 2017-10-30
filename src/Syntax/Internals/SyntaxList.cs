@@ -6,23 +6,24 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
 {
-    internal class SyntaxList<TSyntax, TRoslynSyntax> : IList<TSyntax>, ISyntaxWrapper<Roslyn::SyntaxList<TRoslynSyntax>>
+    internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : IList<TSyntax>, ISyntaxWrapper<TList>
         where TSyntax : class, ISyntaxWrapper<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
+        where TList : struct, IReadOnlyList<TRoslynSyntax>
     {
         // Preserved version of Roslyn SyntaxList used to avoid unnecessary reallocations. Could be out of date.
-        private Roslyn::SyntaxList<TRoslynSyntax> roslynList;
+        private TList roslynList;
 
         // Each item is either TSyntax or TRoslynSyntax. If it's TRoslynSyntax, it's converted to TSyntax when reading.
         private readonly List<object> list;
 
         private readonly Func<TRoslynSyntax, TSyntax> wrapperFactory;
 
-        public SyntaxList() => list = new List<object>();
+        public SyntaxListBase() => list = new List<object>();
 
-        public SyntaxList(IEnumerable<TSyntax> list) => this.list = new List<object>(list);
+        public SyntaxListBase(IEnumerable<TSyntax> list) => this.list = new List<object>(list);
 
-        public SyntaxList(Roslyn::SyntaxList<TRoslynSyntax> syntaxList, Func<TRoslynSyntax, TSyntax> wrapperFactory = null)
+        public SyntaxListBase(TList syntaxList, Func<TRoslynSyntax, TSyntax> wrapperFactory = null)
         {
             roslynList = syntaxList;
             list = new List<object>(syntaxList);
@@ -97,7 +98,9 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
-        public Roslyn::SyntaxList<TRoslynSyntax> GetWrapped()
+        protected abstract TList CreateList(List<TRoslynSyntax> nodes);
+
+        public TList GetWrapped()
         {
             var roslynNodes = new List<TRoslynSyntax>(Count);
 
@@ -115,9 +118,43 @@ namespace CSharpE.Syntax.Internals
             }
 
             if (changed)
-                roslynList = CSharpSyntaxFactory.List(roslynNodes);
+                roslynList = CreateList(roslynNodes);
 
             return roslynList;
         }
+    }
+
+    internal sealed class SyntaxList<TSyntax, TRoslynSyntax>
+        : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SyntaxList<TRoslynSyntax>>
+        where TSyntax : class, ISyntaxWrapper<TRoslynSyntax>
+        where TRoslynSyntax : Roslyn::SyntaxNode
+    {
+        public SyntaxList() : base() { }
+
+        public SyntaxList(IEnumerable<TSyntax> list) : base(list) { }
+
+        public SyntaxList(
+            Roslyn::SyntaxList<TRoslynSyntax> syntaxList, Func<TRoslynSyntax, TSyntax> wrapperFactory = null)
+            : base(syntaxList, wrapperFactory) { }
+
+        protected override Roslyn::SyntaxList<TRoslynSyntax> CreateList(List<TRoslynSyntax> nodes) =>
+            CSharpSyntaxFactory.List(nodes);
+    }
+
+    internal sealed class SeparatedSyntaxList<TSyntax, TRoslynSyntax>
+        : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SeparatedSyntaxList<TRoslynSyntax>>
+        where TSyntax : class, ISyntaxWrapper<TRoslynSyntax>
+        where TRoslynSyntax : Roslyn::SyntaxNode
+    {
+        public SeparatedSyntaxList() : base() { }
+
+        public SeparatedSyntaxList(IEnumerable<TSyntax> list) : base(list) { }
+
+        public SeparatedSyntaxList(
+            Roslyn::SeparatedSyntaxList<TRoslynSyntax> syntaxList, Func<TRoslynSyntax, TSyntax> wrapperFactory = null)
+            : base(syntaxList, wrapperFactory) { }
+
+        protected override Roslyn::SeparatedSyntaxList<TRoslynSyntax> CreateList(List<TRoslynSyntax> nodes) =>
+            CSharpSyntaxFactory.SeparatedList(nodes);
     }
 }

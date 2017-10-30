@@ -141,7 +141,7 @@ namespace CSharpE.Syntax
 
         public bool HasAttribute<T>() => HasAttribute(typeof(T));
 
-        public bool HasAttribute(TypeReference attributeType) => HasAttribute(attributeType.FullName);
+        public bool HasAttribute(NamedTypeReference attributeType) => HasAttribute(attributeType.FullName);
         
         private bool HasAttribute(string attributeTypeFullName)
         {

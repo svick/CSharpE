@@ -22,7 +22,7 @@ namespace CSharpE.Syntax
             {
                 if (compilation == null)
                     compilation = CSharpCompilation.Create(
-                        null, SourceFiles.Select(file => file.GetSyntax()), References.Select(r => r.GetMetadataReference()));
+                        null, SourceFiles.Select(file => file.GetWrapped()), References.Select(r => r.GetMetadataReference()));
 
                 return compilation;
             }

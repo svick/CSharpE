@@ -1,3 +1,9 @@
+- split `TypeReference.FullName` into `Namespace` and `Name`
+- `CollectNamespaces(HashSet<string>)`
+  - or `GetWrapped(SyntaxContext)`?
+
+---
+
 - make writing flags enums easier
   - use it for `MemberModifiers`
 - consider creating code from "template" lambda or local function  
