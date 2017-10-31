@@ -11,6 +11,8 @@ namespace CSharpE.Syntax
         private static readonly Reference[] DefaultReferences = { new AssemblyReference(typeof(object)) };
         
         public IList<SourceFile> SourceFiles { get; }
+
+        protected virtual IEnumerable<SourceFile> ActualSourceFiles => SourceFiles;
         
         public IList<Reference> References { get; }
 
@@ -22,7 +24,7 @@ namespace CSharpE.Syntax
             {
                 if (compilation == null)
                     compilation = CSharpCompilation.Create(
-                        null, SourceFiles.Select(file => file.GetWrapped()), References.Select(r => r.GetMetadataReference()));
+                        null, ActualSourceFiles.Select(file => file.GetWrapped()), References.Select(r => r.GetMetadataReference()));
 
                 return compilation;
             }
@@ -37,7 +39,7 @@ namespace CSharpE.Syntax
                 sourceFile.Project = this;
             }
 
-            References = DefaultReferences.Concat(additionalReferences).ToList();
+            References = DefaultReferences.Union(additionalReferences).ToList();
         }
 
         public Project(IEnumerable<SourceFile> sourceFiles)

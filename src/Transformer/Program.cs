@@ -33,7 +33,7 @@ namespace CSharpE.Transformer
 
             var inputFiles = await Task.WhenAll(inputFilePaths.Select(SourceFile.OpenAsync));
 
-            var project = new Project(inputFiles);
+            var project = new TransformProject(inputFiles);
 
             foreach (var transformationType in transformationTypes)
             {
@@ -44,16 +44,7 @@ namespace CSharpE.Transformer
 
             foreach (var sourceFile in project.SourceFiles)
             {
-                if (sourceFile.Changed)
-                {
-                    if (Path.GetExtension(sourceFile.Path) != ".cse")
-                    {
-                        // TODO: Either should not be possible, or should throw earlier to identify which transformation it was
-                        Console.WriteLine($"Error: Input file '{sourceFile.Path}' with extension other than .cse modified by transformation.");
-                    }
-                    
-                    File.WriteAllText(Path.ChangeExtension(sourceFile.Path, "g.cs"), sourceFile.GetText());
-                }
+                File.WriteAllText(Path.ChangeExtension(sourceFile.Path, "g.cs"), sourceFile.GetText());
             }
         }
 
