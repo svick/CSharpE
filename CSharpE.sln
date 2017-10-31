@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26724.1
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{771C9402-C471-49C0-8BDE-4EBFA32B789A}"
 EndProject
@@ -20,12 +20,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Syntax.Tests", "test\Syntax
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E9B66C54-909F-404A-AC68-4437143295CC}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		global.json = global.json
+		LICENSE = LICENSE
 		TODO.md = TODO.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Actor.Tests", "test\Actor.Tests\Actor.Tests.csproj", "{3335C7DF-DA67-4963-85AC-896DBBAC9DEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transform.Tests", "test\Transform.Tests\Transform.Tests.csproj", "{C3849BA5-F511-4083-B7AD-068502BDFA47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transform.Tests", "test\Transform.Tests\Transform.Tests.csproj", "{C3849BA5-F511-4083-B7AD-068502BDFA47}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestUtilities", "test\TestUtilities\TestUtilities.csproj", "{F5E0644E-D7F0-40FB-BE70-DEFA3AC2E94E}"
 EndProject
