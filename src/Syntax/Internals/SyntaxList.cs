@@ -73,7 +73,7 @@ namespace CSharpE.Syntax.Internals
         {
             get
             {
-                if (index <= Count)
+                if (index >= Count)
                     throw new IndexOutOfRangeException();
 
                 var value = list[index];

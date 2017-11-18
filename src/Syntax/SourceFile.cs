@@ -130,73 +130,21 @@ namespace CSharpE.Syntax
             }
         }
 
-        private static readonly Func<SourceFile, CSharpSyntaxTree> TreeGenerator = self =>
-        {
-            var fileMembers = new List<MemberDeclarationSyntax>();
-
-            string currentNamespace = null;
-            var currentNamespaceTypes = new List<TypeDeclarationSyntax>();
-
-            void FinishCurrentNamespace()
-            {
-                if (currentNamespace == null)
-                    fileMembers.AddRange(currentNamespaceTypes);
-                else
-                    fileMembers.Add(
-                        CSharpSyntaxFactory.NamespaceDeclaration(CSharpSyntaxFactory.ParseName(currentNamespace))
-                            .AddMembers(currentNamespaceTypes.ToArray<MemberDeclarationSyntax>()));
-
-                currentNamespaceTypes.Clear();
-                currentNamespace = null;
-            }
-
-            foreach (var type in self.Types)
-            {
-                if (type.Namespace != currentNamespace)
-                    FinishCurrentNamespace();
-
-                currentNamespace = type.Namespace;
-                currentNamespaceTypes.Add(type.GetWrapped());
-            }
-
-            FinishCurrentNamespace();
-
-            return (CSharpSyntaxTree)CSharpSyntaxFactory.SyntaxTree(CSharpSyntaxFactory.CompilationUnit().AddMembers(fileMembers.ToArray()));
-        };
-
         public CSharpSyntaxTree GetWrapped()
         {
-            throw new NotImplementedException();
+            var newMembers = members.GetWrapped();
+
+            if (tree == null || tree.GetCompilationUnitRoot().Members != newMembers)
+            {
+                tree = (CSharpSyntaxTree)CSharpSyntaxFactory.SyntaxTree(
+                    CSharpSyntaxFactory.CompilationUnit(
+                        CSharpSyntaxFactory.List<ExternAliasDirectiveSyntax>(),
+                        CSharpSyntaxFactory.List<UsingDirectiveSyntax>(),
+                        CSharpSyntaxFactory.List<AttributeListSyntax>(), newMembers));
+            }
+
+            return tree;
         }
-
-        /*
-         *         private static ClassDeclarationSyntax CreateSyntax(
-            string name, SyntaxList<MemberDeclarationSyntax> membersSyntax) =>
-            CSharpSyntaxFactory.ClassDeclaration(name).WithMembers(membersSyntax);
-
-        private static readonly Func<TypeDefinition, TypeDeclarationSyntax> SyntaxNodeGenerator = self =>
-        {
-            var membersSyntax = self.members == null
-                ? self.syntaxNode.Members
-                : CSharpSyntaxFactory.List(self.members.Select(m => m.GetSyntax()));
-
-            return CreateSyntax(self.Name, membersSyntax);
-        };
-
-        public new TypeDeclarationSyntax GetSyntax() => wrapperHelper.GetSyntaxNode(ref syntaxNode, this, SyntaxNodeGenerator);
-
-        public new TypeDeclarationSyntax GetChangedSyntaxOrNull()
-        {
-            var membersSyntax = members?.GetChangedSyntaxOrNull();
-
-            if (membersSyntax == null && !wrapperHelper.Changed)
-                return syntaxNode;
-            
-            wrapperHelper.ResetChanged();
-
-            return CreateSyntax(Name, membersSyntax ?? syntaxNode.Members);
-        }
-*/
     }
 }
  
