@@ -1,6 +1,10 @@
 ﻿using System;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using static CSharpE.Syntax.MemberModifiers;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
+using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
@@ -61,9 +65,35 @@ namespace CSharpE.Syntax
             return (modifiers & ~AccessModifiersMask) | accessModifier;
         }
 
+        internal static readonly BiDirectionalDictionary<MemberModifiers, SyntaxKind> ModifiersMapping =
+            new BiDirectionalDictionary<MemberModifiers, SyntaxKind>
+            {
+                { Public, PublicKeyword },
+                { Protected, ProtectedKeyword },
+                { Internal, InternalKeyword },
+                { Private, PrivateKeyword },
+                { New, NewKeyword },
+                { Static, StaticKeyword },
+                { Unsafe, UnsafeKeyword },
+                { Abstract, AbstractKeyword },
+                { Sealed, SealedKeyword },
+                { Virtual, VirtualKeyword },
+                { Override, OverrideKeyword },
+                { Extern, ExternKeyword },
+                { Const, ConstKeyword },
+                { ReadOnly, ReadOnlyKeyword },
+                { Volatile, VolatileKeyword },
+                { Partial, PartialKeyword },
+                { Async, AsyncKeyword }
+            };
+
         internal static SyntaxTokenList GetWrapped(this MemberModifiers modifiers)
         {
-            throw new NotImplementedException();
+            var tokens = ModifiersMapping
+                .Where((modifier, _) => modifiers.Contains(modifier))
+                .Select((_, syntaxKind) => CSharpSyntaxFactory.Token(syntaxKind));
+
+            return CSharpSyntaxFactory.TokenList(tokens);
         }
     }
 }
