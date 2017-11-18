@@ -36,21 +36,47 @@ namespace CSharpE.Syntax
 
         internal SyntaxContext Context => new SyntaxContext(SemanticModel);
 
-        private List<TypeDefinition> types; // TODO: wrapper list over (string namespace, TypeDeclarationSyntax)
-        public IList<TypeDefinition> Types
+        private SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax> members;
+
+        public IList<NamespaceOrTypeDefinition> Members
         {
             get
             {
-                if (types == null)
-                    types = tree.GetCompilationUnitRoot()
-                        .DescendantNodes(node => node is CompilationUnitSyntax || node is NamespaceDeclarationSyntax)
-                        .OfType<TypeDeclarationSyntax>()
-                        .Select(tds => new TypeDefinition(tds, this))
-                        .ToList();
-                
-                return types;
+                if (members == null)
+                    members = new SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax>(
+                        tree.GetCompilationUnitRoot().Members, mds =>
+                        {
+                            switch (mds)
+                            {
+                                case NamespaceDeclarationSyntax ns: return new NamespaceDefinition(ns);
+                                case TypeDeclarationSyntax type: return new TypeDefinition(type, this);
+                                default: throw new InvalidOperationException();
+                            }
+                        });
+
+                return members;
             }
-            set => types = value.ToList();
+        }
+
+        // TODO: virtual list
+        public IEnumerable<TypeDefinition> Types  
+        {
+            get
+            {
+                IEnumerable<TypeDefinition> GetTypes(NamespaceOrTypeDefinition container)
+                {
+                    if (container.IsNamespace)
+                    {
+                        return container.GetNamespaceDefinition().Members.SelectMany(GetTypes);
+                    }
+                    else
+                    {
+                        return new[] { container.GetTypeDefinition() };
+                    }
+                }
+
+                return Members.SelectMany(GetTypes);
+            }
         }
 
         IEnumerable<TypeDefinition> ITypeContainer.Types => Types;
@@ -59,20 +85,20 @@ namespace CSharpE.Syntax
         {
             get
             {
-                IEnumerable<TypeDefinition> AllNestedTypes(ITypeContainer container)
+                IEnumerable<TypeDefinition> GetAllTypes(ITypeContainer container)
                 {
                     foreach (var directType in container.Types)
                     {
                         yield return directType;
                         
-                        foreach (var indirectType in AllNestedTypes(directType))
+                        foreach (var indirectType in GetAllTypes(directType))
                         {
                             yield return indirectType;
                         }
                     }
                 }
 
-                return AllNestedTypes(this);
+                return GetAllTypes(this);
             }
         }
 
@@ -90,7 +116,7 @@ namespace CSharpE.Syntax
         public SourceFile(string path)
         {
             Path = path;
-            Types = new List<TypeDefinition>();
+            members = new SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax>();
         }
 
         public static async Task<SourceFile> OpenAsync(string path)
@@ -171,10 +197,6 @@ namespace CSharpE.Syntax
             return CreateSyntax(Name, membersSyntax ?? syntaxNode.Members);
         }
 */
-    }
-
-    public class NamespaceDefinition
-    {
     }
 }
  

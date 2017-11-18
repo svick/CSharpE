@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Roslyn = Microsoft.CodeAnalysis;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
 {
     internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : IList<TSyntax>, ISyntaxWrapper<TList>
-        where TSyntax : class, ISyntaxWrapper<TRoslynSyntax>
+        where TSyntax : ISyntaxWrapper<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
         where TList : struct, IReadOnlyList<TRoslynSyntax>
     {
@@ -21,7 +22,7 @@ namespace CSharpE.Syntax.Internals
 
         public SyntaxListBase() => list = new List<object>();
 
-        public SyntaxListBase(IEnumerable<TSyntax> list) => this.list = new List<object>(list);
+        public SyntaxListBase(IEnumerable<TSyntax> list) => this.list = new List<object>(list.Cast<object>());
 
         public SyntaxListBase(TList syntaxList, Func<TRoslynSyntax, TSyntax> wrapperFactory = null)
         {
@@ -126,7 +127,7 @@ namespace CSharpE.Syntax.Internals
 
     internal sealed class SyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SyntaxList<TRoslynSyntax>>
-        where TSyntax : class, ISyntaxWrapper<TRoslynSyntax>
+        where TSyntax : ISyntaxWrapper<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
     {
         public SyntaxList() : base() { }
@@ -143,7 +144,7 @@ namespace CSharpE.Syntax.Internals
 
     internal sealed class SeparatedSyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SeparatedSyntaxList<TRoslynSyntax>>
-        where TSyntax : class, ISyntaxWrapper<TRoslynSyntax>
+        where TSyntax : ISyntaxWrapper<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
     {
         public SeparatedSyntaxList() : base() { }
