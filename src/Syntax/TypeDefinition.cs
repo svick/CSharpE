@@ -12,13 +12,12 @@ namespace CSharpE.Syntax
 {
     public class TypeDefinition : MemberDefinition, ITypeContainer
     {
-        private bool changed;
-        private TypeDeclarationSyntax syntaxNode;
+        private TypeDeclarationSyntax syntax;
         private SourceFile containingFile;
         
         internal TypeDefinition(TypeDeclarationSyntax typeDeclarationSyntax, SourceFile containingFile)
         {
-            syntaxNode = typeDeclarationSyntax;
+            syntax = typeDeclarationSyntax;
             this.containingFile = containingFile;
         }
 
@@ -30,74 +29,11 @@ namespace CSharpE.Syntax
             get
             {
                 if (name == null)
-                    name = syntaxNode.Identifier.ValueText;
+                    name = syntax.Identifier.ValueText;
                 
                 return name;
             }
-            set
-            {
-                changed = true;
-                name = value;
-            }
-        }
-
-        private string ns;
-        public string Namespace
-        {
-            get
-            {
-                if (ns == null)
-                {
-                    string ComputeNamespace(NamespaceDeclarationSyntax namespaceDeclaration)
-                    {
-                        var result = new StringBuilder(namespaceDeclaration.Name.ToString());
-
-                        namespaceDeclaration = (NamespaceDeclarationSyntax)namespaceDeclaration.Parent;
-
-                        while (namespaceDeclaration != null)
-                        {
-                            result.Insert(0, '.');
-                            result.Insert(0, namespaceDeclaration.ToString());
-                        }
-
-                        return result.ToString();
-                    }
-
-                    switch (syntaxNode.Parent)
-                    {
-                        case null:
-                            throw new InvalidOperationException(); // TODO: ???
-                        case CompilationUnitSyntax _:
-                            ns = string.Empty;
-                            break;
-                        case NamespaceDeclarationSyntax nds:
-                            ns = ComputeNamespace(nds);
-                            break;
-                        case TypeDeclarationSyntax _:
-                            throw new NotImplementedException();
-                        default:
-                            throw new InvalidOperationException();
-                    }
-                }
-
-                return ns;
-            }
-            set
-            {
-                changed = true;
-                ns = value;
-            }
-        }
-
-        public string FullName
-        {
-            get
-            {
-                if (Namespace == null)
-                    return Name;
-
-                return Namespace + "." + Name;
-            }
+            set => name = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         private SyntaxList<MemberDefinition, MemberDeclarationSyntax> members;
@@ -107,7 +43,7 @@ namespace CSharpE.Syntax
             {
                 if (members == null)
                     members = new SyntaxList<MemberDefinition, MemberDeclarationSyntax>(
-                        syntaxNode.Members, mds => FromRoslyn.MemberDefinition(mds, this));
+                        syntax.Members, mds => FromRoslyn.MemberDefinition(mds, this));
 
                 return members;
             }
@@ -145,7 +81,7 @@ namespace CSharpE.Syntax
         
         private bool HasAttribute(string attributeTypeFullName)
         {
-            var attributeLists = syntaxNode.AttributeLists;
+            var attributeLists = syntax.AttributeLists;
             
             if (!attributeLists.Any())
                 return false;
@@ -187,14 +123,22 @@ namespace CSharpE.Syntax
         private static readonly Func<TypeDefinition, TypeDeclarationSyntax> SyntaxNodeGenerator = self =>
         {
             var membersSyntax = self.members == null
-                ? self.syntaxNode.Members
+                ? self.syntax.Members
                 : CSharpSyntaxFactory.List(self.members.Select(m => m.GetWrapped()));
 
             return CreateSyntax(self.Name, membersSyntax);
         };
 
-        internal new TypeDeclarationSyntax GetWrapped() => throw new NotImplementedException();
+        internal new TypeDeclarationSyntax GetWrapped()
+        {
+            var newMembers = members.GetWrapped();
 
-        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
+            if (syntax == null || syntax.Identifier.ValueText != Name || syntax.Members != newMembers)
+            {
+                syntax = CSharpSyntaxFactory.ClassDeclaration(Name).WithMembers(newMembers);
+            }
+
+            return syntax;
+        }        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
     }
 }

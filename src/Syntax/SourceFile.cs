@@ -137,10 +137,7 @@ namespace CSharpE.Syntax
             if (tree == null || tree.GetCompilationUnitRoot().Members != newMembers)
             {
                 tree = (CSharpSyntaxTree)CSharpSyntaxFactory.SyntaxTree(
-                    CSharpSyntaxFactory.CompilationUnit(
-                        CSharpSyntaxFactory.List<ExternAliasDirectiveSyntax>(),
-                        CSharpSyntaxFactory.List<UsingDirectiveSyntax>(),
-                        CSharpSyntaxFactory.List<AttributeListSyntax>(), newMembers));
+                    CSharpSyntaxFactory.CompilationUnit().WithMembers(newMembers));
             }
 
             return tree;
