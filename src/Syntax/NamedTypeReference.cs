@@ -88,16 +88,16 @@ namespace CSharpE.Syntax {
 
         protected override TypeSyntax GetWrappedImpl()
         {
-            var newTypeParameters = typeParameters.GetWrapped();
+            var newTypeParameters = typeParameters?.GetWrapped();
             var oldTypeParameters = (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments;
 
             if (syntax == null ||
                 syntaxFullName != fullName || oldTypeParameters != newTypeParameters)
             {
-                if (newTypeParameters.Any())
+                if (newTypeParameters?.Any() == true)
                 {
                     syntax = CSharpSyntaxFactory.GenericName(
-                        CSharpSyntaxFactory.Identifier(Name), CSharpSyntaxFactory.TypeArgumentList(newTypeParameters));
+                        CSharpSyntaxFactory.Identifier(Name), CSharpSyntaxFactory.TypeArgumentList(newTypeParameters.Value));
                 }
                 else
                 {

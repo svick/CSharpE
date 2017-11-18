@@ -97,12 +97,12 @@ namespace CSharpE.Syntax
 
         internal new FieldDeclarationSyntax GetWrapped()
         {
-            var declarator = syntax.Declaration.Variables.Single();
+            var declarator = syntax?.Declaration.Variables.Single();
 
             var newModifiers = Modifiers;
             var newType = type?.GetWrapped() ?? syntax.Declaration.Type;
             var newName = name.GetWrapped();
-            var newInitializer = initializerSet ? initializer?.GetWrapped() : declarator.Initializer?.Value;
+            var newInitializer = initializerSet ? initializer?.GetWrapped() : declarator?.Initializer?.Value;
 
             if (syntax == null ||
                 FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || syntax.Declaration.Type != newType ||
