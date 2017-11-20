@@ -64,19 +64,23 @@ namespace CSharpE.Syntax {
             if (string.IsNullOrEmpty(fullName))
                 throw new ArgumentException(nameof(fullName));
 
-            FullName = fullName;
+            string StripGenericArity(string name)
+            {
+                var backtickIndex = name.IndexOf('`');
+
+                if (backtickIndex == -1)
+                    return name;
+
+                return name.Substring(0, backtickIndex);
+            }
+
+            FullName = StripGenericArity(fullName);
             this.typeParameters =
                 new SeparatedSyntaxList<TypeReference, TypeSyntax>(typeParameters ?? Array.Empty<TypeReference>());
         }
 
         public NamedTypeReference(Type type)
-        {
-            // type.IsGenericType is not in .Net Standard 1.x
-            if (type.GenericTypeArguments.Any())
-                throw new NotImplementedException();
-
-            FullName = type.FullName;
-        }
+            : this(type.FullName, type.GenericTypeArguments.Select(a => (TypeReference)a)) { }
 
         internal NamedTypeReference(TypeSyntax syntax, SyntaxContext context)
         {

@@ -115,22 +115,9 @@ namespace CSharpE.Syntax
 
         protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
 
-        private static ClassDeclarationSyntax CreateSyntax(
-            string name, SyntaxList<MemberDeclarationSyntax> membersSyntax) =>
-            CSharpSyntaxFactory.ClassDeclaration(name).WithMembers(membersSyntax);
-
-        private static readonly Func<TypeDefinition, TypeDeclarationSyntax> SyntaxNodeGenerator = self =>
-        {
-            var membersSyntax = self.members == null
-                ? self.syntax.Members
-                : CSharpSyntaxFactory.List(self.members.Select(m => m.GetWrapped()));
-
-            return CreateSyntax(self.Name, membersSyntax);
-        };
-
         internal new TypeDeclarationSyntax GetWrapped()
         {
-            var newMembers = members.GetWrapped();
+            var newMembers = members?.GetWrapped() ?? syntax.Members;
 
             if (syntax == null || syntax.Identifier.ValueText != Name || syntax.Members != newMembers)
             {
