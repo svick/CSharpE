@@ -137,7 +137,7 @@ namespace CSharpE.Syntax
             if (tree == null || tree.GetCompilationUnitRoot().Members != newMembers)
             {
                 tree = (CSharpSyntaxTree)CSharpSyntaxFactory.SyntaxTree(
-                    CSharpSyntaxFactory.CompilationUnit().WithMembers(newMembers));
+                    CSharpSyntaxFactory.CompilationUnit().WithMembers(newMembers).NormalizeWhitespace());
             }
 
             return tree;

@@ -105,7 +105,7 @@ namespace CSharpE.Syntax.Internals
         {
             var roslynNodes = new List<TRoslynSyntax>(Count);
 
-            bool changed = roslynList.Count == list.Count;
+            bool changed = roslynList.Count != list.Count;
 
             for (int i = 0; i < Count; i++)
             {

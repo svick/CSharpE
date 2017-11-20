@@ -21,22 +21,18 @@ namespace Transform.Tests
         [Fact]
         public void AddField()
         {
-            string input = @"
-class C
+            string input = @"class C
 {
-}
-";
+}";
 
-            string expectedOutput = @"
-class C
+            string expectedOutput = @"class C
 {
     int i;
-}
-";
+}";
 
             var transformation = new AddFieldTransformation();
 
-            Assert.Equal(ProcessSingleFile(input, transformation), expectedOutput);
+            Assert.Equal(expectedOutput, ProcessSingleFile(input, transformation));
         }
     }
 }
