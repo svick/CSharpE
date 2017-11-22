@@ -1,11 +1,11 @@
-using CSharpE.Syntax.Internals;
+﻿using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
-    public abstract class Statement : ISyntaxWrapper<StatementSyntax>
+    public class Parameter : ISyntaxWrapper<ParameterSyntax>
     {
-        public StatementSyntax GetWrapped()
+        public ParameterSyntax GetWrapped()
         {
             throw new System.NotImplementedException();
         }
