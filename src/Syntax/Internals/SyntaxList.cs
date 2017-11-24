@@ -22,7 +22,8 @@ namespace CSharpE.Syntax.Internals
 
         public SyntaxListBase() => list = new List<object>();
 
-        public SyntaxListBase(IEnumerable<TSyntax> list) => this.list = new List<object>(list.Cast<object>());
+        public SyntaxListBase(IEnumerable<TSyntax> list) =>
+            this.list = new List<object>(list?.Cast<object>() ?? Enumerable.Empty<object>());
 
         public SyntaxListBase(TList syntaxList, Func<TRoslynSyntax, TSyntax> wrapperFactory = null)
         {

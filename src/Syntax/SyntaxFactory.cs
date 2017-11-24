@@ -16,8 +16,8 @@ namespace CSharpE.Syntax
 
         #region Expressions
 
-        public static CallExpression Call(Expression receiver, string methodName, params Expression[] arguments) =>
-            new CallExpression(receiver, methodName, arguments);
+        public static InvocationExpression Call(Expression receiver, string methodName, params Expression[] arguments) =>
+            new InvocationExpression(new MemberAccessExpression(receiver, methodName), arguments);
 
         public static NewExpression New(TypeReference type, params Expression[] arguments) => new NewExpression(type, arguments);
 

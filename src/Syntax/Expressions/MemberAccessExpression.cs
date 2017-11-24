@@ -8,8 +8,14 @@ namespace CSharpE.Syntax
         public Expression Receiver { get; set; }
         
         public string MemberName { get; set; }
-        
-        public MemberAccessExpression(FieldDefinition fieldDefinition)
+
+        public MemberAccessExpression(Expression receiver, string memberName)
+        {
+            Receiver = receiver;
+            MemberName = memberName;
+        }
+
+        internal MemberAccessExpression(FieldDefinition fieldDefinition)
         {
             if (fieldDefinition.Modifiers.Contains(MemberModifiers.Static))
                 Receiver = fieldDefinition.ContainingType;

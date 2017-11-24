@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
@@ -31,8 +33,8 @@ namespace CSharpE.Syntax
             IEnumerable<Statement> finallyStatements)
         {
             this.tryStatements = tryStatements.ToList();
-            this.catchClauses = catchClauses.ToList();
-            this.finallyStatements = finallyStatements.ToList();
+            this.catchClauses = catchClauses?.ToList();
+            this.finallyStatements = finallyStatements?.ToList();
         }
 
         public TryStatement(IEnumerable<Statement> tryStatements, IEnumerable<CatchClause> catchClauses)
@@ -49,5 +51,12 @@ namespace CSharpE.Syntax
             : this(tryStatements, null, finallyStatements)
         {
         }
+
+        internal new TryStatementSyntax GetWrapped()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override StatementSyntax GetWrappedImpl() => GetWrapped();
     }
 }

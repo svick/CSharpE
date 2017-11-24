@@ -5,9 +5,10 @@ namespace CSharpE.Syntax
 {
     public abstract class Statement : ISyntaxWrapper<StatementSyntax>
     {
-        public StatementSyntax GetWrapped()
-        {
-            throw new System.NotImplementedException();
-        }
+        StatementSyntax ISyntaxWrapper<StatementSyntax>.GetWrapped() => GetWrapped();
+
+        internal StatementSyntax GetWrapped() => GetWrappedImpl();
+
+        protected abstract StatementSyntax GetWrappedImpl();
     }
 }

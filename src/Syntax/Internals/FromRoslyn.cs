@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax.Internals
@@ -17,9 +18,27 @@ namespace CSharpE.Syntax.Internals
             throw new NotImplementedException();
         }
 
+        public static Statement Statement(StatementSyntax syntax)
+        {
+            switch (syntax)
+            {
+                case ReturnStatementSyntax returnStatement:
+                    return new ReturnStatement(syntax);
+            }
+
+            throw new NotImplementedException();
+        }
+
         public static MemberModifiers MemberModifiers(SyntaxTokenList modifiers)
         {
-            throw new NotImplementedException();
+            MemberModifiers result = 0;
+
+            foreach (var modifier in modifiers)
+            {
+                result |= MemberModifiersExtensions.ModifiersMapping[modifier.Kind()];
+            }
+
+            return result;
         }
 
         public static MemberDefinition MemberDefinition(MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType)

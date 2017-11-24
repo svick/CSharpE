@@ -9,9 +9,7 @@ namespace CSharpE.Syntax
 {
     public class MethodDefinition : MemberDefinition
     {
-        private MethodDeclarationSyntax syntax;
-
-        public MethodDefinition(MethodDeclarationSyntax syntax, TypeDefinition containingType)
+        private MethodDeclarationSyntax syntax;        internal MethodDefinition(MethodDeclarationSyntax syntax, TypeDefinition containingType)
         {
             this.syntax = syntax;
             ContainingType = containingType;
@@ -136,7 +134,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (body == null)
-                    body = new SyntaxList<Statement, StatementSyntax>(syntax.Body.Statements);
+                    body = new SyntaxList<Statement, StatementSyntax>(syntax.Body.Statements, FromRoslyn.Statement);
 
                 return body;
             }
@@ -149,7 +147,7 @@ namespace CSharpE.Syntax
             var newModifiers = Modifiers;
             var newReturnType = ReturnType?.GetWrapped() ?? syntax.ReturnType;
             var newName = name.GetWrapped();
-            var newParameters = parameters.GetWrapped();
+            var newParameters = parameters?.GetWrapped() ?? syntax.ParameterList.Parameters;
             var newBody = body?.GetWrapped() ?? syntax.Body.Statements;
 
             if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
