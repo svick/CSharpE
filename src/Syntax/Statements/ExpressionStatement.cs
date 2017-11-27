@@ -7,7 +7,9 @@ namespace CSharpE.Syntax
 {
     public class ExpressionStatement : Statement
     {
-        private ExpressionStatementSyntax syntax;        internal ExpressionStatement(ExpressionStatementSyntax syntax) =>
+        private ExpressionStatementSyntax syntax;
+
+        internal ExpressionStatement(ExpressionStatementSyntax syntax) =>
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
 
         public ExpressionStatement(Expression expression) =>

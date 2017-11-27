@@ -14,14 +14,17 @@ namespace CSharpE.Syntax
         internal InvocationExpression(InvocationExpressionSyntax syntax) =>
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
 
-        public InvocationExpression(Expression expression, IEnumerable<Expression> arguments = null)
-            : this(expression, arguments?.Select(a => (Argument)a)) { }
-
         public InvocationExpression(Expression expression, IEnumerable<Argument> arguments = null)
         {
             Expression = expression;
             this.arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(arguments);
         }
+
+        public InvocationExpression(Expression expression, IEnumerable<Expression> arguments = null)
+            : this(expression, arguments?.Select(a => (Argument)a)) { }
+
+        public InvocationExpression(Expression expression, params Argument[] arguments)
+            : this(expression, (IEnumerable<Argument>)arguments) { }
 
         private Expression expression;
         public Expression Expression
@@ -50,7 +53,16 @@ namespace CSharpE.Syntax
 
         internal override ExpressionSyntax GetWrapped()
         {
-            throw new System.NotImplementedException();
+            var newExpression = expression?.GetWrapped() ?? syntax.Expression;
+            var newArguments = arguments?.GetWrapped() ?? syntax.ArgumentList.Arguments;
+
+            if (syntax == null || newExpression != syntax.Expression || newArguments != syntax.ArgumentList.Arguments)
+            {
+                syntax = CSharpSyntaxFactory.InvocationExpression(
+                    newExpression, CSharpSyntaxFactory.ArgumentList(newArguments));
+            }
+
+            return syntax;
         }
     }
 }

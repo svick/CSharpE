@@ -15,6 +15,12 @@ namespace CSharpE.Syntax.Internals
     {
         public static Expression Expression(ExpressionSyntax syntax)
         {
+            switch (syntax)
+            {
+                case null:
+                    return null;
+            }
+
             throw new NotImplementedException();
         }
 
@@ -22,8 +28,10 @@ namespace CSharpE.Syntax.Internals
         {
             switch (syntax)
             {
+                case null:
+                    return null;
                 case ReturnStatementSyntax returnStatement:
-                    return new ReturnStatement(syntax);
+                    return new ReturnStatement(returnStatement);
             }
 
             throw new NotImplementedException();
