@@ -8,21 +8,20 @@ namespace CSharpE.Syntax.Internals
     {
         private SyntaxToken syntax;
 
-        // text used by syntax, computed lazily
-        private string syntaxText;
-        private string text;
+        internal Identifier(SyntaxToken syntax) : this() => this.syntax = syntax;
 
+        public Identifier(string text) : this()
+        {
+            if (string.IsNullOrEmpty(text))
+                throw new ArgumentException(nameof(text));
+
+            this.text = text;
+        }
+
+        private string text;
         public string Text
         {
-            get
-            {
-                if (syntaxText == null && text == null)
-                {
-                    syntaxText = syntax.ValueText;
-                }
-
-                return text ?? syntaxText;
-            }
+            get => text ?? syntax.ValueText;
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -32,36 +31,16 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
-        public Identifier(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                throw new ArgumentException(nameof(text));
-
-            syntax = default;
-            syntaxText = null;
-
-            this.text = text;
-        }
-
-        internal Identifier(SyntaxToken syntax)
-        {
-            this.syntax = syntax;
-            syntaxText = null;
-
-            text = null;
-        }
-
         public SyntaxToken GetWrapped()
         {
-            // don't have to do anything if either both are null or both are non-null and equal
-            if (syntaxText != text)
+            var newText = text ?? syntax.ValueText;
+
+            if (newText != syntax.ValueText)
             {
                 syntax = CSharpSyntaxFactory.Identifier(text);
-                syntaxText = text;
             }
 
             return syntax;
         }
-
     }
 }

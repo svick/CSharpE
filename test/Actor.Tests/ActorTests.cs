@@ -9,8 +9,7 @@ namespace Actor.Tests
         [Fact]
         public void SimpleActor()
         {
-            string input = @"
-using CSharpE.Extensions.Actor;
+            string input = @"using CSharpE.Extensions.Actor;
 
 [Actor]
 class C
@@ -19,11 +18,9 @@ class C
     {
         return 42;
     }
-}
-";
+}";
             
-            string expectedOutput = @"
-using System.Threading;
+            string expectedOutput = @"using System.Threading;
 using CSharpE.Extensions.Actor;
 
 [Actor]
@@ -43,12 +40,11 @@ class C
             _actor_semaphore.Release();
         }
     }
-}
-";
+}";
 
             var transformation = new ActorTransformation();
             
-            Assert.Equal(ProcessSingleFile(input, transformation, typeof(ActorAttribute)), expectedOutput);
+            Assert.Equal(expectedOutput, ProcessSingleFile(input, transformation, typeof(ActorAttribute)));
         }
     }
 }
