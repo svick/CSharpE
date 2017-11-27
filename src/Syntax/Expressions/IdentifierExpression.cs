@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
@@ -8,7 +9,7 @@ namespace CSharpE.Syntax
 
         public IdentifierExpression(string identifier) => Identifier = identifier;
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(WrapperContext context)
         {
             throw new System.NotImplementedException();
         }

@@ -5,7 +5,7 @@ namespace CSharpE.Syntax
 {
     public class Parameter : ISyntaxWrapper<ParameterSyntax>
     {
-        public ParameterSyntax GetWrapped()
+        public ParameterSyntax GetWrapped(WrapperContext context)
         {
             throw new System.NotImplementedException();
         }

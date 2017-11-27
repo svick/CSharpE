@@ -34,15 +34,15 @@ namespace CSharpE.Syntax
             }
         }
 
-        internal SyntaxContext Context => new SyntaxContext(SemanticModel);
+        internal SyntaxContext SyntaxContext => new SyntaxContext(SemanticModel);
 
         private SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax> members;
-
         public IList<NamespaceOrTypeDefinition> Members
         {
             get
             {
                 if (members == null)
+                {
                     members = new SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax>(
                         tree.GetCompilationUnitRoot().Members, mds =>
                         {
@@ -53,6 +53,7 @@ namespace CSharpE.Syntax
                                 default: throw new InvalidOperationException();
                             }
                         });
+                }
 
                 return members;
             }
@@ -130,9 +131,9 @@ namespace CSharpE.Syntax
             }
         }
 
-        public CSharpSyntaxTree GetWrapped()
+        internal CSharpSyntaxTree GetWrapped()
         {
-            var newMembers = members.GetWrapped();
+            var newMembers = members.GetWrapped(new WrapperContext(this));
 
             if (tree == null || tree.GetCompilationUnitRoot().Members != newMembers)
             {

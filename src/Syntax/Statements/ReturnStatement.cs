@@ -38,9 +38,9 @@ namespace CSharpE.Syntax
         }
 
 
-        internal new ReturnStatementSyntax GetWrapped()
+        internal new ReturnStatementSyntax GetWrapped(WrapperContext context)
         {
-            var newExpression = expressionSet ? expression?.GetWrapped() : syntax.Expression;
+            var newExpression = expressionSet ? expression?.GetWrapped(context) : syntax.Expression;
 
             if (syntax == null || newExpression != syntax.Expression)
             {
@@ -50,6 +50,6 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override StatementSyntax GetWrappedImpl() => GetWrapped();
+        protected override StatementSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
     }
 }

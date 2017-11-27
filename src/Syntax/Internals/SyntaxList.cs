@@ -102,7 +102,7 @@ namespace CSharpE.Syntax.Internals
 
         protected abstract TList CreateList(List<TRoslynSyntax> nodes);
 
-        public TList GetWrapped()
+        public TList GetWrapped(WrapperContext context)
         {
             var roslynNodes = new List<TRoslynSyntax>(Count);
 
@@ -112,7 +112,7 @@ namespace CSharpE.Syntax.Internals
             {
                 var value = list[i];
 
-                var roslynNode = value is TSyntax node ? node.GetWrapped() : (TRoslynSyntax)value;
+                var roslynNode = value is TSyntax node ? node.GetWrapped(context) : (TRoslynSyntax)value;
 
                 roslynNodes.Add(roslynNode);
 

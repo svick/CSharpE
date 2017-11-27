@@ -1,19 +1,18 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax.Internals
 {
-    internal struct SyntaxContext
+    public struct SyntaxContext
     {
         private readonly SemanticModel semanticModel;
 
-        public SyntaxContext(SemanticModel semanticModel)
-        {
-            this.semanticModel = semanticModel;
-        }
+        internal SyntaxContext(SemanticModel semanticModel) => this.semanticModel =
+            semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
 
         // TODO: is this actually correct?
-        public string GetFullName(TypeSyntax typeSyntax) =>
+        internal string GetFullName(TypeSyntax typeSyntax) =>
             semanticModel.GetTypeInfo(typeSyntax).Type.ToDisplayString();
     }
 }

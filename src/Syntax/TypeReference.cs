@@ -8,10 +8,10 @@ namespace CSharpE.Syntax
     {
         public static implicit operator TypeReference(Type type) => new NamedTypeReference(type);
 
-        TypeSyntax ISyntaxWrapper<TypeSyntax>.GetWrapped() => GetWrapped();
+        TypeSyntax ISyntaxWrapper<TypeSyntax>.GetWrapped(WrapperContext context) => GetWrapped(context);
 
-        internal TypeSyntax GetWrapped() => GetWrappedImpl();
+        internal TypeSyntax GetWrapped(WrapperContext context) => GetWrappedImpl(context);
 
-        protected abstract TypeSyntax GetWrappedImpl();
+        protected abstract TypeSyntax GetWrappedImpl(WrapperContext context);
     }
 }

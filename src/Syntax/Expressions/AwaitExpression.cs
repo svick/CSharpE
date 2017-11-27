@@ -30,9 +30,9 @@ namespace CSharpE.Syntax
             set => operand = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(WrapperContext context)
         {
-            var newOperand = operand?.GetWrapped() ?? syntax.Expression;
+            var newOperand = operand?.GetWrapped(context) ?? syntax.Expression;
 
             if (syntax == null || newOperand != syntax.Expression)
             {

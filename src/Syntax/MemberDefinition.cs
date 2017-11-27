@@ -20,10 +20,11 @@ namespace CSharpE.Syntax
 
         public TypeDefinition ContainingType { get; internal set; }
 
-        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped() => GetWrapped();
+        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(WrapperContext context) =>
+            GetWrapped(context);
 
-        internal MemberDeclarationSyntax GetWrapped() => GetWrappedImpl();
+        internal MemberDeclarationSyntax GetWrapped(WrapperContext context) => GetWrappedImpl(context);
 
-        protected abstract MemberDeclarationSyntax GetWrappedImpl();
+        protected abstract MemberDeclarationSyntax GetWrappedImpl(WrapperContext context);
     }
 }

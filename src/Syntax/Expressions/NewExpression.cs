@@ -11,12 +11,12 @@ namespace CSharpE.Syntax
     public class NewExpression : Expression
     {
         private ObjectCreationExpressionSyntax syntax;
-        private SyntaxContext context;
+        private SyntaxContext syntaxContext;
 
-        internal NewExpression(ObjectCreationExpressionSyntax syntax, SyntaxContext context)
+        internal NewExpression(ObjectCreationExpressionSyntax syntax, SyntaxContext syntaxContext)
         {
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
-            this.context = context;
+            this.syntaxContext = syntaxContext;
         }
 
         public NewExpression(TypeReference type, IEnumerable<Argument> arguments)
@@ -38,8 +38,8 @@ namespace CSharpE.Syntax
             {
                 if (type == null)
                 {
-                    type = new NamedTypeReference(syntax.Type, context);
-                    context = default;
+                    type = new NamedTypeReference(syntax.Type, syntaxContext);
+                    syntaxContext = default;
                 }
 
                 return type;
@@ -60,10 +60,10 @@ namespace CSharpE.Syntax
             set => arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(value);
         }
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(WrapperContext context)
         {
-            var newType = type?.GetWrapped() ?? syntax.Type;
-            var newArguments = arguments?.GetWrapped() ?? syntax.ArgumentList.Arguments;
+            var newType = type?.GetWrapped(context) ?? syntax.Type;
+            var newArguments = arguments?.GetWrapped(context) ?? syntax.ArgumentList.Arguments;
 
             if (syntax == null || newType != syntax.Type || newArguments != syntax.ArgumentList.Arguments)
             {

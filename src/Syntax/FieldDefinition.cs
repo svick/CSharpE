@@ -21,7 +21,7 @@ namespace CSharpE.Syntax
 
         private FieldDeclarationSyntax syntax;
 
-        private SyntaxContext Context => ContainingType.Context;
+        private SyntaxContext SyntaxContext => ContainingType.SyntaxContext;
 
         private TypeReference type;
         public TypeReference Type
@@ -29,7 +29,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (type == null)
-                    type = new NamedTypeReference(syntax.Declaration.Type, Context);
+                    type = new NamedTypeReference(syntax.Declaration.Type, SyntaxContext);
 
                 return type;
             }
@@ -95,14 +95,14 @@ namespace CSharpE.Syntax
         public static implicit operator MemberAccessExpression(FieldDefinition fieldDefinition) =>
             new MemberAccessExpression(fieldDefinition);
 
-        internal new FieldDeclarationSyntax GetWrapped()
+        internal new FieldDeclarationSyntax GetWrapped(WrapperContext context)
         {
             var declarator = syntax?.Declaration.Variables.Single();
 
             var newModifiers = Modifiers;
-            var newType = type?.GetWrapped() ?? syntax.Declaration.Type;
-            var newName = name.GetWrapped();
-            var newInitializer = initializerSet ? initializer?.GetWrapped() : declarator?.Initializer?.Value;
+            var newType = type?.GetWrapped(context) ?? syntax.Declaration.Type;
+            var newName = name.GetWrapped(context);
+            var newInitializer = initializerSet ? initializer?.GetWrapped(context) : declarator?.Initializer?.Value;
 
             if (syntax == null ||
                 FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || syntax.Declaration.Type != newType ||
@@ -120,6 +120,6 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
+        protected override MemberDeclarationSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
     }
 }

@@ -5,7 +5,7 @@ namespace CSharpE.Syntax
 {
     public class CatchClause : ISyntaxWrapper<CatchClauseSyntax>
     {
-        public CatchClauseSyntax GetWrapped()
+        public CatchClauseSyntax GetWrapped(WrapperContext context)
         {
             throw new System.NotImplementedException();
         }

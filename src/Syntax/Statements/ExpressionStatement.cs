@@ -28,9 +28,9 @@ namespace CSharpE.Syntax
             set => expression = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        internal new ExpressionStatementSyntax GetWrapped()
+        internal new ExpressionStatementSyntax GetWrapped(WrapperContext context)
         {
-            var newExpression = expression?.GetWrapped() ?? syntax.Expression;
+            var newExpression = expression?.GetWrapped(context) ?? syntax.Expression;
 
             if (syntax == null || newExpression != syntax.Expression)
             {
@@ -40,6 +40,6 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override StatementSyntax GetWrappedImpl() => GetWrapped();
+        protected override StatementSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
     }
 }

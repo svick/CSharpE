@@ -71,11 +71,11 @@ namespace CSharpE.Syntax
             set => finallyStatements = new SyntaxList<Statement, StatementSyntax>(value);
         }
 
-        internal new TryStatementSyntax GetWrapped()
+        internal new TryStatementSyntax GetWrapped(WrapperContext context)
         {
-            var newTryStatements = tryStatements?.GetWrapped() ?? syntax.Block.Statements;
-            var newCatchClauses = catchClauses?.GetWrapped() ?? syntax.Catches;
-            var newFinallyStatements = finallyStatements?.GetWrapped() ?? syntax.Finally?.Block.Statements ?? default;
+            var newTryStatements = tryStatements?.GetWrapped(context) ?? syntax.Block.Statements;
+            var newCatchClauses = catchClauses?.GetWrapped(context) ?? syntax.Catches;
+            var newFinallyStatements = finallyStatements?.GetWrapped(context) ?? syntax.Finally?.Block.Statements ?? default;
 
             if (syntax == null || newTryStatements != syntax.Block.Statements || newCatchClauses != syntax.Catches ||
                 newFinallyStatements != (syntax.Finally?.Block.Statements ?? default))
@@ -91,6 +91,6 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override StatementSyntax GetWrappedImpl() => GetWrapped();
+        protected override StatementSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
     }
 }

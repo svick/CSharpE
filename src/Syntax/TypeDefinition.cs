@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -20,7 +19,7 @@ namespace CSharpE.Syntax
             this.containingFile = containingFile;
         }
 
-        internal SyntaxContext Context => containingFile.Context;
+        internal SyntaxContext SyntaxContext => containingFile.SyntaxContext;
 
         private string name;
         public string Name
@@ -115,9 +114,9 @@ namespace CSharpE.Syntax
 
         protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
 
-        internal new TypeDeclarationSyntax GetWrapped()
+        internal new TypeDeclarationSyntax GetWrapped(WrapperContext context)
         {
-            var newMembers = members?.GetWrapped() ?? syntax.Members;
+            var newMembers = members?.GetWrapped(context) ?? syntax.Members;
 
             if (syntax == null || syntax.Identifier.ValueText != Name || syntax.Members != newMembers)
             {
@@ -125,6 +124,8 @@ namespace CSharpE.Syntax
             }
 
             return syntax;
-        }        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
+        }
+
+        protected override MemberDeclarationSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
     }
 }

@@ -10,7 +10,7 @@ namespace CSharpE.Syntax {
     public class NamedTypeReference : TypeReference
     {
         private TypeSyntax syntax;
-        private SyntaxContext context;
+        private SyntaxContext syntaxContext;
 
         // name used by syntax, computed lazily
         private string syntaxFullName;
@@ -22,8 +22,8 @@ namespace CSharpE.Syntax {
             {
                 if (fullName == null && syntaxFullName == null)
                 {
-                    syntaxFullName = context.GetFullName(syntax);
-                    context = default;
+                    syntaxFullName = syntaxContext.GetFullName(syntax);
+                    syntaxContext = default;
                 }
 
                 return fullName ?? syntaxFullName;
@@ -82,17 +82,17 @@ namespace CSharpE.Syntax {
         public NamedTypeReference(Type type)
             : this(type.FullName, type.GenericTypeArguments.Select(a => (TypeReference)a)) { }
 
-        internal NamedTypeReference(TypeSyntax syntax, SyntaxContext context)
+        internal NamedTypeReference(TypeSyntax syntax, SyntaxContext syntaxContext)
         {
             this.syntax = syntax;
-            this.context = context;
+            this.syntaxContext = syntaxContext;
         }
 
         public static implicit operator NamedTypeReference(Type type) => new NamedTypeReference(type);
 
-        protected override TypeSyntax GetWrappedImpl()
+        protected override TypeSyntax GetWrappedImpl(WrapperContext context)
         {
-            var newTypeParameters = typeParameters?.GetWrapped();
+            var newTypeParameters = typeParameters?.GetWrapped(context);
             var oldTypeParameters = (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments;
 
             if (syntax == null ||

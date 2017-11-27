@@ -10,7 +10,9 @@ namespace CSharpE.Syntax
     // TODO: generics
     public class MemberAccessExpression : Expression
     {
-        private MemberAccessExpressionSyntax syntax;        internal MemberAccessExpression(MemberAccessExpressionSyntax syntax)
+        private MemberAccessExpressionSyntax syntax;
+
+        internal MemberAccessExpression(MemberAccessExpressionSyntax syntax)
         {
             this.syntax = syntax;
 
@@ -53,10 +55,10 @@ namespace CSharpE.Syntax
             set => memberName.Text = value;
         }
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(WrapperContext context)
         {
-            var newExpression = expression?.GetWrapped() ?? syntax.Expression;
-            var newMemberName = memberName.GetWrapped();
+            var newExpression = expression?.GetWrapped(context) ?? syntax.Expression;
+            var newMemberName = memberName.GetWrapped(context);
 
             if (syntax == null || newExpression != syntax.Expression || newMemberName != syntax.Name.Identifier)
             {
