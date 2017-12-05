@@ -20,8 +20,9 @@ class C
     }
 }";
             
-            string expectedOutput = @"using System.Threading;
-using CSharpE.Extensions.Actor;
+            string expectedOutput = @"using CSharpE.Extensions.Actor;
+using System.Threading;
+using System.Threading.Tasks;
 
 [Actor]
 class C

@@ -1,43 +1,175 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace CSharpE.Syntax {
+namespace CSharpE.Syntax
+{
     public class NamedTypeReference : TypeReference
     {
         private TypeSyntax syntax;
         private SyntaxContext syntaxContext;
 
-        // name used by syntax, computed lazily
-        private string syntaxFullName;
-        private string fullName;
+        public NamedTypeReference(string ns, string name, params TypeReference[] typeParameters)
+            : this(ns, name, typeParameters.AsEnumerable()) { }
 
-        public string FullName
+        public NamedTypeReference(string ns, NamedTypeReference container, string name, IEnumerable<TypeReference> typeParameters = null)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Value cannot be null or empty.", nameof(name));
+
+            this.ns = ns;
+            this.container= container;
+            this.name = name;
+            this.typeParameters =
+                new SeparatedSyntaxList<TypeReference, TypeSyntax>(typeParameters ?? Array.Empty<TypeReference>());
+            isKnownType = true;
+        }
+
+        public NamedTypeReference(string ns, string name, IEnumerable<TypeReference> typeParameters = null)
+            : this(ns, null, name, typeParameters) { }
+
+        private static string StripGenericArity(string name)
+        {
+            var backtickIndex = name.IndexOf('`');
+
+            if (backtickIndex == -1)
+                return name;
+
+            return name.Substring(0, backtickIndex);
+        }
+
+        public NamedTypeReference(Type type)
+            : this(
+                type.Namespace, type.DeclaringType, StripGenericArity(type.Name),
+                type.GenericTypeArguments.Select(a => (TypeReference)a)) { }
+
+        internal NamedTypeReference(TypeSyntax syntax, SyntaxContext syntaxContext)
+        {
+            this.syntax = syntax;
+            this.syntaxContext = syntaxContext;
+        }
+
+        private NamedTypeReference(INamedTypeSymbol symbol)
+        {
+            Resolve(symbol);
+        }
+
+        private void Resolve()
+        {
+            if (isKnownType != null)
+                return;
+
+            // PERF: don't need semantics for PredefinedTypeSyntax 
+
+            var symbol = syntaxContext.Resolve(syntax);
+
+            Resolve(symbol);
+
+            syntaxContext = default;
+        }
+
+        private void Resolve(INamedTypeSymbol symbol)
+        {
+            if (symbol.TypeKind == TypeKind.Error)
+            {
+                container = syntax is QualifiedNameSyntax qualifiedName
+                    ? new NamedTypeReference(qualifiedName.Left, syntaxContext)
+                    : null;
+                syntaxName = symbol.Name;
+                isKnownType = false;
+            }
+            else
+            {
+                syntaxNamespace = symbol.ContainingNamespace?.ToDisplayString();
+                container = symbol.ContainingType == null ? null : new NamedTypeReference(symbol.ContainingType);
+                syntaxName = symbol.Name;
+                isKnownType = true;
+            }
+
+            syntaxContainer = container?.GetWrapped(null);
+        }
+
+        private bool? isKnownType;
+        /// <summary>
+        /// Indicates whether this is a known type.
+        /// A known type has <see cref="Namespace"/>, <see cref="Container"/> (its containing type),
+        /// <see cref="Name"/> and <see cref="TypeParameters"/>.
+        /// An unknown type has <see cref="Container"/> (its containing type or namespace),
+        /// <see cref="Name"/> and <see cref="TypeParameters"/>.
+        /// </summary>
+        private bool IsKnownType
         {
             get
             {
-                if (fullName == null && syntaxFullName == null)
-                {
-                    syntaxFullName = syntaxContext.GetFullName(syntax);
-                    syntaxContext = default;
-                }
+                Resolve();
 
-                return fullName ?? syntaxFullName;
-            }
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                    throw new ArgumentException(nameof(value));
-
-                fullName = value;
+                return isKnownType.Value;
             }
         }
 
-        public string Name => FullName.Split('.').Last();
+        private string syntaxNamespace;
+        private string ns;
+        public string Namespace
+        {
+            get
+            {
+                Resolve();
+
+                return ns ?? syntaxNamespace;
+            }
+            set
+            {
+                Resolve();
+
+                if (isKnownType == false)
+                    throw new InvalidOperationException();
+
+                ns = value;
+            }
+        }
+
+        private TypeSyntax syntaxContainer;
+        private NamedTypeReference container;
+        public NamedTypeReference Container
+        {
+            get
+            {
+                Resolve();
+
+                return container;
+            }
+            set
+            {
+                Resolve();
+
+                container = value;
+            }
+        }
+
+        private string syntaxName;
+        private string name;
+        public string Name
+        {
+            get
+            {
+                // PERF: it should be possible to get name without semantics
+                Resolve();
+
+                return name ?? syntaxName;
+            }
+            set
+            {
+                Resolve();
+
+                name = value;
+            }
+        }
 
         private SeparatedSyntaxList<TypeReference, TypeSyntax> typeParameters;
         public IList<TypeReference> TypeParameters
@@ -46,9 +178,11 @@ namespace CSharpE.Syntax {
             {
                 if (typeParameters == null)
                 {
-                    typeParameters = syntax is GenericNameSyntax genericSyntax
-                        ? new SeparatedSyntaxList<TypeReference, TypeSyntax>(genericSyntax.TypeArgumentList.Arguments)
-                        : new SeparatedSyntaxList<TypeReference, TypeSyntax>();
+                    var genericSyntax = syntax as GenericNameSyntax;
+
+                    typeParameters = new SeparatedSyntaxList<TypeReference, TypeSyntax>(
+                        genericSyntax?.TypeArgumentList.Arguments ?? default,
+                        typeSyntax => FromRoslyn.TypeReference(typeSyntax, syntaxContext));
                 }
 
                 return typeParameters;
@@ -56,68 +190,107 @@ namespace CSharpE.Syntax {
             set => typeParameters = new SeparatedSyntaxList<TypeReference, TypeSyntax>(value);
         }
 
-        public NamedTypeReference(string fullName, TypeReference[] typeParameters)
-            : this(fullName, typeParameters.AsEnumerable()) { }
-
-        public NamedTypeReference(string fullName, IEnumerable<TypeReference> typeParameters)
+        internal override StringBuilder ComputeFullName(StringBuilder stringBuilder)
         {
-            if (string.IsNullOrEmpty(fullName))
-                throw new ArgumentException(nameof(fullName));
-
-            string StripGenericArity(string name)
+            if (Namespace != null)
             {
-                var backtickIndex = name.IndexOf('`');
-
-                if (backtickIndex == -1)
-                    return name;
-
-                return name.Substring(0, backtickIndex);
+                stringBuilder.Append(Namespace);
+                stringBuilder.Append('.');
             }
 
-            FullName = StripGenericArity(fullName);
-            this.typeParameters =
-                new SeparatedSyntaxList<TypeReference, TypeSyntax>(typeParameters ?? Array.Empty<TypeReference>());
+            if (Container != null)
+            {
+                Container.ComputeFullName(stringBuilder);
+                stringBuilder.Append('.');
+            }
+
+            stringBuilder.Append(Name);
+
+            if (TypeParameters.Any())
+            {
+                stringBuilder.Append('<');
+
+                bool first = true;
+
+                foreach (var typeParameter in TypeParameters)
+                {
+                    if (!first)
+                        stringBuilder.Append(", ");
+
+                    typeParameter.ComputeFullName(stringBuilder);
+
+                    first = false;
+                }
+
+                stringBuilder.Append('>');
+            }
+
+            return stringBuilder;
         }
 
-        public NamedTypeReference(Type type)
-            : this(type.FullName, type.GenericTypeArguments.Select(a => (TypeReference)a)) { }
+        public string FullName => ComputeFullName(new StringBuilder()).ToString();
 
-        internal NamedTypeReference(TypeSyntax syntax, SyntaxContext syntaxContext)
-        {
-            this.syntax = syntax;
-            this.syntaxContext = syntaxContext;
-        }
+        public bool RequiresUsingNamespace => IsKnownType && Namespace != null && !IsPredefinedType;
 
-        public static implicit operator NamedTypeReference(Type type) => new NamedTypeReference(type);
+        public static implicit operator NamedTypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 
         protected override TypeSyntax GetWrappedImpl(WrapperContext context)
         {
-            var newTypeParameters = typeParameters?.GetWrapped(context);
-            var oldTypeParameters = (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments;
+            var newTypeParameters = typeParameters?.GetWrapped(context) ?? default;
+            var oldTypeParameters = (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
 
-            if (syntax == null ||
-                syntaxFullName != fullName || oldTypeParameters != newTypeParameters)
+            // if Resolve() wasn't called, only type parameters could have been changed
+            if (isKnownType == null && newTypeParameters == oldTypeParameters)
+                return syntax;
+
+            var newNamespace = ns ?? syntaxNamespace;
+            var newContainer = container?.GetWrapped(context);
+            var newName = name ?? syntaxName;
+
+            if (syntax == null || newNamespace != syntaxNamespace || newContainer != syntaxContainer ||
+                newName != syntaxName || newTypeParameters != oldTypeParameters)
             {
-                if (newTypeParameters?.Any() == true)
+                if (RequiresUsingNamespace)
+                    context?.EnsureUsingNamespace(Namespace);
+
+                var predefinedType = GetPredefinedType();
+                if (predefinedType != null)
                 {
-                    syntax = CSharpSyntaxFactory.GenericName(
-                        CSharpSyntaxFactory.Identifier(Name), CSharpSyntaxFactory.TypeArgumentList(newTypeParameters.Value));
+                    syntax = predefinedType;
                 }
                 else
                 {
-                    syntax = (TypeSyntax)GetPredefinedType(fullName) ?? CSharpSyntaxFactory.IdentifierName(Name);
+                    SimpleNameSyntax simpleName;
+                    if (newTypeParameters.Any())
+                    {
+                        simpleName = CSharpSyntaxFactory.GenericName(
+                            CSharpSyntaxFactory.Identifier(Name),
+                            CSharpSyntaxFactory.TypeArgumentList(newTypeParameters));
+                    }
+                    else
+                    {
+                        simpleName = CSharpSyntaxFactory.IdentifierName(Name);
+                    }
+
+                    if (newContainer == null)
+                        syntax = simpleName;
+                    else
+                        syntax = CSharpSyntaxFactory.QualifiedName((NameSyntax)newContainer, simpleName);
                 }
 
-                syntaxFullName = fullName;
-                context = default;
+                syntaxNamespace = newNamespace;
+                syntaxContainer = newContainer;
+                syntaxName = newName;
             }
 
             return syntax;
         }
 
-        private PredefinedTypeSyntax GetPredefinedType(string name)
+        private bool IsPredefinedType => GetPredefinedSyntaxKind() != SyntaxKind.None;
+
+        private PredefinedTypeSyntax GetPredefinedType()
         {
-            var kind = GetPredefinedSyntaxKind(name);
+            var kind = GetPredefinedSyntaxKind();
 
             if (kind == SyntaxKind.None)
                 return null;
@@ -125,41 +298,44 @@ namespace CSharpE.Syntax {
             return CSharpSyntaxFactory.PredefinedType(CSharpSyntaxFactory.Token(kind));
         }
 
-        private SyntaxKind GetPredefinedSyntaxKind(string name)
+        private SyntaxKind GetPredefinedSyntaxKind()
         {
-            switch (name)
+            if (Namespace != nameof(System) || Container != null || TypeParameters.Any())
+                return SyntaxKind.None;
+
+            switch (Name)
             {
-                case "System.Boolean":
+                case nameof(Boolean):
                     return SyntaxKind.BoolKeyword;
-                case "System.Byte":
+                case nameof(Byte):
                     return SyntaxKind.ByteKeyword;
-                case "System.SByte":
+                case nameof(SByte):
                     return SyntaxKind.SByteKeyword;
-                case "System.Int32":
+                case nameof(Int32):
                     return SyntaxKind.IntKeyword;
-                case "System.UInt32":
+                case nameof(UInt32):
                     return SyntaxKind.UIntKeyword;
-                case "System.Int16":
+                case nameof(Int16):
                     return SyntaxKind.ShortKeyword;
-                case "System.UInt16":
+                case nameof(UInt16):
                     return SyntaxKind.UShortKeyword;
-                case "System.Int64":
+                case nameof(Int64):
                     return SyntaxKind.LongKeyword;
-                case "System.UInt64":
+                case nameof(UInt64):
                     return SyntaxKind.ULongKeyword;
-                case "System.Single":
+                case nameof(Single):
                     return SyntaxKind.FloatKeyword;
-                case "System.Double":
+                case nameof(Double):
                     return SyntaxKind.DoubleKeyword;
-                case "System.Decimal":
+                case nameof(Decimal):
                     return SyntaxKind.DecimalKeyword;
-                case "System.String":
+                case nameof(String):
                     return SyntaxKind.StringKeyword;
-                case "System.Char":
+                case nameof(Char):
                     return SyntaxKind.CharKeyword;
-                case "System.Object":
+                case nameof(Object):
                     return SyntaxKind.ObjectKeyword;
-                case "System.Void":
+                case "Void": // nameof(Void) is illegal
                     return SyntaxKind.VoidKeyword;
                 default:
                     return SyntaxKind.None;

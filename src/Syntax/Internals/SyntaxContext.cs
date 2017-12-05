@@ -8,11 +8,10 @@ namespace CSharpE.Syntax.Internals
     {
         private readonly SemanticModel semanticModel;
 
-        internal SyntaxContext(SemanticModel semanticModel) => this.semanticModel =
-            semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
+        internal SyntaxContext(SemanticModel semanticModel) =>
+            this.semanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
 
-        // TODO: is this actually correct?
-        internal string GetFullName(TypeSyntax typeSyntax) =>
-            semanticModel.GetTypeInfo(typeSyntax).Type.ToDisplayString();
+        internal INamedTypeSymbol Resolve(TypeSyntax typeSyntax) =>
+            (INamedTypeSymbol)semanticModel.GetTypeInfo(typeSyntax).Type;
     }
 }

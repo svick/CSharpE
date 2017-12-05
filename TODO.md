@@ -1,6 +1,5 @@
-- split `TypeReference.FullName` into `Namespace` and `Name`
-- `CollectNamespaces(HashSet<string>)`
-  - or `GetWrapped(SyntaxContext)`?
+- when fixing equivalence, probably use `IsEquivalentTo`
+- fix moving `NamedTypeReference`s between files (doesn't update `using`s)
 
 ---
 

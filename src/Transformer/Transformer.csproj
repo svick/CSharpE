@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <AssemblyName>CSharpE.Transformer</AssemblyName>
     <RootNamespace>CSharpE.Transformer</RootNamespace>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

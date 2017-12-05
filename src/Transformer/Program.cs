@@ -9,11 +9,9 @@ using CSharpE.Transform;
 
 namespace CSharpE.Transformer
 {
-    static class Program
+    public static class Program
     {
-        public static void Main(string[] args) => MainAsync(args).GetAwaiter().GetResult();
-
-        private static async Task MainAsync(string[] args)
+        public static async Task Main(string[] args)
         {
             if (args.Length < 2)
             {

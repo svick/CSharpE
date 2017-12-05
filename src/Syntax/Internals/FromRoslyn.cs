@@ -62,5 +62,9 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
+        public static TypeReference TypeReference(TypeSyntax typeSyntax, SyntaxContext context)
+        {
+            return new NamedTypeReference(typeSyntax, context);
+        }
     }
 }

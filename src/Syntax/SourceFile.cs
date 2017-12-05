@@ -16,7 +16,22 @@ namespace CSharpE.Syntax
     {
         public string Path { get; }
 
-        private CSharpSyntaxTree tree;
+        private CSharpSyntaxTree syntax;
+
+        private SourceFile(string path, SyntaxTree syntaxTree)
+        {
+            Path = path;
+            syntax = (CSharpSyntaxTree)syntaxTree;
+        }
+
+        public SourceFile(string path, string text)
+            : this(path, CSharpSyntaxTree.ParseText(text)) { }
+
+        public SourceFile(string path)
+        {
+            Path = path;
+            members = new SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax>();
+        }
 
         public string GetText() => GetWrapped().ToString();
 
@@ -28,8 +43,13 @@ namespace CSharpE.Syntax
             get
             {
                 if (semanticModel == null)
+                {
+                    if (Project == null)
+                        throw new InvalidOperationException("SourceFile has to be part of a Project for this operation.");
+
                     semanticModel = Project.Compilation.GetSemanticModel(GetWrapped());
-                
+                }
+
                 return semanticModel;
             }
         }
@@ -44,7 +64,7 @@ namespace CSharpE.Syntax
                 if (members == null)
                 {
                     members = new SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax>(
-                        tree.GetCompilationUnitRoot().Members, mds =>
+                        syntax.GetCompilationUnitRoot().Members, mds =>
                         {
                             switch (mds)
                             {
@@ -103,22 +123,7 @@ namespace CSharpE.Syntax
             }
         }
 
-        private SourceFile(string path, SyntaxTree syntaxTree)
-        {
-            Path = path;
-            tree = (CSharpSyntaxTree)syntaxTree;
-        }
-
-        public SourceFile(string path, string text)
-            : this(path, CSharpSyntaxTree.ParseText(text))
-        {
-        }
-
-        public SourceFile(string path)
-        {
-            Path = path;
-            members = new SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax>();
-        }
+        private readonly HashSet<string> additionalNamespaces = new HashSet<string>();
 
         public static async Task<SourceFile> OpenAsync(string path)
         {
@@ -131,17 +136,50 @@ namespace CSharpE.Syntax
             }
         }
 
+        public void EnsureUsingNamespace(string ns)
+        {
+            additionalNamespaces.Add(ns);
+        }
+
         internal CSharpSyntaxTree GetWrapped()
         {
+            var oldCompilationUnit = syntax?.GetCompilationUnitRoot();
+            var oldUsings = oldCompilationUnit?.Usings ?? default;
+
+            var oldUsingNamespaces = oldUsings
+                .Where(u => u.Alias == null && u.StaticKeyword.IsKind(SyntaxKind.None))
+                .Select(u => u.Name)
+                .ToList();
+
+            // remove additional names that already have a using
+            additionalNamespaces.RemoveWhere(
+                ns =>
+                {
+                    var nameSyntax = CSharpSyntaxFactory.ParseName(ns);
+                    return oldUsingNamespaces.Any(ons => nameSyntax.IsEquivalentTo(ons));
+                });
+
             var newMembers = members.GetWrapped(new WrapperContext(this));
 
-            if (tree == null || tree.GetCompilationUnitRoot().Members != newMembers)
+            if (syntax == null || additionalNamespaces.Any() || newMembers != oldCompilationUnit.Members)
             {
-                tree = (CSharpSyntaxTree)CSharpSyntaxFactory.SyntaxTree(
-                    CSharpSyntaxFactory.CompilationUnit().WithMembers(newMembers).NormalizeWhitespace());
+                var newUsings = oldUsings;
+
+                if (additionalNamespaces.Any())
+                {
+                    // TODO: sort usings?
+                    newUsings = newUsings.AddRange(
+                        additionalNamespaces.OrderBy(x => x).Select(
+                            ns => CSharpSyntaxFactory.UsingDirective(CSharpSyntaxFactory.ParseName(ns))));
+                }
+
+                syntax = (CSharpSyntaxTree)CSharpSyntaxFactory.SyntaxTree(
+                    CSharpSyntaxFactory.CompilationUnit(default, newUsings, default, newMembers).NormalizeWhitespace());
+
+                additionalNamespaces.Clear();
             }
 
-            return tree;
+            return syntax;
         }
     }
 }

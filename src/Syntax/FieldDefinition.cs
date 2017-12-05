@@ -29,7 +29,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (type == null)
-                    type = new NamedTypeReference(syntax.Declaration.Type, SyntaxContext);
+                    type = FromRoslyn.TypeReference(syntax.Declaration.Type, SyntaxContext);
 
                 return type;
             }

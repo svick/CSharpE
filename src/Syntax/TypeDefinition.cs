@@ -53,6 +53,12 @@ namespace CSharpE.Syntax
             set => members = new SyntaxList<MemberDefinition, MemberDeclarationSyntax>(value);
         }
 
+        public IList<FieldDefinition> Fields
+        {
+            get => FilteredList.Create<MemberDefinition, FieldDefinition>(MembersList);
+            set => FilteredList.Set(MembersList, value);
+        }
+
         public IList<MethodDefinition> Methods
         {
             get => FilteredList.Create<MemberDefinition, MethodDefinition>(MembersList);
