@@ -1,5 +1,6 @@
 - when fixing equivalence, probably use `IsEquivalentTo`
 - fix moving `NamedTypeReference`s between files (doesn't update `using`s)
+- make most classes `sealed`
 
 ---
 

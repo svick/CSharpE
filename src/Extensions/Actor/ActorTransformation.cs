@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using CSharpE.Syntax;
 using CSharpE.Transform;
@@ -20,11 +18,12 @@ namespace CSharpE.Extensions.Actor
                 foreach (var method in type.PublicMethods)
                 {
                     method.ReturnType = TypeReference(typeof(Task<>), method.ReturnType);
+                    method.IsAsync = true;
 
                     method.Body = new Statement[]
                     {
                         Await(Call(actorDataField, "WaitAsync")),
-                        TryFinally(method.Body, new Statement[] { Call(actorDataField, "WaitAsync") })
+                        TryFinally(method.Body, new Statement[] { Call(actorDataField, "Release") })
                     };
                 }
             }

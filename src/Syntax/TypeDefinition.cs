@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -17,21 +18,19 @@ namespace CSharpE.Syntax
         {
             syntax = typeDeclarationSyntax;
             this.containingFile = containingFile;
+
+            name = new Identifier(syntax.Identifier);
         }
 
         internal SyntaxContext SyntaxContext => containingFile.SyntaxContext;
 
-        private string name;
+        protected override SyntaxList<AttributeListSyntax> GetSyntaxAttributes() => syntax?.AttributeLists ?? default;
+
+        private Identifier name;
         public string Name
         {
-            get
-            {
-                if (name == null)
-                    name = syntax.Identifier.ValueText;
-                
-                return name;
-            }
-            set => name = value ?? throw new ArgumentNullException(nameof(value));
+            get => name.Text;
+            set => name.Text = value;
         }
 
         private SyntaxList<MemberDefinition, MemberDeclarationSyntax> members;
@@ -122,11 +121,14 @@ namespace CSharpE.Syntax
 
         internal new TypeDeclarationSyntax GetWrapped(WrapperContext context)
         {
+            var newName = name.GetWrapped(context);
             var newMembers = members?.GetWrapped(context) ?? syntax.Members;
 
-            if (syntax == null || syntax.Identifier.ValueText != Name || syntax.Members != newMembers)
+            if (syntax == null || AttributesChanged() || newName != syntax.Identifier || newMembers != syntax.Members)
             {
-                syntax = CSharpSyntaxFactory.ClassDeclaration(Name).WithMembers(newMembers);
+                syntax = CSharpSyntaxFactory.ClassDeclaration(
+                    GetNewAttributes(context), default, name.GetWrapped(context), default, default, default,
+                    newMembers);
             }
 
             return syntax;

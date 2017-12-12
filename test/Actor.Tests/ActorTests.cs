@@ -27,20 +27,20 @@ using System.Threading.Tasks;
 [Actor]
 class C
 {
-    SemaphoreSlim _actor_semaphore = new SemaphoreSlim(1);
-
     public async Task M()
     {
-        await _actor_semaphore.WaitAsync();
+        await this._actor_semaphore.WaitAsync();
         try
         {
             return 42;
         }
         finally
         {
-            _actor_semaphore.Release();
+            this._actor_semaphore.Release();
         }
     }
+
+    readonly SemaphoreSlim _actor_semaphore = new SemaphoreSlim(1);
 }";
 
             var transformation = new ActorTransformation();

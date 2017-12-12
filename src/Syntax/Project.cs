@@ -58,7 +58,7 @@ namespace CSharpE.Syntax
             : this(sourceFiles, additionalReferencesRepresentatives.Select(t => new AssemblyReference(t)))
         { }
 
-        public IEnumerable<TypeDefinition> TypesWithAttribute<T>() where T : Attribute
+        public IEnumerable<TypeDefinition> TypesWithAttribute<T>() where T : System.Attribute
         {
             foreach (var sourceFile in SourceFiles)
             {

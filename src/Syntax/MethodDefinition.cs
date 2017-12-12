@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -19,6 +20,8 @@ namespace CSharpE.Syntax
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
             name = new Identifier(syntax.Identifier);
         }
+
+        protected override SyntaxList<AttributeListSyntax> GetSyntaxAttributes() => syntax?.AttributeLists ?? default;
 
         #region Modifiers
 
@@ -152,11 +155,12 @@ namespace CSharpE.Syntax
             var newParameters = parameters?.GetWrapped(context) ?? syntax.ParameterList.Parameters;
             var newBody = body?.GetWrapped(context) ?? syntax.Body.Statements;
 
-            if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
-                newReturnType != syntax.ReturnType || newName != syntax.Identifier || newParameters != syntax.ParameterList.Parameters || newBody != syntax.Body.Statements)
+            if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
+                newReturnType != syntax.ReturnType || newName != syntax.Identifier ||
+                newParameters != syntax.ParameterList.Parameters || newBody != syntax.Body.Statements)
             {
                 syntax = CSharpSyntaxFactory.MethodDeclaration(
-                    default, newModifiers.GetWrapped(), newReturnType, null, newName, null,
+                    GetNewAttributes(context), newModifiers.GetWrapped(), newReturnType, null, newName, null,
                     CSharpSyntaxFactory.ParameterList(newParameters), default, CSharpSyntaxFactory.Block(newBody),
                     null);
             }

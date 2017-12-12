@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -22,6 +23,8 @@ namespace CSharpE.Syntax
         private FieldDeclarationSyntax syntax;
 
         private SyntaxContext SyntaxContext => ContainingType.SyntaxContext;
+
+        protected override SyntaxList<AttributeListSyntax> GetSyntaxAttributes() => syntax?.AttributeLists ?? default;
 
         private TypeReference type;
         public TypeReference Type
@@ -104,7 +107,7 @@ namespace CSharpE.Syntax
             var newName = name.GetWrapped(context);
             var newInitializer = initializerSet ? initializer?.GetWrapped(context) : declarator?.Initializer?.Value;
 
-            if (syntax == null ||
+            if (syntax == null || AttributesChanged() ||
                 FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || syntax.Declaration.Type != newType ||
                 declarator.Identifier != newName || declarator.Initializer?.Value != newInitializer)
             {
@@ -112,7 +115,7 @@ namespace CSharpE.Syntax
                     newInitializer == null ? null : CSharpSyntaxFactory.EqualsValueClause(newInitializer);
 
                 syntax = CSharpSyntaxFactory.FieldDeclaration(
-                    default, newModifiers.GetWrapped(), CSharpSyntaxFactory.VariableDeclaration(
+                    GetNewAttributes(context), newModifiers.GetWrapped(), CSharpSyntaxFactory.VariableDeclaration(
                         newType, CSharpSyntaxFactory.SingletonSeparatedList(
                             CSharpSyntaxFactory.VariableDeclarator(newName, null, equalsValueClause))));
             }
