@@ -8,7 +8,8 @@ namespace CSharpE.Syntax
     public class Project
     {
         // TODO
-        private static readonly Reference[] DefaultReferences = { new AssemblyReference(typeof(object)) };
+        private static readonly Reference[] DefaultReferences = new[] { typeof(object), typeof(System.Attribute) }
+            .Select(t => new AssemblyReference(t)).Distinct().ToArray<Reference>();
         
         public IList<SourceFile> SourceFiles { get; }
 

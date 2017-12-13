@@ -4,6 +4,7 @@
     <TargetFramework>netstandard1.5</TargetFramework>
     <AssemblyName>CSharpE.Extensions.Actor</AssemblyName>
     <RootNamespace>CSharpE.Extensions.Actor</RootNamespace>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
