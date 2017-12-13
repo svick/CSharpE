@@ -27,7 +27,7 @@ using System.Threading.Tasks;
 [Actor]
 class C
 {
-    public async Task M()
+    public async Task<int> M()
     {
         await this._actor_semaphore.WaitAsync();
         try

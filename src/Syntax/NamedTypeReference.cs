@@ -236,8 +236,8 @@ namespace CSharpE.Syntax
 
         protected override TypeSyntax GetWrappedImpl(WrapperContext context)
         {
-            var newTypeParameters = typeParameters?.GetWrapped(context) ?? default;
             var oldTypeParameters = (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
+            var newTypeParameters = typeParameters?.GetWrapped(context) ?? oldTypeParameters;
 
             // if Resolve() wasn't called, only type parameters could have been changed
             if (isKnownType == null && newTypeParameters == oldTypeParameters)

@@ -110,7 +110,18 @@ namespace CSharpE.Syntax
 
         #endregion
 
-        public TypeReference ReturnType { get; set; }
+        private TypeReference returnType;
+        public TypeReference ReturnType
+        {
+            get
+            {
+                if (returnType == null)
+                    returnType = FromRoslyn.TypeReference(syntax.ReturnType, ContainingType.SyntaxContext);
+
+                return returnType;
+            }
+            set => returnType = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         private Identifier name;
         public string Name
@@ -134,6 +145,7 @@ namespace CSharpE.Syntax
 
         // TODO: methods without body and with expression body
         private SyntaxList<Statement, StatementSyntax> body;
+
         public IList<Statement> Body
         {
             get
@@ -150,7 +162,7 @@ namespace CSharpE.Syntax
         internal new MethodDeclarationSyntax GetWrapped(WrapperContext context)
         {
             var newModifiers = Modifiers;
-            var newReturnType = ReturnType?.GetWrapped(context) ?? syntax.ReturnType;
+            var newReturnType = returnType?.GetWrapped(context) ?? syntax.ReturnType;
             var newName = name.GetWrapped(context);
             var newParameters = parameters?.GetWrapped(context) ?? syntax.ParameterList.Parameters;
             var newBody = body?.GetWrapped(context) ?? syntax.Body.Statements;
