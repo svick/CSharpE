@@ -13,7 +13,7 @@ namespace CSharpE.Extensions.Actor
         {
             foreach (var type in project.TypesWithAttribute<ActorAttribute>())
             {
-                var actorDataField = type.AddField(ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
+                var actorSemaphoreField = type.AddField(ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
 
                 foreach (var method in type.PublicMethods)
                 {
@@ -22,8 +22,8 @@ namespace CSharpE.Extensions.Actor
 
                     method.Body = new Statement[]
                     {
-                        Await(Call(actorDataField, "WaitAsync")),
-                        TryFinally(method.Body, new Statement[] { Call(actorDataField, "Release") })
+                        Await(Call(actorSemaphoreField, "WaitAsync")),
+                        TryFinally(method.Body, new Statement[] { Call(actorSemaphoreField, "Release") })
                     };
                 }
             }
