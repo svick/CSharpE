@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.5</TargetFramework>
+    <AssemblyName>CSharpE.Extensions.Actor</AssemblyName>
+    <RootNamespace>CSharpE.Extensions.Actor</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Syntax\Syntax.csproj" />
+    <ProjectReference Include="..\..\Transform\Transform.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Extensions\Actor\Actor.csproj" />
+    <ProjectReference Include="..\..\src\Extensions\Actor.Gated\Actor.Gated.csproj" />
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
 
