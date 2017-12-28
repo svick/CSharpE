@@ -11,22 +11,22 @@ namespace CSharpE.Extensions.Actor
     {
         public void Process(Project project)
         {
-            foreach (var type in project.TypesWithAttribute<ActorAttribute>())
+            project.OpenTypesWithAttribute<ActorAttribute>((type, attribute) =>
             {
                 var actorSemaphoreField = type.AddField(ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
 
-                foreach (var method in type.PublicMethods)
+                type.OpenPublicMethods(method =>
                 {
                     method.ReturnType = TypeReference(typeof(Task<>), method.ReturnType);
                     method.IsAsync = true;
 
-                    method.Body = new Statement[]
+                    method.SetBody(body => new Statement[]
                     {
                         Await(Call(actorSemaphoreField, "WaitAsync")),
-                        TryFinally(method.Body, new Statement[] { Call(actorSemaphoreField, "Release") })
-                    };
-                }
-            }
+                        TryFinally(body, new Statement[] { Call(actorSemaphoreField, "Release") })
+                    });
+                });
+            });
         }
     }
 }
