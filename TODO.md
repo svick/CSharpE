@@ -1,9 +1,10 @@
-- when fixing equivalence, probably use `IsEquivalentTo`
+- when fixing equivalence, probably use `IsEquivalentTo(node, false)`
 - fix moving `NamedTypeReference`s between files (doesn't update `using`s)
 - make most classes `sealed`
 
 ---
 
+- for IntelliSense, create bodies of user methods, but not of new transformer methods
 - make writing flags enums easier
   - use it for `MemberModifiers`
 - consider creating code from "template" lambda or local function  
