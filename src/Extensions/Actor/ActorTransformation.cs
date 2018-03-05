@@ -13,7 +13,8 @@ namespace CSharpE.Extensions.Actor
         {
             foreach (var type in project.TypesWithAttribute<ActorAttribute>())
             {
-                var actorSemaphoreField = type.AddField(ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
+                var actorSemaphoreField = type.AddField(
+                    ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
 
                 foreach (var method in type.PublicMethods)
                 {
