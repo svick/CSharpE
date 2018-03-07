@@ -1,15 +1,16 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using CSharpE.Syntax;
+using CSharpE.Syntax.Smart;
 using CSharpE.Transform;
 using static CSharpE.Syntax.SyntaxFactory;
 using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Extensions.Actor
 {
-    public class ActorTransformation : ISmartTransformation
+    public class ActorTransformation : ITransformation
     {
-        public void Process(SmartProject project)
+        public void Process(Project project)
         {
             project.ForEachTypeWithAttribute<ActorAttribute>((type, attribute) =>
             {
