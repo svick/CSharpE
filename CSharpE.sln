@@ -31,11 +31,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestUtilities", "test\TestU
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Actor.Simple", "src\Extensions\Actor.Simple\Actor.Simple.csproj", "{07586AE9-53E9-49C9-AB6E-006E53BE8454}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Actor.Gated", "src\Extensions\Actor.Gated\Actor.Gated.csproj", "{76BEB94D-9851-4282-9AF3-D1E498A3E69A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Actor.Lazy", "src\Extensions\Actor.Lazy\Actor.Lazy.csproj", "{76BEB94D-9851-4282-9AF3-D1E498A3E69A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Actor.Simple.Tests", "test\Actor.Simple.Tests\Actor.Simple.Tests.csproj", "{A330C641-DA24-4DB2-B93A-4CDA5BEEC464}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Actor.Gated.Tests", "test\Actor.Gated.Tests\Actor.Gated.Tests.csproj", "{E193EEFD-00A6-4ADC-B6FD-B0D860F7FEFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Actor.Lazy.Tests", "test\Actor.Lazy.Tests\Actor.Lazy.Tests.csproj", "{E193EEFD-00A6-4ADC-B6FD-B0D860F7FEFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
