@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
+using static System.Reflection.BindingFlags;
 
 namespace CSharpE.Syntax.Internals
 {
@@ -11,7 +11,7 @@ namespace CSharpE.Syntax.Internals
         public static void ThrowIfHasClosure(Delegate d)
         {
             if (HasClosure(d))
-                throw new HasClosureException($"The delegate for {EnhancedStackTrace.GetMethodDisplayString(d.GetMethodInfo())} has closure."); // TODO: custom exception type
+                throw new HasClosureException($"The delegate for {EnhancedStackTrace.GetMethodDisplayString(d.Method)} has closure.");
         }
 
         private static readonly ConcurrentDictionary<Type, bool> HasClosureCache = new ConcurrentDictionary<Type, bool>();
@@ -24,7 +24,7 @@ namespace CSharpE.Syntax.Internals
             return HasClosureCache.GetOrAdd(d.Target.GetType(), IsClosure);
         }
 
-        private static bool IsClosure(Type type) => type.GetRuntimeFields().Any(f => !f.IsStatic);
+        private static bool IsClosure(Type type) => type.GetFields(Public | NonPublic | Instance).Any();
     }
 
     internal class HasClosureException : Exception

@@ -12,7 +12,7 @@ namespace CSharpE.Syntax
             Assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
 
         public AssemblyReference(Type assemblyRepresentativeType)
-            : this(assemblyRepresentativeType.GetTypeInfo().Assembly)
+            : this(assemblyRepresentativeType.Assembly)
         { }
 
         internal override MetadataReference GetMetadataReference() =>
