@@ -2,8 +2,12 @@
 
 namespace CSharpE.Transform
 {
-    public interface ITransformation
+    public interface ITransformation<in TProject> where TProject : Project
     {
-        void Process(Project project);
+        void Process(TProject project);
     }
+
+    public interface ITransformation : ITransformation<Project> { }
+
+    public interface ISmartTransformation : ITransformation<SmartProject> { }
 }
