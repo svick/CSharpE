@@ -2,8 +2,7 @@
 
 namespace CSharpE.Syntax
 {
-    // TODO: "reference" is too general, is there a more specific name that can be used?
-    public abstract class Reference
+    public abstract class LibraryReference
     {
         internal abstract MetadataReference GetMetadataReference();
     }

@@ -11,9 +11,7 @@ namespace CSharpE.Syntax.Smart
         {
             ClosureChecker.ThrowIfHasClosure(action);
 
-            var types = project.TypesWithAttribute<TAttribute>();
-
-            foreach (var type in types)
+            foreach (var type in project.TypesWithAttribute<TAttribute>())
             {
                 action(type);
             }
@@ -23,7 +21,22 @@ namespace CSharpE.Syntax.Smart
         {
             ClosureChecker.ThrowIfHasClosure(action);
 
-            throw new NotImplementedException();
+            foreach (var method in type.PublicMethods)
+            {
+                action(method);
+            }
+        }
+
+        public static void ForEachPublicMethod<T1>(this TypeDefinition type, T1 arg1, Action<T1, MethodDefinition> action)
+        {
+            ClosureChecker.ThrowIfHasClosure(action);
+
+            ArgumentChecker.ThrowIfNotPersistent(arg1);
+
+            foreach (var method in type.PublicMethods)
+            {
+                action(arg1, method);
+            }
         }
     }
 }

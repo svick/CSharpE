@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class AssemblyReference : Reference, IEquatable<AssemblyReference>
+    public class AssemblyReference : LibraryReference, IEquatable<AssemblyReference>
     {
         public Assembly Assembly { get; }
 

@@ -15,13 +15,13 @@ namespace CSharpE.Transform
 
         protected override IEnumerable<SourceFile> ActualSourceFiles => SourceFiles.Concat(additionalSourceFiles);
 
-        public TransformProject(IEnumerable<SourceFile> inputFiles, IEnumerable<Reference> additionalReferences)
+        public TransformProject(IEnumerable<SourceFile> inputFiles, IEnumerable<LibraryReference> additionalReferences)
             : base(inputFiles.Where(f => Path.GetExtension(f.Path) == ".cse"), additionalReferences)
         {
             additionalSourceFiles = inputFiles.Except(SourceFiles).ToList();
         }
 
-        public TransformProject(IEnumerable<SourceFile> sourceFiles) : this(sourceFiles, Array.Empty<Reference>()) { }
+        public TransformProject(IEnumerable<SourceFile> sourceFiles) : this(sourceFiles, Array.Empty<LibraryReference>()) { }
 
         public TransformProject(Project project) : this(project.SourceFiles, project.References) { }
     }

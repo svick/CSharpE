@@ -98,6 +98,8 @@ namespace CSharpE.Syntax
         public static implicit operator MemberAccessExpression(FieldDefinition fieldDefinition) =>
             new MemberAccessExpression(fieldDefinition);
 
+        public FieldReference GetReference() => new FieldReference(ContainingType.GetReference(), Name, Modifiers.Contains(Static));
+
         internal new FieldDeclarationSyntax GetWrapped(WrapperContext context)
         {
             var declarator = syntax?.Declaration.Variables.Single();
