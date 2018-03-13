@@ -4,10 +4,6 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
-
-    <AssemblyName>CSharpE.Syntax.Tests</AssemblyName>
-
-    <RootNamespace>CSharpE.Syntax.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Syntax\Syntax.csproj" />
+    <ProjectReference Include="..\..\src\Extensions\Actor.Simple\Actor.Simple.csproj" />
+    <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
 
 </Project>

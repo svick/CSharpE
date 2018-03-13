@@ -35,6 +35,16 @@ namespace CSharpE.Syntax
             MemberName = fieldDefinition.Name;
         }
 
+        public MemberAccessExpression(FieldReference fieldReference)
+        {
+            if (fieldReference.IsStatic)
+                Expression = fieldReference.ContainingType;
+            else
+                Expression = This();
+
+            MemberName = fieldReference.Name;
+        }
+
         private Expression expression;
         public Expression Expression
         {
@@ -49,6 +59,7 @@ namespace CSharpE.Syntax
         }
 
         private Identifier memberName;
+
         public string MemberName
         {
             get => memberName.Text;

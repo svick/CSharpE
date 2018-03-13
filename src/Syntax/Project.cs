@@ -8,13 +8,13 @@ namespace CSharpE.Syntax
     public class Project
     {
         // TODO
-        private static readonly Reference[] DefaultReferences = { new AssemblyReference(typeof(object)) };
+        private static readonly LibraryReference[] DefaultReferences = { new AssemblyReference(typeof(object)) };
         
         public IList<SourceFile> SourceFiles { get; }
 
         protected virtual IEnumerable<SourceFile> ActualSourceFiles => SourceFiles;
         
-        public IList<Reference> References { get; }
+        public IList<LibraryReference> References { get; }
 
         private CSharpCompilation compilation;
         
@@ -30,7 +30,7 @@ namespace CSharpE.Syntax
             }
         }
 
-        public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<Reference> additionalReferences)
+        public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
         {
             SourceFiles = sourceFiles.ToList();
 
@@ -43,7 +43,7 @@ namespace CSharpE.Syntax
         }
 
         public Project(IEnumerable<SourceFile> sourceFiles)
-            : this(sourceFiles, Array.Empty<Reference>())
+            : this(sourceFiles, Array.Empty<LibraryReference>())
         { }
 
         public Project()

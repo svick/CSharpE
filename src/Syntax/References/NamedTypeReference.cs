@@ -10,7 +10,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class NamedTypeReference : TypeReference
+    public class NamedTypeReference : TypeReference, IPersistent
     {
         private TypeSyntax syntax;
         private SyntaxContext syntaxContext;
@@ -234,6 +234,8 @@ namespace CSharpE.Syntax
 
         public static implicit operator NamedTypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 
+        public static implicit operator IdentifierExpression(NamedTypeReference typeReference) => new IdentifierExpression(typeReference.Name);
+
         protected override TypeSyntax GetWrappedImpl(WrapperContext context)
         {
             var oldTypeParameters = (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
@@ -340,6 +342,11 @@ namespace CSharpE.Syntax
                 default:
                     return SyntaxKind.None;
             }
+        }
+
+        void IPersistent.Persist()
+        {
+            throw new NotImplementedException();
         }
 
         public override string ToString() => FullName;
