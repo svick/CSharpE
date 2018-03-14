@@ -2,12 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-
     <IsPackable>false</IsPackable>
-
-    <AssemblyName>CSharpE.Syntax.Tests</AssemblyName>
-
-    <RootNamespace>CSharpE.Syntax.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

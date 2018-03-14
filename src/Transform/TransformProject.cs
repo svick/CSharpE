@@ -9,20 +9,24 @@ namespace CSharpE.Transform
     /// <summary>
     /// Project that hides source files that cannot be transformed.
     /// </summary>
-    public class TransformProject : Project
+    public class TransformProject : Syntax.Project
     {
-        private readonly List<SourceFile> additionalSourceFiles;
+        private readonly List<Syntax.SourceFile> additionalSourceFiles;
 
-        protected override IEnumerable<SourceFile> ActualSourceFiles => SourceFiles.Concat(additionalSourceFiles);
+        protected override IEnumerable<Syntax.SourceFile> ActualSourceFiles => SourceFiles.Concat(additionalSourceFiles);
 
-        public TransformProject(IEnumerable<SourceFile> inputFiles, IEnumerable<LibraryReference> additionalReferences)
+        public TransformProject(
+            IEnumerable<Syntax.SourceFile> inputFiles, IEnumerable<LibraryReference> additionalReferences)
+            : this(inputFiles.ToList(), additionalReferences) { }
+
+        private TransformProject(List<Syntax.SourceFile> inputFiles, IEnumerable<LibraryReference> additionalReferences)
             : base(inputFiles.Where(f => Path.GetExtension(f.Path) == ".cse"), additionalReferences)
         {
             additionalSourceFiles = inputFiles.Except(SourceFiles).ToList();
         }
 
-        public TransformProject(IEnumerable<SourceFile> sourceFiles) : this(sourceFiles, Array.Empty<LibraryReference>()) { }
+        public TransformProject(IEnumerable<Syntax.SourceFile> sourceFiles) : this(sourceFiles, Array.Empty<LibraryReference>()) { }
 
-        public TransformProject(Project project) : this(project.SourceFiles, project.References) { }
+        public TransformProject(Syntax.Project project) : this(project.SourceFiles, project.References) { }
     }
 }

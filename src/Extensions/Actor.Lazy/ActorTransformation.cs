@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpE.Syntax;
 using CSharpE.Syntax.Smart;
@@ -10,7 +11,7 @@ namespace CSharpE.Extensions.Actor
 {
     public class ActorTransformation : ITransformation
     {
-        public void Process(Project project)
+        public void Process(Syntax.Project project)
         {
             project.ForEachTypeWithAttribute<ActorAttribute>(type =>
             {
@@ -29,5 +30,8 @@ namespace CSharpE.Extensions.Actor
                 });
             });
         }
+
+        public IEnumerable<LibraryReference> AdditionalReferences =>
+            new[] { new AssemblyReference(typeof(ActorAttribute)) };
     }
 }

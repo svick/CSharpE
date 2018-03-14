@@ -28,7 +28,7 @@ namespace CSharpE.Transformer
 
             var transformationTypes = transformationAssembly.ExportedTypes.Where(t => typeof(ITransformation).IsAssignableFrom(t));
 
-            var inputFiles = await Task.WhenAll(inputFilePaths.Select(SourceFile.OpenAsync));
+            var inputFiles = await Task.WhenAll(inputFilePaths.Select(Syntax.SourceFile.OpenAsync));
 
             var project = new TransformProject(inputFiles);
 

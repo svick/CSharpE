@@ -16,12 +16,12 @@ namespace CSharpE.Syntax
     {
         public string Path { get; }
 
-        private CSharpSyntaxTree syntax;
+        private SyntaxTree syntax;
 
-        private SourceFile(string path, SyntaxTree syntaxTree)
+        public SourceFile(string path, SyntaxTree syntaxTree)
         {
             Path = path;
-            syntax = (CSharpSyntaxTree)syntaxTree;
+            syntax = syntaxTree;
         }
 
         public SourceFile(string path, string text)
@@ -141,7 +141,7 @@ namespace CSharpE.Syntax
             additionalNamespaces.Add(ns);
         }
 
-        internal CSharpSyntaxTree GetWrapped()
+        public SyntaxTree GetWrapped()
         {
             var oldCompilationUnit = syntax?.GetCompilationUnitRoot();
             var oldUsings = oldCompilationUnit?.Usings ?? default;
@@ -159,7 +159,7 @@ namespace CSharpE.Syntax
                     return oldUsingNamespaces.Any(ons => nameSyntax.IsEquivalentTo(ons));
                 });
 
-            var newMembers = members.GetWrapped(new WrapperContext(this));
+            var newMembers = members?.GetWrapped(new WrapperContext(this)) ?? oldCompilationUnit.Members;
 
             if (syntax == null || additionalNamespaces.Any() || newMembers != oldCompilationUnit.Members)
             {
@@ -173,7 +173,7 @@ namespace CSharpE.Syntax
                             ns => CSharpSyntaxFactory.UsingDirective(CSharpSyntaxFactory.ParseName(ns))));
                 }
 
-                syntax = (CSharpSyntaxTree)CSharpSyntaxFactory.SyntaxTree(
+                syntax = CSharpSyntaxFactory.SyntaxTree(
                     CSharpSyntaxFactory.CompilationUnit(default, newUsings, default, newMembers).NormalizeWhitespace());
 
                 additionalNamespaces.Clear();

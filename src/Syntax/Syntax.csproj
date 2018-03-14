@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>CSharpE.Syntax</AssemblyName>
-    <RootNamespace>CSharpE.Syntax</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>
