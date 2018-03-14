@@ -1,0 +1,7 @@
+﻿<Project>
+  <PropertyGroup>
+    <AssemblyName>CSharpE.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>CSharpE.$(MSBuildProjectName)</RootNamespace>
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+</Project>

@@ -1,21 +1,24 @@
+using System.Collections.Generic;
+using System.Linq;
 using CSharpE.Syntax;
-using CSharpE.Transform;
 using Xunit;
-using static TestUtilities.TestUtils;
+using static CSharpE.TestUtilities.TestUtils;
 
-namespace Transform.Tests
+namespace CSharpE.Transform.Tests
 {
     public class AddFieldTests
     {
         class AddFieldTransformation : ITransformation
         {
-            public void Process(Project project)
+            public void Process(Syntax.Project project)
             {
                 foreach (var type in project.Types())
                 {
                     type.AddField(typeof(int), "i");
                 }
             }
+
+            public IEnumerable<LibraryReference> AdditionalReferences => Enumerable.Empty<LibraryReference>();
         }
 
         [Fact]

@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>CSharpE.Transform</AssemblyName>
-    <RootNamespace>CSharpE.Transform</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
