@@ -3,10 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
-using CSharpE.Syntax;
-using CSharpE.Transform;
 
-namespace CSharpE.Transformer
+namespace CSharpE.Transform.App
 {
     public static class Program
     {

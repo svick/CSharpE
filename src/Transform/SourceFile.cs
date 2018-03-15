@@ -24,5 +24,13 @@ namespace CSharpE.Transform
 
         internal static SourceFile FromSyntaxSourceFile(Syntax.SourceFile syntaxSourceFile) =>
             new SourceFile(syntaxSourceFile.Path, syntaxSourceFile.GetWrapped());
+
+        internal FileDiff Diff()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        // TODO: proper implementation
+        internal void Snapshot() { }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
+using CSharpE.Transform.Transformers;
 
 namespace CSharpE.Transform
 {
@@ -8,30 +8,34 @@ namespace CSharpE.Transform
     {
         public IList<SourceFile> SourceFiles { get; }
 
-        private readonly ImmutableArray<ITransformation> transformations;
+        private readonly Transformer transformer;
 
         public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<ITransformation> transformations)
         {
-            this.SourceFiles = sourceFiles.ToList();
-            this.transformations = transformations.ToImmutableArray();
+            SourceFiles = sourceFiles.ToList();
+            transformer = Transformer.Create(transformations);
         }
 
         public Project Transform()
         {
-            Syntax.Project syntaxProject = ToSyntaxProject();
+            var projectDiff = Diff();
 
-            foreach (var transformation in transformations)
-            {
-                transformation.Process(syntaxProject);
-            }
+            transformer.Transform(projectDiff);
 
-            return FromSyntaxProject(syntaxProject);
+            Snapshot();
+
+            return projectDiff.GetProject();
         }
 
-        private Syntax.Project ToSyntaxProject() => new TransformProject(
-            SourceFiles.Select(f => f.ToSyntaxSourceFile()), transformations.SelectMany(t => t.AdditionalReferences));
+        private ProjectDiff Diff() => new ProjectDiff(this);
 
-        private Project FromSyntaxProject(Syntax.Project syntaxProject) => new Project(
-            syntaxProject.SourceFiles.Select(SourceFile.FromSyntaxSourceFile), Enumerable.Empty<ITransformation>());
+        private void Snapshot()
+        {
+            foreach (var file in SourceFiles)
+            {
+                file.Snapshot();
+            }
+        }
+
     }
 }
