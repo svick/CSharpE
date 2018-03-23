@@ -9,6 +9,8 @@ namespace CSharpE.Transform
 
         public SyntaxTree Tree { get; set; }
 
+        private SyntaxTree treeSnapshot;
+
         public string Text => Tree.ToString();
 
         public SourceFile(string path, string text)
@@ -25,12 +27,8 @@ namespace CSharpE.Transform
         internal static SourceFile FromSyntaxSourceFile(Syntax.SourceFile syntaxSourceFile) =>
             new SourceFile(syntaxSourceFile.Path, syntaxSourceFile.GetWrapped());
 
-        internal FileDiff Diff()
-        {
-            throw new System.NotImplementedException();
-        }
+        internal FileDiff Diff() => FileDiff.Between(treeSnapshot, Tree);
 
-        // TODO: proper implementation
-        internal void Snapshot() { }
+        internal void Snapshot() => treeSnapshot = Tree;
     }
 }

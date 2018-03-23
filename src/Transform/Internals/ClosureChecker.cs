@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using static System.Reflection.BindingFlags;
 
-namespace CSharpE.Syntax.Internals
+namespace CSharpE.Transform.Internals
 {
     internal static class ClosureChecker
     {

@@ -28,7 +28,7 @@ namespace CSharpE.Transform.App
 
             var inputFiles = await Task.WhenAll(inputFilePaths.Select(Syntax.SourceFile.OpenAsync));
 
-            var project = new TransformProject(inputFiles);
+            var project = new Syntax.Project(inputFiles);
 
             foreach (var transformationType in transformationTypes)
             {

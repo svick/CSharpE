@@ -8,7 +8,7 @@ namespace CSharpE.Transform
     {
         public IList<SourceFile> SourceFiles { get; }
 
-        private readonly Transformer transformer;
+        private readonly Transformer<ProjectDiff> transformer;
 
         public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<ITransformation> transformations)
         {

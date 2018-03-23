@@ -1,6 +1,7 @@
 ﻿using System;
+using CSharpE.Syntax.Internals;
 
-namespace CSharpE.Syntax.Internals
+namespace CSharpE.Transform.Internals
 {
     internal static class ArgumentChecker
     {

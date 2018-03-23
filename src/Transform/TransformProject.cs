@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CSharpE.Syntax;
+using CSharpE.Syntax.Internals;
+using CSharpE.Transform.Transformers;
 
 namespace CSharpE.Transform
 {
     /// <summary>
     /// Project that hides source files that cannot be transformed.
     /// </summary>
-    public class TransformProject : Syntax.Project
+    internal class TransformProject : Syntax.Project
     {
         private readonly List<Syntax.SourceFile> additionalSourceFiles;
 
@@ -28,5 +30,17 @@ namespace CSharpE.Transform
         public TransformProject(IEnumerable<Syntax.SourceFile> sourceFiles) : this(sourceFiles, Array.Empty<LibraryReference>()) { }
 
         public TransformProject(Syntax.Project project) : this(project.SourceFiles, project.References) { }
+
+        internal TransformerBuilder TransformerBuilder { get; set; }
+
+        /// <summary>
+        /// Runs transformation and returns a transformer that can be used to rerun the same transformation.
+        /// </summary>
+        public Transformer<ProjectDiff> RunTransformation(ITransformation transformation)
+        {
+            this.References.AddRange(transformation.AdditionalReferences);
+
+            return CodeTransformer<ProjectDiff, TransformProject>.Create(transformation.Process);
+        }
     }
 }

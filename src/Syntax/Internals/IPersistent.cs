@@ -1,6 +1,6 @@
-﻿namespace CSharpE.Syntax
+﻿namespace CSharpE.Syntax.Internals
 {
-    internal interface IPersistent
+    public interface IPersistent
     {
         /// <summary>
         /// Makes sure the current object has no references to objects that are not persisitent.

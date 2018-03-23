@@ -1,19 +1,28 @@
 ﻿using System;
-using CSharpE.Syntax.Internals;
+using CSharpE.Syntax;
+using CSharpE.Transform.Internals;
 
-namespace CSharpE.Syntax.Smart
+namespace CSharpE.Transform.Smart
 {
     public static class SmartExtensions
     {
         public static void ForEachTypeWithAttribute<TAttribute>(
-            this Project project, Action<TypeDefinition> action)
+            this Syntax.Project project, Action<TypeDefinition> action)
             where TAttribute : System.Attribute
         {
             ClosureChecker.ThrowIfHasClosure(action);
 
-            foreach (var type in project.TypesWithAttribute<TAttribute>())
+            // TODO: generalize
+            if (project is TransformProject transformProject)
             {
-                action(type);
+                transformProject.TransformerBuilder.Collection(p => p.TypesWithAttribute<TAttribute>(), action);
+            }
+            else
+            {
+                foreach (var type in project.TypesWithAttribute<TAttribute>())
+                {
+                    action(type);
+                }
             }
         }
 

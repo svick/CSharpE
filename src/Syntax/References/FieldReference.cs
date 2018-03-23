@@ -1,4 +1,5 @@
 ﻿using System;
+using CSharpE.Syntax.Internals;
 
 namespace CSharpE.Syntax
 {
