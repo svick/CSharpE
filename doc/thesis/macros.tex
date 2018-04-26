@@ -35,3 +35,37 @@
 %%% of programs. (Requires the fancyvrb package -- fancy verbatim.)
 
 \DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small, frame=single}
+
+\DefineBibliographyExtras{english}{%
+	% d-m-y format for long dates
+	\protected\def\mkbibdatelong#1#2#3{%
+		\iffieldundef{#3}
+		{}
+		{\stripzeros{\thefield{#3}}%
+			\iffieldundef{#2}{}{\nobreakspace}}%
+		\iffieldundef{#2}
+		{}
+		{\mkbibmonth{\thefield{#2}}%
+			\iffieldundef{#1}{}{\space}}%
+		\iffieldbibstring{#1}{\bibstring{\thefield{#1}}}{\stripzeros{\thefield{#1}}}}%
+	% d-m-y format for short dates
+	\protected\def\mkbibdateshort#1#2#3{%
+		\iffieldundef{#3}
+		{}
+		{\stripzeros{\thefield{#3}}%
+			\iffieldundef{#2}{}{\nobreakspace}}%
+		\iffieldundef{#2}
+		{}
+		{\mkbibmonth{\thefield{#2}}%
+			\iffieldundef{#1}{}{\space}}%
+		\iffieldbibstring{#1}{\bibstring{\thefield{#1}}}{\stripzeros{\thefield{#1}}}}%
+}
+
+\xpatchbibdriver{online}
+	{\usebibmacro{title}}
+	{\usebibmacro{title}%
+		\newunit\newblock
+		\usebibmacro{maintitle}}
+	{}{}
+	
+\newcommand{\acr}[1]{\acs{#1} (\acl{#1})}

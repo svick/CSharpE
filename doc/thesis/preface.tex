@@ -1,2 +1,21 @@
-\chapter*{Introduction}
-\addcontentsline{toc}{chapter}{Introduction}
+\chapwithtoc{Introduction}
+
+Extensibility is an important feature of a programming language and its associated programming environment, because it allows adding new capabilities to the language. This way, a programmer can mold the language to their specific needs.
+
+A common way to extend many languages is through libraries. Libraries let programmers use code written by someone else, which can be powerful, especially when combined with extensibility features built into programming languages, such as virtual functions or lambdas.
+
+But libraries are restricted to the features offered by the used language, which limits their usefulness.
+
+\medskip
+
+This work describes a system for extending the C\# language beyond what can be accomplished with libraries by user-provided extensions, which perform transformations of C\# source code.
+
+These extensions, themselves written in C\#, should be easy to create, when compared with existing similar systems, and they should be efficient enough to be usable with code completion in an \ac{IDE}, such as Microsoft Visual Studio.
+
+To achieve this, the system is composed of two primary parts: the Syntax tree \acr{API} and the Transformations \acs{API}.
+
+\medskip
+
+The Syntax tree \acs{API} is used to represent the original C\# source code, examine it, and modify it. The primary goal of this \acs{API} is to be easy to use and abstract syntax trees fit that requirement well.
+
+The Transformation \acs{API} enhances the Syntax tree \acs{API} by adding methods that split source code transformation into smaller parts. The inputs and outputs of each part are then tracked, which means that, after an initial full execution of the transformation, only the parts of the transformation whose inputs changed have to be re-executed. This is done to improve the performance of the system, especially when run from an \ac{IDE}.

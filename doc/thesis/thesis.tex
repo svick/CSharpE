@@ -28,6 +28,8 @@
 
 \usepackage[utf8]{inputenc}
 
+%\usepackage[USenglish]{babel}
+
 %% Prefer Latin Modern fonts
 \usepackage{lmodern}
 
@@ -47,6 +49,12 @@
 %\usepackage{booktabs}       % improved horizontal lines in tables
 %\usepackage{paralist}       % improved enumerate and itemize
 %\usepackage[usenames]{xcolor}  % typesetting in color
+
+\usepackage{biblatex}
+\addbibresource{bibliography.bib}
+\usepackage{xpatch}
+
+\usepackage[printonlyused,nohyperlinks]{acronym}
 
 %%% Basic information on the thesis
 
@@ -133,7 +141,7 @@ Abstract.
 
 %%% Abbreviations used in the thesis, if any, including their explanation
 %%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
-\chapwithtoc{List of Abbreviations}
+\include{abbrev}
 
 %%% Attachments to the master thesis, if any. Each attachment must be
 %%% referred to at least once from the text of the thesis. Attachments
