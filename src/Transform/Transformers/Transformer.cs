@@ -5,39 +5,38 @@ namespace CSharpE.Transform.Transformers
 {
     internal static class Transformer
     {
-        public static Transformer<ProjectDiff> Create(IEnumerable<ITransformation> transformations) =>
-            new SequentialTransformer<ProjectDiff>(transformations.Select(Create));
+        public static Transformer<TransformProject> Create(IEnumerable<ITransformation> transformations) =>
+            new SequentialTransformer<TransformProject>(transformations.Select(Create));
 
-        private static Transformer<ProjectDiff> Create(ITransformation transformation) =>
+        private static Transformer<TransformProject> Create(ITransformation transformation) =>
             new TransformationTransformer(transformation);
     }
 
-    internal abstract class Transformer<TDiff>
+    internal abstract class Transformer<TInput>
     {
-        public abstract bool InputChanged(TDiff diff);
+        public abstract bool InputChanged(Diff<TInput> diff);
 
-        public abstract void Transform(TransformProject project, TDiff diff);
+        public abstract void Transform(TransformProject project, Diff<TInput> diff);
     }
 
     internal static class TransformerExtensions
     {
-        public static void Transform<TDiff>(
-            this Transformer<TDiff> transformer, TDiff diff) where TDiff : Diff<TransformProject> =>
+        public static void Transform(this Transformer<TransformProject> transformer, Diff<TransformProject> diff) =>
             transformer.Transform(diff.GetNew(), diff);
     }
 
-    internal class TransformationTransformer : Transformer<ProjectDiff>
+    internal class TransformationTransformer : Transformer<TransformProject>
     {
         private readonly ITransformation transformation;
 
-        private Transformer<ProjectDiff> innerTransformer;
+        private Transformer<TransformProject> innerTransformer;
 
         public TransformationTransformer(ITransformation transformation) => this.transformation = transformation;
 
         // TODO: proper implementation
-        public override bool InputChanged(ProjectDiff diff) => true;
+        public override bool InputChanged(Diff<TransformProject> diff) => true;
 
-        public override void Transform(TransformProject project, ProjectDiff diff)
+        public override void Transform(TransformProject project, Diff<TransformProject> diff)
         {
             if (innerTransformer == null)
             {

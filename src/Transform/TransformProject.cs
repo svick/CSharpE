@@ -36,11 +36,11 @@ namespace CSharpE.Transform
         /// <summary>
         /// Runs transformation and returns a transformer that can be used to rerun the same transformation.
         /// </summary>
-        public Transformer<ProjectDiff> RunTransformation(ITransformation transformation)
+        public Transformer<TransformProject> RunTransformation(ITransformation transformation)
         {
             this.References.AddRange(transformation.AdditionalReferences);
 
-            return CodeTransformer<ProjectDiff, TransformProject>.Create(transformation.Process);
+            return CodeTransformer<TransformProject>.Create(transformation.Process);
         }
     }
 }

@@ -4,30 +4,30 @@ using System.Linq;
 
 namespace CSharpE.Transform.Transformers
 {
-    internal class CodeTransformer<TDiff, TInput> : Transformer<TDiff> where TDiff : Diff<TInput>
+    internal class CodeTransformer<TInput> : Transformer<TInput>
     {
         private readonly Action<TInput> codeAction;
-        private List<Transformer<TDiff>> transformers;
+        private List<Transformer<TInput>> transformers;
 
-        public static CodeTransformer<TDiff, TInput> Create(Action<TInput> codeAction) =>
-            new CodeTransformer<TDiff, TInput>(codeAction);
+        public static CodeTransformer<TInput> Create(Action<TInput> codeAction) =>
+            new CodeTransformer<TInput>(codeAction);
 
         public CodeTransformer(Action<TInput> codeAction) => this.codeAction = codeAction;
 
-        public override bool InputChanged(TDiff diff) => transformers?.Any(t => t.InputChanged(diff)) ?? true;
+        public override bool InputChanged(Diff<TInput> diff) => transformers?.Any(t => t.InputChanged(diff)) ?? true;
 
-        public override void Transform(TransformProject project, TDiff diff)
+        public override void Transform(TransformProject project, Diff<TInput> diff)
         {
             // leaf code transformers can't be rerun on their own, so if any one of them needs to be rerun,
             // we have to rerun this whole transformer
             if (transformers?.Where(t => t is ILeafCodeTransformer).Any(t => t.InputChanged(diff)) ?? true)
             {
-                var transformerBuilder = new TransformerBuilder<TDiff>();
+                var input = diff.GetNew();
+
+                var transformerBuilder = new TransformerBuilder<TInput>(project, input);
 
                 var oldTransformerBuilder = project.TransformerBuilder;
                 project.TransformerBuilder = transformerBuilder;
-
-                var input = diff.GetNew();
 
                 codeAction(input);
 

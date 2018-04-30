@@ -124,6 +124,8 @@ namespace CSharpE.Syntax
         // TODO: namespace
         public NamedTypeReference GetReference() => new NamedTypeReference(null, Name);
 
+        public Project Project => containingFile?.Project;
+
         protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
 
         internal new TypeDeclarationSyntax GetWrapped(WrapperContext context)

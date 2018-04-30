@@ -8,7 +8,7 @@ namespace CSharpE.Transform
     {
         public IList<SourceFile> SourceFiles { get; }
 
-        private readonly Transformer<ProjectDiff> transformer;
+        private readonly Transformer<TransformProject> transformer;
 
         public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<ITransformation> transformations)
         {
@@ -36,6 +36,5 @@ namespace CSharpE.Transform
                 file.Snapshot();
             }
         }
-
     }
 }

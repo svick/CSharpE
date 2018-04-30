@@ -12,10 +12,10 @@ namespace CSharpE.Transform.Smart
         {
             ClosureChecker.ThrowIfHasClosure(action);
 
-            // TODO: generalize
             if (project is TransformProject transformProject)
             {
-                transformProject.TransformerBuilder.Collection(p => p.TypesWithAttribute<TAttribute>(), action);
+                transformProject.TransformerBuilder.Collection(
+                    project, p => p.TypesWithAttribute<TAttribute>(), (_, item) => action(item), Unit.Value);
             }
             else
             {
@@ -39,12 +39,18 @@ namespace CSharpE.Transform.Smart
         public static void ForEachPublicMethod<T1>(this TypeDefinition type, T1 arg1, Action<T1, MethodDefinition> action)
         {
             ClosureChecker.ThrowIfHasClosure(action);
-
             ArgumentChecker.ThrowIfNotPersistent(arg1);
 
-            foreach (var method in type.PublicMethods)
+            if (type.Project is TransformProject transformProject)
             {
-                action(arg1, method);
+                transformProject.TransformerBuilder.Collection(type, t => t.PublicMethods, action, arg1);
+            }
+            else
+            {
+                foreach (var method in type.PublicMethods)
+                {
+                    action(arg1, method);
+                }
             }
         }
     }
