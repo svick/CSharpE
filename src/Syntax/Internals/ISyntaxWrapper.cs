@@ -6,6 +6,6 @@
     /// </remarks>
     internal interface ISyntaxWrapper<out TSyntax>
     {
-        TSyntax GetWrapped(WrapperContext context);
+        TSyntax GetWrapped();
     }
 }

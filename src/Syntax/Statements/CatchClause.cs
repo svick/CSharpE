@@ -9,7 +9,7 @@ namespace CSharpE.Syntax
     {
         public TryStatement ParentStatement { get; private set; }
 
-        public CatchClauseSyntax GetWrapped(WrapperContext context)
+        public CatchClauseSyntax GetWrapped()
         {
             throw new System.NotImplementedException();
         }

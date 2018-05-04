@@ -33,9 +33,9 @@ namespace CSharpE.Syntax
             set => expression = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        public ArgumentSyntax GetWrapped(WrapperContext context)
+        public ArgumentSyntax GetWrapped()
         {
-            var newExpression = expression?.GetWrapped(context) ?? syntax.Expression;
+            var newExpression = expression?.GetWrapped() ?? syntax.Expression;
 
             if (syntax == null || newExpression != syntax.Expression)
             {

@@ -126,15 +126,15 @@ namespace CSharpE.Syntax
 
         protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
 
-        internal new TypeDeclarationSyntax GetWrapped(WrapperContext context)
+        internal new TypeDeclarationSyntax GetWrapped()
         {
-            var newName = name.GetWrapped(context);
-            var newMembers = members?.GetWrapped(context) ?? syntax.Members;
+            var newName = name.GetWrapped();
+            var newMembers = members?.GetWrapped() ?? syntax.Members;
 
             if (syntax == null || AttributesChanged() || newName != syntax.Identifier || newMembers != syntax.Members || IsAnnotated(syntax))
             {
                 var newSyntax = CSharpSyntaxFactory.ClassDeclaration(
-                    GetNewAttributes(context), default, name.GetWrapped(context), default, default, default,
+                    GetNewAttributes(), default, name.GetWrapped(), default, default, default,
                     newMembers);
 
                 syntax = Annotate(newSyntax);
@@ -143,7 +143,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
+        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
 
         protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
         {

@@ -21,7 +21,7 @@ namespace CSharpE.Syntax
 
         protected override object ValueImpl => Value;
 
-        internal override ExpressionSyntax GetWrapped(WrapperContext context)
+        internal override ExpressionSyntax GetWrapped()
         {
             if (Syntax == null || Value != (int)Syntax.Token.Value)
             {

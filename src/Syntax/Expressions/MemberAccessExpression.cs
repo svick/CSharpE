@@ -67,10 +67,10 @@ namespace CSharpE.Syntax
             set => memberName.Text = value;
         }
 
-        internal override ExpressionSyntax GetWrapped(WrapperContext context)
+        internal override ExpressionSyntax GetWrapped()
         {
-            var newExpression = expression?.GetWrapped(context) ?? syntax.Expression;
-            var newMemberName = memberName.GetWrapped(context);
+            var newExpression = expression?.GetWrapped() ?? syntax.Expression;
+            var newMemberName = memberName.GetWrapped();
 
             if (syntax == null || newExpression != syntax.Expression || newMemberName != syntax.Name.Identifier)
             {

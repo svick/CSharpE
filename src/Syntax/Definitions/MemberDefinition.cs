@@ -34,13 +34,13 @@ namespace CSharpE.Syntax
             if (attributes == null)
                 return false;
 
-            var newAttributes = attributes.Select(a => a.GetWrapped(null));
+            var newAttributes = attributes.Select(a => a.GetWrapped());
             var oldAttributes = GetSyntaxAttributes().SelectMany(al => al.Attributes);
 
             return !newAttributes.SequenceEqual(oldAttributes);
         }
 
-        protected SyntaxList<AttributeListSyntax> GetNewAttributes(WrapperContext context)
+        protected SyntaxList<AttributeListSyntax> GetNewAttributes()
         {
             if (attributes == null)
                 return GetSyntaxAttributes();
@@ -48,7 +48,7 @@ namespace CSharpE.Syntax
             return CSharpSyntaxFactory.List(
                 attributes.Select(
                     a => CSharpSyntaxFactory.AttributeList(
-                        CSharpSyntaxFactory.SingletonSeparatedList(a.GetWrapped(context)))));
+                        CSharpSyntaxFactory.SingletonSeparatedList(a.GetWrapped()))));
         }
 
         private MemberModifiers modifiers;
@@ -66,12 +66,12 @@ namespace CSharpE.Syntax
 
         public TypeDefinition ParentType { get; private set; }
 
-        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(WrapperContext context) =>
-            GetWrapped(context);
+        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped() =>
+            GetWrapped();
 
-        internal MemberDeclarationSyntax GetWrapped(WrapperContext context) => GetWrappedImpl(context);
+        internal MemberDeclarationSyntax GetWrapped() => GetWrappedImpl();
 
-        protected abstract MemberDeclarationSyntax GetWrappedImpl(WrapperContext context);
+        protected abstract MemberDeclarationSyntax GetWrappedImpl();
 
         public override SyntaxNode Parent
         {

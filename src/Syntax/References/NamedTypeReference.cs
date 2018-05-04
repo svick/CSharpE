@@ -89,7 +89,7 @@ namespace CSharpE.Syntax
                 isKnownType = true;
             }
 
-            syntaxContainer = container?.GetWrapped(null);
+            syntaxContainer = container?.GetWrapped();
         }
 
         private bool? isKnownType;
@@ -233,24 +233,24 @@ namespace CSharpE.Syntax
 
         public static implicit operator IdentifierExpression(NamedTypeReference typeReference) => new IdentifierExpression(typeReference.Name);
 
-        protected override TypeSyntax GetWrappedImpl(WrapperContext context)
+        protected override TypeSyntax GetWrappedImpl()
         {
             var oldTypeParameters = (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
-            var newTypeParameters = typeParameters?.GetWrapped(context) ?? oldTypeParameters;
+            var newTypeParameters = typeParameters?.GetWrapped() ?? oldTypeParameters;
 
             // if Resolve() wasn't called, only type parameters could have been changed
             if (isKnownType == null && newTypeParameters == oldTypeParameters)
                 return syntax;
 
             var newNamespace = ns ?? syntaxNamespace;
-            var newContainer = container?.GetWrapped(context);
+            var newContainer = container?.GetWrapped();
             var newName = name ?? syntaxName;
 
             if (syntax == null || newNamespace != syntaxNamespace || newContainer != syntaxContainer ||
                 newName != syntaxName || newTypeParameters != oldTypeParameters)
             {
                 if (RequiresUsingNamespace)
-                    context?.EnsureUsingNamespace(Namespace);
+                    SourceFile?.EnsureUsingNamespace(Namespace);
 
                 var predefinedType = GetPredefinedType();
                 if (predefinedType != null)

@@ -8,6 +8,6 @@ namespace CSharpE.Syntax
         public static implicit operator ExpressionStatement(Expression expression) =>
             new ExpressionStatement(expression);
 
-        internal abstract ExpressionSyntax GetWrapped(WrapperContext context);
+        internal abstract ExpressionSyntax GetWrapped();
     }
 }

@@ -19,7 +19,7 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        internal override ExpressionSyntax GetWrapped(WrapperContext context)
+        internal override ExpressionSyntax GetWrapped()
         {
             if (syntax == null)
                 syntax = CSharpSyntaxFactory.ThisExpression();

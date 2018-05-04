@@ -54,10 +54,10 @@ namespace CSharpE.Syntax
             set => arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(value);
         }
 
-        internal override ExpressionSyntax GetWrapped(WrapperContext context)
+        internal override ExpressionSyntax GetWrapped()
         {
-            var newExpression = expression?.GetWrapped(context) ?? syntax.Expression;
-            var newArguments = arguments?.GetWrapped(context) ?? syntax.ArgumentList.Arguments;
+            var newExpression = expression?.GetWrapped() ?? syntax.Expression;
+            var newArguments = arguments?.GetWrapped() ?? syntax.ArgumentList.Arguments;
 
             if (syntax == null || newExpression != syntax.Expression || newArguments != syntax.ArgumentList.Arguments)
             {

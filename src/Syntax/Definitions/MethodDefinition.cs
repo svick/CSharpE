@@ -160,20 +160,20 @@ namespace CSharpE.Syntax
         }
 
 
-        internal new MethodDeclarationSyntax GetWrapped(WrapperContext context)
+        internal new MethodDeclarationSyntax GetWrapped()
         {
             var newModifiers = Modifiers;
-            var newReturnType = returnType?.GetWrapped(context) ?? syntax.ReturnType;
-            var newName = name.GetWrapped(context);
-            var newParameters = parameters?.GetWrapped(context) ?? syntax.ParameterList.Parameters;
-            var newBody = body?.GetWrapped(context) ?? syntax.Body.Statements;
+            var newReturnType = returnType?.GetWrapped() ?? syntax.ReturnType;
+            var newName = name.GetWrapped();
+            var newParameters = parameters?.GetWrapped() ?? syntax.ParameterList.Parameters;
+            var newBody = body?.GetWrapped() ?? syntax.Body.Statements;
 
             if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 newReturnType != syntax.ReturnType || newName != syntax.Identifier ||
                 newParameters != syntax.ParameterList.Parameters || newBody != syntax.Body.Statements)
             {
                 syntax = CSharpSyntaxFactory.MethodDeclaration(
-                    GetNewAttributes(context), newModifiers.GetWrapped(), newReturnType, null, newName, null,
+                    GetNewAttributes(), newModifiers.GetWrapped(), newReturnType, null, newName, null,
                     CSharpSyntaxFactory.ParameterList(newParameters), default, CSharpSyntaxFactory.Block(newBody),
                     null);
             }
@@ -181,7 +181,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
+        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
 
         protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
         {

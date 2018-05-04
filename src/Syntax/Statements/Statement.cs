@@ -5,10 +5,10 @@ namespace CSharpE.Syntax
 {
     public abstract class Statement : SyntaxNode, ISyntaxWrapper<StatementSyntax>
     {
-        StatementSyntax ISyntaxWrapper<StatementSyntax>.GetWrapped(WrapperContext context) => GetWrapped(context);
+        StatementSyntax ISyntaxWrapper<StatementSyntax>.GetWrapped() => GetWrapped();
 
-        internal StatementSyntax GetWrapped(WrapperContext context) => GetWrappedImpl(context);
+        internal StatementSyntax GetWrapped() => GetWrappedImpl();
 
-        protected abstract StatementSyntax GetWrappedImpl(WrapperContext context);
+        protected abstract StatementSyntax GetWrappedImpl();
     }
 }

@@ -18,7 +18,7 @@ namespace CSharpE.Syntax
             ParentMember = parent;
         }
 
-        public AttributeSyntax GetWrapped(WrapperContext context)
+        public AttributeSyntax GetWrapped()
         {
             throw new System.NotImplementedException();
         }

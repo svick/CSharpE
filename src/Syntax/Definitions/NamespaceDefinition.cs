@@ -14,7 +14,7 @@ namespace CSharpE.Syntax
             throw new System.NotImplementedException();
         }
 
-        public NamespaceDeclarationSyntax GetWrapped(WrapperContext context)
+        public NamespaceDeclarationSyntax GetWrapped()
         {
             throw new System.NotImplementedException();
         }

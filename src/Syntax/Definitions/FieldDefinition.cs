@@ -99,14 +99,14 @@ namespace CSharpE.Syntax
 
         public FieldReference GetReference() => new FieldReference(ParentType.GetReference(), Name, Modifiers.Contains(Static));
 
-        internal new FieldDeclarationSyntax GetWrapped(WrapperContext context)
+        internal new FieldDeclarationSyntax GetWrapped()
         {
             var declarator = syntax?.Declaration.Variables.Single();
 
             var newModifiers = Modifiers;
-            var newType = type?.GetWrapped(context) ?? syntax.Declaration.Type;
-            var newName = name.GetWrapped(context);
-            var newInitializer = initializerSet ? initializer?.GetWrapped(context) : declarator?.Initializer?.Value;
+            var newType = type?.GetWrapped() ?? syntax.Declaration.Type;
+            var newName = name.GetWrapped();
+            var newInitializer = initializerSet ? initializer?.GetWrapped() : declarator?.Initializer?.Value;
 
             if (syntax == null || AttributesChanged() ||
                 FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || syntax.Declaration.Type != newType ||
@@ -116,7 +116,7 @@ namespace CSharpE.Syntax
                     newInitializer == null ? null : CSharpSyntaxFactory.EqualsValueClause(newInitializer);
 
                 syntax = CSharpSyntaxFactory.FieldDeclaration(
-                    GetNewAttributes(context), newModifiers.GetWrapped(), CSharpSyntaxFactory.VariableDeclaration(
+                    GetNewAttributes(), newModifiers.GetWrapped(), CSharpSyntaxFactory.VariableDeclaration(
                         newType, CSharpSyntaxFactory.SingletonSeparatedList(
                             CSharpSyntaxFactory.VariableDeclarator(newName, null, equalsValueClause))));
             }
@@ -124,7 +124,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
+        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
 
         protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
         {

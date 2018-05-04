@@ -31,7 +31,7 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
-        public SyntaxToken GetWrapped(WrapperContext context)
+        public SyntaxToken GetWrapped()
         {
             var newText = text ?? syntax.ValueText;
 

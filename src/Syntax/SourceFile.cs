@@ -159,7 +159,7 @@ namespace CSharpE.Syntax
                     return oldUsingNamespaces.Any(ons => nameSyntax.IsEquivalentTo(ons));
                 });
 
-            var newMembers = members?.GetWrapped(new WrapperContext(this)) ?? oldCompilationUnit.Members;
+            var newMembers = members?.GetWrapped() ?? oldCompilationUnit.Members;
 
             if (syntax == null || additionalNamespaces.Any() || newMembers != oldCompilationUnit.Members)
             {
