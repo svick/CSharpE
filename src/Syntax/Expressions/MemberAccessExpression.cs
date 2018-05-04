@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -8,13 +9,14 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace CSharpE.Syntax
 {
     // TODO: generics
-    public class MemberAccessExpression : Expression
+    public sealed class MemberAccessExpression : Expression
     {
         private MemberAccessExpressionSyntax syntax;
 
-        internal MemberAccessExpression(MemberAccessExpressionSyntax syntax)
+        internal MemberAccessExpression(MemberAccessExpressionSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax;
+            Parent = parent;
 
             memberName = new Identifier(syntax.Name.Identifier);
         }
@@ -28,7 +30,7 @@ namespace CSharpE.Syntax
         internal MemberAccessExpression(FieldDefinition fieldDefinition)
         {
             if (fieldDefinition.Modifiers.Contains(MemberModifiers.Static))
-                Expression = fieldDefinition.ContainingType;
+                Expression = fieldDefinition.ParentType;
             else
                 Expression = This();
 
@@ -59,7 +61,6 @@ namespace CSharpE.Syntax
         }
 
         private Identifier memberName;
-
         public string MemberName
         {
             get => memberName.Text;
@@ -80,5 +81,12 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return Node(Expression);
+        }
+
+        public override SyntaxNode Parent { get; internal set; }
     }
 }

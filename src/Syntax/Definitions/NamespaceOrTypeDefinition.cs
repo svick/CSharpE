@@ -16,7 +16,7 @@ namespace CSharpE.Syntax
         public NamespaceDefinition GetNamespaceDefinition() => (NamespaceDefinition)namespaceOrType;
         public TypeDefinition GetTypeDefinition() => (TypeDefinition)namespaceOrType;
 
-        public object Value => namespaceOrType;
+        public SyntaxNode Value => (SyntaxNode)namespaceOrType;
 
         public static implicit operator NamespaceOrTypeDefinition(NamespaceDefinition ns) =>
             new NamespaceOrTypeDefinition(ns);

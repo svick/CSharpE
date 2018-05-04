@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
-    public abstract class Expression
+    public abstract class Expression : SyntaxNode
     {
         public static implicit operator ExpressionStatement(Expression expression) =>
             new ExpressionStatement(expression);

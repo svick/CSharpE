@@ -12,10 +12,10 @@ namespace CSharpE.Syntax
     {
         private MethodDeclarationSyntax syntax;
 
-        internal MethodDefinition(MethodDeclarationSyntax syntax, TypeDefinition containingType)
+        internal MethodDefinition(MethodDeclarationSyntax syntax, TypeDefinition parent)
         {
             this.syntax = syntax;
-            ContainingType = containingType;
+            Parent = parent;
 
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
             name = new Identifier(syntax.Identifier);
@@ -116,7 +116,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (returnType == null)
-                    returnType = FromRoslyn.TypeReference(syntax.ReturnType, ContainingType.SyntaxContext);
+                    returnType = FromRoslyn.TypeReference(syntax.ReturnType, this);
 
                 return returnType;
             }
@@ -151,7 +151,8 @@ namespace CSharpE.Syntax
             get
             {
                 if (body == null)
-                    body = new SyntaxList<Statement, StatementSyntax>(syntax.Body.Statements, FromRoslyn.Statement);
+                    body = new SyntaxList<Statement, StatementSyntax>(
+                        syntax.Body.Statements, s => FromRoslyn.Statement(s, this));
 
                 return body;
             }
@@ -181,5 +182,13 @@ namespace CSharpE.Syntax
         }
 
         protected override MemberDeclarationSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return Attributes;
+            yield return Node(ReturnType);
+            yield return Parameters;
+            yield return Body;
+        }
     }
 }

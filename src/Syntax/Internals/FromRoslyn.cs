@@ -24,14 +24,14 @@ namespace CSharpE.Syntax.Internals
             throw new NotImplementedException();
         }
 
-        public static Statement Statement(StatementSyntax syntax)
+        public static Statement Statement(StatementSyntax syntax, SyntaxNode parent)
         {
             switch (syntax)
             {
                 case null:
                     return null;
                 case ReturnStatementSyntax returnStatement:
-                    return new ReturnStatement(returnStatement);
+                    return new ReturnStatement(returnStatement, parent);
             }
 
             throw new NotImplementedException();
@@ -62,9 +62,9 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
-        public static TypeReference TypeReference(TypeSyntax typeSyntax, SyntaxContext context)
+        public static TypeReference TypeReference(TypeSyntax typeSyntax, SyntaxNode parent)
         {
-            return new NamedTypeReference(typeSyntax, context);
+            return new NamedTypeReference(typeSyntax, parent);
         }
     }
 }

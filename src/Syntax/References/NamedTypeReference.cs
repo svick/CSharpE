@@ -13,7 +13,6 @@ namespace CSharpE.Syntax
     public class NamedTypeReference : TypeReference, IPersistent
     {
         private TypeSyntax syntax;
-        private SyntaxContext syntaxContext;
 
         public NamedTypeReference(string ns, string name, params TypeReference[] typeParameters)
             : this(ns, name, typeParameters.AsEnumerable()) { }
@@ -49,10 +48,10 @@ namespace CSharpE.Syntax
                 type.Namespace, type.DeclaringType, StripGenericArity(type.Name),
                 type.GenericTypeArguments.Select(a => (TypeReference)a)) { }
 
-        internal NamedTypeReference(TypeSyntax syntax, SyntaxContext syntaxContext)
+        internal NamedTypeReference(TypeSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax;
-            this.syntaxContext = syntaxContext;
+            Parent = parent;
         }
 
         private NamedTypeReference(INamedTypeSymbol symbol)
@@ -67,11 +66,9 @@ namespace CSharpE.Syntax
 
             // PERF: don't need semantics for PredefinedTypeSyntax 
 
-            var symbol = syntaxContext.Resolve(syntax);
+            var symbol = SourceFile.SyntaxContext.Resolve(syntax);
 
             Resolve(symbol);
-
-            syntaxContext = default;
         }
 
         private void Resolve(INamedTypeSymbol symbol)
@@ -79,7 +76,7 @@ namespace CSharpE.Syntax
             if (symbol.TypeKind == TypeKind.Error)
             {
                 container = syntax is QualifiedNameSyntax qualifiedName
-                    ? new NamedTypeReference(qualifiedName.Left, syntaxContext)
+                    ? new NamedTypeReference(qualifiedName.Left, this)
                     : null;
                 syntaxName = symbol.Name;
                 isKnownType = false;
@@ -182,7 +179,7 @@ namespace CSharpE.Syntax
 
                     typeParameters = new SeparatedSyntaxList<TypeReference, TypeSyntax>(
                         genericSyntax?.TypeArgumentList.Arguments ?? default,
-                        typeSyntax => FromRoslyn.TypeReference(typeSyntax, syntaxContext));
+                        typeSyntax => FromRoslyn.TypeReference(typeSyntax, this));
                 }
 
                 return typeParameters;
@@ -350,5 +347,9 @@ namespace CSharpE.Syntax
         }
 
         public override string ToString() => FullName;
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren() => Enumerable.Empty<IEnumerable<SyntaxNode>>();
+
+        public override SyntaxNode Parent { get; internal set; }
     }
 }

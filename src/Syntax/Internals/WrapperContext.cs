@@ -2,6 +2,7 @@
 
 namespace CSharpE.Syntax.Internals
 {
+    // TODO: probably not necessary anymore
     public class WrapperContext
     {
         private readonly SourceFile sourceFile;

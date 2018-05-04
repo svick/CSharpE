@@ -9,9 +9,10 @@ namespace CSharpE.Syntax
     {
         private TryStatementSyntax syntax;
 
-        internal TryStatement(TryStatementSyntax syntax)
+        internal TryStatement(TryStatementSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax;
+            Parent = parent;
         }
 
         public TryStatement(
@@ -92,5 +93,14 @@ namespace CSharpE.Syntax
         }
 
         protected override StatementSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return TryStatements;
+            yield return CatchClauses;
+            yield return FinallyStatements;
+        }
+
+        public override SyntaxNode Parent { get; internal set; }
     }
 }

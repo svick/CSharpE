@@ -1,16 +1,20 @@
 using System;
+using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class AwaitExpression : Expression
+    public sealed class AwaitExpression : Expression
     {
         private AwaitExpressionSyntax syntax;
 
-        internal AwaitExpression(AwaitExpressionSyntax syntax) =>
+        internal AwaitExpression(AwaitExpressionSyntax syntax, SyntaxNode parent)
+        {
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+            Parent = parent;
+        }
 
         public AwaitExpression(Expression operand) =>
             Operand = operand ?? throw new ArgumentNullException(nameof(operand));
@@ -41,5 +45,12 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return Node(Operand);
+        }
+
+        public override SyntaxNode Parent { get; internal set; }
     }
 }

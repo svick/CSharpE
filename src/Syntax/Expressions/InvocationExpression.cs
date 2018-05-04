@@ -7,12 +7,15 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class InvocationExpression : Expression
+    public sealed class InvocationExpression : Expression
     {
         private InvocationExpressionSyntax syntax;
 
-        internal InvocationExpression(InvocationExpressionSyntax syntax) =>
+        internal InvocationExpression(InvocationExpressionSyntax syntax, SyntaxNode parent)
+        {
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+            Parent = parent;
+        }
 
         public InvocationExpression(Expression expression, IEnumerable<Argument> arguments = null)
         {
@@ -64,5 +67,13 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return Node(Expression);
+            yield return Arguments;
+        }
+
+        public override SyntaxNode Parent { get; internal set; }
     }
 }

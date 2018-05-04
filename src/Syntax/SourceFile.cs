@@ -12,7 +12,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class SourceFile : ITypeContainer
+    public class SourceFile : SyntaxNode, ITypeContainer
     {
         public string Path { get; }
 
@@ -180,6 +180,17 @@ namespace CSharpE.Syntax
             }
 
             return syntax;
+        }
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return Members.Select(m => m.Value);
+        }
+
+        public override SyntaxNode Parent
+        {
+            get => null;
+            internal set => throw new InvalidOperationException();
         }
     }
 }

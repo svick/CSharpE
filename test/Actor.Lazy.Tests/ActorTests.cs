@@ -87,7 +87,9 @@ class C
 }";
 
             var sourceFile = new SourceFile("source.cse", input);
-            var project = new Project(new[] { sourceFile }, new ITransformation[] { new ActorTransformation() });
+            var project = new Project(
+                new[] { sourceFile }, new[] { typeof(ActorAttribute) },
+                new ITransformation[] { new ActorTransformation() });
 
             var tranformedProject = project.Transform();
             Assert.Equal(input, tranformedProject.SourceFiles.Single().Text);

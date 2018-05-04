@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -6,12 +7,15 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace CSharpE.Syntax
 {
     // TODO: named arguments; ref and out
-    public class Argument : ISyntaxWrapper<ArgumentSyntax>
+    public sealed class Argument : SyntaxNode, ISyntaxWrapper<ArgumentSyntax>
     {
         private ArgumentSyntax syntax;
 
-        internal Argument(ArgumentSyntax syntax) =>
+        internal Argument(ArgumentSyntax syntax, SyntaxNode parent)
+        {
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+            Parent = parent;
+        }
 
         public Argument(Expression expression) =>
             this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
@@ -42,5 +46,12 @@ namespace CSharpE.Syntax
         }
 
         public static implicit operator Argument(Expression expression) => new Argument(expression);
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return Node(Expression);
+        }
+
+        public override SyntaxNode Parent { get; internal set; }
     }
 }

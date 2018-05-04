@@ -1,16 +1,20 @@
 using System;
+using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class ExpressionStatement : Statement
+    public sealed class ExpressionStatement : Statement
     {
         private ExpressionStatementSyntax syntax;
 
-        internal ExpressionStatement(ExpressionStatementSyntax syntax) =>
+        internal ExpressionStatement(ExpressionStatementSyntax syntax, SyntaxNode parent)
+        {
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+            Parent = parent;
+        }
 
         public ExpressionStatement(Expression expression) =>
             Expression = expression ?? throw new ArgumentNullException(nameof(expression));
@@ -41,5 +45,12 @@ namespace CSharpE.Syntax
         }
 
         protected override StatementSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return Node(Expression);
+        }
+
+        public override SyntaxNode Parent { get; internal set; }
     }
 }

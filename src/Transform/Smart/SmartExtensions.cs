@@ -12,6 +12,7 @@ namespace CSharpE.Transform.Smart
         {
             ClosureChecker.ThrowIfHasClosure(action);
 
+            // TODO: DRY with other methods here
             if (project is TransformProject transformProject)
             {
                 transformProject.TransformerBuilder.Collection(

@@ -11,12 +11,11 @@ namespace CSharpE.Syntax
     public class NewExpression : Expression
     {
         private ObjectCreationExpressionSyntax syntax;
-        private SyntaxContext syntaxContext;
 
-        internal NewExpression(ObjectCreationExpressionSyntax syntax, SyntaxContext syntaxContext)
+        internal NewExpression(ObjectCreationExpressionSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
-            this.syntaxContext = syntaxContext;
+            Parent = parent;
         }
 
         public NewExpression(TypeReference type, IEnumerable<Argument> arguments)
@@ -37,10 +36,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (type == null)
-                {
-                    type = new NamedTypeReference(syntax.Type, syntaxContext);
-                    syntaxContext = default;
-                }
+                    type = new NamedTypeReference(syntax.Type, this);
 
                 return type;
             }
@@ -73,5 +69,13 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return Node(type);
+            yield return Arguments;
+        }
+
+        public override SyntaxNode Parent { get; internal set; }
     }
 }

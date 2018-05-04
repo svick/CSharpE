@@ -6,12 +6,13 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class IntLiteralExpression : LiteralExpression
+    public sealed class IntLiteralExpression : LiteralExpression
     {
-        internal IntLiteralExpression(LiteralExpressionSyntax syntax)
+        internal IntLiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
         {
             this.Syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
             Value = syntax.Token.Value as int? ?? throw new ArgumentException(nameof(syntax));
+            Parent = parent;
         }
 
         public IntLiteralExpression(int value) => Value = value;

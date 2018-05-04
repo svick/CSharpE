@@ -22,8 +22,6 @@ namespace CSharpE.Syntax
             name = new Identifier(syntax.Identifier);
         }
 
-        internal SyntaxContext SyntaxContext => containingFile.SyntaxContext;
-
         protected override SyntaxList<AttributeListSyntax> GetSyntaxAttributes() => syntax?.AttributeLists ?? default;
 
         private Identifier name;
@@ -111,7 +109,7 @@ namespace CSharpE.Syntax
             this.Members.Add(field);
 
             // TODO: SyntaxList will probably have to notify its parent, so that it can set ContainingType of the child
-            field.ContainingType = this;
+            field.Parent = this;
 
             return field;
         }
@@ -133,16 +131,24 @@ namespace CSharpE.Syntax
             var newName = name.GetWrapped(context);
             var newMembers = members?.GetWrapped(context) ?? syntax.Members;
 
-            if (syntax == null || AttributesChanged() || newName != syntax.Identifier || newMembers != syntax.Members)
+            if (syntax == null || AttributesChanged() || newName != syntax.Identifier || newMembers != syntax.Members || IsAnnotated(syntax))
             {
-                syntax = CSharpSyntaxFactory.ClassDeclaration(
+                var newSyntax = CSharpSyntaxFactory.ClassDeclaration(
                     GetNewAttributes(context), default, name.GetWrapped(context), default, default, default,
                     newMembers);
+
+                syntax = Annotate(newSyntax);
             }
 
             return syntax;
         }
 
         protected override MemberDeclarationSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return Attributes;
+            yield return Members;
+        }
     }
 }

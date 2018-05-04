@@ -1,4 +1,5 @@
-﻿using CSharpE.Syntax.Internals;
+﻿using System.Collections.Generic;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
@@ -13,5 +14,12 @@ namespace CSharpE.Syntax
         {
             throw new System.NotImplementedException();
         }
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override SyntaxNode Parent { get; internal set; }
     }
 }

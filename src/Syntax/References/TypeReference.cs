@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
-    public abstract class TypeReference : ISyntaxWrapper<TypeSyntax>
+    public abstract class TypeReference : SyntaxNode, ISyntaxWrapper<TypeSyntax>
     {
         public static implicit operator TypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 

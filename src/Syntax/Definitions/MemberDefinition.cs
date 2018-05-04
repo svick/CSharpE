@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
@@ -7,7 +8,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public abstract class MemberDefinition : ISyntaxWrapper<MemberDeclarationSyntax>
+    public abstract class MemberDefinition : SyntaxNode, ISyntaxWrapper<MemberDeclarationSyntax>
     {
         private List<Attribute> attributes;
         public IList<Attribute> Attributes
@@ -18,7 +19,7 @@ namespace CSharpE.Syntax
                 {
                     attributes = (from attributeList in GetSyntaxAttributes()
                         from attribute in attributeList.Attributes
-                        select new Attribute(attribute)).ToList();
+                        select new Attribute(attribute, this)).ToList();
                 }
 
                 return attributes;
@@ -63,7 +64,7 @@ namespace CSharpE.Syntax
 
         protected abstract void ValidateModifiers(MemberModifiers modifiers);
 
-        public TypeDefinition ContainingType { get; internal set; }
+        public TypeDefinition ParentType { get; private set; }
 
         MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(WrapperContext context) =>
             GetWrapped(context);
@@ -71,5 +72,17 @@ namespace CSharpE.Syntax
         internal MemberDeclarationSyntax GetWrapped(WrapperContext context) => GetWrappedImpl(context);
 
         protected abstract MemberDeclarationSyntax GetWrappedImpl(WrapperContext context);
+
+        public override SyntaxNode Parent
+        {
+            get => ParentType;
+            internal set
+            {
+                if (value is TypeDefinition parentType)
+                    ParentType = parentType;
+
+                throw new ArgumentException(nameof(value));
+            }
+        }
     }
 }

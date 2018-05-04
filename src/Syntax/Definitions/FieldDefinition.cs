@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
@@ -22,8 +23,6 @@ namespace CSharpE.Syntax
 
         private FieldDeclarationSyntax syntax;
 
-        private SyntaxContext SyntaxContext => ContainingType.SyntaxContext;
-
         protected override SyntaxList<AttributeListSyntax> GetSyntaxAttributes() => syntax?.AttributeLists ?? default;
 
         private TypeReference type;
@@ -32,7 +31,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (type == null)
-                    type = FromRoslyn.TypeReference(syntax.Declaration.Type, SyntaxContext);
+                    type = FromRoslyn.TypeReference(syntax.Declaration.Type, this);
 
                 return type;
             }
@@ -74,10 +73,10 @@ namespace CSharpE.Syntax
             }
         }
 
-        internal FieldDefinition(FieldDeclarationSyntax syntax, TypeDefinition containingType)
+        internal FieldDefinition(FieldDeclarationSyntax syntax, TypeDefinition parent)
         {
             this.syntax = syntax;
-            ContainingType = containingType;
+            Parent = parent;
 
             if (syntax.Declaration.Variables.Count > 1)
                 throw new NotImplementedException("Field declarations with more than one field are not currently supported.");
@@ -98,7 +97,7 @@ namespace CSharpE.Syntax
         public static implicit operator MemberAccessExpression(FieldDefinition fieldDefinition) =>
             new MemberAccessExpression(fieldDefinition);
 
-        public FieldReference GetReference() => new FieldReference(ContainingType.GetReference(), Name, Modifiers.Contains(Static));
+        public FieldReference GetReference() => new FieldReference(ParentType.GetReference(), Name, Modifiers.Contains(Static));
 
         internal new FieldDeclarationSyntax GetWrapped(WrapperContext context)
         {
@@ -126,5 +125,13 @@ namespace CSharpE.Syntax
         }
 
         protected override MemberDeclarationSyntax GetWrappedImpl(WrapperContext context) => GetWrapped(context);
+
+        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
+        {
+            yield return Attributes;
+            yield return Node(Type);
+            if (Initializer != null)
+                yield return Node(Initializer);
+        }
     }
 }
