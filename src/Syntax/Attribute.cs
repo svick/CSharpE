@@ -33,8 +33,8 @@ namespace CSharpE.Syntax
             {
                 if (value is MemberDefinition memberDefinition)
                     ParentMember = memberDefinition;
-
-                throw new ArgumentException(nameof(value));
+                else
+                    throw new ArgumentException(nameof(value));
             }
         }
     }

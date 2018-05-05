@@ -80,8 +80,8 @@ namespace CSharpE.Syntax
             {
                 if (value is TypeDefinition parentType)
                     ParentType = parentType;
-
-                throw new ArgumentException(nameof(value));
+                else
+                    throw new ArgumentException(nameof(value));
             }
         }
     }

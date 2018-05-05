@@ -26,8 +26,8 @@ namespace CSharpE.Syntax
             {
                 if (value is TryStatement tryStatement)
                     ParentStatement = tryStatement;
-
-                throw new ArgumentException(nameof(value));
+                else
+                    throw new ArgumentException(nameof(value));
             }
         }
     }
