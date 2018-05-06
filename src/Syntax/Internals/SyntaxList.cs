@@ -104,6 +104,8 @@ namespace CSharpE.Syntax.Internals
 
         public TList GetWrapped()
         {
+            // PERF: don't allocate roslynNodes before it's known something changed
+
             var roslynNodes = new List<TRoslynSyntax>(Count);
 
             bool changed = roslynList.Count != list.Count;
@@ -116,7 +118,7 @@ namespace CSharpE.Syntax.Internals
 
                 roslynNodes.Add(roslynNode);
 
-                changed = changed || roslynNode != roslynList[i];
+                changed = changed || !CSharpSyntaxFactory.AreEquivalent(roslynNode, roslynList[i]);
             }
 
             if (changed)

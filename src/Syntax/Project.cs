@@ -22,6 +22,8 @@ namespace CSharpE.Syntax
         {
             get
             {
+                // TODO: if something changed, alter the compilation
+
                 if (compilation == null)
                     compilation = CSharpCompilation.Create(
                         null, ActualSourceFiles.Select(file => file.GetWrapped()), References.Select(r => r.GetMetadataReference()));

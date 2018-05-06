@@ -128,7 +128,8 @@ namespace CSharpE.Syntax
             var newName = name.GetWrapped();
             var newMembers = members?.GetWrapped() ?? syntax.Members;
 
-            if (syntax == null || AttributesChanged() || newName != syntax.Identifier || newMembers != syntax.Members || !IsAnnotated(syntax))
+            if (syntax == null || AttributesChanged() || newName != syntax.Identifier ||
+                !CSharpSyntaxFactory.AreEquivalent(newMembers, syntax.Members) || !IsAnnotated(syntax))
             {
                 var newSyntax = CSharpSyntaxFactory.ClassDeclaration(
                     GetNewAttributes(), default, name.GetWrapped(), default, default, default,

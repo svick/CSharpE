@@ -58,14 +58,16 @@ namespace CSharpE.Syntax
 
         protected void Set<T>(ref T field, T value) where T : SyntaxNode
         {
-            if (value.Parent != null)
+            if (value?.Parent != null)
                 throw new InvalidOperationException(
                     $"Can't set the parent of syntax node '{value}', because it already has one.");
 
             if (field != null)
                 field.Parent = null;
 
-            value.Parent = this;
+            if (value != null)
+                value.Parent = this;
+
             field = value;
         }
     }
