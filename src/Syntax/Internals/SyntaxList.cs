@@ -118,7 +118,7 @@ namespace CSharpE.Syntax.Internals
 
                 roslynNodes.Add(roslynNode);
 
-                changed = changed || !CSharpSyntaxFactory.AreEquivalent(roslynNode, roslynList[i]);
+                changed = changed || roslynNode != roslynList[i];
             }
 
             if (changed)
