@@ -1,5 +1,6 @@
 ﻿using System;
 using CSharpE.Syntax;
+using CSharpE.Syntax.Internals;
 using CSharpE.Transform.Internals;
 
 namespace CSharpE.Transform.Smart
