@@ -42,7 +42,7 @@ namespace CSharpE.Transform.Smart
             ClosureChecker.ThrowIfHasClosure(action);
             ArgumentChecker.ThrowIfNotPersistent(arg1);
 
-            if (type.Project is TransformProject transformProject)
+            if (type.SourceFile?.Project is TransformProject transformProject)
             {
                 transformProject.TransformerBuilder.Collection(type, t => t.PublicMethods, action, arg1);
             }

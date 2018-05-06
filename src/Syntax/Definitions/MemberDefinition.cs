@@ -64,25 +64,11 @@ namespace CSharpE.Syntax
 
         protected abstract void ValidateModifiers(MemberModifiers modifiers);
 
-        public TypeDefinition ParentType { get; private set; }
-
         MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped() =>
             GetWrapped();
 
         internal MemberDeclarationSyntax GetWrapped() => GetWrappedImpl();
 
         protected abstract MemberDeclarationSyntax GetWrappedImpl();
-
-        public override SyntaxNode Parent
-        {
-            get => ParentType;
-            internal set
-            {
-                if (value is TypeDefinition parentType)
-                    ParentType = parentType;
-                else
-                    throw new ArgumentException(nameof(value));
-            }
-        }
     }
 }

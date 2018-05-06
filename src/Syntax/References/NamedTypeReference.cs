@@ -66,6 +66,9 @@ namespace CSharpE.Syntax
 
             // PERF: don't need semantics for PredefinedTypeSyntax 
 
+            if (SourceFile == null)
+                throw new InvalidOperationException("Can't get this information for node without ancestor SourceFile.");
+
             var symbol = SourceFile.SyntaxContext.Resolve(syntax);
 
             Resolve(symbol);

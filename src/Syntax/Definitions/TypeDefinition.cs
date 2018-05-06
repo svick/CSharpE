@@ -9,15 +9,14 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class TypeDefinition : MemberDefinition, ITypeContainer
+    public sealed class TypeDefinition : MemberDefinition, ITypeContainer
     {
         private TypeDeclarationSyntax syntax;
-        private SourceFile containingFile;
         
-        internal TypeDefinition(TypeDeclarationSyntax typeDeclarationSyntax, SourceFile containingFile)
+        internal TypeDefinition(TypeDeclarationSyntax typeDeclarationSyntax, SyntaxNode parent)
         {
             syntax = typeDeclarationSyntax;
-            this.containingFile = containingFile;
+            Parent = parent;
 
             name = new Identifier(syntax.Identifier);
         }
@@ -87,7 +86,7 @@ namespace CSharpE.Syntax
             if (!attributeLists.Any())
                 return false;
 
-            var semanticModel = containingFile.SemanticModel;
+            var semanticModel = SourceFile.SemanticModel;
 
             var attributeType = semanticModel.Compilation.GetTypeByMetadataName(attributeTypeFullName);
 
@@ -122,8 +121,6 @@ namespace CSharpE.Syntax
         // TODO: namespace
         public NamedTypeReference GetReference() => new NamedTypeReference(null, Name);
 
-        public Project Project => containingFile?.Project;
-
         protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
 
         internal new TypeDeclarationSyntax GetWrapped()
@@ -131,7 +128,7 @@ namespace CSharpE.Syntax
             var newName = name.GetWrapped();
             var newMembers = members?.GetWrapped() ?? syntax.Members;
 
-            if (syntax == null || AttributesChanged() || newName != syntax.Identifier || newMembers != syntax.Members || IsAnnotated(syntax))
+            if (syntax == null || AttributesChanged() || newName != syntax.Identifier || newMembers != syntax.Members || !IsAnnotated(syntax))
             {
                 var newSyntax = CSharpSyntaxFactory.ClassDeclaration(
                     GetNewAttributes(), default, name.GetWrapped(), default, default, default,
@@ -150,5 +147,7 @@ namespace CSharpE.Syntax
             yield return Attributes;
             yield return Members;
         }
+
+        public override SyntaxNode Parent { get; internal set; }
     }
 }

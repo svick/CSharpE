@@ -120,7 +120,7 @@ namespace CSharpE.Syntax
 
                 return returnType;
             }
-            set => returnType = value ?? throw new ArgumentNullException(nameof(value));
+            set => SetNotNull(ref returnType, value);
         }
 
         private Identifier name;
@@ -159,6 +159,7 @@ namespace CSharpE.Syntax
             set => body = new SyntaxList<Statement, StatementSyntax>(value);
         }
 
+        public TypeDefinition ParentType { get; private set; }
 
         internal new MethodDeclarationSyntax GetWrapped()
         {
@@ -189,6 +190,18 @@ namespace CSharpE.Syntax
             yield return Node(ReturnType);
             yield return Parameters;
             yield return Body;
+        }
+
+        public override SyntaxNode Parent
+        {
+            get => ParentType;
+            internal set
+            {
+                if (value is TypeDefinition parentType)
+                    ParentType = parentType;
+                else
+                    throw new ArgumentException(nameof(value));
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
@@ -46,5 +47,26 @@ namespace CSharpE.Syntax
 
         protected T Annotate<T>(T syntax) where T : Roslyn::SyntaxNode =>
             syntax.WithAdditionalAnnotations(MarkerAnnotation);
+
+        protected void SetNotNull<T>(ref T field, T value) where T : SyntaxNode
+        {
+            if (value == null)
+                throw new ArgumentNullException();
+
+            Set(ref field, value);
+        }
+
+        protected void Set<T>(ref T field, T value) where T : SyntaxNode
+        {
+            if (value.Parent != null)
+                throw new InvalidOperationException(
+                    $"Can't set the parent of syntax node '{value}', because it already has one.");
+
+            if (field != null)
+                field.Parent = null;
+
+            value.Parent = this;
+            field = value;
+        }
     }
 }

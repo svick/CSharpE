@@ -35,7 +35,7 @@ namespace CSharpE.Syntax
 
                 return type;
             }
-            set => type = value ?? throw new ArgumentNullException();
+            set => SetNotNull(ref type, value);
         }
 
         private Identifier name;
@@ -68,7 +68,7 @@ namespace CSharpE.Syntax
             }
             set
             {
-                initializer = value;
+                Set(ref initializer, value);
                 initializerSet = true;
             }
         }
@@ -93,7 +93,9 @@ namespace CSharpE.Syntax
             Name = name;
             Initializer = initializer;
         }
-        
+
+        public TypeDefinition ParentType { get; private set; }
+
         public static implicit operator MemberAccessExpression(FieldDefinition fieldDefinition) =>
             new MemberAccessExpression(fieldDefinition);
 
@@ -132,6 +134,18 @@ namespace CSharpE.Syntax
             yield return Node(Type);
             if (Initializer != null)
                 yield return Node(Initializer);
+        }
+
+        public override SyntaxNode Parent
+        {
+            get => ParentType;
+            internal set
+            {
+                if (value is TypeDefinition parentType)
+                    ParentType = parentType;
+                else
+                    throw new ArgumentException(nameof(value));
+            }
         }
     }
 }

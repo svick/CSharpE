@@ -151,15 +151,17 @@ namespace CSharpE.Syntax
                 .Select(u => u.Name)
                 .ToList();
 
+            var newMembers = members?.GetWrapped() ?? oldCompilationUnit.Members;
+
             // remove additional names that already have a using
+            // NOTE: this has to be executed *after* all GetWrapped() have already been called
+            // (otherwise new usings could be added by those called)
             additionalNamespaces.RemoveWhere(
                 ns =>
                 {
                     var nameSyntax = CSharpSyntaxFactory.ParseName(ns);
                     return oldUsingNamespaces.Any(ons => nameSyntax.IsEquivalentTo(ons));
                 });
-
-            var newMembers = members?.GetWrapped() ?? oldCompilationUnit.Members;
 
             if (syntax == null || additionalNamespaces.Any() || newMembers != oldCompilationUnit.Members)
             {
