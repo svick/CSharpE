@@ -9,14 +9,16 @@ namespace CSharpE.Syntax.Internals.Mapping
         TRoslynSyntax GetWrapped(TSyntax syntax);
     }
 
-    internal class SyntaxMapping<TSyntax, TRoslynSyntax, TMembers, TRoslynMembers> : ISyntaxMapping<TSyntax, TRoslynSyntax>
+    internal class SyntaxMapping<TSyntax, TRoslynSyntax, TRoslynMembers> : ISyntaxMapping<TSyntax, TRoslynSyntax>
         where TSyntax : ISyntax<TRoslynSyntax>
         where TRoslynSyntax : Microsoft.CodeAnalysis.SyntaxNode 
     {
-        private readonly SyntaxMappingMembers<TSyntax, TRoslynSyntax, TMembers, TRoslynMembers> members;
+        private readonly SyntaxMappingMembers<TSyntax, TRoslynSyntax, TRoslynMembers> members;
         private readonly Func<TRoslynMembers, TRoslynSyntax> constructor;
 
-        public SyntaxMapping(SyntaxMappingMembers<TSyntax, TRoslynSyntax, TMembers, TRoslynMembers> members, Func<TRoslynMembers, TRoslynSyntax> constructor)
+        public SyntaxMapping(
+            SyntaxMappingMembers<TSyntax, TRoslynSyntax, TRoslynMembers> members,
+            Func<TRoslynMembers, TRoslynSyntax> constructor)
         {
             this.members = members;
             this.constructor = constructor;
@@ -29,40 +31,40 @@ namespace CSharpE.Syntax.Internals.Mapping
 
     internal class SyntaxMapping
     {
-        public static SyntaxMappingBuilder<TSyntax, TRoslynSyntax, Unit, Unit> For<TSyntax, TRoslynSyntax>(
+        public static SyntaxMappingBuilder<TSyntax, TRoslynSyntax, Unit> For<TSyntax, TRoslynSyntax>(
             RefFunc<TSyntax, TRoslynSyntax> syntaxAccessor)
             where TSyntax : ISyntax<TRoslynSyntax>
             where TRoslynSyntax : Microsoft.CodeAnalysis.SyntaxNode =>
-            new SyntaxMappingBuilder<TSyntax, TRoslynSyntax, Unit, Unit>(
+            new SyntaxMappingBuilder<TSyntax, TRoslynSyntax, Unit>(
                 new SyntaxMappingMembersLeaf<TSyntax, TRoslynSyntax>(syntaxAccessor));
     }
 
-    internal class SyntaxMappingBuilder<TSyntax, TRoslynSyntax, TMembers, TRoslynMembers>
+    internal class SyntaxMappingBuilder<TSyntax, TRoslynSyntax, TRoslynMembers>
         where TSyntax : ISyntax<TRoslynSyntax>
         where TRoslynSyntax : Microsoft.CodeAnalysis.SyntaxNode
     {
-        private readonly SyntaxMappingMembers<TSyntax, TRoslynSyntax, TMembers, TRoslynMembers> members;
+        private readonly SyntaxMappingMembers<TSyntax, TRoslynSyntax, TRoslynMembers> members;
 
-        public SyntaxMappingBuilder(SyntaxMappingMembers<TSyntax, TRoslynSyntax, TMembers, TRoslynMembers> members) =>
+        public SyntaxMappingBuilder(SyntaxMappingMembers<TSyntax, TRoslynSyntax, TRoslynMembers> members) =>
             this.members = members;
 
-        public SyntaxMappingBuilder<TSyntax, TRoslynSyntax, (TMemberSyntax, TMembers), (TMemberRoslynSyntax, TRoslynMembers)>
+        public SyntaxMappingBuilder<TSyntax, TRoslynSyntax, (TMemberRoslynSyntax, TRoslynMembers)>
             AddMember<TMemberSyntax, TMemberRoslynSyntax>(
                 Func<TSyntax, TMemberSyntax> memberAccessor, Func<TSyntax, TMemberRoslynSyntax> roslynMemberAccessor,
                 Func<TRoslynSyntax, TMemberRoslynSyntax> roslynMemberDeconstructor)
             where TMemberSyntax : ISyntax<TMemberRoslynSyntax>
             where TMemberRoslynSyntax : class
         {
-            return new SyntaxMappingBuilder<TSyntax, TRoslynSyntax, (TMemberSyntax, TMembers), (TMemberRoslynSyntax, TRoslynMembers)>(
-                new SyntaxMappingMembersNode<TSyntax, TRoslynSyntax, TMemberSyntax, TMembers, TMemberRoslynSyntax, TRoslynMembers>(
+            return new SyntaxMappingBuilder<TSyntax, TRoslynSyntax, (TMemberRoslynSyntax, TRoslynMembers)>(
+                new SyntaxMappingMembersNode<TSyntax, TRoslynSyntax, TMemberSyntax, TMemberRoslynSyntax, TRoslynMembers>(
                     memberAccessor, roslynMemberAccessor, roslynMemberDeconstructor, members));
         }
 
         internal ISyntaxMapping<TSyntax, TRoslynSyntax> BuildCore(Func<TRoslynMembers, TRoslynSyntax> constructor) =>
-            new SyntaxMapping<TSyntax, TRoslynSyntax, TMembers, TRoslynMembers>(members, constructor);
+            new SyntaxMapping<TSyntax, TRoslynSyntax, TRoslynMembers>(members, constructor);
     }
 
-    internal abstract class SyntaxMappingMembers<TSyntax, TRoslynSyntax, TMembers, TRoslynMembers>
+    internal abstract class SyntaxMappingMembers<TSyntax, TRoslynSyntax, TRoslynMembers>
         where TRoslynSyntax : Microsoft.CodeAnalysis.SyntaxNode
     {
         public TRoslynSyntax GetWrapped(TSyntax syntax, Func<TRoslynMembers, TRoslynSyntax> constructor)
@@ -80,8 +82,8 @@ namespace CSharpE.Syntax.Internals.Mapping
         public abstract void Push(TSyntax syntax, TRoslynSyntax roslynSyntax);
     }
 
-    internal class SyntaxMappingMembersNode<TSyntax, TRoslynSyntax, TMember, TMembersRest, TRoslynMember, TRoslynMembersRest>
-        : SyntaxMappingMembers<TSyntax, TRoslynSyntax, (TMember head, TMembersRest tail), (TRoslynMember head, TRoslynMembersRest tail)>
+    internal class SyntaxMappingMembersNode<TSyntax, TRoslynSyntax, TMember, TRoslynMember, TRoslynMembersRest>
+        : SyntaxMappingMembers<TSyntax, TRoslynSyntax, (TRoslynMember head, TRoslynMembersRest tail)>
         where TRoslynSyntax : Microsoft.CodeAnalysis.SyntaxNode
         where TMember : ISyntax<TRoslynMember>
         where TRoslynMember : class
@@ -89,12 +91,12 @@ namespace CSharpE.Syntax.Internals.Mapping
         private readonly Func<TSyntax, TMember> memberAccessor;
         private readonly Func<TSyntax, TRoslynMember> roslynMemberAccessor;
         private readonly Func<TRoslynSyntax, TRoslynMember> roslynMemberDeconstructor;
-        private readonly SyntaxMappingMembers<TSyntax, TRoslynSyntax, TMembersRest, TRoslynMembersRest> previousMembers;
+        private readonly SyntaxMappingMembers<TSyntax, TRoslynSyntax, TRoslynMembersRest> previousMembers;
 
         public SyntaxMappingMembersNode(
             Func<TSyntax, TMember> memberAccessor, Func<TSyntax, TRoslynMember> roslynMemberAccessor,
             Func<TRoslynSyntax, TRoslynMember> roslynMemberDeconstructor,
-            SyntaxMappingMembers<TSyntax, TRoslynSyntax, TMembersRest, TRoslynMembersRest> previousMembers)
+            SyntaxMappingMembers<TSyntax, TRoslynSyntax, TRoslynMembersRest> previousMembers)
         {
             this.memberAccessor = memberAccessor;
             this.roslynMemberAccessor = roslynMemberAccessor;
@@ -130,7 +132,7 @@ namespace CSharpE.Syntax.Internals.Mapping
     internal delegate ref TResult RefFunc<T, TResult>(T arg);
 
     internal class SyntaxMappingMembersLeaf<TSyntax, TRoslynSyntax>
-        : SyntaxMappingMembers<TSyntax, TRoslynSyntax, Unit, Unit>
+        : SyntaxMappingMembers<TSyntax, TRoslynSyntax, Unit>
         where TRoslynSyntax : Microsoft.CodeAnalysis.SyntaxNode
     {
         private readonly RefFunc<TSyntax, TRoslynSyntax> syntaxAccessor;
