@@ -81,11 +81,11 @@ namespace CSharpE.Syntax
         
         private bool HasAttribute(string attributeTypeFullName)
         {
-            var attributeLists = syntax.AttributeLists;
-            
-            if (!attributeLists.Any())
+            if (!syntax.AttributeLists.Any())
                 return false;
 
+            var attributeLists = ((TypeDeclarationSyntax)GetSourceFileNode()).AttributeLists;
+            
             var semanticModel = SourceFile.SemanticModel;
 
             var attributeType = semanticModel.Compilation.GetTypeByMetadataName(attributeTypeFullName);

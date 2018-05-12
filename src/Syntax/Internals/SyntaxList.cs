@@ -108,19 +108,21 @@ namespace CSharpE.Syntax.Internals
 
             var roslynNodes = new List<TRoslynSyntax>(Count);
 
-            bool localChanged = roslynList.Count != list.Count;
+            bool thisChanged = roslynList.Count != list.Count;
 
             for (int i = 0; i < Count; i++)
             {
                 var value = list[i];
 
                 var roslynNode =
-                    value is TSyntax node ? node.GetWrapped(roslynList[i], ref localChanged) : (TRoslynSyntax)value;
+                    value is TSyntax node
+                        ? node.GetWrapped(thisChanged ? null : roslynList[i], ref thisChanged)
+                        : (TRoslynSyntax)value;
 
                 roslynNodes.Add(roslynNode);
             }
 
-            if (localChanged)
+            if (thisChanged)
             {
                 roslynList = CreateList(roslynNodes);
 
