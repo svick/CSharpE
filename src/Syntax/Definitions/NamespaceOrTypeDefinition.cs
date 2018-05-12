@@ -3,9 +3,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
-    public struct NamespaceOrTypeDefinition : ISyntaxWrapper<MemberDeclarationSyntax>
+    public struct NamespaceOrTypeDefinition : ISyntaxWrapper2<MemberDeclarationSyntax>
     {
-        private readonly ISyntaxWrapper<MemberDeclarationSyntax> namespaceOrType;
+        private readonly ISyntaxWrapper2<MemberDeclarationSyntax> namespaceOrType;
 
         public NamespaceOrTypeDefinition(NamespaceDefinition ns) => namespaceOrType = ns;
         public NamespaceOrTypeDefinition(TypeDefinition type) => namespaceOrType = type;
@@ -23,6 +23,7 @@ namespace CSharpE.Syntax
         public static implicit operator NamespaceOrTypeDefinition(TypeDefinition type) =>
             new NamespaceOrTypeDefinition(type);
 
-        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped() => namespaceOrType.GetWrapped();
+        MemberDeclarationSyntax ISyntaxWrapper2<MemberDeclarationSyntax>.GetWrapped(ref bool changed) =>
+            namespaceOrType.GetWrapped(ref changed);
     }
 }

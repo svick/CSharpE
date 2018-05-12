@@ -9,7 +9,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class FieldDefinition : MemberDefinition
+    public sealed class FieldDefinition : MemberDefinition, ISyntaxWrapper2<FieldDeclarationSyntax>
     {
         private const MemberModifiers ValidFieldModifiers =
             AccessModifiersMask | New | Static | Unsafe | Const | ReadOnly | Volatile;
@@ -101,18 +101,20 @@ namespace CSharpE.Syntax
 
         public FieldReference GetReference() => new FieldReference(ParentType.GetReference(), Name, Modifiers.Contains(Static));
 
-        internal new FieldDeclarationSyntax GetWrapped()
+        internal FieldDeclarationSyntax GetWrapped(ref bool changed)
         {
             var declarator = syntax?.Declaration.Variables.Single();
 
+            bool localChanged = false;
+
             var newModifiers = Modifiers;
-            var newType = type?.GetWrapped() ?? syntax.Declaration.Type;
-            var newName = name.GetWrapped();
+            var newType = type?.GetWrapped(ref localChanged) ?? syntax.Declaration.Type;
+            var newName = name.GetWrapped(ref localChanged);
             var newInitializer = initializerSet ? initializer?.GetWrapped() : declarator?.Initializer?.Value;
 
             if (syntax == null || AttributesChanged() ||
-                FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || syntax.Declaration.Type != newType ||
-                declarator.Identifier != newName || declarator.Initializer?.Value != newInitializer)
+                FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || localChanged ||
+                declarator.Initializer?.Value != newInitializer)
             {
                 var equalsValueClause =
                     newInitializer == null ? null : CSharpSyntaxFactory.EqualsValueClause(newInitializer);
@@ -121,12 +123,16 @@ namespace CSharpE.Syntax
                     GetNewAttributes(), newModifiers.GetWrapped(), CSharpSyntaxFactory.VariableDeclaration(
                         newType, CSharpSyntaxFactory.SingletonSeparatedList(
                             CSharpSyntaxFactory.VariableDeclarator(newName, null, equalsValueClause))));
+
+                changed = true;
             }
 
             return syntax;
         }
 
         protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
+
+        FieldDeclarationSyntax ISyntaxWrapper2<FieldDeclarationSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
 
         protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
         {

@@ -7,8 +7,8 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
 {
-    internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : IList<TSyntax>, ISyntaxWrapper<TList>
-        where TSyntax : ISyntaxWrapper<TRoslynSyntax>
+    internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : IList<TSyntax>, ISyntaxWrapper2<TList>
+        where TSyntax : ISyntaxWrapperBase<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
         where TList : struct, IReadOnlyList<TRoslynSyntax>
     {
@@ -102,27 +102,30 @@ namespace CSharpE.Syntax.Internals
 
         protected abstract TList CreateList(List<TRoslynSyntax> nodes);
 
-        public TList GetWrapped()
+        public TList GetWrapped(ref bool changed)
         {
             // PERF: don't allocate roslynNodes before it's known something changed
 
             var roslynNodes = new List<TRoslynSyntax>(Count);
 
-            bool changed = roslynList.Count != list.Count;
+            bool localChanged = roslynList.Count != list.Count;
 
             for (int i = 0; i < Count; i++)
             {
                 var value = list[i];
 
-                var roslynNode = value is TSyntax node ? node.GetWrapped() : (TRoslynSyntax)value;
+                var roslynNode =
+                    value is TSyntax node ? node.GetWrapped(roslynList[i], ref localChanged) : (TRoslynSyntax)value;
 
                 roslynNodes.Add(roslynNode);
-
-                changed = changed || roslynNode != roslynList[i];
             }
 
-            if (changed)
+            if (localChanged)
+            {
                 roslynList = CreateList(roslynNodes);
+
+                changed = true;
+            }
 
             return roslynList;
         }
@@ -130,7 +133,7 @@ namespace CSharpE.Syntax.Internals
 
     internal sealed class SyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SyntaxList<TRoslynSyntax>>
-        where TSyntax : ISyntaxWrapper<TRoslynSyntax>
+        where TSyntax : ISyntaxWrapperBase<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
     {
         public SyntaxList() : base() { }
@@ -147,7 +150,7 @@ namespace CSharpE.Syntax.Internals
 
     internal sealed class SeparatedSyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SeparatedSyntaxList<TRoslynSyntax>>
-        where TSyntax : ISyntaxWrapper<TRoslynSyntax>
+        where TSyntax : ISyntaxWrapperBase<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
     {
         public SeparatedSyntaxList() : base() { }

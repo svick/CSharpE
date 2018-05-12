@@ -3,7 +3,7 @@ using LinqExpression = System.Linq.Expressions.Expression;
 
 namespace CSharpE.Syntax.Internals
 {
-    internal static class SyntaxWrapper<TSyntaxWrapper, TSyntax> where TSyntaxWrapper : ISyntaxWrapper<TSyntax>
+    internal static class SyntaxWrapper<TSyntaxWrapper, TSyntax> where TSyntaxWrapper : ISyntaxWrapperBase<TSyntax>
     {
         private static Func<TSyntax, TSyntaxWrapper> CreateConstructor()
         {

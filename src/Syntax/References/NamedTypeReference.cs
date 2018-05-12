@@ -10,7 +10,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class NamedTypeReference : TypeReference, IPersistent
+    public sealed class NamedTypeReference : TypeReference, IPersistent
     {
         private TypeSyntax syntax;
 
@@ -69,7 +69,7 @@ namespace CSharpE.Syntax
             if (SourceFile == null)
                 throw new InvalidOperationException("Can't get this information for node without ancestor SourceFile.");
 
-            var symbol = SourceFile.SyntaxContext.Resolve(syntax);
+            var symbol = SourceFile.SyntaxContext.Resolve((TypeSyntax)GetSourceFileNode());
 
             Resolve(symbol);
         }
@@ -91,8 +91,6 @@ namespace CSharpE.Syntax
                 syntaxName = symbol.Name;
                 isKnownType = true;
             }
-
-            syntaxContainer = container?.GetWrapped();
         }
 
         private bool? isKnownType;
@@ -134,7 +132,6 @@ namespace CSharpE.Syntax
             }
         }
 
-        private TypeSyntax syntaxContainer;
         private NamedTypeReference container;
         public NamedTypeReference Container
         {
@@ -236,21 +233,32 @@ namespace CSharpE.Syntax
 
         public static implicit operator IdentifierExpression(NamedTypeReference typeReference) => new IdentifierExpression(typeReference.Name);
 
-        protected override TypeSyntax GetWrappedImpl()
+        protected override TypeSyntax GetWrappedImpl(ref bool changed)
         {
             var oldTypeParameters = (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
             var newTypeParameters = typeParameters?.GetWrapped() ?? oldTypeParameters;
 
             // if Resolve() wasn't called, only type parameters could have been changed
             if (isKnownType == null && newTypeParameters == oldTypeParameters)
+            {
+                if (!IsAnnotated(syntax))
+                {
+                    syntax = Annotate(syntax);
+
+                    changed = true;
+                }
+
                 return syntax;
+            }
+
+            bool thisChanged = false;
 
             var newNamespace = ns ?? syntaxNamespace;
-            var newContainer = container?.GetWrapped();
+            var newContainer = container?.GetWrapped(ref thisChanged);
             var newName = name ?? syntaxName;
 
-            if (syntax == null || newNamespace != syntaxNamespace || newContainer != syntaxContainer ||
-                newName != syntaxName || newTypeParameters != oldTypeParameters)
+            if (syntax == null || newNamespace != syntaxNamespace || thisChanged ||
+                newName != syntaxName || newTypeParameters != oldTypeParameters || !IsAnnotated(syntax))
             {
                 if (RequiresUsingNamespace)
                     SourceFile?.EnsureUsingNamespace(Namespace);
@@ -280,8 +288,11 @@ namespace CSharpE.Syntax
                         syntax = CSharpSyntaxFactory.QualifiedName((NameSyntax)newContainer, simpleName);
                 }
 
+                syntax = Annotate(syntax);
+
+                changed = true;
+
                 syntaxNamespace = newNamespace;
-                syntaxContainer = newContainer;
                 syntaxName = newName;
             }
 

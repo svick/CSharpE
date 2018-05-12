@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -21,8 +20,11 @@ namespace CSharpE.Syntax
         public SourceFile SourceFile => this is SourceFile sourceFile ? sourceFile : Parent?.SourceFile;
 
         // local cached syntax might not be part of the tree, so it won't have correct Span
-        public TextSpan Span =>
-            SourceFile.GetWrapped().GetRoot().GetAnnotatedNodes(MarkerAnnotation).Single().Span;
+        public TextSpan Span => GetSourceFileNode().Span;
+
+        // returns a copy of Roslyn version of this node that's part of the SourceFile SyntaxTree
+        protected Roslyn::SyntaxNode GetSourceFileNode() =>
+            SourceFile.GetWrapped().GetRoot().GetAnnotatedNodes(MarkerAnnotation).Single();
 
         protected static IEnumerable<SyntaxNode> Node(SyntaxNode node)
         {

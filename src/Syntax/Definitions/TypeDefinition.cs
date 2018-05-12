@@ -9,7 +9,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public sealed class TypeDefinition : MemberDefinition, ITypeContainer
+    public sealed class TypeDefinition : MemberDefinition, ITypeContainer, ISyntaxWrapper2<TypeDeclarationSyntax>
     {
         private TypeDeclarationSyntax syntax;
         
@@ -123,25 +123,29 @@ namespace CSharpE.Syntax
 
         protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
 
-        internal new TypeDeclarationSyntax GetWrapped()
+        internal TypeDeclarationSyntax GetWrapped(ref bool changed)
         {
-            var newName = name.GetWrapped();
-            var newMembers = members?.GetWrapped() ?? syntax.Members;
+            bool localChanged = false;
 
-            if (syntax == null || AttributesChanged() || newName != syntax.Identifier || newMembers != syntax.Members ||
-                !IsAnnotated(syntax))
+            var newName = name.GetWrapped(ref localChanged);
+            var newMembers = members?.GetWrapped(ref localChanged) ?? syntax.Members;
+
+            if (syntax == null || AttributesChanged() || localChanged || !IsAnnotated(syntax))
             {
                 var newSyntax = CSharpSyntaxFactory.ClassDeclaration(
-                    GetNewAttributes(), default, name.GetWrapped(), default, default, default,
-                    newMembers);
+                    GetNewAttributes(), default, newName, default, default, default, newMembers);
 
                 syntax = Annotate(newSyntax);
+
+                changed = true;
             }
 
             return syntax;
         }
 
         protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
+
+        TypeDeclarationSyntax ISyntaxWrapper2<TypeDeclarationSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
 
         protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
         {
@@ -150,5 +154,6 @@ namespace CSharpE.Syntax
         }
 
         public override SyntaxNode Parent { get; internal set; }
+
     }
 }

@@ -12,7 +12,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public class SourceFile : SyntaxNode, ITypeContainer
+    public class SourceFile : SyntaxNode, ITypeContainer, ISyntaxWrapper2<SyntaxTree>
     {
         public string Path { get; }
 
@@ -42,12 +42,15 @@ namespace CSharpE.Syntax
         {
             get
             {
+                // note that GetWrapped() nulls-out semanticModel if change occurred
+                var syntaxTree = GetWrapped();
+
                 if (semanticModel == null)
                 {
                     if (Project == null)
                         throw new InvalidOperationException("SourceFile has to be part of a Project for this operation.");
 
-                    semanticModel = Project.Compilation.GetSemanticModel(GetWrapped());
+                    semanticModel = Project.Compilation.GetSemanticModel(syntaxTree);
                 }
 
                 return semanticModel;
@@ -136,13 +139,12 @@ namespace CSharpE.Syntax
             }
         }
 
-        public void EnsureUsingNamespace(string ns)
-        {
-            additionalNamespaces.Add(ns);
-        }
+        public void EnsureUsingNamespace(string ns) => additionalNamespaces.Add(ns);
 
-        public SyntaxTree GetWrapped()
+        internal SyntaxTree GetWrapped(ref bool changed)
         {
+            bool localChanged = false;
+
             var oldCompilationUnit = syntax?.GetCompilationUnitRoot();
             var oldUsings = oldCompilationUnit?.Usings ?? default;
 
@@ -151,7 +153,7 @@ namespace CSharpE.Syntax
                 .Select(u => u.Name)
                 .ToList();
 
-            var newMembers = members?.GetWrapped() ?? oldCompilationUnit.Members;
+            var newMembers = members?.GetWrapped(ref localChanged) ?? oldCompilationUnit.Members;
 
             // remove additional names that already have a using
             // NOTE: this has to be executed *after* all GetWrapped() have already been called
@@ -163,7 +165,7 @@ namespace CSharpE.Syntax
                     return oldUsingNamespaces.Any(ons => nameSyntax.IsEquivalentTo(ons));
                 });
 
-            if (syntax == null || additionalNamespaces.Any() || newMembers != oldCompilationUnit.Members)
+            if (syntax == null || additionalNamespaces.Any() || localChanged)
             {
                 var newUsings = oldUsings;
 
@@ -179,10 +181,18 @@ namespace CSharpE.Syntax
                     CSharpSyntaxFactory.CompilationUnit(default, newUsings, default, newMembers).NormalizeWhitespace());
 
                 additionalNamespaces.Clear();
+
+                changed = true;
+
+                semanticModel = null;
             }
 
             return syntax;
         }
+
+        SyntaxTree ISyntaxWrapper2<SyntaxTree>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
+
+        public SyntaxTree GetWrapped() => SyntaxWrapperExtensions.GetWrapped(this);
 
         protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
         {

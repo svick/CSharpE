@@ -17,16 +17,24 @@ namespace CSharpE.Syntax
         public IList<LibraryReference> References { get; }
 
         private CSharpCompilation compilation;
-        
         public CSharpCompilation Compilation
         {
             get
             {
-                // TODO: if something changed, alter the compilation
+                // TODO: if References changed, alter the compilation
+
+                var trees = ActualSourceFiles.Select(file => file.GetWrapped()).ToList();
 
                 if (compilation == null)
+                {
                     compilation = CSharpCompilation.Create(
-                        null, ActualSourceFiles.Select(file => file.GetWrapped()), References.Select(r => r.GetMetadataReference()));
+                        null, trees, References.Select(r => r.GetMetadataReference()));
+                }
+                else if (!trees.SequenceEqual(compilation.SyntaxTrees))
+                {
+                    // PERF: only replace trees that changed, but be careful about what happens if order changes
+                    compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(trees);
+                }
 
                 return compilation;
             }
