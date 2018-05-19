@@ -16,14 +16,14 @@ namespace CSharpE.Transform.Internals
 
             if (closureInfo != null)
             {
-                string message = $"The delegate for {EnhancedStackTrace.GetMethodDisplayString(d.Method)} has closure.";
-
-                if (closureInfo != string.Empty)
-                    message = $"{message} Closure contains {closureInfo}.";
+                string message =
+                    $"The delegate for {EnhancedStackTrace.GetMethodDisplayString(d.Method)} has closure. Closure contains {closureInfo}.";
 
                 throw new HasClosureException(message);
             }
         }
+
+        public static bool HasClosure(Delegate d) => GetClosureInfo(d) != null;
 
         private static readonly ConcurrentDictionary<Type, string> HasClosureCache = new ConcurrentDictionary<Type, string>();
 

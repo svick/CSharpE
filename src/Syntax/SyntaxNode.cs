@@ -22,6 +22,8 @@ namespace CSharpE.Syntax
         // local cached syntax might not be part of the tree, so it won't have correct Span
         public TextSpan Span => GetSourceFileNode().Span;
 
+        public FileSpan FileSpan => new FileSpan(Span, SourceFile.GetWrapped());
+
         // returns a copy of Roslyn version of this node that's part of the SourceFile SyntaxTree
         protected Roslyn::SyntaxNode GetSourceFileNode() =>
             SourceFile.GetWrapped().GetRoot().GetAnnotatedNodes(MarkerAnnotation).Single();

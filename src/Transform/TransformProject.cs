@@ -40,7 +40,11 @@ namespace CSharpE.Transform
         {
             this.References.AddRange(transformation.AdditionalReferences);
 
-            return CodeTransformer<TransformProject>.Create(transformation.Process);
+            var transformer = CodeTransformer<TransformProject>.Create(transformation.Process);
+
+            transformer.Transform(this, new ProjectDiff(this));
+
+            return transformer;
         }
     }
 }

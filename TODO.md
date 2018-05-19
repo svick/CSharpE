@@ -1,9 +1,9 @@
 - figure out better names than `Project`, `Project` and `SourceFile`, `SourceFile`
-- when fixing equivalence, probably use `IsEquivalentTo(node, false)`
 - fix moving `NamedTypeReference`s between files (doesn't update `using`s)
 - make most classes `sealed`
 - allow modifying lists while iterating them
   - optional: make it more efficient using copy on write 
+- detect reading of References/Symbols, then rerun when those symbols change
 
 ---
 

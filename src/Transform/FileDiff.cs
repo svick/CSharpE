@@ -2,7 +2,7 @@
 
 namespace CSharpE.Transform
 {
-    internal class FileDiff
+    public class FileDiff
     {
         public static FileDiff Between(SyntaxTree oldTree, SyntaxTree newTree)
         {

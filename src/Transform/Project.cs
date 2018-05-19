@@ -11,7 +11,7 @@ namespace CSharpE.Transform
         public IList<SourceFile> SourceFiles { get; }
         public IList<LibraryReference> AdditionalReferences { get; }
 
-        private readonly Transformer<TransformProject> transformer;
+        private readonly List<TransformationTransformer> transformers;
 
         public Project(
             IEnumerable<SourceFile> sourceFiles, IEnumerable<Type> additionalReferencesRepresentatives,
@@ -26,28 +26,22 @@ namespace CSharpE.Transform
         {
             SourceFiles = sourceFiles.ToList();
             AdditionalReferences = additionalReferences.ToList();
-            transformer = Transformer.Create(transformations);
+            transformers = transformations.Select(t => new TransformationTransformer(t)).ToList();
         }
 
         public Project Transform()
         {
-            var projectDiff = Diff();
+            var transformProject = new TransformProject(
+                SourceFiles.Select(f => f.ToSyntaxSourceFile()), AdditionalReferences);
 
-            transformer.Transform(projectDiff);
-
-            Snapshot();
-
-            return projectDiff.GetProject();
-        }
-
-        private ProjectDiff Diff() => new ProjectDiff(this);
-
-        private void Snapshot()
-        {
-            foreach (var file in SourceFiles)
+            foreach (var transformer in transformers)
             {
-                file.Snapshot();
+                transformer.Transform(transformProject);
             }
+
+            return new Project(
+                transformProject.SourceFiles.Select(SourceFile.FromSyntaxSourceFile),
+                Enumerable.Empty<LibraryReference>(), Enumerable.Empty<ITransformation>());
         }
     }
 }

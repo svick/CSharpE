@@ -52,6 +52,54 @@ class C
         }
 
         [Fact]
+        public void SimpleActorProject()
+        {
+            string input = @"using CSharpE.Extensions.Actor;
+
+[Actor]
+class C
+{
+    public int M()
+    {
+        return 42;
+    }
+}";
+
+            string expectedOutput = @"using CSharpE.Extensions.Actor;
+using System.Threading;
+using System.Threading.Tasks;
+
+[Actor]
+class C
+{
+    public async Task<int> M()
+    {
+        await this._actor_semaphore.WaitAsync();
+        try
+        {
+            return 42;
+        }
+        finally
+        {
+            this._actor_semaphore.Release();
+        }
+    }
+
+    readonly SemaphoreSlim _actor_semaphore = new SemaphoreSlim(1);
+}";
+
+            var sourceFile = new SourceFile("source.cse", input);
+
+            var project = new Project(
+                new[] { sourceFile }, new[] { typeof(ActorAttribute) },
+                new ITransformation[] { new ActorTransformation() });
+
+            var tranformedProject = project.Transform();
+            Assert.Equal(expectedOutput, tranformedProject.SourceFiles.Single().Text);
+
+        }
+
+        [Fact]
         public void IncrementalActor()
         {
             string input = @"using CSharpE.Extensions.Actor;
