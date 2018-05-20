@@ -42,7 +42,7 @@ namespace CSharpE.Transform
 
             var transformer = CodeTransformer<TransformProject>.Create(transformation.Process);
 
-            transformer.Transform(this, new ProjectDiff(this));
+            transformer.Transform(this, this);
 
             return transformer;
         }

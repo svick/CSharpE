@@ -47,7 +47,7 @@ namespace CSharpE.Transform.Transformers
             if (transformer == null)
                 transformer = new CollectionTransformer<TParent, TItem, TData>(parent, action, data);
 
-            transformer.Transform(project, TrivialDiff.Create(collectionFunction(parent)));
+            transformer.Transform(project, collectionFunction(parent));
 
             Transformers.Add(transformer);
         }
@@ -88,9 +88,9 @@ namespace CSharpE.Transform.Transformers
             this.data = data;
         }
 
-        public override void Transform(TransformProject project, Diff<IEnumerable<TItem>> diff)
+        public override void Transform(TransformProject project, IEnumerable<TItem> input)
         {
-            foreach (var item in diff.GetNew())
+            foreach (var item in input)
             {
                 action.Invoke(data, item);
             }

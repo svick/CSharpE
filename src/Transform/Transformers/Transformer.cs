@@ -4,7 +4,7 @@
 
     internal abstract class Transformer<TInput> : Transformer
     {
-        public abstract void Transform(TransformProject project, Diff<TInput> diff);
+        public abstract void Transform(TransformProject project, TInput input);
     }
 
     internal class TransformationTransformer
@@ -23,10 +23,7 @@
             }
             else
             {
-                // TODO
-                var diff = new ProjectDiff(project);
-
-                innerTransformer.Transform(project, diff);
+                innerTransformer.Transform(project, project);
             }
         }
     }

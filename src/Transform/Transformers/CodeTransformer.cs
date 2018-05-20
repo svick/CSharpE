@@ -13,10 +13,8 @@ namespace CSharpE.Transform.Transformers
 
         public CodeTransformer(Action<TInput> codeAction) => this.codeAction = codeAction;
 
-        public override void Transform(TransformProject project, Diff<TInput> diff)
+        public override void Transform(TransformProject project, TInput input)
         {
-            var input = diff.GetNew();
-
             var transformerBuilder = new TransformerBuilder<TInput>(project, input, transformers);
 
             var oldTransformerBuilder = project.TransformerBuilder;
