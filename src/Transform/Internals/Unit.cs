@@ -6,5 +6,7 @@
     internal struct Unit
     {
         public static Unit Value => default;
+
+        // PERF: override Equals() and GetHashCode
     }
 }

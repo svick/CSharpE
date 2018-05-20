@@ -16,7 +16,8 @@ namespace CSharpE.Transform.Smart
             if (project is TransformProject transformProject)
             {
                 transformProject.TransformerBuilder.Collection(
-                    project, p => p.TypesWithAttribute<TAttribute>(), (_, item) => action(item), Unit.Value);
+                    project, p => p.TypesWithAttribute<TAttribute>(),
+                    ActionInvoker<Unit, TypeDefinition>.Create(action, (a, _, item) => a(item)), Unit.Value);
             }
             else
             {
@@ -44,7 +45,8 @@ namespace CSharpE.Transform.Smart
 
             if (type.SourceFile?.Project is TransformProject transformProject)
             {
-                transformProject.TransformerBuilder.Collection(type, t => t.PublicMethods, action, arg1);
+                transformProject.TransformerBuilder.Collection(
+                    type, t => t.PublicMethods, ActionInvoker<T1, MethodDefinition>.Create(action), arg1);
             }
             else
             {

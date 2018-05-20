@@ -1,9 +1,10 @@
-- figure out better names than `Project`, `Project` and `SourceFile`, `SourceFile`
+﻿- figure out better names than `Project`, `Project` and `SourceFile`, `SourceFile`
 - fix moving `NamedTypeReference`s between files (doesn't update `using`s)
 - make most classes `sealed`
 - allow modifying lists while iterating them
   - optional: make it more efficient using copy on write 
 - detect reading of References/Symbols, then rerun when those symbols change
+- somehow handle multi-level collections like `project.ForEachTypeWithAttribute` (project → file → type)
 
 ---
 

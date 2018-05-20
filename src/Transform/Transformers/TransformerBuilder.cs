@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax;
+using CSharpE.Transform.Internals;
 
 namespace CSharpE.Transform.Transformers
 {
     internal abstract class TransformerBuilder
     {
         public abstract void Collection<TParent, TItem, TData>(
-            TParent parent, Func<TParent, IEnumerable<TItem>> collectionFunction, Action<TData, TItem> action,
+            TParent parent, Func<TParent, IEnumerable<TItem>> collectionFunction, ActionInvoker<TData, TItem> action,
             TData data) where TParent : class;
     }
 
@@ -30,7 +31,7 @@ namespace CSharpE.Transform.Transformers
         public List<Transformer> Transformers { get; } = new List<Transformer>();
 
         public override void Collection<TParent, TItem, TData>(
-            TParent parent, Func<TParent, IEnumerable<TItem>> collectionFunction, Action<TData, TItem> action,
+            TParent parent, Func<TParent, IEnumerable<TItem>> collectionFunction, ActionInvoker<TData, TItem> action,
             TData data)
         {
             CollectionTransformer<TParent, TItem, TData> transformer = null;
@@ -67,14 +68,20 @@ namespace CSharpE.Transform.Transformers
                 return (Func<TParent, TParent, bool>)syntaxNodeMatcher;
             }
 
+            if (typeof(Syntax.Project) == typeof(TParent))
+            {
+                // assume that two instances of Project refer to the same project
+                return (oldProject, newProject) => true;
+            }
+
             return ReferenceEquals;
         }
 
         private readonly TParent parent;
-        private readonly Action<TData, TItem> action;
+        private readonly ActionInvoker<TData, TItem> action;
         private readonly TData data;
 
-        public CollectionTransformer(TParent parent, Action<TData, TItem> action, TData data)
+        public CollectionTransformer(TParent parent, ActionInvoker<TData, TItem> action, TData data)
         {
             this.parent = parent;
             this.action = action;
@@ -85,12 +92,12 @@ namespace CSharpE.Transform.Transformers
         {
             foreach (var item in diff.GetNew())
             {
-                action(data, item);
+                action.Invoke(data, item);
             }
         }
 
-        public bool Matches(TParent newParent, Action<TData, TItem> newAction, TData newData) =>
-            action.Method == newAction.Method &&
+        public bool Matches(TParent newParent, ActionInvoker<TData, TItem> newAction, TData newData) =>
+            action.Equals(newAction) &&
             EqualityComparer<TData>.Default.Equals(data, newData) &&
             ParentMatcher(parent, newParent);
     }
