@@ -51,6 +51,6 @@ namespace CSharpE.Syntax
             yield return Node(Operand);
         }
 
-        public override SyntaxNode Parent { get; internal set; }
+        internal override SyntaxNode Parent { get; set; }
     }
 }

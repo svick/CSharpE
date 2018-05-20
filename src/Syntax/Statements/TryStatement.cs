@@ -101,6 +101,6 @@ namespace CSharpE.Syntax
             yield return FinallyStatements;
         }
 
-        public override SyntaxNode Parent { get; internal set; }
+        internal override SyntaxNode Parent { get; set; }
     }
 }

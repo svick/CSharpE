@@ -19,10 +19,10 @@ namespace CSharpE.Syntax
             throw new System.NotImplementedException();
         }
 
-        public override SyntaxNode Parent
+        internal override SyntaxNode Parent
         {
             get => ParentStatement;
-            internal set
+            set
             {
                 if (value is TryStatement tryStatement)
                     ParentStatement = tryStatement;

@@ -14,6 +14,6 @@ namespace CSharpE.Syntax
 
         protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren() => Enumerable.Empty<IEnumerable<SyntaxNode>>();
 
-        public override SyntaxNode Parent { get; internal set; }
+        internal override SyntaxNode Parent { get; set; }
     }
 }

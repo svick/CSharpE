@@ -20,16 +20,16 @@ namespace CSharpE.Syntax
 
         public AttributeSyntax GetWrapped()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         // TODO
         protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren() => Enumerable.Empty<IEnumerable<SyntaxNode>>();
 
-        public override SyntaxNode Parent
+        internal override SyntaxNode Parent
         {
             get => ParentMember;
-            internal set
+            set
             {
                 if (value is MemberDefinition memberDefinition)
                     ParentMember = memberDefinition;

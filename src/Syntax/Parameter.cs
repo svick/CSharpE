@@ -16,6 +16,6 @@ namespace CSharpE.Syntax
             throw new System.NotImplementedException();
         }
 
-        public override SyntaxNode Parent { get; internal set; }
+        internal override SyntaxNode Parent { get; set; }
     }
 }

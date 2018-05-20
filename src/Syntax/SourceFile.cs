@@ -35,7 +35,7 @@ namespace CSharpE.Syntax
 
         public string GetText() => GetWrapped().ToString();
 
-        public Project Project { get; internal set; }
+        internal Project Project { get; set; }
 
         private SemanticModel semanticModel;
         internal SemanticModel SemanticModel
@@ -199,10 +199,10 @@ namespace CSharpE.Syntax
             yield return Members.Select(m => m.Value);
         }
 
-        public override SyntaxNode Parent
+        internal override SyntaxNode Parent
         {
             get => null;
-            internal set => throw new InvalidOperationException();
+            set => throw new InvalidOperationException();
         }
     }
 }

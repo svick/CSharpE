@@ -74,6 +74,6 @@ namespace CSharpE.Syntax
             yield return Arguments;
         }
 
-        public override SyntaxNode Parent { get; internal set; }
+        internal override SyntaxNode Parent { get; set; }
     }
 }

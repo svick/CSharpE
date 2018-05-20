@@ -153,7 +153,7 @@ namespace CSharpE.Syntax
             yield return Members;
         }
 
-        public override SyntaxNode Parent { get; internal set; }
+        internal override SyntaxNode Parent { get; set; }
 
     }
 }

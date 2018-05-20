@@ -15,9 +15,9 @@ namespace CSharpE.Syntax
 
         protected abstract IEnumerable<IEnumerable<SyntaxNode>> GetChildren();
 
-        public abstract SyntaxNode Parent { get; internal set; }
+        internal abstract SyntaxNode Parent { get; set; }
 
-        public SourceFile SourceFile => this is SourceFile sourceFile ? sourceFile : Parent?.SourceFile;
+        internal SourceFile SourceFile => this is SourceFile sourceFile ? sourceFile : Parent?.SourceFile;
 
         // local cached syntax might not be part of the tree, so it won't have correct Span
         public TextSpan Span => GetSourceFileNode().Span;

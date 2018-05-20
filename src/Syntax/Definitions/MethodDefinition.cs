@@ -192,10 +192,10 @@ namespace CSharpE.Syntax
             yield return Body;
         }
 
-        public override SyntaxNode Parent
+        internal override SyntaxNode Parent
         {
             get => ParentType;
-            internal set
+            set
             {
                 if (value is TypeDefinition parentType)
                     ParentType = parentType;
