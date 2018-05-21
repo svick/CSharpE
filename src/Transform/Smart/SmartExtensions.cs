@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CSharpE.Syntax;
 using CSharpE.Transform.Internals;
 
@@ -6,55 +7,81 @@ namespace CSharpE.Transform.Smart
 {
     public static class SmartExtensions
     {
-        public static void ForEachTypeWithAttribute<TAttribute>(
-            this Syntax.Project project, Action<TypeDefinition> action)
-            where TAttribute : System.Attribute
+        private static void ForEach<TParent, TItem>(
+            TParent parent, Syntax.Project project, Action<TItem> action,
+            Func<TParent, IEnumerable<TItem>> collectionFunction) where TParent : class
         {
             ClosureChecker.ThrowIfHasClosure(action);
 
-            // TODO: DRY with other methods here
             if (project is TransformProject transformProject)
             {
                 transformProject.TransformerBuilder.Collection(
-                    project, p => p.TypesWithAttribute<TAttribute>(),
-                    ActionInvoker<Unit, TypeDefinition>.Create(action, (a, _, item) => a(item)), Unit.Value);
+                    parent, collectionFunction, ActionInvoker<TItem>.Create(action), Unit.Value);
             }
             else
             {
-                foreach (var type in project.TypesWithAttribute<TAttribute>())
+                foreach (var item in collectionFunction(parent))
                 {
-                    action(type);
+                    action(item);
                 }
             }
         }
 
-        public static void ForEachPublicMethod(this TypeDefinition type, Action<MethodDefinition> action)
-        {
-            ClosureChecker.ThrowIfHasClosure(action);
+        private static void ForEach<TItem>(
+            Syntax.Project project, Action<TItem> action,
+            Func<Syntax.Project, IEnumerable<TItem>> collectionFunction)
+            => ForEach(project, project, action, collectionFunction);
 
-            foreach (var method in type.PublicMethods)
-            {
-                action(method);
-            }
-        }
+        private static void ForEach<TParent, TItem>(
+            TParent parent, Action<TItem> action, Func<TParent, IEnumerable<TItem>> collectionFunction)
+            where TParent : SyntaxNode
+            => ForEach(parent, parent.SourceFile?.Project, action, collectionFunction);
 
-        public static void ForEachPublicMethod<T1>(this TypeDefinition type, T1 arg1, Action<T1, MethodDefinition> action)
+        private static void ForEach<TParent, TItem, T1>(
+            TParent parent, Syntax.Project project, T1 arg1, Action<T1, TItem> action,
+            Func<TParent, IEnumerable<TItem>> collectionFunction) where TParent : class
         {
             ClosureChecker.ThrowIfHasClosure(action);
             ArgumentChecker.ThrowIfNotPersistent(arg1);
 
-            if (type.SourceFile?.Project is TransformProject transformProject)
+            if (project is TransformProject transformProject)
             {
                 transformProject.TransformerBuilder.Collection(
-                    type, t => t.PublicMethods, ActionInvoker<T1, MethodDefinition>.Create(action), arg1);
+                    parent, collectionFunction, ActionInvoker<T1, TItem>.Create(action), arg1);
             }
             else
             {
-                foreach (var method in type.PublicMethods)
+                foreach (var item in collectionFunction(parent))
                 {
-                    action(arg1, method);
+                    action(arg1, item);
                 }
             }
         }
+
+        private static void ForEach<TItem, T1>(
+            Syntax.Project project, T1 arg1, Action<T1, TItem> action,
+            Func<Syntax.Project, IEnumerable<TItem>> collectionFunction) =>
+            ForEach(project, project, arg1, action, collectionFunction);
+
+        private static void ForEach<TParent, TItem, T1>(
+            TParent parent, T1 arg1, Action<T1, TItem> action, Func<TParent, IEnumerable<TItem>> collectionFunction)
+            where TParent : SyntaxNode =>
+            ForEach(parent, parent.SourceFile?.Project, arg1, action, collectionFunction);
+
+        public static void ForEachTypeWithAttribute<TAttribute>(
+            this Syntax.Project project, Action<TypeDefinition> action)
+            where TAttribute : System.Attribute =>
+            ForEach(project, project, action, p => p.TypesWithAttribute<TAttribute>());
+
+        public static void ForEachSourceFile<T1>(
+            this Syntax.Project project, T1 arg1, Action<T1, Syntax.SourceFile> action) =>
+            ForEach(project, arg1, action, p => p.SourceFiles);
+
+        public static void ForEachPublicMethod(this TypeDefinition type, Action<MethodDefinition> action) =>
+            ForEach(type, action, t => t.PublicMethods);
+
+        public static void ForEachPublicMethod<T1>(
+            this TypeDefinition type, T1 arg1, Action<T1, MethodDefinition> action) =>
+            ForEach(type, arg1, action, t => t.PublicMethods);
     }
 }

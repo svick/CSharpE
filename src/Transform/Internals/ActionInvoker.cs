@@ -13,28 +13,23 @@ namespace CSharpE.Transform.Internals
 
         public abstract void Invoke(T1 arg1, T2 arg2);
 
-        public static ActionInvoker<T1, T2> Create<TWrapped>(
-            TWrapped wrapped, Action<TWrapped, T1, T2> unwrapper = null) where TWrapped : Delegate =>
-            new ActionInvoker<T1, T2, TWrapped>(wrapped, unwrapper);
+        public static ActionInvoker<T1, T2> Create(Action<T1, T2> action) => new SimpleActionInvoker<T1, T2>(action);
     }
 
-    internal class ActionInvoker<T1, T2, TWrapped> : ActionInvoker<T1, T2> where TWrapped : Delegate
+    internal static class ActionInvoker<T>
     {
-        private readonly TWrapped wrapped;
-        private readonly Action<TWrapped, T1, T2> unwrapper;
+        public static ActionInvoker<Unit, T> Create(Action<T> action) => new UnitActionInvoker<T>(action);
+    }
 
-        public ActionInvoker(TWrapped wrapped, Action<TWrapped, T1, T2> unwrapper = null)
+    internal class SimpleActionInvoker<T1, T2> : ActionInvoker<T1, T2>
+    {
+        private readonly Action<T1, T2> action;
+
+        public SimpleActionInvoker(Action<T1, T2> action)
         {
-            Debug.Assert(!ClosureChecker.HasClosure(wrapped));
+            Debug.Assert(!ClosureChecker.HasClosure(action));
 
-            if (unwrapper != null)
-                ClosureChecker.ThrowIfHasClosure(unwrapper);
-
-            if (unwrapper == null && !(wrapped is Action<T1, T2>))
-                throw new ArgumentException(nameof(wrapped));
-
-            this.wrapped = wrapped;
-            this.unwrapper = unwrapper;
+            this.action = action;
         }
 
         public override bool Equals(ActionInvoker<T1, T2> other)
@@ -42,27 +37,45 @@ namespace CSharpE.Transform.Internals
             if (ReferenceEquals(this, other))
                 return true;
 
-            var otherInvoker = other as ActionInvoker<T1, T2, TWrapped>;
+            var otherInvoker = other as SimpleActionInvoker<T1, T2>;
 
             if (otherInvoker == null)
                 return false;
 
-            return wrapped.Method == otherInvoker.wrapped.Method && unwrapper?.Method == otherInvoker.unwrapper?.Method;
+            return action.Method == otherInvoker.action.Method;
         }
 
-        public override int GetHashCode() => (wrapped.Method, unwrapper?.Method).GetHashCode();
+        public override int GetHashCode() => action.Method.GetHashCode();
 
-        public override void Invoke(T1 arg1, T2 arg2)
+        public override void Invoke(T1 arg1, T2 arg2) => action(arg1, arg2);
+    }
+
+    internal class UnitActionInvoker<T> : ActionInvoker<Unit, T>
+    {
+        private readonly Action<T> action;
+
+        public UnitActionInvoker(Action<T> action)
         {
-            if (unwrapper == null)
-            {
-                var unwrapped = (Action<T1, T2>)(object)wrapped;
-                unwrapped(arg1, arg2);
-            }
-            else
-            {
-                unwrapper(wrapped, arg1, arg2);
-            }
+            Debug.Assert(!ClosureChecker.HasClosure(action));
+
+            this.action = action;
         }
+
+        public override bool Equals(ActionInvoker<Unit, T> other)
+        {
+            if (ReferenceEquals(this, other))
+                return true;
+
+            var otherInvoker = other as UnitActionInvoker<T>;
+
+            if (otherInvoker == null)
+                return false;
+
+            return action.Method == otherInvoker.action.Method;
+        }
+
+        public override int GetHashCode() => action.Method.GetHashCode();
+
+        public override void Invoke(Unit arg1, T arg2) => action(arg2);
     }
 }
