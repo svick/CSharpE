@@ -126,6 +126,15 @@ namespace CSharpE.Syntax
             }
         }
 
+        public IEnumerable<TypeDefinition> TypesWithAttribute<T>() where T : System.Attribute
+        {
+            foreach (var type in Types)
+            {
+                if (type.HasAttribute<T>())
+                    yield return type;
+            }
+        }
+
         private readonly HashSet<string> additionalNamespaces = new HashSet<string>();
 
         public static async Task<SourceFile> OpenAsync(string path)
@@ -204,6 +213,8 @@ namespace CSharpE.Syntax
             get => null;
             set => throw new InvalidOperationException();
         }
+
+        public override TextSpan Span => GetWrapped().GetRoot().Span;
     }
 }
  

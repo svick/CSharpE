@@ -17,7 +17,7 @@ namespace CSharpE.Transform.Internals
 
         public bool Equals(ActionInvoker<T1, T2> other)
         {
-            if (other == null)
+            if (other is null)
                 return false;
 
             if (ReferenceEquals(this, other))
@@ -25,6 +25,8 @@ namespace CSharpE.Transform.Internals
 
             return method == other.method;
         }
+
+        public override bool Equals(object obj) => Equals(obj as ActionInvoker<T1, T2>);
 
         public override int GetHashCode() => method.GetHashCode();
 

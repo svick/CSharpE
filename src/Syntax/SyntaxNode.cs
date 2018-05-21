@@ -20,7 +20,7 @@ namespace CSharpE.Syntax
         internal SourceFile SourceFile => this is SourceFile sourceFile ? sourceFile : Parent?.SourceFile;
 
         // local cached syntax might not be part of the tree, so it won't have correct Span
-        public TextSpan Span => GetSourceFileNode().Span;
+        public virtual TextSpan Span => GetSourceFileNode().Span;
 
         public FileSpan FileSpan => new FileSpan(Span, SourceFile.GetWrapped());
 

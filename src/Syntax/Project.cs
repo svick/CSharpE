@@ -68,38 +68,11 @@ namespace CSharpE.Syntax
             : this(sourceFiles, additionalReferencesRepresentatives.Select(t => new AssemblyReference(t)))
         { }
 
-        public IEnumerable<TypeDefinition> TypesWithAttribute<T>() where T : System.Attribute
-        {
-            foreach (var sourceFile in SourceFiles)
-            {
-                foreach (var type in sourceFile.Types)
-                {
-                    if (type.HasAttribute<T>())
-                        yield return type;
-                }
-            }
-        }
+        public IEnumerable<TypeDefinition> TypesWithAttribute<T>() where T : System.Attribute =>
+            SourceFiles.SelectMany(sourceFile => sourceFile.TypesWithAttribute<T>());
 
-        public IEnumerable<TypeDefinition> Types()
-        {
-            foreach (var sourceFile in SourceFiles)
-            {
-                foreach (var type in sourceFile.Types)
-                {
-                    yield return type;
-                }
-            }
-        }
+        public IEnumerable<TypeDefinition> Types() => SourceFiles.SelectMany(sourceFile => sourceFile.Types);
 
-        public IEnumerable<TypeDefinition> AllTypes()
-        {
-            foreach (var sourceFile in SourceFiles)
-            {
-                foreach (var type in sourceFile.AllTypes)
-                {
-                    yield return type;
-                }
-            }
-        }
+        public IEnumerable<TypeDefinition> AllTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.AllTypes);
     }
 }
