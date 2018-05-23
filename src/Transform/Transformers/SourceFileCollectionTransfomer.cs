@@ -6,17 +6,10 @@ namespace CSharpE.Transform.Transformers
     // transformer for a collection of source files
     internal class SourceFileCollectionTransformer<TData> : CollectionTransformer<Syntax.Project, Syntax.SourceFile, TData>
     {
-        private readonly ActionInvoker<TData, Syntax.SourceFile> action;
-        private readonly TData data;
-
         private Dictionary<string, CodeTransformer<Syntax.SourceFile>> oldTransfomers;
 
         public SourceFileCollectionTransformer(
-            Syntax.Project parent, ActionInvoker<TData, Syntax.SourceFile> action, TData data)
-        {
-            this.action = action;
-            this.data = data;
-        }
+            Syntax.Project parent, ActionInvoker<TData, Syntax.SourceFile> action, TData data) : base(action, data) { }
 
         public override void Transform(TransformProject project, IEnumerable<Syntax.SourceFile> sourceFiles)
         {
@@ -31,7 +24,7 @@ namespace CSharpE.Transform.Transformers
                 oldTransfomers?.TryGetValue(path, out fileTransformer);
 
                 if (fileTransformer == null)
-                    fileTransformer = new CodeTransformer<Syntax.SourceFile>(f => action.Invoke(data, f));
+                    fileTransformer = new CodeTransformer<Syntax.SourceFile>(f => Action.Invoke(Data, f));
 
                 fileTransformer.Transform(project, sourceFile);
 
@@ -43,6 +36,6 @@ namespace CSharpE.Transform.Transformers
 
         public override bool Matches(
             Syntax.Project newParent, ActionInvoker<TData, Syntax.SourceFile> newAction, TData newData) =>
-            action.Equals(newAction) && EqualityComparer<TData>.Default.Equals(data, newData);
+            Action.Equals(newAction) && EqualityComparer<TData>.Default.Equals(Data, newData);
     }
 }

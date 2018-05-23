@@ -6,6 +6,7 @@ namespace CSharpE.Transform.Transformers
     internal sealed class CodeTransformer<TInput> : Transformer<TInput>
     {
         private readonly Action<TInput> codeAction;
+
         private List<Transformer> transformers;
 
         public static CodeTransformer<TInput> Create(Action<TInput> codeAction) =>

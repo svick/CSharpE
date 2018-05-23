@@ -352,11 +352,6 @@ namespace CSharpE.Syntax
             }
         }
 
-        void IPersistent.Persist()
-        {
-            throw new NotImplementedException();
-        }
-
         public override string ToString() => FullName;
 
         protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren() => Enumerable.Empty<IEnumerable<SyntaxNode>>();

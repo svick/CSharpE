@@ -18,19 +18,13 @@ namespace CSharpE.Transform.Transformers
         where TItem : SyntaxNode
     {
         private readonly FileSpan parentFileSpan;
-        private readonly ActionInvoker<TData, TItem> action;
-        private readonly TData data;
 
         private SyntaxTree oldTree;
         private List<TextSpan> oldItemsSpans;
         private List<CodeTransformer<TItem>> oldTransformers;
 
         public SyntaxNodeCollectionTransformer(TParent parent, ActionInvoker<TData, TItem> action, TData data)
-        {
-            this.parentFileSpan = parent.FileSpan;
-            this.action = action;
-            this.data = data;
-        }
+            : base(action, data) => parentFileSpan = parent.FileSpan;
 
         public override void Transform(TransformProject project, IEnumerable<TItem> input)
         {
@@ -72,7 +66,7 @@ namespace CSharpE.Transform.Transformers
                 }
 
                 if (itemTransformer == null)
-                    itemTransformer = new CodeTransformer<TItem>(i => action.Invoke(data, i));
+                    itemTransformer = new CodeTransformer<TItem>(i => Action.Invoke(Data, i));
 
                 var newItem = items[newIndex];
 
@@ -91,8 +85,8 @@ namespace CSharpE.Transform.Transformers
         }
 
         public override bool Matches(TParent newParent, ActionInvoker<TData, TItem> newAction, TData newData) =>
-            action.Equals(newAction) &&
-            EqualityComparer<TData>.Default.Equals(data, newData) &&
+            Action.Equals(newAction) &&
+            EqualityComparer<TData>.Default.Equals(Data, newData) &&
             parentFileSpan.Matches(newParent.FileSpan);
     }
 }

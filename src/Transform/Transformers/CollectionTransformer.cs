@@ -9,6 +9,15 @@ namespace CSharpE.Transform.Transformers
         where TParent : class
         where TItem : SyntaxNode
     {
+        protected ActionInvoker<TData, TItem> Action { get; }
+        protected TData Data { get; }
+
+        protected CollectionTransformer(ActionInvoker<TData, TItem> action, TData data)
+        {
+            Action = action;
+            Data = data;
+        }
+
         public abstract bool Matches(TParent newParent, ActionInvoker<TData, TItem> newAction, TData newData);
     }
 

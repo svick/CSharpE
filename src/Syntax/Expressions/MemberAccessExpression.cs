@@ -27,7 +27,7 @@ namespace CSharpE.Syntax
             MemberName = memberName;
         }
 
-        internal MemberAccessExpression(FieldDefinition fieldDefinition)
+        public MemberAccessExpression(FieldDefinition fieldDefinition)
         {
             if (fieldDefinition.Modifiers.Contains(MemberModifiers.Static))
                 Expression = fieldDefinition.ParentType;
@@ -35,16 +35,6 @@ namespace CSharpE.Syntax
                 Expression = This();
 
             MemberName = fieldDefinition.Name;
-        }
-
-        public MemberAccessExpression(FieldReference fieldReference)
-        {
-            if (fieldReference.IsStatic)
-                Expression = fieldReference.ContainingType;
-            else
-                Expression = This();
-
-            MemberName = fieldReference.Name;
         }
 
         private Expression expression;

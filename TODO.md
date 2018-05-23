@@ -1,5 +1,4 @@
-﻿- remove `IPersistent.Persist` (and rename `IPersistent`)
-- remove `SyntaxNode.Children`
+﻿- remove `SyntaxNode.Children`
 
 ---
 

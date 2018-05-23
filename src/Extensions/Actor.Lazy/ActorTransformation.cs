@@ -17,7 +17,9 @@ namespace CSharpE.Extensions.Actor
             {
                 var actorSemaphoreField = type.AddField(ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
 
-                type.ForEachPublicMethod(actorSemaphoreField.GetReference(), (asf, method) =>
+                Expression actorSemaphoreFieldExpression = actorSemaphoreField;
+
+                type.ForEachPublicMethod(actorSemaphoreFieldExpression, (asf, method) =>
                 {
                     method.ReturnType = TypeReference(typeof(Task<>), method.ReturnType);
                     method.IsAsync = true;

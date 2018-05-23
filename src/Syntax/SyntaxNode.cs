@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public abstract class SyntaxNode
+    public abstract class SyntaxNode : ISyntaxWrapperBase<Roslyn::SyntaxNode>, IEquatable<SyntaxNode>
     {
         internal SyntaxNode() { }
 
@@ -20,9 +21,9 @@ namespace CSharpE.Syntax
         internal SourceFile SourceFile => this is SourceFile sourceFile ? sourceFile : Parent?.SourceFile;
 
         // local cached syntax might not be part of the tree, so it won't have correct Span
-        public TextSpan Span => GetSourceFileNode().Span;
+        internal TextSpan Span => GetSourceFileNode().Span;
 
-        public FileSpan FileSpan => new FileSpan(Span, SourceFile.GetWrapped());
+        internal FileSpan FileSpan => new FileSpan(Span, SourceFile.GetWrapped());
 
         // returns a copy of Roslyn version of this node that's part of the SourceFile SyntaxTree
         protected Roslyn::SyntaxNode GetSourceFileNode()
@@ -77,6 +78,30 @@ namespace CSharpE.Syntax
                 value.Parent = this;
 
             field = value;
+        }
+
+        public bool Equals(SyntaxNode other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other.GetType() != this.GetType()) return false;
+
+            // nodes that are part of a tree are compared by reference
+            if (other.SourceFile != null || this.SourceFile != null)
+                return false;
+
+            return this.GetWrapped().IsEquivalentTo(other.GetWrapped());
+        }
+
+        public override bool Equals(object obj) => Equals(obj as SyntaxNode);
+
+        public override int GetHashCode()
+        {
+            if (SourceFile != null)
+                return base.GetHashCode();
+
+            // if nodes are equivalent, their strings should be equal
+            return StringComparer.Ordinal.GetHashCode(this.GetWrapped().ToString());
         }
     }
 }

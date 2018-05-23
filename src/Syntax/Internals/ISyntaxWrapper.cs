@@ -37,9 +37,16 @@ namespace CSharpE.Syntax.Internals
             throw new InvalidOperationException();
         }
 
+        public static TSyntax GetWrapped<TSyntax>(this ISyntaxWrapperBase<TSyntax> syntaxWrapper)
+        {
+            bool changed = true;
+
+            return syntaxWrapper.GetWrapped(default, ref changed);
+        }
+
         public static TSyntax GetWrapped<TSyntax>(this ISyntaxWrapper2<TSyntax> syntaxWrapper)
         {
-            bool changed = default;
+            bool changed = true;
 
             return syntaxWrapper.GetWrapped(ref changed);
         }
