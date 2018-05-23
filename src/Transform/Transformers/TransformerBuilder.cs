@@ -10,7 +10,9 @@ namespace CSharpE.Transform.Transformers
     {
         public abstract void Collection<TParent, TItem, TData>(
             TParent parent, Func<TParent, IEnumerable<TItem>> collectionFunction, ActionInvoker<TData, TItem> action,
-            TData data) where TParent : class;
+            TData data)
+            where TParent : class
+            where TItem : SyntaxNode;
     }
 
     internal class TransformerBuilder<TInput> : TransformerBuilder
@@ -45,7 +47,7 @@ namespace CSharpE.Transform.Transformers
             }
 
             if (transformer == null)
-                transformer = new CollectionTransformer<TParent, TItem, TData>(parent, action, data);
+                transformer = CollectionTransformer.Create(parent, action, data);
 
             transformer.Transform(project, collectionFunction(parent));
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
 namespace CSharpE.Syntax
@@ -19,41 +20,11 @@ namespace CSharpE.Syntax
             if (newSpan.span == span && newSpan.file == file)
                 return true;
 
-            int? start = span.Start;
-            int? end = span.End;
+            // PERF: special case for full file spans?
 
-            // TODO: somehow cache diff?
-            var changes = newSpan.file.GetChanges(file);
+            var changes = newSpan.file.GetChangeRanges(file);
 
-            foreach (var change in changes)
-            {
-                start = Adjust(start, change);
-                end = Adjust(end, change);
-            }
-
-            if (start != null && end != null)
-                return newSpan.span == TextSpan.FromBounds(start.Value, end.Value);
-
-            return false;
-        }
-
-        private static int? Adjust(int? position, TextChange change)
-        {
-            if (position == null)
-                return null;
-
-            var pos = position.Value;
-
-            int diff = change.NewText.Length - change.Span.Length;
-
-            if (change.Span.End < pos)
-                return pos + diff;
-
-            if (change.Span.Start > pos)
-                return pos;
-
-            // TODO?
-            return null;
+            return span.Compare(newSpan.span, changes) == SpanCompareResult.Matching;
         }
     }
 }

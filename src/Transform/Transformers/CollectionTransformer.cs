@@ -5,52 +5,34 @@ using CSharpE.Transform.Internals;
 
 namespace CSharpE.Transform.Transformers
 {
-    internal class CollectionTransformer<TParent, TItem, TData> : Transformer<IEnumerable<TItem>>
+    internal abstract class CollectionTransformer<TParent, TItem, TData> : Transformer<IEnumerable<TItem>>
         where TParent : class
+        where TItem : SyntaxNode
     {
-        private static readonly Func<TParent, TParent, bool> ParentMatcher = CreateParentMatcher();
+        public abstract bool Matches(TParent newParent, ActionInvoker<TData, TItem> newAction, TData newData);
+    }
 
-        private static Func<TParent, TParent, bool> CreateParentMatcher()
+    internal static class CollectionTransformer
+    {
+        public static CollectionTransformer<TParent, TItem, TData> Create<TParent, TItem, TData>(
+            TParent parent, ActionInvoker<TData, TItem> action, TData data)
+            where TParent : class
+            where TItem : SyntaxNode
         {
-            if (typeof(SyntaxNode).IsAssignableFrom(typeof(TParent)))
-            {
-                Func<SyntaxNode, SyntaxNode, bool> syntaxNodeMatcher =
-                    (oldNode, newNode) => oldNode.FileSpan.Matches(newNode.FileSpan);
+            Type transfomerType;
 
-                return (Func<TParent, TParent, bool>)syntaxNodeMatcher;
-            }
+            // PERF: SourceFileCollectionTransformer doesn't need reflection; SyntaxNodeCollectionTransformer might profit from ExpressionTree-based cache
 
-            if (typeof(Syntax.Project) == typeof(TParent))
-            {
-                // assume that two instances of Project refer to the same project
-                return (oldProject, newProject) => true;
-            }
+            if (typeof(TParent) == typeof(Syntax.Project) && typeof(TItem) == typeof(Syntax.SourceFile))
+                transfomerType = typeof(SourceFileCollectionTransformer<TData>);
+            else if (typeof(SyntaxNode).IsAssignableFrom(typeof(TParent)))
+                transfomerType = typeof(SyntaxNodeCollectionTransformer<,,>)
+                    .MakeGenericType(typeof(TParent), typeof(TItem), typeof(TData));
+            else
+                throw new InvalidOperationException();
 
-            return ReferenceEquals;
+            return (CollectionTransformer<TParent, TItem, TData>)Activator.CreateInstance(
+                transfomerType, parent, action, data);
         }
-
-        private readonly TParent parent;
-        private readonly ActionInvoker<TData, TItem> action;
-        private readonly TData data;
-
-        public CollectionTransformer(TParent parent, ActionInvoker<TData, TItem> action, TData data)
-        {
-            this.parent = parent;
-            this.action = action;
-            this.data = data;
-        }
-
-        public override void Transform(TransformProject project, IEnumerable<TItem> input)
-        {
-            foreach (var item in input)
-            {
-                action.Invoke(data, item);
-            }
-        }
-
-        public bool Matches(TParent newParent, ActionInvoker<TData, TItem> newAction, TData newData) =>
-            action.Equals(newAction) &&
-            EqualityComparer<TData>.Default.Equals(data, newData) &&
-            ParentMatcher(parent, newParent);
     }
 }

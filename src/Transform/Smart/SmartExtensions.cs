@@ -9,7 +9,9 @@ namespace CSharpE.Transform.Smart
     {
         private static void ForEach<TParent, TItem>(
             TParent parent, Syntax.Project project, Action<TItem> action,
-            Func<TParent, IEnumerable<TItem>> collectionFunction) where TParent : class
+            Func<TParent, IEnumerable<TItem>> collectionFunction)
+            where TParent : class
+            where TItem : SyntaxNode
         {
             ClosureChecker.ThrowIfHasClosure(action);
 
@@ -29,17 +31,20 @@ namespace CSharpE.Transform.Smart
 
         private static void ForEach<TItem>(
             Syntax.Project project, Action<TItem> action,
-            Func<Syntax.Project, IEnumerable<TItem>> collectionFunction)
+            Func<Syntax.Project, IEnumerable<TItem>> collectionFunction) where TItem : SyntaxNode
             => ForEach(project, project, action, collectionFunction);
 
         private static void ForEach<TParent, TItem>(
             TParent parent, Action<TItem> action, Func<TParent, IEnumerable<TItem>> collectionFunction)
             where TParent : SyntaxNode
+            where TItem : SyntaxNode
             => ForEach(parent, parent.SourceFile?.Project, action, collectionFunction);
 
         private static void ForEach<TParent, TItem, T1>(
             TParent parent, Syntax.Project project, T1 arg1, Action<T1, TItem> action,
-            Func<TParent, IEnumerable<TItem>> collectionFunction) where TParent : class
+            Func<TParent, IEnumerable<TItem>> collectionFunction)
+            where TParent : class
+            where TItem : SyntaxNode
         {
             ClosureChecker.ThrowIfHasClosure(action);
             ArgumentChecker.ThrowIfNotPersistent(arg1);
@@ -60,13 +65,14 @@ namespace CSharpE.Transform.Smart
 
         private static void ForEach<TItem, T1>(
             Syntax.Project project, T1 arg1, Action<T1, TItem> action,
-            Func<Syntax.Project, IEnumerable<TItem>> collectionFunction) =>
-            ForEach(project, project, arg1, action, collectionFunction);
+            Func<Syntax.Project, IEnumerable<TItem>> collectionFunction) where TItem : SyntaxNode
+            => ForEach(project, project, arg1, action, collectionFunction);
 
         private static void ForEach<TParent, TItem, T1>(
             TParent parent, T1 arg1, Action<T1, TItem> action, Func<TParent, IEnumerable<TItem>> collectionFunction)
-            where TParent : SyntaxNode =>
-            ForEach(parent, parent.SourceFile?.Project, arg1, action, collectionFunction);
+            where TParent : SyntaxNode
+            where TItem : SyntaxNode
+            => ForEach(parent, parent.SourceFile?.Project, arg1, action, collectionFunction);
 
         public static void ForEachTypeWithAttribute<TAttribute>(
             this Syntax.Project project, Action<TypeDefinition> action)

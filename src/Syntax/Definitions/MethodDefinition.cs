@@ -171,12 +171,14 @@ namespace CSharpE.Syntax
 
             if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 newReturnType != syntax.ReturnType || newName != syntax.Identifier ||
-                newParameters != syntax.ParameterList.Parameters || newBody != syntax.Body.Statements)
+                newParameters != syntax.ParameterList.Parameters || newBody != syntax.Body.Statements || !IsAnnotated(syntax))
             {
-                syntax = CSharpSyntaxFactory.MethodDeclaration(
+                var newSyntax = CSharpSyntaxFactory.MethodDeclaration(
                     GetNewAttributes(), newModifiers.GetWrapped(), newReturnType, null, newName, null,
                     CSharpSyntaxFactory.ParameterList(newParameters), default, CSharpSyntaxFactory.Block(newBody),
                     null);
+
+                syntax = Annotate(newSyntax);
             }
 
             return syntax;

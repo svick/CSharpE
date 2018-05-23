@@ -20,7 +20,7 @@ namespace CSharpE.Syntax
 
         public SourceFile(string path, SyntaxTree syntaxTree)
         {
-            Path = path;
+            Path = path ?? throw new ArgumentNullException(nameof(path));
             syntax = syntaxTree;
         }
 
@@ -213,8 +213,6 @@ namespace CSharpE.Syntax
             get => null;
             set => throw new InvalidOperationException();
         }
-
-        public override TextSpan Span => GetWrapped().GetRoot().Span;
     }
 }
  

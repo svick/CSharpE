@@ -10,12 +10,15 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public sealed class NamedTypeReference : TypeReference, IPersistent
+    public sealed class NamedTypeReference : TypeReference, IPersistent, IEquatable<NamedTypeReference>
     {
         private TypeSyntax syntax;
 
         public NamedTypeReference(string ns, string name, params TypeReference[] typeParameters)
             : this(ns, name, typeParameters.AsEnumerable()) { }
+
+        public NamedTypeReference(string ns, string name, IEnumerable<TypeReference> typeParameters = null)
+            : this(ns, null, name, typeParameters) { }
 
         public NamedTypeReference(string ns, NamedTypeReference container, string name, IEnumerable<TypeReference> typeParameters = null)
         {
@@ -23,15 +26,12 @@ namespace CSharpE.Syntax
                 throw new ArgumentException("Value cannot be null or empty.", nameof(name));
 
             this.ns = ns;
-            this.container= container;
+            this.container = container;
             this.name = name;
             this.typeParameters =
                 new SeparatedSyntaxList<TypeReference, TypeSyntax>(typeParameters ?? Array.Empty<TypeReference>());
             isKnownType = true;
         }
-
-        public NamedTypeReference(string ns, string name, IEnumerable<TypeReference> typeParameters = null)
-            : this(ns, null, name, typeParameters) { }
 
         private static string StripGenericArity(string name)
         {
@@ -54,10 +54,7 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        private NamedTypeReference(INamedTypeSymbol symbol)
-        {
-            Resolve(symbol);
-        }
+        private NamedTypeReference(INamedTypeSymbol symbol) => Resolve(symbol);
 
         private void Resolve()
         {
@@ -365,5 +362,31 @@ namespace CSharpE.Syntax
         protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren() => Enumerable.Empty<IEnumerable<SyntaxNode>>();
 
         internal override SyntaxNode Parent { get; set; }
+
+        public bool Equals(NamedTypeReference other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            var ordinalComparer = StringComparer.Ordinal;
+
+            return ordinalComparer.Equals(Namespace, other.Namespace) && Equals(Container, other.Container) &&
+                   ordinalComparer.Equals(Name, other.Name) && TypeParameters.SequenceEqual(other.TypeParameters);
+        }
+
+        public override bool Equals(object obj) => Equals(obj as NamedTypeReference);
+
+        public override int GetHashCode()
+        {
+            var ordinalComparer = StringComparer.Ordinal;
+            
+            var hc = new HashCode();
+            hc.Add(Namespace, ordinalComparer);
+            hc.Add(Container);
+            hc.Add(Name, ordinalComparer);
+            foreach (var tp in TypeParameters)
+                hc.Add(tp);
+            return hc.ToHashCode();
+        }
     }
 }

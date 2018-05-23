@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CSharpE.Transform.Transformers
 {
-    internal class CodeTransformer<TInput> : Transformer<TInput>
+    internal sealed class CodeTransformer<TInput> : Transformer<TInput>
     {
         private readonly Action<TInput> codeAction;
         private List<Transformer> transformers;

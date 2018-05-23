@@ -17,7 +17,7 @@ namespace CSharpE.Syntax
         }
     }
 
-    public abstract class MemberReference
+    public abstract class MemberReference : IEquatable<MemberReference>
     {
         public NamedTypeReference ContainingType { get; }
         public string Name { get; }
@@ -29,5 +29,20 @@ namespace CSharpE.Syntax
             Name = name ?? throw new ArgumentNullException(nameof(name));
             IsStatic = isStatic;
         }
+
+        public bool Equals(MemberReference other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other.GetType() != this.GetType()) return false;
+
+            return ContainingType.Equals(other.ContainingType) && StringComparer.Ordinal.Equals(Name, other.Name) &&
+                   IsStatic == other.IsStatic;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as MemberReference);
+
+        public override int GetHashCode() =>
+            HashCode.Combine(ContainingType, StringComparer.Ordinal.GetHashCode(Name), IsStatic);
     }
 }

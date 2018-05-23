@@ -20,13 +20,17 @@ namespace CSharpE.Syntax
         internal SourceFile SourceFile => this is SourceFile sourceFile ? sourceFile : Parent?.SourceFile;
 
         // local cached syntax might not be part of the tree, so it won't have correct Span
-        public virtual TextSpan Span => GetSourceFileNode().Span;
+        public TextSpan Span => GetSourceFileNode().Span;
 
         public FileSpan FileSpan => new FileSpan(Span, SourceFile.GetWrapped());
 
         // returns a copy of Roslyn version of this node that's part of the SourceFile SyntaxTree
-        protected Roslyn::SyntaxNode GetSourceFileNode() =>
-            SourceFile.GetWrapped().GetRoot().GetAnnotatedNodes(MarkerAnnotation).Single();
+        protected Roslyn::SyntaxNode GetSourceFileNode()
+        {
+            var root = SourceFile.GetWrapped().GetRoot();
+
+            return this is SourceFile ? root : root.GetAnnotatedNodes(MarkerAnnotation).Single();
+        }
 
         protected static IEnumerable<SyntaxNode> Node(SyntaxNode node)
         {

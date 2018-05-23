@@ -1,4 +1,9 @@
-﻿- figure out better names than `Project`, `Project` and `SourceFile`, `SourceFile`
+﻿- remove `IPersistent.Persist` (and rename `IPersistent`)
+- remove `SyntaxNode.Children`
+
+---
+
+- figure out better names than `Project`, `Project` and `SourceFile`, `SourceFile`
 - fix moving `NamedTypeReference`s between files (doesn't update `using`s)
 - make most classes `sealed`
 - allow modifying lists while iterating them

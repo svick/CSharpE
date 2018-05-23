@@ -38,7 +38,7 @@ namespace CSharpE.Syntax.Tests
         [Fact]
         public void UnknownTypeFromSyntax()
         {
-            var file = new SourceFile(null, @"class C { Foo.Bar f; }");
+            var file = new SourceFile("C.cse", @"class C { Foo.Bar f; }");
             new Project(file);
             var field = file.Types.Single().Fields.Single();
             var type = (NamedTypeReference)field.Type;
