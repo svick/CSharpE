@@ -6,35 +6,26 @@ using CSharpE.Transform.Internals;
 
 namespace CSharpE.Transform.Transformers
 {
-    internal abstract class TransformerBuilder
-    {
-        public abstract void Collection<TParent, TItem, TData>(
-            TParent parent, Func<TParent, IEnumerable<TItem>> collectionFunction, ActionInvoker<TData, TItem> action,
-            TData data)
-            where TParent : class
-            where TItem : SyntaxNode;
-    }
-
-    internal class TransformerBuilder<TInput> : TransformerBuilder
+    internal class TransformerBuilder
     {
         private readonly TransformProject project;
-        private readonly TInput input;
         private readonly IReadOnlyList<Transformer> oldTransformers;
         private int oldTransformersIndex = 0;
 
         public TransformerBuilder(
-            TransformProject project, TInput input, IReadOnlyList<Transformer> transformers)
+            TransformProject project, IReadOnlyList<Transformer> transformers)
         {
             this.project = project;
-            this.input = input;
             oldTransformers = transformers;
         }
 
         public List<Transformer> Transformers { get; } = new List<Transformer>();
 
-        public override void Collection<TParent, TItem, TData>(
+        public void Collection<TParent, TItem, TData>(
             TParent parent, Func<TParent, IEnumerable<TItem>> collectionFunction, ActionInvoker<TData, TItem> action,
             TData data)
+            where TParent : class
+            where TItem : SyntaxNode
         {
             CollectionTransformer<TParent, TItem, TData> transformer = null;
 

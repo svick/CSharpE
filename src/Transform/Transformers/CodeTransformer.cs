@@ -16,7 +16,7 @@ namespace CSharpE.Transform.Transformers
 
         public override void Transform(TransformProject project, TInput input)
         {
-            var transformerBuilder = new TransformerBuilder<TInput>(project, input, transformers);
+            var transformerBuilder = new TransformerBuilder(project, transformers);
 
             var oldTransformerBuilder = project.TransformerBuilder;
             project.TransformerBuilder = transformerBuilder;
