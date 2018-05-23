@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -26,9 +23,6 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
-
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren() =>
-            Enumerable.Empty<IEnumerable<SyntaxNode>>();
 
         internal override SyntaxNode Parent { get; set; }
     }

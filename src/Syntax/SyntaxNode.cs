@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
@@ -11,10 +10,6 @@ namespace CSharpE.Syntax
     public abstract class SyntaxNode : ISyntaxWrapperBase<Roslyn::SyntaxNode>, IEquatable<SyntaxNode>
     {
         internal SyntaxNode() { }
-
-        public IEnumerable<SyntaxNode> Children => GetChildren().SelectMany(c => c);
-
-        protected abstract IEnumerable<IEnumerable<SyntaxNode>> GetChildren();
 
         internal abstract SyntaxNode Parent { get; set; }
 
@@ -32,13 +27,6 @@ namespace CSharpE.Syntax
 
             return this is SourceFile ? root : root.GetAnnotatedNodes(MarkerAnnotation).Single();
         }
-
-        protected static IEnumerable<SyntaxNode> Node(SyntaxNode node)
-        {
-            yield return node;
-        }
-
-        protected static IEnumerable<SyntaxNode> Nodes(params SyntaxNode[] nodes) => nodes;
 
         private SyntaxAnnotation markerAnnotation;
         private SyntaxAnnotation MarkerAnnotation

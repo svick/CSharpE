@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -46,11 +45,6 @@ namespace CSharpE.Syntax
         }
 
         public static implicit operator Argument(Expression expression) => new Argument(expression);
-
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
-        {
-            yield return Node(Expression);
-        }
 
         internal override SyntaxNode Parent { get; set; }
     }

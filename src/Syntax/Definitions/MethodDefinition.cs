@@ -186,14 +186,6 @@ namespace CSharpE.Syntax
 
         protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
 
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
-        {
-            yield return Attributes;
-            yield return Node(ReturnType);
-            yield return Parameters;
-            yield return Body;
-        }
-
         internal override SyntaxNode Parent
         {
             get => ParentType;

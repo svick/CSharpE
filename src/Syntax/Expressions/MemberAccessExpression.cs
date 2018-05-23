@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -70,11 +69,6 @@ namespace CSharpE.Syntax
             }
 
             return syntax;
-        }
-
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
-        {
-            yield return Node(Expression);
         }
 
         internal override SyntaxNode Parent { get; set; }

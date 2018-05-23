@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
@@ -131,14 +130,6 @@ namespace CSharpE.Syntax
         protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
 
         FieldDeclarationSyntax ISyntaxWrapper2<FieldDeclarationSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
-
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
-        {
-            yield return Attributes;
-            yield return Node(Type);
-            if (Initializer != null)
-                yield return Node(Initializer);
-        }
 
         internal override SyntaxNode Parent
         {

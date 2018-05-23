@@ -354,8 +354,6 @@ namespace CSharpE.Syntax
 
         public override string ToString() => FullName;
 
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren() => Enumerable.Empty<IEnumerable<SyntaxNode>>();
-
         internal override SyntaxNode Parent { get; set; }
 
         public bool Equals(NamedTypeReference other)

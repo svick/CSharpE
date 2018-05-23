@@ -68,12 +68,6 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
-        {
-            yield return Node(Expression);
-            yield return Arguments;
-        }
-
         internal override SyntaxNode Parent { get; set; }
     }
 }

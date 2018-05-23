@@ -94,13 +94,6 @@ namespace CSharpE.Syntax
 
         protected override StatementSyntax GetWrappedImpl() => GetWrapped();
 
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
-        {
-            yield return TryStatements;
-            yield return CatchClauses;
-            yield return FinallyStatements;
-        }
-
         internal override SyntaxNode Parent { get; set; }
     }
 }

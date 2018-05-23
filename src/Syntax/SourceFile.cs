@@ -203,11 +203,6 @@ namespace CSharpE.Syntax
 
         public SyntaxTree GetWrapped() => SyntaxWrapperExtensions.GetWrapped(this);
 
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
-        {
-            yield return Members.Select(m => m.Value);
-        }
-
         internal override SyntaxNode Parent
         {
             get => null;

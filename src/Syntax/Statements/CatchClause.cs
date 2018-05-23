@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -10,11 +9,6 @@ namespace CSharpE.Syntax
         public TryStatement ParentStatement { get; private set; }
 
         public CatchClauseSyntax GetWrapped()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
         {
             throw new System.NotImplementedException();
         }

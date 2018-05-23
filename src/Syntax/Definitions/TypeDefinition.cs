@@ -147,13 +147,6 @@ namespace CSharpE.Syntax
 
         TypeDeclarationSyntax ISyntaxWrapper2<TypeDeclarationSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
 
-        protected override IEnumerable<IEnumerable<SyntaxNode>> GetChildren()
-        {
-            yield return Attributes;
-            yield return Members;
-        }
-
         internal override SyntaxNode Parent { get; set; }
-
     }
 }
