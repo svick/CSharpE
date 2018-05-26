@@ -31,7 +31,7 @@ namespace CSharpE.Transform.Transformers
             var items = input.ToList();
 
             var newFile = items.FirstOrDefault()?.SourceFile;
-            var newTree = newFile?.GetWrapped();
+            var newTree = newFile?.GetSyntaxTree();
             var newItemsSpans = items.Select(x => x.Span).ToList();
             var newTransformers = new List<CodeTransformer<TItem>>(items.Count);
 
@@ -66,7 +66,7 @@ namespace CSharpE.Transform.Transformers
                 }
 
                 if (itemTransformer == null)
-                    itemTransformer = new CodeTransformer<TItem>(i => Action.Invoke(Data, i));
+                    itemTransformer = CodeTransformer<TItem>.Create(i => Action.Invoke(Data, i));
 
                 var newItem = items[newIndex];
 

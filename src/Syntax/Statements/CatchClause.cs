@@ -1,6 +1,7 @@
 using System;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -10,7 +11,12 @@ namespace CSharpE.Syntax
 
         public CatchClauseSyntax GetWrapped()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            throw new NotImplementedException();
         }
 
         internal override SyntaxNode Parent

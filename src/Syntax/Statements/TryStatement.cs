@@ -2,6 +2,7 @@
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -93,6 +94,15 @@ namespace CSharpE.Syntax
         }
 
         protected override StatementSyntax GetWrappedImpl() => GetWrapped();
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            syntax = (TryStatementSyntax)newSyntax;
+
+            tryStatements = null;
+            catchClauses = null;
+            finallyStatements = null;
+        }
 
         internal override SyntaxNode Parent { get; set; }
     }

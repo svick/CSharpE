@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -23,6 +24,8 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => syntax = (ThisExpressionSyntax)newSyntax;
 
         internal override SyntaxNode Parent { get; set; }
     }

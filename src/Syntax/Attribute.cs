@@ -1,14 +1,15 @@
 using System;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class Attribute : SyntaxNode, ISyntaxWrapper<AttributeSyntax>
+    public class Attribute : SyntaxNode, ISyntaxWrapper2<AttributeSyntax>
     {
         private AttributeSyntax syntax;
 
-        public MemberDefinition ParentMember { get; private set; }
+        internal MemberDefinition ParentMember { get; private set; }
 
         internal Attribute(AttributeSyntax syntax, MemberDefinition parent)
         {
@@ -16,10 +17,12 @@ namespace CSharpE.Syntax
             ParentMember = parent;
         }
 
-        public AttributeSyntax GetWrapped()
+        AttributeSyntax ISyntaxWrapper2<AttributeSyntax>.GetWrapped(ref bool changed)
         {
             throw new NotImplementedException();
         }
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => syntax = (AttributeSyntax)newSyntax;
 
         internal override SyntaxNode Parent
         {

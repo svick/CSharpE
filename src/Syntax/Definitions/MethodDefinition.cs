@@ -5,20 +5,26 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class MethodDefinition : MemberDefinition
+    public sealed class MethodDefinition : MemberDefinition
     {
         private MethodDeclarationSyntax syntax;
 
         internal MethodDefinition(MethodDeclarationSyntax syntax, TypeDefinition parent)
         {
-            this.syntax = syntax;
+            Init(syntax);
             Parent = parent;
+        }
 
-            Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
-            name = new Identifier(syntax.Identifier);
+        private void Init(MethodDeclarationSyntax methodDeclarationSyntax)
+        {
+            syntax = methodDeclarationSyntax;
+
+            Modifiers = FromRoslyn.MemberModifiers(methodDeclarationSyntax.Modifiers);
+            name = new Identifier(methodDeclarationSyntax.Identifier);
         }
 
         protected override SyntaxList<AttributeListSyntax> GetSyntaxAttributes() => syntax?.AttributeLists ?? default;
@@ -145,7 +151,6 @@ namespace CSharpE.Syntax
 
         // TODO: methods without body and with expression body
         private SyntaxList<Statement, StatementSyntax> body;
-
         public IList<Statement> Body
         {
             get
@@ -185,6 +190,16 @@ namespace CSharpE.Syntax
         }
 
         protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            Init((MethodDeclarationSyntax)newSyntax);
+            ResetAttributes();
+
+            Set(ref returnType, null);
+            parameters = null;
+            body = null;
+        }
 
         internal override SyntaxNode Parent
         {

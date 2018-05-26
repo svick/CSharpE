@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -17,7 +18,7 @@ namespace CSharpE.Syntax
         {
             var invalidModifiers = value & ~ValidFieldModifiers;
             if (invalidModifiers != 0)
-                throw new ArgumentException(nameof(value), $"The modifiers {invalidModifiers} are not valid for a field.");
+                throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a field.", nameof(value));
         }
 
         private FieldDeclarationSyntax syntax;
@@ -44,7 +45,6 @@ namespace CSharpE.Syntax
             set => name.Text = value;
         }
 
-        // null is a valid value for initializer, so another variable has to be used to track if it has already been lazily computed
         private bool initializerSet;
         private Expression initializer;
         public Expression Initializer
@@ -74,15 +74,20 @@ namespace CSharpE.Syntax
 
         internal FieldDefinition(FieldDeclarationSyntax syntax, TypeDefinition parent)
         {
-            this.syntax = syntax;
+            Init(syntax);
             Parent = parent;
+        }
 
-            if (syntax.Declaration.Variables.Count > 1)
+        private void Init(FieldDeclarationSyntax fieldDeclarationSyntax)
+        {
+            syntax = fieldDeclarationSyntax;
+
+            if (fieldDeclarationSyntax.Declaration.Variables.Count > 1)
                 throw new NotImplementedException("Field declarations with more than one field are not currently supported.");
 
             // initialize non-lazy properties
-            Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
-            name = new Identifier(syntax.Declaration.Variables.Single().Identifier);
+            Modifiers = FromRoslyn.MemberModifiers(fieldDeclarationSyntax.Modifiers);
+            name = new Identifier(fieldDeclarationSyntax.Declaration.Variables.Single().Identifier);
         }
 
         public FieldDefinition(MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null)
@@ -100,6 +105,8 @@ namespace CSharpE.Syntax
 
         internal FieldDeclarationSyntax GetWrapped(ref bool changed)
         {
+            changed |= GetAndResetSyntaxSet();
+
             var declarator = syntax?.Declaration.Variables.Single();
 
             bool localChanged = false;
@@ -129,7 +136,18 @@ namespace CSharpE.Syntax
 
         protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
 
-        FieldDeclarationSyntax ISyntaxWrapper2<FieldDeclarationSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
+        FieldDeclarationSyntax ISyntaxWrapper2<FieldDeclarationSyntax>.GetWrapped(ref bool changed) =>
+            GetWrapped(ref changed);
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            Init((FieldDeclarationSyntax)newSyntax);
+            ResetAttributes();
+
+            Set(ref type, null);
+            initializerSet = false;
+            Set(ref initializer, null);
+        }
 
         internal override SyntaxNode Parent
         {

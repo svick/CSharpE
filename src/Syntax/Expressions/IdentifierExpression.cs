@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -9,6 +10,11 @@ namespace CSharpE.Syntax
         public IdentifierExpression(string identifier) => Identifier = identifier;
 
         internal override ExpressionSyntax GetWrapped()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             throw new System.NotImplementedException();
         }

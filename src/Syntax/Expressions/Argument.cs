@@ -2,6 +2,7 @@
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -45,6 +46,12 @@ namespace CSharpE.Syntax
         }
 
         public static implicit operator Argument(Expression expression) => new Argument(expression);
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            syntax = (ArgumentSyntax)newSyntax;
+            expression = null;
+        }
 
         internal override SyntaxNode Parent { get; set; }
     }

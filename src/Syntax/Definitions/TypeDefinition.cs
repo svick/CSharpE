@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -15,9 +16,14 @@ namespace CSharpE.Syntax
         
         internal TypeDefinition(TypeDeclarationSyntax typeDeclarationSyntax, SyntaxNode parent)
         {
-            syntax = typeDeclarationSyntax;
-            Parent = parent;
+            Init(typeDeclarationSyntax);
 
+            Parent = parent;
+        }
+
+        private void Init(TypeDeclarationSyntax typeDeclarationSyntax)
+        {
+            syntax = typeDeclarationSyntax;
             name = new Identifier(syntax.Identifier);
         }
 
@@ -116,7 +122,8 @@ namespace CSharpE.Syntax
         public FieldDefinition AddField(TypeReference type, string name, Expression initializer = null) =>
             AddField(MemberModifiers.None, type, name, initializer);
 
-        public static implicit operator IdentifierExpression(TypeDefinition typeDefinition) => new IdentifierExpression(typeDefinition.Name);
+        public static implicit operator IdentifierExpression(TypeDefinition typeDefinition) =>
+            new IdentifierExpression(typeDefinition.Name);
 
         // TODO: namespace
         public NamedTypeReference GetReference() => new NamedTypeReference(null, Name);
@@ -125,6 +132,8 @@ namespace CSharpE.Syntax
 
         internal TypeDeclarationSyntax GetWrapped(ref bool changed)
         {
+            changed |= GetAndResetSyntaxSet();
+
             bool localChanged = false;
 
             var newName = name.GetWrapped(ref localChanged);
@@ -143,9 +152,18 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            Init((TypeDeclarationSyntax)newSyntax);
+            ResetAttributes();
+
+            members = null;
+        }
+
         protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
 
-        TypeDeclarationSyntax ISyntaxWrapper2<TypeDeclarationSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
+        TypeDeclarationSyntax ISyntaxWrapper2<TypeDeclarationSyntax>.GetWrapped(ref bool changed) =>
+            GetWrapped(ref changed);
 
         internal override SyntaxNode Parent { get; set; }
     }

@@ -9,10 +9,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class SourceFile : SyntaxNode, ITypeContainer, ISyntaxWrapper2<SyntaxTree>
+    public class SourceFile : SyntaxNode, ITypeContainer, ISyntaxWrapper2<CompilationUnitSyntax>
     {
         public string Path { get; }
 
@@ -33,7 +34,7 @@ namespace CSharpE.Syntax
             members = new SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax>();
         }
 
-        public string GetText() => GetWrapped().ToString();
+        public string GetText() => GetSyntaxTree().ToString();
 
         internal Project Project { get; set; }
 
@@ -42,8 +43,8 @@ namespace CSharpE.Syntax
         {
             get
             {
-                // note that GetWrapped() nulls-out semanticModel if change occurred
-                var syntaxTree = GetWrapped();
+                // note that GetSyntaxTree() nulls-out semanticModel if change occurred
+                var syntaxTree = GetSyntaxTree();
 
                 if (semanticModel == null)
                 {
@@ -152,6 +153,8 @@ namespace CSharpE.Syntax
 
         internal SyntaxTree GetWrapped(ref bool changed)
         {
+            changed |= GetAndResetSyntaxSet();
+
             bool localChanged = false;
 
             var oldCompilationUnit = syntax?.GetCompilationUnitRoot();
@@ -199,9 +202,17 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        SyntaxTree ISyntaxWrapper2<SyntaxTree>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
+        CompilationUnitSyntax ISyntaxWrapper2<CompilationUnitSyntax>.GetWrapped(ref bool changed) =>
+            GetWrapped(ref changed).GetCompilationUnitRoot();
 
-        public SyntaxTree GetWrapped() => SyntaxWrapperExtensions.GetWrapped(this);
+        internal SyntaxTree GetSyntaxTree()
+        {
+            bool changed = true;
+            return GetWrapped(ref changed);
+        }
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
+            syntax = syntax.WithRootAndOptions(newSyntax, syntax.Options);
 
         internal override SyntaxNode Parent
         {

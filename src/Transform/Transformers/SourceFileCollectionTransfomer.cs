@@ -24,7 +24,7 @@ namespace CSharpE.Transform.Transformers
                 oldTransfomers?.TryGetValue(path, out fileTransformer);
 
                 if (fileTransformer == null)
-                    fileTransformer = new CodeTransformer<Syntax.SourceFile>(f => Action.Invoke(Data, f));
+                    fileTransformer = CodeTransformer<Syntax.SourceFile>.Create(f => Action.Invoke(Data, f));
 
                 fileTransformer.Transform(project, sourceFile);
 

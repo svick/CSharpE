@@ -18,12 +18,12 @@ namespace CSharpE.Syntax
         // local cached syntax might not be part of the tree, so it won't have correct Span
         internal TextSpan Span => GetSourceFileNode().Span;
 
-        internal FileSpan FileSpan => new FileSpan(Span, SourceFile.GetWrapped());
+        internal FileSpan FileSpan => new FileSpan(Span, SourceFile.GetSyntaxTree());
 
         // returns a copy of Roslyn version of this node that's part of the SourceFile SyntaxTree
         protected Roslyn::SyntaxNode GetSourceFileNode()
         {
-            var root = SourceFile.GetWrapped().GetRoot();
+            var root = SourceFile.GetSyntaxTree().GetRoot();
 
             return this is SourceFile ? root : root.GetAnnotatedNodes(MarkerAnnotation).Single();
         }
@@ -66,6 +66,22 @@ namespace CSharpE.Syntax
                 value.Parent = this;
 
             field = value;
+        }
+
+        internal void SetSyntax(Roslyn::SyntaxNode newSyntax)
+        {
+            SetSyntaxImpl(newSyntax);
+            syntaxSet = true;
+        }
+
+        protected abstract void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax);
+
+        private bool syntaxSet;
+        protected  bool GetAndResetSyntaxSet()
+        {
+            bool result = syntaxSet;
+            syntaxSet = false;
+            return result;
         }
 
         public bool Equals(SyntaxNode other)

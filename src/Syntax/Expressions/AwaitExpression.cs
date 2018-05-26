@@ -2,6 +2,7 @@ using System;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -11,7 +12,7 @@ namespace CSharpE.Syntax
 
         internal AwaitExpression(AwaitExpressionSyntax syntax, SyntaxNode parent)
         {
-            this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+            this.syntax = syntax;
             Parent = parent;
         }
 
@@ -43,6 +44,13 @@ namespace CSharpE.Syntax
             }
 
             return syntax;
+        }
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            syntax = (AwaitExpressionSyntax)newSyntax;
+
+            Set(ref operand, null);
         }
 
         internal override SyntaxNode Parent { get; set; }

@@ -23,7 +23,7 @@ namespace CSharpE.Syntax
             {
                 // TODO: if References changed, alter the compilation
 
-                var trees = ActualSourceFiles.Select(file => file.GetWrapped()).ToList();
+                var trees = ActualSourceFiles.Select(file => file.GetSyntaxTree()).ToList();
 
                 if (compilation == null)
                 {

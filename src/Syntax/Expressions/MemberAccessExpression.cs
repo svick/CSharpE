@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.SyntaxFactory;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -14,10 +15,15 @@ namespace CSharpE.Syntax
 
         internal MemberAccessExpression(MemberAccessExpressionSyntax syntax, SyntaxNode parent)
         {
-            this.syntax = syntax;
+            Init(syntax);
             Parent = parent;
+        }
 
-            memberName = new Identifier(syntax.Name.Identifier);
+        private void Init(MemberAccessExpressionSyntax memberAccessExpressionSyntax)
+        {
+            syntax = memberAccessExpressionSyntax;
+
+            memberName = new Identifier(memberAccessExpressionSyntax.Name.Identifier);
         }
 
         public MemberAccessExpression(Expression expression, string memberName)
@@ -69,6 +75,13 @@ namespace CSharpE.Syntax
             }
 
             return syntax;
+        }
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            Init((MemberAccessExpressionSyntax)newSyntax);
+
+            Set(ref expression, null);
         }
 
         internal override SyntaxNode Parent { get; set; }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
@@ -50,6 +49,8 @@ namespace CSharpE.Syntax
                     a => CSharpSyntaxFactory.AttributeList(
                         CSharpSyntaxFactory.SingletonSeparatedList(a.GetWrapped()))));
         }
+
+        protected void ResetAttributes() => attributes = null;
 
         private MemberModifiers modifiers;
         public MemberModifiers Modifiers

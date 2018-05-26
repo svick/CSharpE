@@ -4,6 +4,7 @@ using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -68,6 +69,14 @@ namespace CSharpE.Syntax
             }
 
             return syntax;
+        }
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            syntax = (ObjectCreationExpressionSyntax)newSyntax;
+
+            Set(ref type, null);
+            arguments = null;
         }
 
         internal override SyntaxNode Parent { get; set; }

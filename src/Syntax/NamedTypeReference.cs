@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -232,6 +233,8 @@ namespace CSharpE.Syntax
 
         protected override TypeSyntax GetWrappedImpl(ref bool changed)
         {
+            changed |= GetAndResetSyntaxSet();
+
             var oldTypeParameters = (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
             var newTypeParameters = typeParameters?.GetWrapped() ?? oldTypeParameters;
 
@@ -294,6 +297,13 @@ namespace CSharpE.Syntax
             }
 
             return syntax;
+        }
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            syntax = (TypeSyntax)newSyntax;
+            typeParameters = null;
+            isKnownType = false;
         }
 
         private bool IsPredefinedType => GetPredefinedSyntaxKind() != SyntaxKind.None;

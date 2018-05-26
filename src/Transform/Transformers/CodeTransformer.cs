@@ -1,18 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using CSharpE.Syntax;
+using CSharpE.Syntax.Internals;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Transform.Transformers
 {
-    internal sealed class CodeTransformer<TInput> : Transformer<TInput>
+    internal class CodeTransformer<TInput> : Transformer<TInput>
     {
         private readonly Action<TInput> codeAction;
 
         private List<Transformer> transformers;
 
-        public static CodeTransformer<TInput> Create(Action<TInput> codeAction) =>
-            new CodeTransformer<TInput>(codeAction);
+        public static CodeTransformer<TInput> Create(Action<TInput> codeAction)
+        {
+            if (typeof(SyntaxNode).IsAssignableFrom(typeof(TInput)))
+                return (CodeTransformer<TInput>)Activator.CreateInstance(
+                    typeof(SyntaxNodeCodeTransfomer<>).MakeGenericType(typeof(TInput)), codeAction);
 
-        public CodeTransformer(Action<TInput> codeAction) => this.codeAction = codeAction;
+            return new CodeTransformer<TInput>(codeAction);
+        }
+
+        protected CodeTransformer(Action<TInput> codeAction) => this.codeAction = codeAction;
 
         public override void Transform(TransformProject project, TInput input)
         {
@@ -26,6 +35,31 @@ namespace CSharpE.Transform.Transformers
             project.TransformerBuilder = oldTransformerBuilder;
 
             transformers = transformerBuilder.Transformers;
+        }
+    }
+
+    internal sealed class SyntaxNodeCodeTransfomer<TInput> : CodeTransformer<TInput> where TInput : SyntaxNode
+    {
+        private Roslyn::SyntaxNode beforeSyntax;
+        private Roslyn::SyntaxNode afterSyntax;
+
+        public SyntaxNodeCodeTransfomer(Action<TInput> codeAction) : base(codeAction) { }
+
+        public override void Transform(TransformProject project, TInput input)
+        {
+            var newBeforeSyntax = input.GetWrapped();
+
+            if (beforeSyntax != null && beforeSyntax.IsEquivalentTo(newBeforeSyntax))
+            {
+                input.SetSyntax(afterSyntax);
+            }
+            else
+            {
+                base.Transform(project, input);
+
+                beforeSyntax = newBeforeSyntax;
+                afterSyntax = input.GetWrapped();
+            }
         }
     }
 }

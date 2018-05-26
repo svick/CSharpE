@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -9,9 +10,15 @@ namespace CSharpE.Syntax
     {
         internal IntLiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
         {
-            this.Syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
-            Value = syntax.Token.Value as int? ?? throw new ArgumentException(nameof(syntax));
+            Init(syntax ?? throw new ArgumentNullException(nameof(syntax)));
+
             Parent = parent;
+        }
+
+        private void Init(LiteralExpressionSyntax syntax)
+        {
+            Syntax = syntax;
+            Value = syntax.Token.Value as int? ?? throw new ArgumentException(nameof(syntax));
         }
 
         public IntLiteralExpression(int value) => Value = value;
@@ -30,5 +37,7 @@ namespace CSharpE.Syntax
 
             return Syntax;
         }
+
+        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => Init((LiteralExpressionSyntax)newSyntax);
     }
 }
