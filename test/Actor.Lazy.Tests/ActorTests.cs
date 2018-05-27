@@ -1,5 +1,6 @@
 using System.Linq;
 using CSharpE.Extensions.Actor;
+using CSharpE.TestUtilities;
 using CSharpE.Transform;
 using Microsoft.CodeAnalysis.CSharp.UnitTests;
 using Xunit;
@@ -139,17 +140,36 @@ class C
                 new[] { sourceFile }, new[] { typeof(ActorAttribute) },
                 new ITransformation[] { new ActorTransformation() });
 
+            var recorder = new LogRecorder<LogAction>();
+            project.Log += recorder.Record;
+
             var tranformedProject = project.Transform();
             Assert.Equal(input, tranformedProject.SourceFiles.Single().Text);
+            Assert.Equal(
+                recorder.Read(),
+                new LogAction[] { ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "transform") });
 
             sourceFile.Tree = sourceFile.Tree.WithInsertBefore("class", "[Actor]\n");
             tranformedProject = project.Transform();
             Assert.Equal(IgnoreOptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
+            Assert.Equal(
+                recorder.Read(),
+                new LogAction[]
+                {
+                    ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "transform"),
+                    ("TypeDefinition", "C", "transform"), ("MethodDefinition", "M", "transform")
+                });
 
             sourceFile.Tree = sourceFile.Tree.WithInsertBefore("    }", "        return 42;\n");
             tranformedProject = project.Transform();
             Assert.Equal(Includeptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
-
+            Assert.Equal(
+                recorder.Read(),
+                new LogAction[]
+                {
+                    ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "transform"),
+                    ("TypeDefinition", "C", "transform"), ("MethodDefinition", "M", "transform")
+                });
         }
     }
 }

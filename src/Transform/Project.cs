@@ -29,10 +29,12 @@ namespace CSharpE.Transform
             transformers = transformations.Select(t => new TransformationTransformer(t)).ToList();
         }
 
+        public event Action<LogAction> Log;
+
         public Project Transform()
         {
             var transformProject = new TransformProject(
-                SourceFiles.Select(f => f.ToSyntaxSourceFile()), AdditionalReferences);
+                SourceFiles.Select(f => f.ToSyntaxSourceFile()), AdditionalReferences, Log);
 
             foreach (var transformer in transformers)
             {
@@ -43,5 +45,50 @@ namespace CSharpE.Transform
                 transformProject.SourceFiles.Select(SourceFile.FromSyntaxSourceFile),
                 Enumerable.Empty<LibraryReference>(), Enumerable.Empty<ITransformation>());
         }
+    }
+
+    public sealed class LogAction : IEquatable<LogAction>
+    {
+        public string TargetKind { get; }
+        public string TargetName { get; }
+        public string Action { get; }
+
+        public LogAction(string targetKind, string targetName, string action)
+        {
+            TargetKind = targetKind;
+            TargetName = targetName;
+            Action = action;
+        }
+
+        public bool Equals(LogAction other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            var ordinalComparer = StringComparer.Ordinal;
+
+            return ordinalComparer.Equals(TargetKind, other.TargetKind) &&
+                   ordinalComparer.Equals(TargetName, other.TargetName) && ordinalComparer.Equals(Action, other.Action);
+        }
+
+        public override bool Equals(object obj) => Equals(obj as LogAction);
+
+        public override int GetHashCode()
+        {
+            var ordinalComparer = StringComparer.Ordinal;
+
+            var hashCode = new HashCode();
+
+            hashCode.Add(TargetKind, ordinalComparer);
+            hashCode.Add(TargetName, ordinalComparer);
+            hashCode.Add(Action, ordinalComparer);
+
+            return hashCode.ToHashCode();
+        }
+
+        public static implicit operator LogAction((string TargetKind, string TargetName, string Action) tuple) =>
+            new LogAction(tuple.TargetKind, tuple.TargetName, tuple.Action);
+
+        public override string ToString() => (TargetKind, TargetName, Action).ToString();
     }
 }

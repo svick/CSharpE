@@ -13,13 +13,19 @@ namespace CSharpE.Transform
     /// </summary>
     internal class TransformProject : Syntax.Project
     {
+        private readonly Action<LogAction> onLog;
+
         private readonly List<Syntax.SourceFile> additionalSourceFiles;
 
         protected override IEnumerable<Syntax.SourceFile> ActualSourceFiles => SourceFiles.Concat(additionalSourceFiles);
 
         public TransformProject(
-            IEnumerable<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
-            : this(sourceFiles.ToList(), additionalReferences) { }
+            IEnumerable<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
+            Action<LogAction> onLog = null)
+            : this(sourceFiles.ToList(), additionalReferences)
+        {
+            this.onLog = onLog;
+        }
 
         private TransformProject(List<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
             : base(sourceFiles.Where(f => Path.GetExtension(f.Path) == ".cse"), additionalReferences)
@@ -46,5 +52,8 @@ namespace CSharpE.Transform
 
             return transformer;
         }
+
+        internal void Log(string targetKind, string targetName, string action) =>
+            onLog?.Invoke((targetKind, targetName, action));
     }
 }

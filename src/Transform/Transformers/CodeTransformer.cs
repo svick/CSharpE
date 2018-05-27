@@ -30,6 +30,8 @@ namespace CSharpE.Transform.Transformers
             var oldTransformerBuilder = project.TransformerBuilder;
             project.TransformerBuilder = transformerBuilder;
 
+            project.Log(typeof(TInput).Name, LogInfo.GetName(input), "transform");
+
             codeAction(input);
 
             project.TransformerBuilder = oldTransformerBuilder;
@@ -52,6 +54,8 @@ namespace CSharpE.Transform.Transformers
 
             if (beforeSyntax != null && beforeSyntax.IsEquivalentTo(newBeforeSyntax))
             {
+                project.Log(typeof(TInput).Name, LogInfo.GetName(input), "cached");
+
                 input.SetSyntax(afterSyntax);
             }
             else
