@@ -5,7 +5,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class Attribute : SyntaxNode, ISyntaxWrapper2<AttributeSyntax>
+    public class Attribute : SyntaxNode, ISyntaxWrapper<AttributeSyntax>
     {
         private AttributeSyntax syntax;
 
@@ -17,7 +17,7 @@ namespace CSharpE.Syntax
             ParentMember = parent;
         }
 
-        AttributeSyntax ISyntaxWrapper2<AttributeSyntax>.GetWrapped(ref bool changed)
+        AttributeSyntax ISyntaxWrapper<AttributeSyntax>.GetWrapped(ref bool changed)
         {
             throw new NotImplementedException();
         }

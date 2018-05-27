@@ -8,7 +8,6 @@
 - allow modifying lists while iterating them
   - optional: make it more efficient using copy on write 
 - detect reading of References/Symbols, then rerun when those symbols change
-- somehow handle multi-level collections like `project.ForEachTypeWithAttribute` (project → file → type)
 
 ---
 

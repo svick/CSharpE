@@ -10,7 +10,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class TypeDefinition : MemberDefinition, ITypeContainer, ISyntaxWrapper2<TypeDeclarationSyntax>
+    public sealed class TypeDefinition : MemberDefinition, ITypeContainer, ISyntaxWrapper<TypeDeclarationSyntax>
     {
         private TypeDeclarationSyntax syntax;
         
@@ -153,7 +153,7 @@ namespace CSharpE.Syntax
 
         protected override MemberDeclarationSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
 
-        TypeDeclarationSyntax ISyntaxWrapper2<TypeDeclarationSyntax>.GetWrapped(ref bool changed) =>
+        TypeDeclarationSyntax ISyntaxWrapper<TypeDeclarationSyntax>.GetWrapped(ref bool changed) =>
             GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)

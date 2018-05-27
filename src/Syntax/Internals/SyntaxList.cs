@@ -12,8 +12,8 @@ namespace CSharpE.Syntax.Internals
         internal abstract SyntaxNode Parent { get; set; }
     }
 
-    internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : SyntaxListBase, IList<TSyntax>, ISyntaxWrapper2<TList>
-        where TSyntax : ISyntaxWrapperBase<TRoslynSyntax>
+    internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : SyntaxListBase, IList<TSyntax>, ISyntaxWrapper<TList>
+        where TSyntax : ISyntaxWrapper<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
         where TList : struct, IReadOnlyList<TRoslynSyntax>
     {
@@ -156,10 +156,7 @@ namespace CSharpE.Syntax.Internals
             {
                 var value = list[i];
 
-                var roslynNode =
-                    value is TSyntax node
-                        ? node.GetWrapped(thisChanged ? null : roslynList[i], ref thisChanged)
-                        : (TRoslynSyntax)value;
+                var roslynNode = value is TSyntax node ? node.GetWrapped(ref thisChanged) : (TRoslynSyntax)value;
 
                 roslynNodes.Add(roslynNode);
             }
@@ -177,7 +174,7 @@ namespace CSharpE.Syntax.Internals
 
     internal class SyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SyntaxList<TRoslynSyntax>>
-        where TSyntax : ISyntaxWrapperBase<TRoslynSyntax>
+        where TSyntax : ISyntaxWrapper<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
     {
         internal SyntaxList(SyntaxNode parent) : base(parent) { }
@@ -193,7 +190,7 @@ namespace CSharpE.Syntax.Internals
 
     internal class SeparatedSyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SeparatedSyntaxList<TRoslynSyntax>>
-        where TSyntax : ISyntaxWrapperBase<TRoslynSyntax>
+        where TSyntax : ISyntaxWrapper<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
     {
         internal SeparatedSyntaxList(SyntaxNode parent) : base(parent) { }

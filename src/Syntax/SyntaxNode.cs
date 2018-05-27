@@ -7,7 +7,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public abstract class SyntaxNode : ISyntaxWrapperBase<Roslyn::SyntaxNode>, IEquatable<SyntaxNode>
+    public abstract class SyntaxNode : IEquatable<SyntaxNode>
     {
         internal SyntaxNode() { }
 
@@ -113,7 +113,10 @@ namespace CSharpE.Syntax
             if (other.SourceFile != null || this.SourceFile != null)
                 return false;
 
-            return this.GetWrapped().IsEquivalentTo(other.GetWrapped());
+            var thisWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)this;
+            var otherWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)other;
+
+            return thisWrapper.GetWrapped().IsEquivalentTo(otherWrapper.GetWrapped());
         }
 
         public override bool Equals(object obj) => Equals(obj as SyntaxNode);
@@ -123,8 +126,10 @@ namespace CSharpE.Syntax
             if (SourceFile != null)
                 return base.GetHashCode();
 
+            var thisWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)this;
+
             // if nodes are equivalent, their strings should be equal
-            return StringComparer.Ordinal.GetHashCode(this.GetWrapped().ToString());
+            return StringComparer.Ordinal.GetHashCode(thisWrapper.GetWrapped().ToString());
         }
     }
 }

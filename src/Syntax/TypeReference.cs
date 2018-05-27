@@ -5,11 +5,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
-    public abstract class TypeReference : SyntaxNode, ISyntaxWrapper2<TypeSyntax>
+    public abstract class TypeReference : SyntaxNode, ISyntaxWrapper<TypeSyntax>
     {
         public static implicit operator TypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 
-        TypeSyntax ISyntaxWrapper2<TypeSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
+        TypeSyntax ISyntaxWrapper<TypeSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
 
         internal TypeSyntax GetWrapped(ref bool changed) => GetWrappedImpl(ref changed);
 

@@ -7,7 +7,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 namespace CSharpE.Syntax
 {
     // TODO: named arguments; ref and out
-    public sealed class Argument : SyntaxNode, ISyntaxWrapper2<ArgumentSyntax>
+    public sealed class Argument : SyntaxNode, ISyntaxWrapper<ArgumentSyntax>
     {
         private ArgumentSyntax syntax;
 
@@ -50,7 +50,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        ArgumentSyntax ISyntaxWrapper2<ArgumentSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
+        ArgumentSyntax ISyntaxWrapper<ArgumentSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
 
         public static implicit operator Argument(Expression expression) => new Argument(expression);
 

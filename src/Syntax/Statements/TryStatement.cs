@@ -6,7 +6,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class TryStatement : Statement
+    public sealed class TryStatement : Statement
     {
         private TryStatementSyntax syntax;
 
@@ -73,14 +73,17 @@ namespace CSharpE.Syntax
             set => SetList(ref finallyStatements, new StatementList(value, this));
         }
 
-        internal new TryStatementSyntax GetWrapped()
+        internal TryStatementSyntax GetWrapped(ref bool changed)
         {
-            var newTryStatements = tryStatements?.GetWrapped() ?? syntax.Block.Statements;
-            var newCatchClauses = catchClauses?.GetWrapped() ?? syntax.Catches;
-            var newFinallyStatements = finallyStatements?.GetWrapped() ?? syntax.Finally?.Block.Statements ?? default;
+            changed |= GetAndResetSyntaxSet();
 
-            if (syntax == null || newTryStatements != syntax.Block.Statements || newCatchClauses != syntax.Catches ||
-                newFinallyStatements != (syntax.Finally?.Block.Statements ?? default))
+            bool thisChanged = false;
+
+            var newTryStatements = tryStatements?.GetWrapped(ref thisChanged) ?? syntax.Block.Statements;
+            var newCatchClauses = catchClauses?.GetWrapped(ref thisChanged) ?? syntax.Catches;
+            var newFinallyStatements = finallyStatements?.GetWrapped(ref thisChanged) ?? syntax.Finally?.Block.Statements ?? default;
+
+            if (syntax == null || thisChanged)
             {
                 var newFinallyClause = newFinallyStatements.Any()
                     ? CSharpSyntaxFactory.FinallyClause(CSharpSyntaxFactory.Block(newFinallyStatements))
@@ -88,12 +91,14 @@ namespace CSharpE.Syntax
 
                 syntax = CSharpSyntaxFactory.TryStatement(
                     CSharpSyntaxFactory.Block(newTryStatements), newCatchClauses, newFinallyClause);
+
+                changed = true;
             }
 
             return syntax;
         }
 
-        protected override StatementSyntax GetWrappedImpl() => GetWrapped();
+        protected override StatementSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

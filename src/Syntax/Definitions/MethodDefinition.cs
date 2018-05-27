@@ -9,7 +9,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class MethodDefinition : MemberDefinition, ISyntaxWrapper2<MethodDeclarationSyntax>
+    public sealed class MethodDefinition : MemberDefinition, ISyntaxWrapper<MethodDeclarationSyntax>
     {
         private MethodDeclarationSyntax syntax;
 
@@ -196,7 +196,7 @@ namespace CSharpE.Syntax
 
         protected override MemberDeclarationSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
 
-        MethodDeclarationSyntax ISyntaxWrapper2<MethodDeclarationSyntax>.GetWrapped(ref bool changed) =>
+        MethodDeclarationSyntax ISyntaxWrapper<MethodDeclarationSyntax>.GetWrapped(ref bool changed) =>
             GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)

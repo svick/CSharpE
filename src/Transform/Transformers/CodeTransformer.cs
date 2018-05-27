@@ -38,7 +38,8 @@ namespace CSharpE.Transform.Transformers
         }
     }
 
-    internal sealed class SyntaxNodeCodeTransfomer<TInput> : CodeTransformer<TInput> where TInput : SyntaxNode
+    internal sealed class SyntaxNodeCodeTransfomer<TInput> : CodeTransformer<TInput>
+        where TInput : SyntaxNode, ISyntaxWrapper<Roslyn::SyntaxNode>
     {
         private Roslyn::SyntaxNode beforeSyntax;
         private Roslyn::SyntaxNode afterSyntax;

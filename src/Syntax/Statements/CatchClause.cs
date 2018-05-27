@@ -7,10 +7,12 @@ namespace CSharpE.Syntax
 {
     public class CatchClause : SyntaxNode, ISyntaxWrapper<CatchClauseSyntax>
     {
-        public CatchClauseSyntax GetWrapped()
+        internal CatchClauseSyntax GetWrapped(ref bool changed)
         {
             throw new NotImplementedException();
         }
+
+        CatchClauseSyntax ISyntaxWrapper<CatchClauseSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
@@ -34,5 +36,6 @@ namespace CSharpE.Syntax
                     throw new ArgumentException(nameof(value));
             }
         }
+
     }
 }

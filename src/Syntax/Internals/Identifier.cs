@@ -4,7 +4,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
 {
-    internal struct Identifier : ISyntaxWrapper2<SyntaxToken>
+    internal struct Identifier : ISyntaxWrapper<SyntaxToken>
     {
         private SyntaxToken syntax;
 
@@ -31,7 +31,7 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
-        public SyntaxToken GetWrapped(ref bool changed)
+        internal SyntaxToken GetWrapped(ref bool changed)
         {
             var newText = text ?? syntax.ValueText;
 
@@ -44,5 +44,7 @@ namespace CSharpE.Syntax.Internals
 
             return syntax;
         }
+
+        SyntaxToken ISyntaxWrapper<SyntaxToken>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
     }
 }

@@ -9,7 +9,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class FieldDefinition : MemberDefinition, ISyntaxWrapper2<FieldDeclarationSyntax>
+    public sealed class FieldDefinition : MemberDefinition, ISyntaxWrapper<FieldDeclarationSyntax>
     {
         private const MemberModifiers ValidFieldModifiers =
             AccessModifiersMask | New | Static | Unsafe | Const | ReadOnly | Volatile;
@@ -133,7 +133,7 @@ namespace CSharpE.Syntax
 
         protected override MemberDeclarationSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
 
-        FieldDeclarationSyntax ISyntaxWrapper2<FieldDeclarationSyntax>.GetWrapped(ref bool changed) =>
+        FieldDeclarationSyntax ISyntaxWrapper<FieldDeclarationSyntax>.GetWrapped(ref bool changed) =>
             GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)

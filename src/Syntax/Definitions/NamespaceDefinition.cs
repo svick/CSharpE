@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
-    public class NamespaceDefinition : ISyntaxWrapper2<NamespaceDeclarationSyntax>
+    public class NamespaceDefinition : ISyntaxWrapper<NamespaceDeclarationSyntax>
     {
         private SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax> members;
         public IList<NamespaceOrTypeDefinition> Members => members;
@@ -14,9 +14,12 @@ namespace CSharpE.Syntax
             throw new System.NotImplementedException();
         }
 
-        public NamespaceDeclarationSyntax GetWrapped(ref bool changed)
+        internal NamespaceDeclarationSyntax GetWrapped(ref bool changed)
         {
             throw new System.NotImplementedException();
         }
+
+        NamespaceDeclarationSyntax ISyntaxWrapper<NamespaceDeclarationSyntax>.GetWrapped(ref bool changed) =>
+            GetWrapped(ref changed);
     }
 }

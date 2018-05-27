@@ -32,19 +32,25 @@ namespace CSharpE.Syntax
             set => SetNotNull(ref expression, value);
         }
 
-        internal new ExpressionStatementSyntax GetWrapped()
+        internal ExpressionStatementSyntax GetWrapped(ref bool changed)
         {
-            var newExpression = expression?.GetWrapped() ?? syntax.Expression;
+            changed |= GetAndResetSyntaxSet();
 
-            if (syntax == null || newExpression != syntax.Expression)
+            bool thisChanged = false;
+
+            var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
+
+            if (syntax == null || thisChanged)
             {
                 syntax = CSharpSyntaxFactory.ExpressionStatement(newExpression);
+
+                changed = true;
             }
 
             return syntax;
         }
 
-        protected override StatementSyntax GetWrappedImpl() => GetWrapped();
+        protected override StatementSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
