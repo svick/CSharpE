@@ -9,7 +9,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 namespace CSharpE.Syntax
 {
     // TODO: object initializer, anonymous types
-    public class NewExpression : Expression
+    public sealed class NewExpression : Expression
     {
         private ObjectCreationExpressionSyntax syntax;
 
@@ -22,7 +22,7 @@ namespace CSharpE.Syntax
         public NewExpression(TypeReference type, IEnumerable<Argument> arguments)
         {
             this.Type = type;
-            this.arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(arguments);
+            this.arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(arguments, this);
         }
 
         public NewExpression(TypeReference type, IEnumerable<Expression> arguments)
@@ -41,7 +41,7 @@ namespace CSharpE.Syntax
 
                 return type;
             }
-            set => type = value ?? throw new ArgumentNullException(nameof(value));
+            set => SetNotNull(ref type, value);
         }
 
         private SeparatedSyntaxList<Argument, ArgumentSyntax> arguments;
@@ -50,22 +50,28 @@ namespace CSharpE.Syntax
             get
             {
                 if (arguments == null)
-                    arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(syntax.ArgumentList.Arguments);
+                    arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(syntax.ArgumentList.Arguments, this);
 
                 return arguments;
             }
-            set => arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(value);
+            set => SetList(ref arguments, new SeparatedSyntaxList<Argument, ArgumentSyntax>(value, this));
         }
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(ref bool changed)
         {
-            var newType = type?.GetWrapped() ?? syntax.Type;
-            var newArguments = arguments?.GetWrapped() ?? syntax.ArgumentList.Arguments;
+            changed |= GetAndResetSyntaxSet();
 
-            if (syntax == null || newType != syntax.Type || newArguments != syntax.ArgumentList.Arguments)
+            bool thisChanged = false;
+
+            var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
+            var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList.Arguments;
+
+            if (syntax == null || thisChanged)
             {
                 syntax = CSharpSyntaxFactory.ObjectCreationExpression(
                     newType, CSharpSyntaxFactory.ArgumentList(newArguments), null);
+
+                changed = true;
             }
 
             return syntax;
@@ -78,6 +84,8 @@ namespace CSharpE.Syntax
             Set(ref type, null);
             arguments = null;
         }
+
+        internal override SyntaxNode Clone() => new NewExpression(Type, Arguments);
 
         internal override SyntaxNode Parent { get; set; }
     }

@@ -7,7 +7,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    public abstract class MemberDefinition : SyntaxNode, ISyntaxWrapper<MemberDeclarationSyntax>
+    public abstract class MemberDefinition : SyntaxNode, ISyntaxWrapper2<MemberDeclarationSyntax>
     {
         private List<Attribute> attributes;
         public IList<Attribute> Attributes
@@ -65,11 +65,9 @@ namespace CSharpE.Syntax
 
         protected abstract void ValidateModifiers(MemberModifiers modifiers);
 
-        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped() =>
-            GetWrapped();
+        MemberDeclarationSyntax ISyntaxWrapper2<MemberDeclarationSyntax>.GetWrapped(ref bool changed) =>
+            GetWrappedImpl(ref changed);
 
-        internal MemberDeclarationSyntax GetWrapped() => GetWrappedImpl();
-
-        protected abstract MemberDeclarationSyntax GetWrappedImpl();
+        protected abstract MemberDeclarationSyntax GetWrappedImpl(ref bool changed);
     }
 }

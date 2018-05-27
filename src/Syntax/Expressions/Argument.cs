@@ -7,7 +7,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 namespace CSharpE.Syntax
 {
     // TODO: named arguments; ref and out
-    public sealed class Argument : SyntaxNode, ISyntaxWrapper<ArgumentSyntax>
+    public sealed class Argument : SyntaxNode, ISyntaxWrapper2<ArgumentSyntax>
     {
         private ArgumentSyntax syntax;
 
@@ -17,8 +17,7 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        public Argument(Expression expression) =>
-            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
+        public Argument(Expression expression) => Expression = expression;
 
         private Expression expression;
         public Expression Expression
@@ -26,24 +25,32 @@ namespace CSharpE.Syntax
             get
             {
                 if (expression == null)
-                    expression = FromRoslyn.Expression(syntax.Expression);
+                    expression = FromRoslyn.Expression(syntax.Expression, this);
 
                 return expression;
             }
-            set => expression = value ?? throw new ArgumentNullException(nameof(value));
+            set => SetNotNull(ref expression, value);
         }
 
-        public ArgumentSyntax GetWrapped()
+        internal ArgumentSyntax GetWrapped(ref bool changed)
         {
-            var newExpression = expression?.GetWrapped() ?? syntax.Expression;
+            changed |= GetAndResetSyntaxSet();
 
-            if (syntax == null || newExpression != syntax.Expression)
+            bool thisChanged = false;
+
+            var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
+
+            if (syntax == null || thisChanged)
             {
                 syntax = CSharpSyntaxFactory.Argument(newExpression);
+
+                changed = true;
             }
 
             return syntax;
         }
+
+        ArgumentSyntax ISyntaxWrapper2<ArgumentSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
 
         public static implicit operator Argument(Expression expression) => new Argument(expression);
 
@@ -52,6 +59,8 @@ namespace CSharpE.Syntax
             syntax = (ArgumentSyntax)newSyntax;
             expression = null;
         }
+
+        internal override SyntaxNode Clone() => new Argument(Expression);
 
         internal override SyntaxNode Parent { get; set; }
     }

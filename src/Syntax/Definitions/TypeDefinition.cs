@@ -36,14 +36,13 @@ namespace CSharpE.Syntax
             set => name.Text = value;
         }
 
-        private SyntaxList<MemberDefinition, MemberDeclarationSyntax> members;
-        private SyntaxList<MemberDefinition, MemberDeclarationSyntax> MembersList
+        private MemberList members;
+        private MemberList MembersList
         {
             get
             {
                 if (members == null)
-                    members = new SyntaxList<MemberDefinition, MemberDeclarationSyntax>(
-                        syntax.Members, mds => FromRoslyn.MemberDefinition(mds, this));
+                    members = new MemberList(syntax.Members, this);
 
                 return members;
             }
@@ -52,7 +51,7 @@ namespace CSharpE.Syntax
         public IList<MemberDefinition> Members
         {
             get => MembersList;
-            set => members = new SyntaxList<MemberDefinition, MemberDeclarationSyntax>(value);
+            set => SetList(ref members, new MemberList(value, this));
         }
 
         public IList<FieldDefinition> Fields
@@ -152,6 +151,11 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
+        protected override MemberDeclarationSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
+
+        TypeDeclarationSyntax ISyntaxWrapper2<TypeDeclarationSyntax>.GetWrapped(ref bool changed) =>
+            GetWrapped(ref changed);
+
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Init((TypeDeclarationSyntax)newSyntax);
@@ -160,10 +164,10 @@ namespace CSharpE.Syntax
             members = null;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
-
-        TypeDeclarationSyntax ISyntaxWrapper2<TypeDeclarationSyntax>.GetWrapped(ref bool changed) =>
-            GetWrapped(ref changed);
+        internal override SyntaxNode Clone()
+        {
+            throw new NotImplementedException();
+        }
 
         internal override SyntaxNode Parent { get; set; }
     }

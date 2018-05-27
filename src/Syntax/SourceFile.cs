@@ -31,7 +31,7 @@ namespace CSharpE.Syntax
         public SourceFile(string path)
         {
             Path = path;
-            members = new SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax>();
+            members = new NamespaceOrTypeList(this);
         }
 
         public string GetText() => GetSyntaxTree().ToString();
@@ -60,23 +60,14 @@ namespace CSharpE.Syntax
 
         internal SyntaxContext SyntaxContext => new SyntaxContext(SemanticModel);
 
-        private SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax> members;
+        private NamespaceOrTypeList members;
         public IList<NamespaceOrTypeDefinition> Members
         {
             get
             {
                 if (members == null)
                 {
-                    members = new SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax>(
-                        syntax.GetCompilationUnitRoot().Members, mds =>
-                        {
-                            switch (mds)
-                            {
-                                case NamespaceDeclarationSyntax ns: return new NamespaceDefinition(ns);
-                                case TypeDeclarationSyntax type: return new TypeDefinition(type, this);
-                                default: throw new InvalidOperationException();
-                            }
-                        });
+                    members = new NamespaceOrTypeList(syntax.GetCompilationUnitRoot().Members, this);
                 }
 
                 return members;
@@ -213,6 +204,8 @@ namespace CSharpE.Syntax
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
             syntax = syntax.WithRootAndOptions(newSyntax, syntax.Options);
+
+        internal override SyntaxNode Clone() => throw new InvalidOperationException();
 
         internal override SyntaxNode Parent
         {

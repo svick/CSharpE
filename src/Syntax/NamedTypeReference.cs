@@ -30,7 +30,7 @@ namespace CSharpE.Syntax
             this.container = container;
             this.name = name;
             this.typeParameters =
-                new SeparatedSyntaxList<TypeReference, TypeSyntax>(typeParameters ?? Array.Empty<TypeReference>());
+                new TypeList(typeParameters ?? Array.Empty<TypeReference>(), this);
             isKnownType = true;
         }
 
@@ -166,7 +166,7 @@ namespace CSharpE.Syntax
             }
         }
 
-        private SeparatedSyntaxList<TypeReference, TypeSyntax> typeParameters;
+        private TypeList typeParameters;
         public IList<TypeReference> TypeParameters
         {
             get
@@ -175,14 +175,13 @@ namespace CSharpE.Syntax
                 {
                     var genericSyntax = syntax as GenericNameSyntax;
 
-                    typeParameters = new SeparatedSyntaxList<TypeReference, TypeSyntax>(
-                        genericSyntax?.TypeArgumentList.Arguments ?? default,
-                        typeSyntax => FromRoslyn.TypeReference(typeSyntax, this));
+                    typeParameters = new TypeList(
+                        genericSyntax?.TypeArgumentList.Arguments ?? default, this);
                 }
 
                 return typeParameters;
             }
-            set => typeParameters = new SeparatedSyntaxList<TypeReference, TypeSyntax>(value);
+            set => SetList(ref typeParameters, new TypeList(value, this));
         }
 
         internal override StringBuilder ComputeFullName(StringBuilder stringBuilder)
@@ -365,6 +364,8 @@ namespace CSharpE.Syntax
         public override string ToString() => FullName;
 
         internal override SyntaxNode Parent { get; set; }
+
+        internal override SyntaxNode Clone() => new NamedTypeReference(Namespace, Container, Name, TypeParameters);
 
         public bool Equals(NamedTypeReference other)
         {

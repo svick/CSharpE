@@ -55,17 +55,34 @@ namespace CSharpE.Syntax
 
         protected void Set<T>(ref T field, T value) where T : SyntaxNode
         {
-            if (value?.Parent != null)
-                throw new InvalidOperationException(
-                    $"Can't set the parent of syntax node '{value}', because it already has one.");
-
             if (field != null)
                 field.Parent = null;
 
-            if (value != null)
-                value.Parent = this;
+            field = WithParent(value, this);
+        }
+
+        private protected void SetList<T>(ref T field, T value) where T : SyntaxListBase
+        {
+            if (field != null)
+                field.Parent = null;
 
             field = value;
+        }
+
+        internal static T WithParent<T>(T node, SyntaxNode parent) where T : SyntaxNode
+        {
+            if (node is null)
+                return null;
+
+            if (ReferenceEquals(node.Parent, parent))
+                return node;
+
+            if (!(node.Parent is null))
+                node = (T)node.Clone();
+
+            node.Parent = parent;
+
+            return node;
         }
 
         internal void SetSyntax(Roslyn::SyntaxNode newSyntax)
@@ -83,6 +100,8 @@ namespace CSharpE.Syntax
             syntaxSet = false;
             return result;
         }
+
+        internal abstract SyntaxNode Clone();
 
         public bool Equals(SyntaxNode other)
         {

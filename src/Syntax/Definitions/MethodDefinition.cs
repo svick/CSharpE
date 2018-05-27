@@ -9,7 +9,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class MethodDefinition : MemberDefinition
+    public sealed class MethodDefinition : MemberDefinition, ISyntaxWrapper2<MethodDeclarationSyntax>
     {
         private MethodDeclarationSyntax syntax;
 
@@ -142,41 +142,44 @@ namespace CSharpE.Syntax
             get
             {
                 if (parameters == null)
-                    parameters = new SeparatedSyntaxList<Parameter, ParameterSyntax>(syntax.ParameterList.Parameters);
+                    parameters = new SeparatedSyntaxList<Parameter, ParameterSyntax>(
+                        syntax.ParameterList.Parameters, this);
 
                 return parameters;
             }
-            set => parameters = new SeparatedSyntaxList<Parameter, ParameterSyntax>(value);
+            set => SetList(ref parameters, new SeparatedSyntaxList<Parameter, ParameterSyntax>(value, this));
         }
 
         // TODO: methods without body and with expression body
-        private SyntaxList<Statement, StatementSyntax> body;
+        private StatementList body;
         public IList<Statement> Body
         {
             get
             {
                 if (body == null)
-                    body = new SyntaxList<Statement, StatementSyntax>(
-                        syntax.Body.Statements, s => FromRoslyn.Statement(s, this));
+                    body = new StatementList(syntax.Body.Statements, this);
 
                 return body;
             }
-            set => body = new SyntaxList<Statement, StatementSyntax>(value);
+            set => SetList(ref body, new StatementList(value, this));
         }
 
         public TypeDefinition ParentType { get; private set; }
 
-        internal new MethodDeclarationSyntax GetWrapped()
+        internal MethodDeclarationSyntax GetWrapped(ref bool changed)
         {
+            changed |= GetAndResetSyntaxSet();
+
+            bool thisChanged = false;
+
             var newModifiers = Modifiers;
-            var newReturnType = returnType?.GetWrapped() ?? syntax.ReturnType;
-            var newName = name.GetWrapped();
-            var newParameters = parameters?.GetWrapped() ?? syntax.ParameterList.Parameters;
-            var newBody = body?.GetWrapped() ?? syntax.Body.Statements;
+            var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? syntax.ReturnType;
+            var newName = name.GetWrapped(ref thisChanged);
+            var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
+            var newBody = body?.GetWrapped(ref thisChanged) ?? syntax.Body.Statements;
 
             if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
-                newReturnType != syntax.ReturnType || newName != syntax.Identifier ||
-                newParameters != syntax.ParameterList.Parameters || newBody != syntax.Body.Statements || !IsAnnotated(syntax))
+                thisChanged || !IsAnnotated(syntax))
             {
                 var newSyntax = CSharpSyntaxFactory.MethodDeclaration(
                     GetNewAttributes(), newModifiers.GetWrapped(), newReturnType, null, newName, null,
@@ -184,12 +187,17 @@ namespace CSharpE.Syntax
                     null);
 
                 syntax = Annotate(newSyntax);
+
+                changed = true;
             }
 
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
+        protected override MemberDeclarationSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
+
+        MethodDeclarationSyntax ISyntaxWrapper2<MethodDeclarationSyntax>.GetWrapped(ref bool changed) =>
+            GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
@@ -199,6 +207,11 @@ namespace CSharpE.Syntax
             Set(ref returnType, null);
             parameters = null;
             body = null;
+        }
+
+        internal override SyntaxNode Clone()
+        {
+            throw new NotImplementedException();
         }
 
         internal override SyntaxNode Parent

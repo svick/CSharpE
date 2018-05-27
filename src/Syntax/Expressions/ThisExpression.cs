@@ -17,15 +17,23 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(ref bool changed)
         {
+            changed |= GetAndResetSyntaxSet();
+
             if (syntax == null)
+            {
                 syntax = CSharpSyntaxFactory.ThisExpression();
+
+                changed = true;
+            }
 
             return syntax;
         }
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => syntax = (ThisExpressionSyntax)newSyntax;
+
+        internal override SyntaxNode Clone() => new ThisExpression();
 
         internal override SyntaxNode Parent { get; set; }
     }

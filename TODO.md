@@ -1,6 +1,4 @@
-﻿- create derived classes for `SyntaxList`s
-   - add `Parent` to `SyntaxList`
-- add unchanged method to test, logging to transfomers
+﻿- add unchanged method to test, logging to transfomers
 
 ---
 

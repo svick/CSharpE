@@ -24,6 +24,11 @@ namespace CSharpE.Syntax
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => syntax = (AttributeSyntax)newSyntax;
 
+        internal override SyntaxNode Clone()
+        {
+            throw new NotImplementedException();
+        }
+
         internal override SyntaxNode Parent
         {
             get => ParentMember;

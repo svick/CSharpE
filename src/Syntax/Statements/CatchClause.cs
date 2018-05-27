@@ -7,8 +7,6 @@ namespace CSharpE.Syntax
 {
     public class CatchClause : SyntaxNode, ISyntaxWrapper<CatchClauseSyntax>
     {
-        public TryStatement ParentStatement { get; private set; }
-
         public CatchClauseSyntax GetWrapped()
         {
             throw new NotImplementedException();
@@ -19,13 +17,19 @@ namespace CSharpE.Syntax
             throw new NotImplementedException();
         }
 
+        internal override SyntaxNode Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        private TryStatement parent;
         internal override SyntaxNode Parent
         {
-            get => ParentStatement;
+            get => parent;
             set
             {
                 if (value is TryStatement tryStatement)
-                    ParentStatement = tryStatement;
+                    parent = tryStatement;
                 else
                     throw new ArgumentException(nameof(value));
             }

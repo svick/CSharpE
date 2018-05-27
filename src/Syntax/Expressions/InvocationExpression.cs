@@ -21,7 +21,7 @@ namespace CSharpE.Syntax
         public InvocationExpression(Expression expression, IEnumerable<Argument> arguments = null)
         {
             Expression = expression;
-            this.arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(arguments);
+            this.arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(arguments, this);
         }
 
         public InvocationExpression(Expression expression, IEnumerable<Expression> arguments = null)
@@ -36,11 +36,11 @@ namespace CSharpE.Syntax
             get
             {
                 if (expression == null)
-                    expression = FromRoslyn.Expression(syntax.Expression);
+                    expression = FromRoslyn.Expression(syntax.Expression, this);
 
                 return expression;
             }
-            set => expression = value ?? throw new ArgumentNullException(nameof(value));
+            set => SetNotNull(ref expression, value);
         }
 
         private SeparatedSyntaxList<Argument, ArgumentSyntax> arguments;
@@ -49,22 +49,28 @@ namespace CSharpE.Syntax
             get
             {
                 if (arguments == null)
-                    arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(syntax.ArgumentList.Arguments);
+                    arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(syntax.ArgumentList.Arguments, this);
 
                 return arguments;
             }
-            set => arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(value);
+            set => SetList(ref arguments, new SeparatedSyntaxList<Argument, ArgumentSyntax>(value, this));
         }
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(ref bool changed)
         {
-            var newExpression = expression?.GetWrapped() ?? syntax.Expression;
-            var newArguments = arguments?.GetWrapped() ?? syntax.ArgumentList.Arguments;
+            changed |= GetAndResetSyntaxSet();
 
-            if (syntax == null || newExpression != syntax.Expression || newArguments != syntax.ArgumentList.Arguments)
+            bool thisChanged = false;
+
+            var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
+            var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList.Arguments;
+
+            if (syntax == null || thisChanged)
             {
                 syntax = CSharpSyntaxFactory.InvocationExpression(
                     newExpression, CSharpSyntaxFactory.ArgumentList(newArguments));
+
+                changed = true;
             }
 
             return syntax;
@@ -77,6 +83,8 @@ namespace CSharpE.Syntax
             Set(ref expression, null);
             arguments = null;
         }
+
+        internal override SyntaxNode Clone() => new InvocationExpression(Expression, Arguments);
 
         internal override SyntaxNode Parent { get; set; }
     }

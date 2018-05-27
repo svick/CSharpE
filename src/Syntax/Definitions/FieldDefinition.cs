@@ -56,9 +56,7 @@ namespace CSharpE.Syntax
                     var syntaxInitializer = syntax.Declaration.Variables.Single().Initializer;
 
                     if (syntaxInitializer != null)
-                    {
-                        initializer = FromRoslyn.Expression(syntaxInitializer.Value);
-                    }
+                        initializer = FromRoslyn.Expression(syntaxInitializer.Value, this);
 
                     initializerSet = true;
                 }
@@ -114,11 +112,10 @@ namespace CSharpE.Syntax
             var newModifiers = Modifiers;
             var newType = type?.GetWrapped(ref localChanged) ?? syntax.Declaration.Type;
             var newName = name.GetWrapped(ref localChanged);
-            var newInitializer = initializerSet ? initializer?.GetWrapped() : declarator?.Initializer?.Value;
+            var newInitializer = initializerSet ? initializer?.GetWrapped(ref localChanged) : declarator?.Initializer?.Value;
 
             if (syntax == null || AttributesChanged() ||
-                FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || localChanged ||
-                declarator.Initializer?.Value != newInitializer)
+                FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || localChanged)
             {
                 var equalsValueClause =
                     newInitializer == null ? null : CSharpSyntaxFactory.EqualsValueClause(newInitializer);
@@ -134,7 +131,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl() => GetWrapped();
+        protected override MemberDeclarationSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
 
         FieldDeclarationSyntax ISyntaxWrapper2<FieldDeclarationSyntax>.GetWrapped(ref bool changed) =>
             GetWrapped(ref changed);
@@ -148,6 +145,8 @@ namespace CSharpE.Syntax
             initializerSet = false;
             Set(ref initializer, null);
         }
+
+        internal override SyntaxNode Clone() => new FieldDefinition(Modifiers, Type, Name, Initializer);
 
         internal override SyntaxNode Parent
         {

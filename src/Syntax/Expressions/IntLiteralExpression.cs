@@ -27,17 +27,23 @@ namespace CSharpE.Syntax
 
         protected override object ValueImpl => Value;
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(ref bool changed)
         {
+            changed |= GetAndResetSyntaxSet();
+
             if (Syntax == null || Value != (int)Syntax.Token.Value)
             {
                 Syntax = CSharpSyntaxFactory.LiteralExpression(
                     NumericLiteralExpression, CSharpSyntaxFactory.Literal(Value));
+
+                changed = true;
             }
 
             return Syntax;
         }
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => Init((LiteralExpressionSyntax)newSyntax);
+
+        internal override SyntaxNode Clone() => new IntLiteralExpression(Value);
     }
 }

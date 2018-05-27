@@ -20,9 +20,9 @@ namespace CSharpE.Syntax
             IEnumerable<Statement> tryStatements, IEnumerable<CatchClause> catchClauses,
             IEnumerable<Statement> finallyStatements)
         {
-            this.tryStatements = new SyntaxList<Statement, StatementSyntax>(tryStatements);
-            this.catchClauses = new SyntaxList<CatchClause, CatchClauseSyntax>(catchClauses);
-            this.finallyStatements = new SyntaxList<Statement, StatementSyntax>(finallyStatements);
+            this.tryStatements = new StatementList(tryStatements, this);
+            this.catchClauses = new SyntaxList<CatchClause, CatchClauseSyntax>(catchClauses, this);
+            this.finallyStatements = new StatementList(finallyStatements, this);
         }
 
         public TryStatement(IEnumerable<Statement> tryStatements, IEnumerable<CatchClause> catchClauses)
@@ -34,17 +34,17 @@ namespace CSharpE.Syntax
         public TryStatement(IEnumerable<Statement> tryStatements, IEnumerable<Statement> finallyStatements)
             : this(tryStatements, null, finallyStatements) { }
 
-        private SyntaxList<Statement, StatementSyntax> tryStatements;
+        private StatementList tryStatements;
         public IList<Statement> TryStatements
         {
             get
             {
                 if (tryStatements == null)
-                    tryStatements = new SyntaxList<Statement, StatementSyntax>(syntax.Block.Statements);
+                    tryStatements = new StatementList(syntax.Block.Statements, this);
 
                 return tryStatements;
             }
-            set => tryStatements = new SyntaxList<Statement, StatementSyntax>(value);
+            set => SetList(ref tryStatements, new StatementList(value, this));
         }
 
         private SyntaxList<CatchClause, CatchClauseSyntax> catchClauses;
@@ -53,24 +53,24 @@ namespace CSharpE.Syntax
             get
             {
                 if (catchClauses == null)
-                    catchClauses = new SyntaxList<CatchClause, CatchClauseSyntax>(syntax.Catches);
+                    catchClauses = new SyntaxList<CatchClause, CatchClauseSyntax>(syntax.Catches, this);
 
                 return catchClauses;
             }
-            set => catchClauses = new SyntaxList<CatchClause, CatchClauseSyntax>();
+            set => SetList(ref catchClauses, new SyntaxList<CatchClause, CatchClauseSyntax>(this));
         }
 
-        private SyntaxList<Statement, StatementSyntax> finallyStatements;
+        private StatementList finallyStatements;
         public IList<Statement> FinallyStatements
         {
             get
             {
                 if (finallyStatements == null)
-                    finallyStatements = new SyntaxList<Statement, StatementSyntax>(syntax.Finally?.Block.Statements ?? default);
+                    finallyStatements = new StatementList(syntax.Finally?.Block.Statements ?? default, this);
 
                 return finallyStatements;
             }
-            set => finallyStatements = new SyntaxList<Statement, StatementSyntax>(value);
+            set => SetList(ref finallyStatements, new StatementList(value, this));
         }
 
         internal new TryStatementSyntax GetWrapped()
@@ -103,6 +103,8 @@ namespace CSharpE.Syntax
             catchClauses = null;
             finallyStatements = null;
         }
+
+        internal override SyntaxNode Clone() => new TryStatement(TryStatements, CatchClauses, FinallyStatements);
 
         internal override SyntaxNode Parent { get; set; }
     }

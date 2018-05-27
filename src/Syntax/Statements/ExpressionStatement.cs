@@ -25,11 +25,11 @@ namespace CSharpE.Syntax
             get
             {
                 if (expression == null)
-                    expression = FromRoslyn.Expression(syntax.Expression);
+                    expression = FromRoslyn.Expression(syntax.Expression, this);
 
                 return expression;
             }
-            set => expression = value ?? throw new ArgumentNullException(nameof(value));
+            set => SetNotNull(ref expression, value);
         }
 
         internal new ExpressionStatementSyntax GetWrapped()
@@ -52,6 +52,8 @@ namespace CSharpE.Syntax
 
             Set(ref expression, null);
         }
+
+        internal override SyntaxNode Clone() => new ExpressionStatement(Expression);
 
         internal override SyntaxNode Parent { get; set; }
     }

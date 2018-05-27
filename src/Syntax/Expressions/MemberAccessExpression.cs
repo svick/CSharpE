@@ -48,11 +48,11 @@ namespace CSharpE.Syntax
             get
             {
                 if (expression == null)
-                    expression = FromRoslyn.Expression(syntax.Expression);
+                    expression = FromRoslyn.Expression(syntax.Expression, this);
 
                 return expression;
             }
-            set => expression = value ?? throw new ArgumentNullException(nameof(value));
+            set => SetNotNull(ref expression, value);
         }
 
         private Identifier memberName;
@@ -62,16 +62,22 @@ namespace CSharpE.Syntax
             set => memberName.Text = value;
         }
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(ref bool changed)
         {
-            var newExpression = expression?.GetWrapped() ?? syntax.Expression;
-            var newMemberName = memberName.GetWrapped();
+            changed |= GetAndResetSyntaxSet();
 
-            if (syntax == null || newExpression != syntax.Expression || newMemberName != syntax.Name.Identifier)
+            bool thisChanged = false;
+
+            var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
+            var newMemberName = memberName.GetWrapped(ref thisChanged);
+
+            if (syntax == null || thisChanged)
             {
                 syntax = CSharpSyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression, newExpression,
                     CSharpSyntaxFactory.IdentifierName(newMemberName));
+
+                changed = true;
             }
 
             return syntax;
@@ -83,6 +89,8 @@ namespace CSharpE.Syntax
 
             Set(ref expression, null);
         }
+
+        internal override SyntaxNode Clone() => new MemberAccessExpression(Expression, MemberName);
 
         internal override SyntaxNode Parent { get; set; }
     }

@@ -7,7 +7,12 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
 {
-    internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : IList<TSyntax>, ISyntaxWrapper2<TList>
+    internal abstract class SyntaxListBase
+    {
+        internal abstract SyntaxNode Parent { get; set; }
+    }
+
+    internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : SyntaxListBase, IList<TSyntax>, ISyntaxWrapper2<TList>
         where TSyntax : ISyntaxWrapperBase<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
         where TList : struct, IReadOnlyList<TRoslynSyntax>
@@ -18,18 +23,45 @@ namespace CSharpE.Syntax.Internals
         // Each item is either TSyntax or TRoslynSyntax. If it's TRoslynSyntax, it's converted to TSyntax when reading.
         private readonly List<object> list;
 
-        private readonly Func<TRoslynSyntax, TSyntax> wrapperFactory;
+        private SyntaxNode parent;
+        internal sealed override SyntaxNode Parent
+        {
+            get => parent;
+            set
+            {
+                parent = value;
 
-        public SyntaxListBase() => list = new List<object>();
+                // PERF: check is TSyntax is assignable to SyntaxNode
+                foreach (var o in list)
+                {
+                    if (o is SyntaxNode node)
+                        node.Parent = value;
+                }
+            }
+        }
 
-        public SyntaxListBase(IEnumerable<TSyntax> list) =>
-            this.list = new List<object>(list?.Cast<object>() ?? Enumerable.Empty<object>());
+        protected SyntaxListBase(SyntaxNode parent)
+        {
+            list = new List<object>();
 
-        public SyntaxListBase(TList syntaxList, Func<TRoslynSyntax, TSyntax> wrapperFactory = null)
+            Parent = parent;
+        }
+
+        protected SyntaxListBase(IEnumerable<TSyntax> list, SyntaxNode parent)
+        {
+            this.list =
+                list?.Select(syntax => syntax is SyntaxNode node ? (object)SyntaxNode.WithParent(node, parent) : syntax)
+                    .ToList() ?? new List<object>();
+
+            Parent = parent;
+        }
+
+        protected SyntaxListBase(TList syntaxList, SyntaxNode parent)
         {
             roslynList = syntaxList;
             list = new List<object>(syntaxList);
-            this.wrapperFactory = wrapperFactory ?? SyntaxWrapper<TSyntax, TRoslynSyntax>.Constructor;
+
+            Parent = parent;
         }
 
         public IEnumerator<TSyntax> GetEnumerator()
@@ -83,7 +115,7 @@ namespace CSharpE.Syntax.Internals
                     return node;
                 }
 
-                node = wrapperFactory((TRoslynSyntax)value);
+                node = CreateWrapper((TRoslynSyntax)value);
                 list[index] = node;
 
                 return node;
@@ -101,6 +133,16 @@ namespace CSharpE.Syntax.Internals
         }
 
         protected abstract TList CreateList(List<TRoslynSyntax> nodes);
+
+        protected virtual TSyntax CreateWrapper(TRoslynSyntax roslynSyntax)
+        {
+            var wrapper = SyntaxWrapper<TSyntax, TRoslynSyntax>.Constructor(roslynSyntax);
+
+            if (wrapper is SyntaxNode node)
+                node.Parent = parent;
+
+            return wrapper;
+        }
 
         public TList GetWrapped(ref bool changed)
         {
@@ -133,37 +175,35 @@ namespace CSharpE.Syntax.Internals
         }
     }
 
-    internal sealed class SyntaxList<TSyntax, TRoslynSyntax>
+    internal class SyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SyntaxList<TRoslynSyntax>>
         where TSyntax : ISyntaxWrapperBase<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
     {
-        public SyntaxList() : base() { }
+        internal SyntaxList(SyntaxNode parent) : base(parent) { }
 
-        public SyntaxList(IEnumerable<TSyntax> list) : base(list) { }
+        internal SyntaxList(IEnumerable<TSyntax> list, SyntaxNode parent) : base(list, parent) { }
 
-        public SyntaxList(
-            Roslyn::SyntaxList<TRoslynSyntax> syntaxList, Func<TRoslynSyntax, TSyntax> wrapperFactory = null)
-            : base(syntaxList, wrapperFactory) { }
+        internal SyntaxList(
+            Roslyn::SyntaxList<TRoslynSyntax> syntaxList, SyntaxNode parent) : base(syntaxList, parent) { }
 
-        protected override Roslyn::SyntaxList<TRoslynSyntax> CreateList(List<TRoslynSyntax> nodes) =>
+        protected sealed override Roslyn::SyntaxList<TRoslynSyntax> CreateList(List<TRoslynSyntax> nodes) =>
             CSharpSyntaxFactory.List(nodes);
     }
 
-    internal sealed class SeparatedSyntaxList<TSyntax, TRoslynSyntax>
+    internal class SeparatedSyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SeparatedSyntaxList<TRoslynSyntax>>
         where TSyntax : ISyntaxWrapperBase<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
     {
-        public SeparatedSyntaxList() : base() { }
+        internal SeparatedSyntaxList(SyntaxNode parent) : base(parent) { }
 
-        public SeparatedSyntaxList(IEnumerable<TSyntax> list) : base(list) { }
+        internal SeparatedSyntaxList(IEnumerable<TSyntax> list, SyntaxNode parent) : base(list, parent) { }
 
-        public SeparatedSyntaxList(
-            Roslyn::SeparatedSyntaxList<TRoslynSyntax> syntaxList, Func<TRoslynSyntax, TSyntax> wrapperFactory = null)
-            : base(syntaxList, wrapperFactory) { }
+        internal SeparatedSyntaxList(
+            Roslyn::SeparatedSyntaxList<TRoslynSyntax> syntaxList, SyntaxNode parent) : base(syntaxList, parent) { }
 
-        protected override Roslyn::SeparatedSyntaxList<TRoslynSyntax> CreateList(List<TRoslynSyntax> nodes) =>
+        protected sealed override Roslyn::SeparatedSyntaxList<TRoslynSyntax> CreateList(List<TRoslynSyntax> nodes) =>
             CSharpSyntaxFactory.SeparatedList(nodes);
     }
 }

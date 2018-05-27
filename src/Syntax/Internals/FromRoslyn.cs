@@ -13,12 +13,25 @@ namespace CSharpE.Syntax.Internals
     /// </remarks>
     internal static class FromRoslyn
     {
-        public static Expression Expression(ExpressionSyntax syntax)
+        public static Expression Expression(ExpressionSyntax syntax, SyntaxNode parent)
         {
             switch (syntax)
             {
-                case null:
-                    return null;
+                case LiteralExpressionSyntax literalSyntax: return LiteralExpression(literalSyntax, parent);
+                case null: return null;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public static LiteralExpression LiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
+        {
+            switch (syntax.Kind())
+            {
+                case SyntaxKind.NumericLiteralExpression:
+                    if (syntax.Token.Value is int)
+                        return new IntLiteralExpression(syntax, parent);
+                    break;
             }
 
             throw new NotImplementedException();

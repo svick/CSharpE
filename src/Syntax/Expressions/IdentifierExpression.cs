@@ -9,12 +9,17 @@ namespace CSharpE.Syntax
 
         public IdentifierExpression(string identifier) => Identifier = identifier;
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(ref bool changed)
         {
             throw new System.NotImplementedException();
         }
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        internal override SyntaxNode Clone()
         {
             throw new System.NotImplementedException();
         }

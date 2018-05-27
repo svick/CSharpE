@@ -25,22 +25,26 @@ namespace CSharpE.Syntax
             get
             {
                 if (operand == null)
-                {
-                    operand = FromRoslyn.Expression(syntax.Expression);
-                }
+                    operand = FromRoslyn.Expression(syntax.Expression, this);
 
                 return operand;
             }
-            set => operand = value ?? throw new ArgumentNullException(nameof(value));
+            set => SetNotNull(ref operand, value);
         }
 
-        internal override ExpressionSyntax GetWrapped()
+        internal override ExpressionSyntax GetWrapped(ref bool changed)
         {
-            var newOperand = operand?.GetWrapped() ?? syntax.Expression;
+            changed |= GetAndResetSyntaxSet();
 
-            if (syntax == null || newOperand != syntax.Expression)
+            bool thisChanged = false;
+
+            var newOperand = operand?.GetWrapped(ref thisChanged) ?? syntax.Expression;
+
+            if (syntax == null || thisChanged)
             {
                 syntax = CSharpSyntaxFactory.AwaitExpression(newOperand);
+
+                changed = true;
             }
 
             return syntax;
@@ -52,6 +56,8 @@ namespace CSharpE.Syntax
 
             Set(ref operand, null);
         }
+
+        internal override SyntaxNode Clone() => new AwaitExpression(Operand);
 
         internal override SyntaxNode Parent { get; set; }
     }

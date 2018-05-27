@@ -18,7 +18,7 @@ namespace CSharpE.Syntax
 
         public ReturnStatement(Expression expression) => Expression = expression;
 
-        public ReturnStatement() : this((Expression)null) { }
+        public ReturnStatement() : this(null) { }
 
         private bool expressionSet;
         private Expression expression;
@@ -28,7 +28,7 @@ namespace CSharpE.Syntax
             {
                 if (!expressionSet)
                 {
-                    expression = FromRoslyn.Expression(syntax.Expression);
+                    expression = FromRoslyn.Expression(syntax.Expression, this);
                     expressionSet = true;
                 }
 
@@ -36,7 +36,7 @@ namespace CSharpE.Syntax
             }
             set
             {
-                expression = value;
+                Set(ref expression, value);
                 expressionSet = true;
             }
         }
@@ -62,6 +62,8 @@ namespace CSharpE.Syntax
             expressionSet = false;
             Set(ref expression, null);
         }
+
+        internal override SyntaxNode Clone() => new ReturnStatement(Expression);
 
         internal override SyntaxNode Parent { get; set; }
     }

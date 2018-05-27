@@ -16,6 +16,11 @@ namespace CSharpE.Syntax
             throw new System.NotImplementedException();
         }
 
+        internal override SyntaxNode Clone()
+        {
+            throw new System.NotImplementedException();
+        }
+
         internal override SyntaxNode Parent { get; set; }
     }
 }
