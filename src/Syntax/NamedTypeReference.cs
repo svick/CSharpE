@@ -234,11 +234,13 @@ namespace CSharpE.Syntax
         {
             changed |= GetAndResetSyntaxSet();
 
-            var oldTypeParameters = (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
-            var newTypeParameters = typeParameters?.GetWrapped() ?? oldTypeParameters;
+            bool thisChanged = false;
+
+            var newTypeParameters = typeParameters?.GetWrapped(ref thisChanged) ??
+                                    (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
 
             // if Resolve() wasn't called, only type parameters could have been changed
-            if (isKnownType == null && newTypeParameters == oldTypeParameters)
+            if (isKnownType == null && !thisChanged)
             {
                 if (!IsAnnotated(syntax))
                 {
@@ -250,14 +252,12 @@ namespace CSharpE.Syntax
                 return syntax;
             }
 
-            bool thisChanged = false;
-
             var newNamespace = ns ?? syntaxNamespace;
             var newContainer = container?.GetWrapped(ref thisChanged);
             var newName = name ?? syntaxName;
 
-            if (syntax == null || newNamespace != syntaxNamespace || thisChanged ||
-                newName != syntaxName || newTypeParameters != oldTypeParameters || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged || newNamespace != syntaxNamespace || newName != syntaxName ||
+                !IsAnnotated(syntax))
             {
                 if (RequiresUsingNamespace)
                     SourceFile?.EnsureUsingNamespace(Namespace);
