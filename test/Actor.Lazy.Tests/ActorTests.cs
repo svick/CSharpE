@@ -190,6 +190,12 @@ class C
                     ("TypeDefinition", "C", "transform"), ("MethodDefinition", "M1", "cached"),
                     ("MethodDefinition", "M2", "transform")
                 }, recorder.Read());
+
+            tranformedProject = project.Transform();
+            Assert.Equal(Includeptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
+            Assert.Equal(
+                new LogAction[] { ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "cached") },
+                recorder.Read());
         }
     }
 }
