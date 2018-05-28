@@ -42,25 +42,25 @@ namespace CSharpE.Syntax
         }
 
 
-        internal ReturnStatementSyntax GetWrapped(ref bool changed)
+        internal ReturnStatementSyntax GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
-            bool thisChanged = false;
+            bool? thisChanged = false;
 
             var newExpression = expressionSet ? expression?.GetWrapped(ref thisChanged) : syntax.Expression;
 
-            if (syntax == null || thisChanged)
+            if (syntax == null || thisChanged == true)
             {
                 syntax = CSharpSyntaxFactory.ReturnStatement(newExpression);
 
-                changed = true;
+                SetChanged(ref changed);
             }
 
             return syntax;
         }
 
-        protected override StatementSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
+        protected override StatementSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

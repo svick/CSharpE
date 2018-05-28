@@ -23,7 +23,7 @@ namespace CSharpE.Syntax
         public static implicit operator NamespaceOrTypeDefinition(TypeDefinition type) =>
             new NamespaceOrTypeDefinition(type);
 
-        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(ref bool changed) =>
+        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             namespaceOrType.GetWrapped(ref changed);
     }
 }

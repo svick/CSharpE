@@ -27,16 +27,16 @@ namespace CSharpE.Syntax
 
         protected override object ValueImpl => Value;
 
-        internal override ExpressionSyntax GetWrapped(ref bool changed)
+        internal override ExpressionSyntax GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
             if (Syntax == null || Value != (int)Syntax.Token.Value)
             {
                 Syntax = CSharpSyntaxFactory.LiteralExpression(
                     NumericLiteralExpression, CSharpSyntaxFactory.Literal(Value));
 
-                changed = true;
+                SetChanged(ref changed);
             }
 
             return Syntax;

@@ -5,8 +5,8 @@ namespace CSharpE.Syntax
 {
     public abstract class Statement : SyntaxNode, ISyntaxWrapper<StatementSyntax>
     {
-        StatementSyntax ISyntaxWrapper<StatementSyntax>.GetWrapped(ref bool changed) => GetWrappedImpl(ref changed);
+        StatementSyntax ISyntaxWrapper<StatementSyntax>.GetWrapped(ref bool? changed) => GetWrappedImpl(ref changed);
 
-        protected abstract StatementSyntax GetWrappedImpl(ref bool changed);
+        protected abstract StatementSyntax GetWrappedImpl(ref bool? changed);
     }
 }

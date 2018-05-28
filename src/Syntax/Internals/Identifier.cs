@@ -31,7 +31,7 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
-        internal SyntaxToken GetWrapped(ref bool changed)
+        internal SyntaxToken GetWrapped(ref bool? changed)
         {
             var newText = text ?? syntax.ValueText;
 
@@ -45,6 +45,6 @@ namespace CSharpE.Syntax.Internals
             return syntax;
         }
 
-        SyntaxToken ISyntaxWrapper<SyntaxToken>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
+        SyntaxToken ISyntaxWrapper<SyntaxToken>.GetWrapped(ref bool? changed) => GetWrapped(ref changed);
     }
 }

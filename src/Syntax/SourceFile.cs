@@ -142,11 +142,11 @@ namespace CSharpE.Syntax
 
         public void EnsureUsingNamespace(string ns) => additionalNamespaces.Add(ns);
 
-        internal SyntaxTree GetWrapped(ref bool changed)
+        internal SyntaxTree GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
-            bool localChanged = false;
+            bool? thisChanged = false;
 
             var oldCompilationUnit = syntax?.GetCompilationUnitRoot();
             var oldUsings = oldCompilationUnit?.Usings ?? default;
@@ -156,7 +156,7 @@ namespace CSharpE.Syntax
                 .Select(u => u.Name)
                 .ToList();
 
-            var newMembers = members?.GetWrapped(ref localChanged) ?? oldCompilationUnit.Members;
+            var newMembers = members?.GetWrapped(ref thisChanged) ?? oldCompilationUnit.Members;
 
             // remove additional names that already have a using
             // NOTE: this has to be executed *after* all GetWrapped() have already been called
@@ -168,7 +168,7 @@ namespace CSharpE.Syntax
                     return oldUsingNamespaces.Any(ons => nameSyntax.IsEquivalentTo(ons));
                 });
 
-            if (syntax == null || additionalNamespaces.Any() || localChanged)
+            if (syntax == null || additionalNamespaces.Any() || thisChanged == true)
             {
                 var newUsings = oldUsings;
 
@@ -185,7 +185,7 @@ namespace CSharpE.Syntax
 
                 additionalNamespaces.Clear();
 
-                changed = true;
+                SetChanged(ref changed);
 
                 semanticModel = null;
             }
@@ -193,12 +193,12 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        CompilationUnitSyntax ISyntaxWrapper<CompilationUnitSyntax>.GetWrapped(ref bool changed) =>
+        CompilationUnitSyntax ISyntaxWrapper<CompilationUnitSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed).GetCompilationUnitRoot();
 
         internal SyntaxTree GetSyntaxTree()
         {
-            bool changed = true;
+            bool? changed = null;
             return GetWrapped(ref changed);
         }
 

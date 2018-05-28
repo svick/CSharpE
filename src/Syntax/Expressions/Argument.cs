@@ -32,25 +32,25 @@ namespace CSharpE.Syntax
             set => SetNotNull(ref expression, value);
         }
 
-        internal ArgumentSyntax GetWrapped(ref bool changed)
+        internal ArgumentSyntax GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
-            bool thisChanged = false;
+            bool? thisChanged = false;
 
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
 
-            if (syntax == null || thisChanged)
+            if (syntax == null || thisChanged == true)
             {
                 syntax = CSharpSyntaxFactory.Argument(newExpression);
 
-                changed = true;
+                SetChanged(ref changed);
             }
 
             return syntax;
         }
 
-        ArgumentSyntax ISyntaxWrapper<ArgumentSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
+        ArgumentSyntax ISyntaxWrapper<ArgumentSyntax>.GetWrapped(ref bool? changed) => GetWrapped(ref changed);
 
         public static implicit operator Argument(Expression expression) => new Argument(expression);
 

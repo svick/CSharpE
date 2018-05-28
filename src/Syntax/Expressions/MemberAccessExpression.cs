@@ -62,22 +62,22 @@ namespace CSharpE.Syntax
             set => memberName.Text = value;
         }
 
-        internal override ExpressionSyntax GetWrapped(ref bool changed)
+        internal override ExpressionSyntax GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
-            bool thisChanged = false;
+            bool? thisChanged = false;
 
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
             var newMemberName = memberName.GetWrapped(ref thisChanged);
 
-            if (syntax == null || thisChanged)
+            if (syntax == null || thisChanged == true)
             {
                 syntax = CSharpSyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression, newExpression,
                     CSharpSyntaxFactory.IdentifierName(newMemberName));
 
-                changed = true;
+                SetChanged(ref changed);
             }
 
             return syntax;

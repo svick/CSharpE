@@ -17,7 +17,7 @@ namespace CSharpE.Syntax
             ParentMember = parent;
         }
 
-        AttributeSyntax ISyntaxWrapper<AttributeSyntax>.GetWrapped(ref bool changed)
+        AttributeSyntax ISyntaxWrapper<AttributeSyntax>.GetWrapped(ref bool? changed)
         {
             throw new NotImplementedException();
         }

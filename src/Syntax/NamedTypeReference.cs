@@ -230,23 +230,23 @@ namespace CSharpE.Syntax
 
         public static implicit operator IdentifierExpression(NamedTypeReference typeReference) => new IdentifierExpression(typeReference.Name);
 
-        protected override TypeSyntax GetWrappedImpl(ref bool changed)
+        protected override TypeSyntax GetWrappedImpl(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
-            bool thisChanged = false;
+            bool? thisChanged = false;
 
             var newTypeParameters = typeParameters?.GetWrapped(ref thisChanged) ??
                                     (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
 
             // if Resolve() wasn't called, only type parameters could have been changed
-            if (isKnownType == null && !thisChanged)
+            if (isKnownType == null && thisChanged == false)
             {
                 if (!IsAnnotated(syntax))
                 {
                     syntax = Annotate(syntax);
 
-                    changed = true;
+                    SetChanged(ref changed);
                 }
 
                 return syntax;
@@ -256,7 +256,7 @@ namespace CSharpE.Syntax
             var newContainer = container?.GetWrapped(ref thisChanged);
             var newName = name ?? syntaxName;
 
-            if (syntax == null || thisChanged || newNamespace != syntaxNamespace || newName != syntaxName ||
+            if (syntax == null || thisChanged == true || newNamespace != syntaxNamespace || newName != syntaxName ||
                 !IsAnnotated(syntax))
             {
                 if (RequiresUsingNamespace)
@@ -289,7 +289,7 @@ namespace CSharpE.Syntax
 
                 syntax = Annotate(syntax);
 
-                changed = true;
+                SetChanged(ref changed);
 
                 syntaxNamespace = newNamespace;
                 syntaxName = newName;

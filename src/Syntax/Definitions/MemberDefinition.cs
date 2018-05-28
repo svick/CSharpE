@@ -65,9 +65,9 @@ namespace CSharpE.Syntax
 
         protected abstract void ValidateModifiers(MemberModifiers modifiers);
 
-        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(ref bool changed) =>
+        MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrappedImpl(ref changed);
 
-        protected abstract MemberDeclarationSyntax GetWrappedImpl(ref bool changed);
+        protected abstract MemberDeclarationSyntax GetWrappedImpl(ref bool? changed);
     }
 }

@@ -14,12 +14,12 @@ namespace CSharpE.Syntax
             throw new System.NotImplementedException();
         }
 
-        internal NamespaceDeclarationSyntax GetWrapped(ref bool changed)
+        internal NamespaceDeclarationSyntax GetWrapped(ref bool? changed)
         {
             throw new System.NotImplementedException();
         }
 
-        NamespaceDeclarationSyntax ISyntaxWrapper<NamespaceDeclarationSyntax>.GetWrapped(ref bool changed) =>
+        NamespaceDeclarationSyntax ISyntaxWrapper<NamespaceDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);
     }
 }

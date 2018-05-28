@@ -9,7 +9,7 @@ namespace CSharpE.Syntax
 
         public IdentifierExpression(string identifier) => Identifier = identifier;
 
-        internal override ExpressionSyntax GetWrapped(ref bool changed)
+        internal override ExpressionSyntax GetWrapped(ref bool? changed)
         {
             throw new System.NotImplementedException();
         }

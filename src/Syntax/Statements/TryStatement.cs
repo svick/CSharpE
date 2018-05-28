@@ -73,17 +73,17 @@ namespace CSharpE.Syntax
             set => SetList(ref finallyStatements, new StatementList(value, this));
         }
 
-        internal TryStatementSyntax GetWrapped(ref bool changed)
+        internal TryStatementSyntax GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
-            bool thisChanged = false;
+            bool? thisChanged = false;
 
             var newTryStatements = tryStatements?.GetWrapped(ref thisChanged) ?? syntax.Block.Statements;
             var newCatchClauses = catchClauses?.GetWrapped(ref thisChanged) ?? syntax.Catches;
             var newFinallyStatements = finallyStatements?.GetWrapped(ref thisChanged) ?? syntax.Finally?.Block.Statements ?? default;
 
-            if (syntax == null || thisChanged)
+            if (syntax == null || thisChanged == true)
             {
                 var newFinallyClause = newFinallyStatements.Any()
                     ? CSharpSyntaxFactory.FinallyClause(CSharpSyntaxFactory.Block(newFinallyStatements))
@@ -92,13 +92,13 @@ namespace CSharpE.Syntax
                 syntax = CSharpSyntaxFactory.TryStatement(
                     CSharpSyntaxFactory.Block(newTryStatements), newCatchClauses, newFinallyClause);
 
-                changed = true;
+                SetChanged(ref changed);
             }
 
             return syntax;
         }
 
-        protected override StatementSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
+        protected override StatementSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

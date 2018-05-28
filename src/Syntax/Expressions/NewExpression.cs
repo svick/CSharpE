@@ -57,21 +57,21 @@ namespace CSharpE.Syntax
             set => SetList(ref arguments, new SeparatedSyntaxList<Argument, ArgumentSyntax>(value, this));
         }
 
-        internal override ExpressionSyntax GetWrapped(ref bool changed)
+        internal override ExpressionSyntax GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
-            bool thisChanged = false;
+            bool? thisChanged = false;
 
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
             var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList.Arguments;
 
-            if (syntax == null || thisChanged)
+            if (syntax == null || thisChanged == true)
             {
                 syntax = CSharpSyntaxFactory.ObjectCreationExpression(
                     newType, CSharpSyntaxFactory.ArgumentList(newArguments), null);
 
-                changed = true;
+                SetChanged(ref changed);
             }
 
             return syntax;

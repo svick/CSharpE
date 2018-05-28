@@ -9,11 +9,11 @@ namespace CSharpE.Syntax
     {
         public static implicit operator TypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 
-        TypeSyntax ISyntaxWrapper<TypeSyntax>.GetWrapped(ref bool changed) => GetWrapped(ref changed);
+        TypeSyntax ISyntaxWrapper<TypeSyntax>.GetWrapped(ref bool? changed) => GetWrapped(ref changed);
 
-        internal TypeSyntax GetWrapped(ref bool changed) => GetWrappedImpl(ref changed);
+        internal TypeSyntax GetWrapped(ref bool? changed) => GetWrappedImpl(ref changed);
 
-        protected abstract TypeSyntax GetWrappedImpl(ref bool changed);
+        protected abstract TypeSyntax GetWrappedImpl(ref bool? changed);
 
         internal abstract StringBuilder ComputeFullName(StringBuilder stringBuilder);
     }

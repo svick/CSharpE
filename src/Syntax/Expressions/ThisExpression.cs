@@ -17,15 +17,15 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        internal override ExpressionSyntax GetWrapped(ref bool changed)
+        internal override ExpressionSyntax GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
             if (syntax == null)
             {
                 syntax = CSharpSyntaxFactory.ThisExpression();
 
-                changed = true;
+                SetChanged(ref changed);
             }
 
             return syntax;

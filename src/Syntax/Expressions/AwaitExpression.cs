@@ -32,19 +32,19 @@ namespace CSharpE.Syntax
             set => SetNotNull(ref operand, value);
         }
 
-        internal override ExpressionSyntax GetWrapped(ref bool changed)
+        internal override ExpressionSyntax GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
-            bool thisChanged = false;
+            bool? thisChanged = false;
 
             var newOperand = operand?.GetWrapped(ref thisChanged) ?? syntax.Expression;
 
-            if (syntax == null || thisChanged)
+            if (syntax == null || thisChanged == true)
             {
                 syntax = CSharpSyntaxFactory.AwaitExpression(newOperand);
 
-                changed = true;
+                SetChanged(ref changed);
             }
 
             return syntax;

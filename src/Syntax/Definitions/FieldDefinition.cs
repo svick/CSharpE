@@ -101,21 +101,21 @@ namespace CSharpE.Syntax
         public static implicit operator MemberAccessExpression(FieldDefinition fieldDefinition) =>
             new MemberAccessExpression(fieldDefinition);
 
-        internal FieldDeclarationSyntax GetWrapped(ref bool changed)
+        internal FieldDeclarationSyntax GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
             var declarator = syntax?.Declaration.Variables.Single();
 
-            bool localChanged = false;
+            bool? thisChanged = false;
 
             var newModifiers = Modifiers;
-            var newType = type?.GetWrapped(ref localChanged) ?? syntax.Declaration.Type;
-            var newName = name.GetWrapped(ref localChanged);
-            var newInitializer = initializerSet ? initializer?.GetWrapped(ref localChanged) : declarator?.Initializer?.Value;
+            var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Declaration.Type;
+            var newName = name.GetWrapped(ref thisChanged);
+            var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : declarator?.Initializer?.Value;
 
             if (syntax == null || AttributesChanged() ||
-                FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || localChanged)
+                FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || thisChanged == true)
             {
                 var equalsValueClause =
                     newInitializer == null ? null : CSharpSyntaxFactory.EqualsValueClause(newInitializer);
@@ -125,15 +125,15 @@ namespace CSharpE.Syntax
                         newType, CSharpSyntaxFactory.SingletonSeparatedList(
                             CSharpSyntaxFactory.VariableDeclarator(newName, null, equalsValueClause))));
 
-                changed = true;
+                SetChanged(ref changed);
             }
 
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
+        protected override MemberDeclarationSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
 
-        FieldDeclarationSyntax ISyntaxWrapper<FieldDeclarationSyntax>.GetWrapped(ref bool changed) =>
+        FieldDeclarationSyntax ISyntaxWrapper<FieldDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)

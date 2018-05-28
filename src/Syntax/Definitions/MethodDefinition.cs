@@ -166,11 +166,11 @@ namespace CSharpE.Syntax
 
         public TypeDefinition ParentType { get; private set; }
 
-        internal MethodDeclarationSyntax GetWrapped(ref bool changed)
+        internal MethodDeclarationSyntax GetWrapped(ref bool? changed)
         {
-            changed |= GetAndResetSyntaxSet();
+            GetAndResetChanged(ref changed);
 
-            bool thisChanged = false;
+            bool? thisChanged = false;
 
             var newModifiers = Modifiers;
             var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? syntax.ReturnType;
@@ -179,7 +179,7 @@ namespace CSharpE.Syntax
             var newBody = body?.GetWrapped(ref thisChanged) ?? syntax.Body.Statements;
 
             if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
-                thisChanged || !IsAnnotated(syntax))
+                thisChanged == true || !IsAnnotated(syntax))
             {
                 var newSyntax = CSharpSyntaxFactory.MethodDeclaration(
                     GetNewAttributes(), newModifiers.GetWrapped(), newReturnType, null, newName, null,
@@ -188,15 +188,15 @@ namespace CSharpE.Syntax
 
                 syntax = Annotate(newSyntax);
 
-                changed = true;
+                SetChanged(ref changed);
             }
 
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl(ref bool changed) => GetWrapped(ref changed);
+        protected override MemberDeclarationSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
 
-        MethodDeclarationSyntax ISyntaxWrapper<MethodDeclarationSyntax>.GetWrapped(ref bool changed) =>
+        MethodDeclarationSyntax ISyntaxWrapper<MethodDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);
 
         protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)

@@ -144,13 +144,17 @@ namespace CSharpE.Syntax.Internals
             return wrapper;
         }
 
-        public TList GetWrapped(ref bool changed)
+        private ChangeTracker changeTracker = new ChangeTracker();
+
+        public TList GetWrapped(ref bool? changed)
         {
+            changeTracker.GetAndResetChanged(ref changed);
+
             // PERF: don't allocate roslynNodes before it's known something changed
 
             var roslynNodes = new List<TRoslynSyntax>(Count);
 
-            bool thisChanged = roslynList.Count != list.Count;
+            bool? thisChanged = roslynList.Count != list.Count;
 
             for (int i = 0; i < Count; i++)
             {
@@ -161,11 +165,11 @@ namespace CSharpE.Syntax.Internals
                 roslynNodes.Add(roslynNode);
             }
 
-            if (thisChanged)
+            if (thisChanged == true)
             {
                 roslynList = CreateList(roslynNodes);
 
-                changed = true;
+                changeTracker.SetChanged(ref changed);
             }
 
             return roslynList;

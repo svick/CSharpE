@@ -88,18 +88,16 @@ namespace CSharpE.Syntax
         internal void SetSyntax(Roslyn::SyntaxNode newSyntax)
         {
             SetSyntaxImpl(newSyntax);
-            syntaxSet = true;
+            changeTracker.SetChanged();
         }
 
         protected abstract void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax);
 
-        private bool syntaxSet;
-        protected  bool GetAndResetSyntaxSet()
-        {
-            bool result = syntaxSet;
-            syntaxSet = false;
-            return result;
-        }
+        private ChangeTracker changeTracker = new ChangeTracker();
+
+        protected void GetAndResetChanged(ref bool? changed) => changeTracker.GetAndResetChanged(ref changed);
+
+        protected void SetChanged(ref bool? changed) => changeTracker.SetChanged(ref changed);
 
         internal abstract SyntaxNode Clone();
 
