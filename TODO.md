@@ -1,8 +1,4 @@
-﻿- add unchanged method to test, logging to transfomers
-
----
-
-- figure out better names than `Project`, `Project` and `SourceFile`, `SourceFile`
+﻿- figure out better names than `Project`, `Project` and `SourceFile`, `SourceFile`
 - fix moving `NamedTypeReference`s between files (doesn't update `using`s)
 - make most classes `sealed`
 - allow modifying lists while iterating them

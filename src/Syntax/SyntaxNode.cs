@@ -74,15 +74,11 @@ namespace CSharpE.Syntax
             if (node is null)
                 return null;
 
-            if (ReferenceEquals(node.Parent, parent))
-                return node;
+            var newNode = (T)node.Clone();
 
-            if (!(node.Parent is null))
-                node = (T)node.Clone();
+            newNode.Parent = parent;
 
-            node.Parent = parent;
-
-            return node;
+            return newNode;
         }
 
         internal void SetSyntax(Roslyn::SyntaxNode newSyntax)
@@ -107,8 +103,8 @@ namespace CSharpE.Syntax
             if (ReferenceEquals(this, other)) return true;
             if (other.GetType() != this.GetType()) return false;
 
-            // if both nodes are part of a tree, they are compared by reference
-            if (other.SourceFile != null && this.SourceFile != null)
+            // nodes that are part of a tree are compared by reference
+            if (other.SourceFile != null || this.SourceFile != null)
                 return false;
 
             var thisWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)this;
