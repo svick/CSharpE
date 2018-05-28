@@ -17,7 +17,7 @@ namespace CSharpE.Transform.Transformers
         where TParent : SyntaxNode
         where TItem : SyntaxNode
     {
-        private readonly FileSpan parentFileSpan;
+        private FileSpan parentFileSpan;
 
         private SyntaxTree oldTree;
         private List<TextSpan> oldItemsSpans;
@@ -84,9 +84,19 @@ namespace CSharpE.Transform.Transformers
             oldTransformers = newTransformers;
         }
 
-        public override bool Matches(TParent newParent, ActionInvoker<TData, TItem> newAction, TData newData) =>
-            Action.Equals(newAction) &&
-            EqualityComparer<TData>.Default.Equals(Data, newData) &&
-            parentFileSpan.Matches(newParent.FileSpan);
+        public override bool Matches(TParent newParent, ActionInvoker<TData, TItem> newAction, TData newData)
+        {
+            var newParentFileSpan = newParent.FileSpan;
+
+            var result = Action.Equals(newAction) &&
+                         EqualityComparer<TData>.Default.Equals(Data, newData) &&
+                         parentFileSpan.Matches(newParentFileSpan);
+
+            // to make following matches simpler
+            if (result)
+                parentFileSpan = newParentFileSpan;
+
+            return result;
+        }
     }
 }

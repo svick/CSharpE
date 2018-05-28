@@ -107,8 +107,8 @@ namespace CSharpE.Syntax
             if (ReferenceEquals(this, other)) return true;
             if (other.GetType() != this.GetType()) return false;
 
-            // nodes that are part of a tree are compared by reference
-            if (other.SourceFile != null || this.SourceFile != null)
+            // if both nodes are part of a tree, they are compared by reference
+            if (other.SourceFile != null && this.SourceFile != null)
                 return false;
 
             var thisWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)this;

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using CSharpE.Extensions.Actor;
 using CSharpE.TestUtilities;
@@ -97,7 +98,6 @@ class C
 
             var tranformedProject = project.Transform();
             Assert.Equal(expectedOutput, tranformedProject.SourceFiles.Single().Text);
-
         }
 
         [Fact]
@@ -107,7 +107,12 @@ class C
 
 class C
 {
-    public int M()
+    public int M1()
+    {
+        return 0;
+    }
+
+    public int M2()
     {
     }
 }";
@@ -119,7 +124,20 @@ using System.Threading.Tasks;
 [Actor]
 class C
 {
-    public async Task<int> M()
+    public async Task<int> M1()
+    {
+        await this._actor_semaphore.WaitAsync();
+        try
+        {
+            return 0;
+        }
+        finally
+        {
+            this._actor_semaphore.Release();
+        }
+    }
+
+    public async Task<int> M2()
     {
         await this._actor_semaphore.WaitAsync();
         try
@@ -146,30 +164,32 @@ class C
             var tranformedProject = project.Transform();
             Assert.Equal(input, tranformedProject.SourceFiles.Single().Text);
             Assert.Equal(
-                recorder.Read(),
-                new LogAction[] { ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "transform") });
+                new LogAction[] { ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "transform") },
+                recorder.Read());
 
-            sourceFile.Tree = sourceFile.Tree.WithInsertBefore("class", "[Actor]\n");
+            string nl = Environment.NewLine;
+
+            sourceFile.Tree = sourceFile.Tree.WithInsertBefore("class", $"[Actor]{nl}");
             tranformedProject = project.Transform();
             Assert.Equal(IgnoreOptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
             Assert.Equal(
-                recorder.Read(),
                 new LogAction[]
                 {
                     ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "transform"),
-                    ("TypeDefinition", "C", "transform"), ("MethodDefinition", "M", "transform")
-                });
+                    ("TypeDefinition", "C", "transform"), ("MethodDefinition", "M1", "transform"),
+                    ("MethodDefinition", "M2", "transform")
+                }, recorder.Read());
 
-            sourceFile.Tree = sourceFile.Tree.WithInsertBefore("    }", "        return 42;\n");
+            sourceFile.Tree = sourceFile.Tree.WithInsertBefore($"    }}{nl}}}", $"        return 42;{nl}");
             tranformedProject = project.Transform();
             Assert.Equal(Includeptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
             Assert.Equal(
-                recorder.Read(),
                 new LogAction[]
                 {
                     ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "transform"),
-                    ("TypeDefinition", "C", "transform"), ("MethodDefinition", "M", "transform")
-                });
+                    ("TypeDefinition", "C", "transform"), ("MethodDefinition", "M1", "cached"),
+                    ("MethodDefinition", "M2", "transform")
+                }, recorder.Read());
         }
     }
 }
