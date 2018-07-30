@@ -14,20 +14,37 @@ The C\# compiler, code named "Roslyn", \cite{roslyn} compiles C\# source code in
 
 An assembly, produced by the C\# compiler or in some other way, can be executed on a .NET implementation. Each .NET implementation contains a runtime, which is responsible for executing code, and a base class library, which contains basic types used by .NET programs.
 
-Runtimes of .NET implementations are usually using \iac{JIT} compiler, which converts the \ac{IL} for each method into machine code specific for the current instruction set just before executing that method for the first time.
+Runtimes of .NET implementations are usually using \iac{JIT} compiler, which converts the \ac{IL} for each method into machine code specific for the current instruction set just before executing that method for the first time. % mention AOT?
 
-\todo{something about libraries (incl. NuGet), extensibility and metaprogramming}
+\medskip
+
+In the .NET ecosystem, class libraries, which are just .NET assemblies, are commonly distributed thorough the NuGet package manager, \cite{nuget} because it makes using those libraries easier.
+And while NuGet is primarily used for regular libraries, which are directly used by programmers in their source code, it can also be used for various kinds of special libraries, such as add-ins for general metaprogramming systems like Fody, or Roslyn analyzers for detecting issues with source code (more on these in section \ref{metaprogramming}).
+
+\medskip
+
+The C\# language contains some basic extensibility features itself, namely virtual methods and delegates.
+But for more advanced use cases, it is necessary ot manipulate code in some form and the .NET ecosystem has various approaches to achieve that, including those that manipulate C\# code, those that manipulate \ac{IL} and those that use a custom model for representing code. Some of these approaches will be described in following sections.
 
 \section{Manipulating C\# source code}
+
+\subsection{T4}
 
 \subsection{CodeDOM}
 
 \subsection{Roslyn}
 
+\todo{mention IOperation (?) and SyntaxGenerator (?)}
+
 \section{Manipulating \acs{IL}}
 
 \todo{Reflection.Emit, System.Reflection.Metadata, Cecil}
 
+\section{Other approaches}
+
+\todo{Expression trees}
+
 \section{Metaprogramming systems (?)}
+\label{metaprogramming}
 
 \todo{PostSharp, Fody, others}
