@@ -1,1 +1,33 @@
 \chapter{Background}
+
+The .NET ecosystem is composed of programming languages (including C\#, F\# and \acl{VB}), \cite{tour} .NET implementations (including .NET Framework, .NET Core and Mono), \cite{implementations} class libraries, commonly distributed through the NuGet package manager, and tooling, including command-line tools and tools integrated into code editors and \acp{IDE}.
+
+What unifies all these components is the \ac{CLI}, \cite{ecma-335} which specifies binary file format for "assemblies". These contain compiled .NET code in the form of \ac{IL} and also metadata associated with this code.
+%also known as \acf{CIL} or \acf{MSIL}
+
+\medskip
+
+The C\# language \cite{csharp-spec} is an object-oriented programming language which is part of the .NET ecosystem.
+The C\# compiler, code named "Roslyn", \cite{roslyn} compiles C\# source code into a .NET assembly. The compiler can also be used as a class library, which exposes types for programmatically manipulating C\# source code.
+
+\medskip
+
+An assembly, produced by the C\# compiler or in some other way, can be executed on a .NET implementation. Each .NET implementation contains a runtime, which is responsible for executing code, and a base class library, which contains basic types used by .NET programs.
+
+Runtimes of .NET implementations are usually using \iac{JIT} compiler, which converts the \ac{IL} for each method into machine code specific for the current instruction set just before executing that method for the first time.
+
+\todo{something about libraries (incl. NuGet), extensibility and metaprogramming}
+
+\section{Manipulating C\# source code}
+
+\subsection{CodeDOM}
+
+\subsection{Roslyn}
+
+\section{Manipulating \acs{IL}}
+
+\todo{Reflection.Emit, System.Reflection.Metadata, Cecil}
+
+\section{Metaprogramming systems (?)}
+
+\todo{PostSharp, Fody, others}

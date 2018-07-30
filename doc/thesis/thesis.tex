@@ -50,11 +50,19 @@
 %\usepackage{paralist}       % improved enumerate and itemize
 %\usepackage[usenames]{xcolor}  % typesetting in color
 
-\usepackage{biblatex}
+\usepackage[sorting=none]{biblatex}
 \addbibresource{bibliography.bib}
 \usepackage{xpatch}
 
 \usepackage[printonlyused,nohyperlinks]{acronym}
+
+\usepackage{csquotes}
+
+\MakeOuterQuote{"}
+
+\usepackage{todonotes}
+
+\presetkeys{todonotes}{inline}{}
 
 %%% Basic information on the thesis
 

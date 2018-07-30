@@ -4,13 +4,13 @@ Extensibility is an important feature of a programming language and its associat
 
 A common way to extend many languages is through libraries. Libraries let programmers use code written by someone else, which can be powerful, especially when combined with extensibility features built into programming languages, such as virtual functions or lambdas.
 
-But libraries are restricted to the features offered by the used language, which limits their usefulness.
+But libraries are restricted to the features offered by the used language, which can limit their usefulness.
 
 \medskip
 
 This work describes a system for extending the C\# language beyond what can be accomplished with libraries by user-provided extensions, which perform transformations of C\# source code.
 
-These extensions, themselves written in C\#, should be easy to create, when compared with existing similar systems, and they should be efficient enough to be usable with code completion in an \ac{IDE}, such as Microsoft Visual Studio.
+These extensions, themselves written in C\#, should be easy to create, when compared with existing similar systems, and they should be efficient enough to be usable with code completion in a code editor or an \ac{IDE}, such as Microsoft Visual Studio.
 
 To achieve this, the system is composed of two primary parts: the Syntax tree \acr{API} and the Transformations \acs{API}.
 
