@@ -1,0 +1,6 @@
+﻿<Project>
+  <PropertyGroup>
+    <AssemblyName>CSharpE.Samples.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>CSharpE.Samples.$(MSBuildProjectName)</RootNamespace>
+  </PropertyGroup>
+</Project>

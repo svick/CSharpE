@@ -1,0 +1,43 @@
+<#@ assembly name="System.Core.dll" #>
+<#@ assembly name="System.Runtime.dll" #>
+<#@ assembly name="$(TargetDir)CSharpE.Samples.Core.dll" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="CSharpE.Samples.Core" #>
+<#@ output extension=".cs" #>
+using System;
+
+<# foreach (var entityKind in EntityKinds.ToGenerate) { #>
+class <#= entityKind.Name #>
+    : IComparable<<#= entityKind.Name #>>
+{
+<# foreach (var property in entityKind.Properties) { #>
+    public <#= property.Type #> <#= property.Name #> { get; }
+<# } #>
+
+<# var ps = string.Join(", ", entityKind.Properties.Select(
+        p => $"{p.Type} {p.LowercaseName}")); #>
+    public <#= entityKind.Name #>(<#= ps #>)
+    {
+<# foreach (var property in entityKind.Properties) { #>
+        <#= property.Name #> = <#= property.LowercaseName #>;
+<# } #>
+    }
+
+    public int CompareTo(<#= entityKind.Name #> other)
+    {
+        if (other is null)
+            return 1;
+
+        int result;
+
+<# foreach (var property in entityKind.Properties) { #>
+        result = this.<#= property.Name #>.CompareTo(
+            other.<#= property.Name #>);
+        if (result != 0)
+            return result;
+
+<# } #>
+        return 0;
+    }
+}
+<# } #>

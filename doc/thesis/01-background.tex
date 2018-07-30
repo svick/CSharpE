@@ -26,9 +26,29 @@ And while NuGet is primarily used for regular libraries, which are directly used
 The C\# language contains some basic extensibility features itself, namely virtual methods and delegates.
 But for more advanced use cases, it is necessary ot manipulate code in some form and the .NET ecosystem has various approaches to achieve that, including those that manipulate C\# code, those that manipulate \ac{IL} and those that use a custom model for representing code. Some of these approaches will be described in following sections.
 
+\section{Example}
+
+To demonstrate various code generation approaches, a running example of generating a simple entity class with a set of properties, a constructor and an implementation of the |IComparable<T>| interface will be used.
+
+For example, for an entity named |Person| with properties |Name| of type |string| and |Age| of type |int|, the generated code should be similar to the following:
+
+\codefile{samples/Core/Person.cs}{}
+
 \section{Manipulating C\# source code}
 
-\subsection{T4}
+\subsection{\acs{T4}}
+
+\ac{T4} is a tool for generating text by interspersing snippets of the text to generate with fragments of C\# code to control how the text is generated. The resulting text can be in any language, including C\#.
+
+\ac{T4} does not have any special way of accessing other source code, which makes it most suitable for generating code based on external data. Its text-based nature gives it flexibility, but also makes using it fairly hard, since generating C\# code effectively requires writing two interleaved programs, without any help from the \ac{IDE}, because \ac{T4} integration into Visual Studio is very limited.
+
+\subsubsection{Example}
+
+To generate entities, as required by the running example, the \ac{T4} code could look like the following:
+
+\codefile{samples/T4/Entities.tt}{language=}
+
+The code shown above highlights another issue with \ac{T4}: indentation. It is hard to keep indentation of both the generated code and the generating code consistent, especially since any whitespace outside of \ac{T4} tags will be included in the output.
 
 \subsection{CodeDOM}
 
