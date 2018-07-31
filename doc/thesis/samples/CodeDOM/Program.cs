@@ -26,9 +26,6 @@ namespace CSharpE.Samples.CodeDOM
                     }
                 };
 
-                var ctor = new CodeConstructor();
-                entityType.Members.Add(ctor);
-
                 foreach (var property in entityKind.Properties)
                 {
                     var propertyType = new CodeTypeReference(property.Type);
@@ -44,16 +41,13 @@ namespace CSharpE.Samples.CodeDOM
                             Attributes = Public | Final,
                             Name = property.Name,
                             Type = propertyType,
-                            GetStatements =
+                            GetStatements = { new CodeMethodReturnStatement(fieldReference) },
+                            SetStatements =
                             {
-                                new CodeMethodReturnStatement(fieldReference)
+                                new CodeAssignStatement(
+                                    fieldReference, new CodePropertySetValueReferenceExpression())
                             }
                         });
-                    ctor.Parameters.Add(new CodeParameterDeclarationExpression(property.Type, property.LowercaseName));
-
-                    ctor.Statements.Add(
-                        new CodeAssignStatement(
-                            fieldReference, new CodeArgumentReferenceExpression(property.LowercaseName)));
                 }
 
                 string otherName = "other";

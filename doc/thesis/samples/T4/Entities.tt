@@ -1,7 +1,5 @@
-<#@ assembly name="System.Core.dll" #>
 <#@ assembly name="System.Runtime.dll" #>
 <#@ assembly name="$(TargetDir)CSharpE.Samples.Core.dll" #>
-<#@ import namespace="System.Linq" #>
 <#@ import namespace="CSharpE.Samples.Core" #>
 <#@ output extension=".cs" #>
 using System;
@@ -11,17 +9,8 @@ class <#= entityKind.Name #>
     : IComparable<<#= entityKind.Name #>>
 {
 <# foreach (var property in entityKind.Properties) { #>
-    public <#= property.Type #> <#= property.Name #> { get; }
+    public <#= property.Type #> <#= property.Name #> { get; set; }
 <# } #>
-
-<# var ps = string.Join(", ", entityKind.Properties.Select(
-        p => $"{p.Type} {p.LowercaseName}")); #>
-    public <#= entityKind.Name #>(<#= ps #>)
-    {
-<# foreach (var property in entityKind.Properties) { #>
-        <#= property.Name #> = <#= property.LowercaseName #>;
-<# } #>
-    }
 
     public int CompareTo(<#= entityKind.Name #> other)
     {

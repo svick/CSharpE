@@ -3,14 +3,8 @@ using System;
 class Person
     : IComparable<Person>
 {
-    public String Name { get; }
-    public Int32 Age { get; }
-
-    public Person(String name, Int32 age)
-    {
-        Name = name;
-        Age = age;
-    }
+    public String Name { get; set; }
+    public Int32 Age { get; set; }
 
     public int CompareTo(Person other)
     {

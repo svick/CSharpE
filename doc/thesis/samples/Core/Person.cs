@@ -2,14 +2,8 @@
 
 class Person : IComparable<Person>
 {
-    public string Name { get; }
-    public int Age { get; }
-
-    public Person(string name, int age)
-    {
-        Name = name;
-        Age = age;
-    }
+    public string Name { get; set; }
+    public int Age { get; set; }
 
     public int CompareTo(Person other)
     {
