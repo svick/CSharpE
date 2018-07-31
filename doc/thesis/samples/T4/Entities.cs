@@ -3,10 +3,10 @@ using System;
 class Person
     : IComparable<Person>
 {
-    public string Name { get; }
-    public int Age { get; }
+    public String Name { get; }
+    public Int32 Age { get; }
 
-    public Person(string name, int age)
+    public Person(String name, Int32 age)
     {
         Name = name;
         Age = age;
@@ -19,11 +19,13 @@ class Person
 
         int result;
 
-        result = this.Name.CompareTo(other.Name);
+        result = this.Name.CompareTo(
+            other.Name);
         if (result != 0)
             return result;
 
-        result = this.Age.CompareTo(other.Age);
+        result = this.Age.CompareTo(
+            other.Age);
         if (result != 0)
             return result;
 

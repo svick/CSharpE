@@ -15,3 +15,5 @@
 
 *.pdf
 !img/*.pdf
+
+_minted*/

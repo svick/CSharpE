@@ -20,10 +20,6 @@ class Person : IComparable<Person>
         if (result != 0)
             return result;
 
-        result = this.Age.CompareTo(other.Age);
-        if (result != 0)
-            return result;
-
-        return 0;
+        return this.Age.CompareTo(other.Age);
     }
 }

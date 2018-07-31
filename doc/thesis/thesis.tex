@@ -56,25 +56,24 @@
 
 \usepackage[printonlyused,nohyperlinks]{acronym}
 
-\usepackage{csquotes}
-\MakeOuterQuote{"}
-
 \usepackage{todonotes}
 \presetkeys{todonotes}{inline}{}
 
-\usepackage{listings}
-\lstMakeShortInline|
-\lstdefinelanguage{CSharp}[Sharp]{C}{}
-%{morekeywords={from,where,join,on,equals,orderby,descending,group,by,let,select}},columns=flexible,showstringspaces=false}
-\lstset{language=CSharp,basicstyle=\ttfamily\footnotesize}
+\usepackage{minted}
+\newmintinline[cs]{text}{}
 
-\newcommand{\codefile}[2]{
+\setminted{autogobble}
+
+\newcommand{\codefile}[3]{
 	\noindent
 	\begin{minipage}{\linewidth}
-		\lstinputlisting[#2]{#1}
+		\inputminted[#3]{#2}{#1}
 	\end{minipage}
 	\smallskip
 }
+
+\usepackage{csquotes}
+\MakeOuterQuote{"}
 
 %%% Basic information on the thesis
 

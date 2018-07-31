@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace CSharpE.Samples.Core
@@ -35,6 +34,6 @@ namespace CSharpE.Samples.Core
     public static class EntityKinds
     {
         public static IEnumerable<EntityKind> ToGenerate { get; } =
-            new[] { new EntityKind("Person", new[] { ("string", "Name"), ("int", "Age") }) };
+            new[] { new EntityKind("Person", new[] { ("String", "Name"), ("Int32", "Age") }) };
     }
 }

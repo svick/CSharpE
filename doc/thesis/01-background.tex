@@ -28,11 +28,11 @@ But for more advanced use cases, it is necessary ot manipulate code in some form
 
 \section{Example}
 
-To demonstrate various code generation approaches, a running example of generating a simple entity class with a set of properties, a constructor and an implementation of the |IComparable<T>| interface will be used.
+To demonstrate various code generation approaches, a running example of generating a simple entity class with a set of properties, a constructor and an implementation of the \cs{IComparable<T>} interface will be used.
 
-For example, for an entity named |Person| with properties |Name| of type |string| and |Age| of type |int|, the generated code should be similar to the following:
+For example, for an entity named \cs{Person} with properties \cs{Name} of type \cs{string} and \cs{Age} of type \cs{int}, the generated code should be similar to the following:
 
-\codefile{samples/Core/Person.cs}{}
+\codefile{samples/Core/Person.cs}{csharp}{}
 
 \section{Manipulating C\# source code}
 
@@ -46,11 +46,19 @@ For example, for an entity named |Person| with properties |Name| of type |string
 
 To generate entities, as required by the running example, the \ac{T4} code could look like the following:
 
-\codefile{samples/T4/Entities.tt}{language=}
+\codefile{samples/T4/Entities.tt}{text}{}
 
 The code shown above highlights another issue with \ac{T4}: indentation. It is hard to keep indentation of both the generated code and the generating code consistent, especially since any whitespace outside of \ac{T4} tags will be included in the output.
 
 \subsection{CodeDOM}
+
+\ac{CodeDOM} is a library for generating source code by using a language-independent object model. It is fairly easy to use, but is limited in what language features it supports, due to its language-independent nature and due to it not being updated since .NET Framework 2.0. Some of these limitations can be worked around by using string-based "snippet" objects, but using them means negating the advantages that CodeDOM has. Some examples of features it does not support are declaring \cs{static} classes, LINQ query expressions or declaring auto-implemented properties.
+
+\subsubsection{Example}
+
+\todo{Why are only some types highlighted?}
+
+\codefile{samples/CodeDOM/Program.cs}{csharp}{firstline=14,lastline=111}
 
 \subsection{Roslyn}
 
