@@ -56,9 +56,13 @@ The code shown above highlights another issue with \ac{T4}: indentation. It is h
 
 \subsubsection{Example}
 
+To generate entities for the running example using CodeDOM, the code could look like the following:
+
 \todo{Why are only some types highlighted?}
 
-\codefile{samples/CodeDOM/Program.cs}{csharp}{firstline=14,lastline=105}
+\inputminted[firstline=14,lastline=108]{csharp}{samples/CodeDOM/Program.cs}
+
+Especially notice that the above code has to manually generate fields for properties, because CodeDOM does not support auto-implemented properties.
 
 \subsection{Roslyn}
 

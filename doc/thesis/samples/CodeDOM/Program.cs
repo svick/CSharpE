@@ -12,84 +12,88 @@ namespace CSharpE.Samples.CodeDOM
         static void Main()
         {
             var ns = new CodeNamespace();
+            ns.Imports.Add(new CodeNamespaceImport("System"));
 
             foreach (var entityKind in EntityKinds.ToGenerate)
             {
-                var entityType = new CodeTypeDeclaration(entityKind.Name)
-                {
-                    BaseTypes =
-                    {
-                        new CodeTypeReference(typeof(IComparable<>))
-                        {
-                            TypeArguments = { new CodeTypeReference(entityKind.Name) }
-                        }
-                    }
-                };
+                var entityType = new CodeTypeDeclaration(entityKind.Name);
+                entityType.BaseTypes.Add(new CodeTypeReference(
+                    "IComparable", new CodeTypeReference(entityKind.Name)));
 
                 foreach (var property in entityKind.Properties)
                 {
                     var propertyType = new CodeTypeReference(property.Type);
 
-                    entityType.Members.Add(new CodeMemberField { Name = property.LowercaseName, Type = propertyType });
+                    entityType.Members.Add(new CodeMemberField
+                    {
+                        Name = property.LowercaseName, Type = propertyType
+                    });
 
                     var fieldReference = new CodeFieldReferenceExpression(
                         new CodeThisReferenceExpression(), property.LowercaseName);
 
-                    entityType.Members.Add(
-                        new CodeMemberProperty
+                    entityType.Members.Add(new CodeMemberProperty
+                    {
+                        Attributes = Public | Final,
+                        Name = property.Name,
+                        Type = propertyType,
+                        GetStatements =
                         {
-                            Attributes = Public | Final,
-                            Name = property.Name,
-                            Type = propertyType,
-                            GetStatements = { new CodeMethodReturnStatement(fieldReference) },
-                            SetStatements =
-                            {
-                                new CodeAssignStatement(
-                                    fieldReference, new CodePropertySetValueReferenceExpression())
-                            }
-                        });
+                            new CodeMethodReturnStatement(fieldReference)
+                        },
+                        SetStatements =
+                        {
+                            new CodeAssignStatement(fieldReference,
+                                new CodePropertySetValueReferenceExpression())
+                        }
+                    });
                 }
 
-                string otherName = "other";
-                string compareToName = "CompareTo";
                 var compareToMethod = new CodeMemberMethod
                 {
                     Attributes = Public | Final,
                     ReturnType = new CodeTypeReference(typeof(int)),
-                    Name = compareToName,
-                    Parameters = { new CodeParameterDeclarationExpression(entityKind.Name, otherName) }
+                    Name = "CompareTo",
+                    Parameters =
+                    {
+                        new CodeParameterDeclarationExpression(
+                            entityKind.Name, "other")
+                    }
                 };
 
-                var otherReference = new CodeArgumentReferenceExpression(otherName);
+                var otherReference = new CodeArgumentReferenceExpression("other");
+
+                compareToMethod.Statements.Add(new CodeConditionStatement(
+                    new CodeBinaryOperatorExpression(otherReference,
+                        CodeBinaryOperatorType.IdentityEquality,
+                        new CodePrimitiveExpression(null)),
+                    new CodeMethodReturnStatement(new CodePrimitiveExpression(1))));
 
                 compareToMethod.Statements.Add(
-                    new CodeConditionStatement(
-                        new CodeBinaryOperatorExpression(
-                            otherReference, CodeBinaryOperatorType.IdentityEquality, new CodePrimitiveExpression(null)),
-                        new CodeMethodReturnStatement(new CodePrimitiveExpression(1))));
+                    new CodeVariableDeclarationStatement(typeof(int), "result"));
 
-                var resultName = "result";
-                compareToMethod.Statements.Add(new CodeVariableDeclarationStatement(typeof(int), resultName));
-
-                var resultReference = new CodeVariableReferenceExpression(resultName);
+                var resultReference = new CodeVariableReferenceExpression("result");
 
                 foreach (var property in entityKind.Properties)
                 {
-                    compareToMethod.Statements.Add(
-                        new CodeAssignStatement(
-                            resultReference,
-                            new CodeMethodInvokeExpression(
-                                new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), property.Name),
-                                compareToName, new CodePropertyReferenceExpression(otherReference, property.Name))));
+                    compareToMethod.Statements.Add(new CodeAssignStatement(
+                        resultReference,
+                        new CodeMethodInvokeExpression(
+                            new CodePropertyReferenceExpression(
+                                new CodeThisReferenceExpression(), property.Name),
+                            "CompareTo",
+                            new CodePropertyReferenceExpression(
+                                otherReference, property.Name))));
 
-                    compareToMethod.Statements.Add(
-                        new CodeConditionStatement(
-                            new CodeBinaryOperatorExpression(
-                                resultReference, CodeBinaryOperatorType.IdentityInequality,
-                                new CodePrimitiveExpression(0)), new CodeMethodReturnStatement(resultReference)));
+                    compareToMethod.Statements.Add(new CodeConditionStatement(
+                        new CodeBinaryOperatorExpression(resultReference,
+                            CodeBinaryOperatorType.IdentityInequality,
+                            new CodePrimitiveExpression(0)),
+                        new CodeMethodReturnStatement(resultReference)));
                 }
 
-                compareToMethod.Statements.Add(new CodeMethodReturnStatement(new CodePrimitiveExpression(0)));
+                compareToMethod.Statements.Add(
+                    new CodeMethodReturnStatement(new CodePrimitiveExpression(0)));
 
                 entityType.Members.Add(compareToMethod);
 
@@ -99,9 +103,8 @@ namespace CSharpE.Samples.CodeDOM
             var compileUnit = new CodeCompileUnit { Namespaces = { ns } };
 
             var stringWriter = new StringWriter();
-
-            new CSharpCodeProvider().GenerateCodeFromCompileUnit(compileUnit, stringWriter, null);
-
+            new CSharpCodeProvider().GenerateCodeFromCompileUnit(
+                compileUnit, stringWriter, null);
             Console.WriteLine(stringWriter);
         }
     }
