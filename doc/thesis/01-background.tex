@@ -60,9 +60,9 @@ The code shown above highlights another issue with \ac{T4}: indentation. It is h
 
 To generate entities for the running example using CodeDOM, the code could look like the following:
 
-\inputminted[firstline=14,lastline=108]{csharp}{samples/CodeDOM/Program.cs}
+\inputminted[firstline=14,lastline=102]{csharp}{samples/CodeDOM/Program.cs}
 
-Especially notice that the above code has to manually generate fields for properties, because CodeDOM does not support auto-implemented properties.
+Especially notice that the above code has to manually generate backing fields for properties, because CodeDOM does not support auto-implemented properties.
 
 \subsection{Roslyn}
 
@@ -70,7 +70,7 @@ Roslyn \cite{roslyn} is the C\# (and Visual Basic .NET) compiler, which can also
 
 \subsubsection{Example}
 
-\inputminted[firstline=16,lastline=102]{csharp}{samples/Roslyn/Program.cs}
+\inputminted[firstline=16,lastline=94]{csharp}{samples/Roslyn/Program.cs}
 
 \todo{mention IOperation (?) and SyntaxGenerator (?)}
 

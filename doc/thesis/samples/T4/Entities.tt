@@ -14,9 +14,6 @@ class <#= entityKind.Name #>
 
     public int CompareTo(<#= entityKind.Name #> other)
     {
-        if (other is null)
-            return 1;
-
         int result;
 
 <# foreach (var property in entityKind.Properties) { #>

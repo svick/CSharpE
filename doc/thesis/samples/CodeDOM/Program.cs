@@ -63,12 +63,6 @@ namespace CSharpE.Samples.CodeDOM
 
                 var otherReference = new CodeArgumentReferenceExpression("other");
 
-                compareToMethod.Statements.Add(new CodeConditionStatement(
-                    new CodeBinaryOperatorExpression(otherReference,
-                        CodeBinaryOperatorType.IdentityEquality,
-                        new CodePrimitiveExpression(null)),
-                    new CodeMethodReturnStatement(new CodePrimitiveExpression(1))));
-
                 compareToMethod.Statements.Add(
                     new CodeVariableDeclarationStatement(typeof(int), "result"));
 

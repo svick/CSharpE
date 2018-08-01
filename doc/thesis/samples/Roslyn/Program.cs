@@ -13,9 +13,7 @@ namespace CSharpE.Samples.Roslyn
     {
         static void Main()
         {
-            string input = EntityKinds.ToGenerateFromSource;
-
-            var compilationUnit = ParseCompilationUnit(input);
+            var compilationUnit = ParseCompilationUnit(EntityKinds.ToGenerateFromSource);
 
             compilationUnit =
                 compilationUnit.AddUsings(UsingDirective(IdentifierName("System")));
@@ -51,12 +49,6 @@ namespace CSharpE.Samples.Roslyn
                         });
 
                     var statements = new List<StatementSyntax>();
-
-                    statements.Add(IfStatement(
-                        IsPatternExpression(IdentifierName("other"),
-                            ConstantPattern(LiteralExpression(NullLiteralExpression))),
-                        ReturnStatement(LiteralExpression(NumericLiteralExpression,
-                            Literal(1)))));
 
                     statements.Add(LocalDeclarationStatement(
                         VariableDeclaration(PredefinedType(Token(IntKeyword)))

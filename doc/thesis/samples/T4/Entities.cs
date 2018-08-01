@@ -8,9 +8,6 @@ class Person
 
     public int CompareTo(Person other)
     {
-        if (other is null)
-            return 1;
-
         int result;
 
         result = this.Name.CompareTo(
