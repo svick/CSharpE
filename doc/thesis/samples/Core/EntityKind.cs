@@ -35,5 +35,12 @@ namespace CSharpE.Samples.Core
     {
         public static IEnumerable<EntityKind> ToGenerate { get; } =
             new[] { new EntityKind("Person", new[] { ("String", "Name"), ("Int32", "Age") }) };
+
+        public static string ToGenerateFromSource { get; } =
+            @"class Person
+{
+    string Name;
+    int Age;
+}";
     }
 }
