@@ -68,11 +68,15 @@ Especially notice that the above code has to manually generate backing fields fo
 
 Roslyn \cite{roslyn} is the C\# (and Visual Basic .NET) compiler, which can also be used as a library for manipulating C\# code, including parsing, modification and generation. Its object model was primarily designed to be used in the Visual Studio \ac{IDE}, which is why it is very detailed (so it can accurately represent any source code) and also immutable (so that multiple \ac{IDE} services can operate on the same model).
 
+\todo{mention IOperation (?) and SyntaxGenerator (?)}
+
 \subsubsection{Example}
+
+To transform entities for the running example using Roslyn, the code could look like the following:
 
 \inputminted[firstline=16,lastline=94]{csharp}{samples/Roslyn/Program.cs}
 
-\todo{mention IOperation (?) and SyntaxGenerator (?)}
+Notice how immutability makes transforming code harder by requiring the use of methods such as \cs{ReplaceNodes} and how the level of detail leads to very verbose code, in some cases requiring the specification of individual semicolons.
 
 \section{Manipulating \acs{IL}}
 
