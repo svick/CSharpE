@@ -28,7 +28,7 @@ namespace CSharpE.Samples.Roslyn
                                 IdentifierName(classDeclaration.Identifier))));
 
                     var fields = classDeclaration.ChildNodes()
-                        .OfType<FieldDeclarationSyntax>().ToList();
+                        .OfType<FieldDeclarationSyntax>();
 
                     classDeclaration = classDeclaration.ReplaceNodes(fields,
                         (__, fieldDeclaration) =>
@@ -37,15 +37,13 @@ namespace CSharpE.Samples.Roslyn
                             var name = fieldDeclaration.Declaration.Variables.Single()
                                 .Identifier;
 
-                            var property = PropertyDeclaration(type, name)
+                            return PropertyDeclaration(type, name)
                                 .AddModifiers(Token(PublicKeyword))
                                 .AddAccessorListAccessors(
                                     AccessorDeclaration(GetAccessorDeclaration)
                                         .WithSemicolonToken(Token(SemicolonToken)),
                                     AccessorDeclaration(SetAccessorDeclaration)
                                         .WithSemicolonToken(Token(SemicolonToken)));
-
-                            return property;
                         });
 
                     var statements = new List<StatementSyntax>();
@@ -78,13 +76,12 @@ namespace CSharpE.Samples.Roslyn
                     statements.Add(ReturnStatement(
                         LiteralExpression(NumericLiteralExpression, Literal(0))));
 
-                    var compareToMethod =
+                    classDeclaration = classDeclaration.AddMembers(
                         MethodDeclaration(PredefinedType(Token(IntKeyword)), "CompareTo")
                             .AddModifiers(Token(PublicKeyword))
                             .AddParameterListParameters(Parameter(Identifier("other"))
                                 .WithType(IdentifierName(classDeclaration.Identifier)))
-                            .WithBody(Block(statements));
-                    classDeclaration = classDeclaration.AddMembers(compareToMethod);
+                            .WithBody(Block(statements)));
 
                     return classDeclaration;
                 });

@@ -7,9 +7,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "T4", "t4\T4.csproj", "{F4DA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{BC32DC52-8C66-4445-BD0D-F2F4239B968D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeDOM", "CodeDOM\CodeDOM.csproj", "{D17CBFF0-8F70-4748-9FF9-4B48EA3FBE58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeDOM", "CodeDOM\CodeDOM.csproj", "{D17CBFF0-8F70-4748-9FF9-4B48EA3FBE58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Roslyn", "Roslyn\Roslyn.csproj", "{0930B665-BC13-4A90-9F9B-ED7F3F74CBE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roslyn", "Roslyn\Roslyn.csproj", "{0930B665-BC13-4A90-9F9B-ED7F3F74CBE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynSyntaxGenerator", "Roslyn.SyntaxGenerator\RoslynSyntaxGenerator.csproj", "{B526BDEC-5E76-42C7-9134-69F39A9CE41E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{414B5DDC-5977-4C71-A71C-53971AE9940D}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +40,10 @@ Global
 		{0930B665-BC13-4A90-9F9B-ED7F3F74CBE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0930B665-BC13-4A90-9F9B-ED7F3F74CBE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0930B665-BC13-4A90-9F9B-ED7F3F74CBE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B526BDEC-5E76-42C7-9134-69F39A9CE41E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B526BDEC-5E76-42C7-9134-69F39A9CE41E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B526BDEC-5E76-42C7-9134-69F39A9CE41E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B526BDEC-5E76-42C7-9134-69F39A9CE41E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

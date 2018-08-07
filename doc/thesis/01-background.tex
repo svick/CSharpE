@@ -77,22 +77,42 @@ On the other hand, no semantic information is available from this \ac{API}, so f
 
 The \cs{SyntaxFactory} class can be used to create new nodes for this \cs{API}.
 
-\item \cs{SemanticModel} and \cs{ISymbol}
+\item The \cs{SemanticModel} class can be used to answer semantic questions about some part of a \cs{SyntaxTree}.
 
-\item \cs{IOperation}
+The disadvantage of using this class is that it requires a full compilation, which includes all files in a project and also all of its dependencies. It is also less efficient, especially when a change is made.
+
+The \cs{SemanticModel} class surfaces semantic information in two forms:
+
+\begin{itemize}
+\item The \cs{ISymbol} \ac{API} can be used to get semantic information about members declared or referenced by a piece of code.
+
+For example, for the expression \cs{Console.WriteLine(42)}, this \ac{API} could return the symbol for the \cs{System.Console.WriteLine(int)} method. That symbol could then be used to find out more semantic information about that method, like the assembly it is contained in.
+
+\item The \cs{IOperation} \ac{API} is an alternative representation of statements and expressions as a language-independent abstract syntax tree. It includes semantic information in the form of \cs{ISymbol} objects.
+
+\end{itemize}
 
 \item \cs{SyntaxGenerator}
 \end{itemize}
 
 \subsubsection{Example}
 
-To transform entities for the running example using Roslyn, the code could look like the following:
+To transform entities for the running example using the Roslyn \cs{SyntaxTree} \ac{API}, the code could look like the following.
 
-\todo{Note hidden \cs{SyntaxFactory}}
+Note that this code is heavily using \cs{SyntaxFactory} to create new syntax nodes, but that type is not visible due to use of \cs{using static}, to make the code more succinct.
 
-\inputminted[firstline=16,lastline=94]{csharp}{samples/Roslyn/Program.cs}
+\inputminted[firstline=16,lastline=91]{csharp}{samples/Roslyn/Program.cs}
 
 Notice how immutability makes transforming code harder by requiring the use of methods such as \cs{ReplaceNodes} and how the level of detail leads to very verbose code, in some cases requiring even the specification of individual semicolons.
+
+\medskip
+
+\todo{Explain \cs{SyntaxGenerator} example follows}
+
+\inputminted[firstline=18,lastline=107]{csharp}{samples/Roslyn.SyntaxGenerator/Program.cs}
+
+\todo{Comment on the preceding example}
+
 
 \section{Manipulating \acs{IL}}
 

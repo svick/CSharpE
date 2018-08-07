@@ -2,5 +2,6 @@
   <PropertyGroup>
     <AssemblyName>CSharpE.Samples.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>CSharpE.Samples.$(MSBuildProjectName)</RootNamespace>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 </Project>
