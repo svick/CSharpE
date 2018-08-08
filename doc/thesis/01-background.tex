@@ -42,6 +42,8 @@ If an approach supports transforming C\# code, not just generating it, the examp
 
 \section{Manipulating C\# source code}
 
+This section describes various approaches for generating and transforming C\# source code. The resulting code then needs to be compiled by the C\# compiler, as usual.
+
 \subsection{\acs{T4}}
 
 \ac{T4} is a tool for generating text by interspersing snippets of the text to generate with fragments of C\# code to control how the text is generated. The resulting text can be in any language, including C\#.
@@ -139,7 +141,17 @@ Also note that \cs{SyntaxGenerator} generates overly verbose code (for example, 
 
 \section{Manipulating \acs{IL}}
 
-\todo{Reflection.Emit, System.Reflection.Metadata, Cecil}
+This section describes various libraries that can be used for generating and transforming \ac{IL} code.
+
+Since \ac{IL} is primarily meant to be produced by compilers and consumed by .NET runtimes, it is not a very convenient language for programmers.
+
+\subsection{System.Reflection.Emit}
+
+System.Reflection.Emit (Reflection.Emit for short)
+
+\subsection{System.Reflection.Metadata}
+
+\subsection{Mono.Cecil}
 
 \section{Other approaches}
 

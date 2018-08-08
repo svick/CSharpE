@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReflectionEmit", "ReflectionEmit\ReflectionEmit.csproj", "{E8185282-A21F-4C24-9A37-9A1F5CE59ACA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{B526BDEC-5E76-42C7-9134-69F39A9CE41E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B526BDEC-5E76-42C7-9134-69F39A9CE41E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B526BDEC-5E76-42C7-9134-69F39A9CE41E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8185282-A21F-4C24-9A37-9A1F5CE59ACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8185282-A21F-4C24-9A37-9A1F5CE59ACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8185282-A21F-4C24-9A37-9A1F5CE59ACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8185282-A21F-4C24-9A37-9A1F5CE59ACA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
