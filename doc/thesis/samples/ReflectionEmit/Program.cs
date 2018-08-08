@@ -10,9 +10,8 @@ namespace CSharpE.Samples.ReflectionEmit
         static void Main()
         {
             var assemblyName = "MyAssembly";
-            var assemblyBuilder =
-                AssemblyBuilder.DefineDynamicAssembly(
-                    new AssemblyName(assemblyName), AssemblyBuilderAccess.Save);
+            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
+                new AssemblyName(assemblyName), AssemblyBuilderAccess.Save);
             var moduleBuilder =
                 assemblyBuilder.DefineDynamicModule(assemblyName, assemblyName + ".dll");
 
@@ -20,7 +19,8 @@ namespace CSharpE.Samples.ReflectionEmit
             {
                 var typeBuilder = moduleBuilder.DefineType(entityKind.Name);
 
-                typeBuilder.AddInterfaceImplementation(typeof(IEquatable<>).MakeGenericType(typeBuilder));
+                typeBuilder.AddInterfaceImplementation(
+                    typeof(IEquatable<>).MakeGenericType(typeBuilder));
 
                 foreach (var property in entityKind.Properties)
                 {
@@ -57,14 +57,6 @@ namespace CSharpE.Samples.ReflectionEmit
 
                     propertyBuilder.SetSetMethod(setMethod);
                 }
-
-                // TODO: make trivial Equals, commit, then delete it
-
-                var methodBuilder = typeBuilder.DefineMethod("Equals",
-                    MethodAttributes.Public | MethodAttributes.Virtual |
-                    MethodAttributes.NewSlot | MethodAttributes.Final, typeof(bool),
-                    new[] { typeBuilder });
-                methodBuilder.GetILGenerator().Emit(OpCodes.Ret);
 
                 typeBuilder.CreateType();
             }
