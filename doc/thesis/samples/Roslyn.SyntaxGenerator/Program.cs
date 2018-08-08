@@ -14,7 +14,7 @@ namespace CSharpE.Samples.RoslynSyntaxGenerator
     {
         static async Task Main()
         {
-            var project = new AdhocWorkspace().AddProject("Project", LanguageNames.CSharp)
+            var project = new AdhocWorkspace().AddProject("MyProject", LanguageNames.CSharp)
                 .AddMetadataReference(
                     MetadataReference.CreateFromFile(typeof(object).Assembly.Location));
             var document =

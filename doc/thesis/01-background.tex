@@ -104,7 +104,9 @@ For example, for the expression \cs{Console.WriteLine(42)}, this \ac{API} could 
 
 \end{itemize}
 
-\item \todo{\cs{SyntaxGenerator}}
+\item The \cs{SyntaxGenerator} class offers an alternative, language-independent way of generating Roslyn syntax nodes. It is part of the Workspaces layer of Roslyn, which means that using it on its own requires some additional setup. \cs{SyntaxGenerator} has a more semantic view of code, which can be easier than generating the exact syntax using \cs{SyntaxFactory}.
+
+Since \cs{SyntaxGenerator} is language-independent, it is using the \cs{SyntaxNode} type  in its \ac{API} to represent any kind of syntax node, because \cs{SyntaxNode} is the common base class for syntax node types in different languages. This approach makes \cs{SyntaxGenerator} less type-safe compared with \cs{SyntaxFactory}, which uses specific \cs{SyntaxNode}-derived types in its \ac{API}.
 \end{itemize}
 
 \subsubsection{Example}
@@ -123,7 +125,7 @@ Also notice how immutability makes transforming code harder by requiring the use
 
 \medskip
 
-\todo{Explain \cs{SyntaxGenerator} example}
+Code to transform entities for the running example using \cs{SyntaxGenerator} can be seen in Listing~\ref{syntaxgenerator-example}.
 
 \begin{listing}
 \inputminted[firstline=17,lastline=73]{csharp}{samples/Roslyn.SyntaxGenerator/Program.cs}
@@ -131,8 +133,9 @@ Also notice how immutability makes transforming code harder by requiring the use
 \label{syntaxgenerator-example}
 \end{listing}
 
-\todo{Comment on the \cs{SyntaxGenerator} example}
+Note that \cs{SyntaxGenerator} does not support auto-implemented properties, so the example has to create properties with backing fields.
 
+Also note that \cs{SyntaxGenerator} generates overly verbose code (for example, \cs{global::System.IEquatable<global::Person>}), but this is counterweighted by being able to use another Workspace-layer service, \cs{Simplifier}, to make the code simpler.
 
 \section{Manipulating \acs{IL}}
 
