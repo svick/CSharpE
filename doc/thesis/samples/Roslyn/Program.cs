@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Samples.Core;
 using Microsoft.CodeAnalysis;
@@ -15,17 +14,14 @@ namespace CSharpE.Samples.Roslyn
         {
             var compilationUnit = ParseCompilationUnit(EntityKinds.ToGenerateFromSource);
 
-            compilationUnit =
-                compilationUnit.AddUsings(UsingDirective(IdentifierName("System")));
-
             compilationUnit = compilationUnit.ReplaceNodes(
                 compilationUnit.DescendantNodes().OfType<ClassDeclarationSyntax>(),
                 (_, classDeclaration) =>
                 {
                     classDeclaration = classDeclaration.AddBaseListTypes(
-                        SimpleBaseType(GenericName("IComparable")
-                            .AddTypeArgumentListArguments(
-                                IdentifierName(classDeclaration.Identifier))));
+                        SimpleBaseType(QualifiedName(IdentifierName("System"),
+                            GenericName("IEquatable").AddTypeArgumentListArguments(
+                                IdentifierName(classDeclaration.Identifier)))));
 
                     var fields = classDeclaration.ChildNodes()
                         .OfType<FieldDeclarationSyntax>();
@@ -45,43 +41,6 @@ namespace CSharpE.Samples.Roslyn
                                     AccessorDeclaration(SetAccessorDeclaration)
                                         .WithSemicolonToken(Token(SemicolonToken)));
                         });
-
-                    var statements = new List<StatementSyntax>();
-
-                    statements.Add(LocalDeclarationStatement(
-                        VariableDeclaration(PredefinedType(Token(IntKeyword)))
-                            .AddVariables(VariableDeclarator("result"))));
-
-                    foreach (var field in fields)
-                    {
-                        var fieldIdentifier = IdentifierName(
-                            field.Declaration.Variables.Single().Identifier);
-
-                        statements.Add(ExpressionStatement(AssignmentExpression(
-                            SimpleAssignmentExpression, IdentifierName("result"),
-                            InvocationExpression(MemberAccessExpression(
-                                SimpleMemberAccessExpression, fieldIdentifier,
-                                IdentifierName("CompareTo"))).AddArgumentListArguments(
-                                Argument(MemberAccessExpression(
-                                    SimpleMemberAccessExpression, IdentifierName("other"),
-                                    fieldIdentifier))))));
-
-                        statements.Add(IfStatement(
-                            BinaryExpression(NotEqualsExpression,
-                                IdentifierName("result"),
-                                LiteralExpression(NumericLiteralExpression, Literal(0))),
-                            ReturnStatement(IdentifierName("result"))));
-                    }
-
-                    statements.Add(ReturnStatement(
-                        LiteralExpression(NumericLiteralExpression, Literal(0))));
-
-                    classDeclaration = classDeclaration.AddMembers(
-                        MethodDeclaration(PredefinedType(Token(IntKeyword)), "CompareTo")
-                            .AddModifiers(Token(PublicKeyword))
-                            .AddParameterListParameters(Parameter(Identifier("other"))
-                                .WithType(IdentifierName(classDeclaration.Identifier)))
-                            .WithBody(Block(statements)));
 
                     return classDeclaration;
                 });

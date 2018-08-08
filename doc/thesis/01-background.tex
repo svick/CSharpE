@@ -28,13 +28,17 @@ But for more advanced use cases, it is necessary ot manipulate code in some form
 
 \section{Example}
 
-To demonstrate various code generation approaches, a running example of generating a simple entity class with a set of properties, a constructor and an implementation of the \cs{IComparable<T>} interface will be used.
+To demonstrate various code generation approaches, a running example of generating a simple entity class with a set of properties and having \cs{IEquatable<T>} as an implemented interface will be used. (To make the examples shorter, the \cs{Equals} method required to properly implement the interface will not be included.)
 
-For example, for an entity named \cs{Person} with properties \cs{Name} of type \cs{string} and \cs{Age} of type \cs{int}, the generated code should be similar to the following:
+For example, for an entity named \cs{Person} with properties \cs{Name} of type \cs{string} and \cs{Age} of type \cs{int}, the generated code should be similar to the one in Listing~\ref{example-result}.
 
-\codefile{samples/Core/Person.cs}{csharp}{}
+\begin{listing}
+\inputminted{csharp}{samples/Core/Person.cs}
+\caption{Running example result}
+\label{example-result}
+\end{listing}
 
-If an approach supports transforming C\# code, not just generating it, the example will instead be transforming simple classes containing only fields with the right types and names into the form above.
+If an approach supports transforming C\# code, not just generating it, the example will instead be transforming simple classes containing only fields with the right types and names into the form above. Such transformation is too simple to be useful in practice, but it is sufficient as a demonstration.
 
 \section{Manipulating C\# source code}
 
@@ -46,11 +50,15 @@ If an approach supports transforming C\# code, not just generating it, the examp
 
 \subsubsection{Example}
 
-To generate entities, as required by the running example, the \ac{T4} code could look like the following:
+The code to generate entities using \ac{T4}, as required by the running example, can be seen in Listing~\ref{t4-example}.
 
-\codefile{samples/T4/Entities.tt}{text}{}
+\begin{listing}
+\inputminted{text}{samples/T4/Entities.tt}
+\caption{\ac{T4} example}
+\label{t4-example}
+\end{listing}
 
-The code shown above highlights another issue with \ac{T4}: indentation. It is hard to keep indentation of both the generated code and the generating code consistent, especially since any whitespace outside of \ac{T4} tags will be included in the output.
+The code highlights another issue with \ac{T4}: indentation. It is hard to keep indentation of both the generated code and the generating code consistent, especially since any whitespace outside of \ac{T4} tags will be included in the output.
 
 \subsection{CodeDOM}
 
@@ -58,11 +66,15 @@ The code shown above highlights another issue with \ac{T4}: indentation. It is h
 
 \subsubsection{Example}
 
-To generate entities for the running example using CodeDOM, the code could look like the following:
+The code to generate entities for the running example using CodeDOM can be seen in Listing~\ref{codedom-example}.
 
-\inputminted[firstline=14,lastline=102]{csharp}{samples/CodeDOM/Program.cs}
+\begin{listing}
+\inputminted[firstline=14,lastline=60]{csharp}{samples/CodeDOM/Program.cs}
+\caption{CodeDOM example}
+\label{codedom-example}
+\end{listing}
 
-Especially notice that the above code has to manually generate backing fields for properties, because CodeDOM does not support auto-implemented properties.
+Especially notice that the code has to manually generate backing fields for properties, because CodeDOM does not support auto-implemented properties.
 
 \subsection{Roslyn}
 
@@ -92,26 +104,34 @@ For example, for the expression \cs{Console.WriteLine(42)}, this \ac{API} could 
 
 \end{itemize}
 
-\item \cs{SyntaxGenerator}
+\item \todo{\cs{SyntaxGenerator}}
 \end{itemize}
 
 \subsubsection{Example}
 
-To transform entities for the running example using the Roslyn \cs{SyntaxTree} \ac{API}, the code could look like the following.
+The code to transform entities for the running example using the \cs{SyntaxTree} \ac{API} can be seen in Listing~\ref{syntaxtree-example}.
 
 Note that this code is heavily using \cs{SyntaxFactory} to create new syntax nodes, but that type is not visible due to use of \cs{using static}, to make the code more succinct.
 
-\inputminted[firstline=16,lastline=91]{csharp}{samples/Roslyn/Program.cs}
+\begin{listing}
+\inputminted[firstline=15,lastline=50]{csharp}{samples/Roslyn/Program.cs}
+\caption{Roslyn \cs{SyntaxTree} example}
+\label{syntaxtree-example}
+\end{listing}
 
-Notice how immutability makes transforming code harder by requiring the use of methods such as \cs{ReplaceNodes} and how the level of detail leads to very verbose code, in some cases requiring even the specification of individual semicolons.
+Also notice how immutability makes transforming code harder by requiring the use of methods such as \cs{ReplaceNodes} and how the level of detail leads to very verbose code, in some cases requiring even the specification of individual semicolons.
 
 \medskip
 
-\todo{Explain \cs{SyntaxGenerator} example follows}
+\todo{Explain \cs{SyntaxGenerator} example}
 
-\inputminted[firstline=18,lastline=107]{csharp}{samples/Roslyn.SyntaxGenerator/Program.cs}
+\begin{listing}
+\inputminted[firstline=17,lastline=73]{csharp}{samples/Roslyn.SyntaxGenerator/Program.cs}
+\caption{Roslyn \cs{SyntaxGenerator} example}
+\label{syntaxgenerator-example}
+\end{listing}
 
-\todo{Comment on the preceding example}
+\todo{Comment on the \cs{SyntaxGenerator} example}
 
 
 \section{Manipulating \acs{IL}}

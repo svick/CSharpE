@@ -6,24 +6,10 @@ using System;
 
 <# foreach (var entityKind in EntityKinds.ToGenerate) { #>
 class <#= entityKind.Name #>
-    : IComparable<<#= entityKind.Name #>>
+    : IEquatable<<#= entityKind.Name #>>
 {
 <# foreach (var property in entityKind.Properties) { #>
     public <#= property.Type #> <#= property.Name #> { get; set; }
 <# } #>
-
-    public int CompareTo(<#= entityKind.Name #> other)
-    {
-        int result;
-
-<# foreach (var property in entityKind.Properties) { #>
-        result = this.<#= property.Name #>.CompareTo(
-            other.<#= property.Name #>);
-        if (result != 0)
-            return result;
-
-<# } #>
-        return 0;
-    }
 }
 <# } #>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpE.Samples.Core;
@@ -33,7 +32,7 @@ namespace CSharpE.Samples.RoslynSyntaxGenerator
                     SyntaxNode result = classDeclaration;
 
                     result = g.AddBaseType(result, g.TypeExpression(
-                        compilation.GetTypeByMetadataName("System.IComparable`1")
+                        compilation.GetTypeByMetadataName("System.IEquatable`1")
                             .Construct(model.GetDeclaredSymbol(classDeclaration))));
 
                     var fields = result.ChildNodes().OfType<FieldDeclarationSyntax>();
@@ -64,39 +63,6 @@ namespace CSharpE.Samples.RoslynSyntaxGenerator
 
                         result = g.AddMembers(result, field, property);
                     }
-
-                    var statements = new List<SyntaxNode>();
-
-                    statements.Add(g.LocalDeclarationStatement(
-                        compilation.GetSpecialType(SpecialType.System_Int32), "result"));
-
-                    foreach (var field in fields)
-                    {
-                        var fieldIdentifier = g.IdentifierName(g.GetName(field));
-
-                        statements.Add(g.AssignmentStatement(g.IdentifierName("result"),
-                            g.InvocationExpression(
-                                g.MemberAccessExpression(fieldIdentifier, "CompareTo"),
-                                g.MemberAccessExpression(g.IdentifierName("other"),
-                                    fieldIdentifier))));
-
-                        statements.Add(g.IfStatement(
-                            g.ValueNotEqualsExpression(g.IdentifierName("result"),
-                                g.LiteralExpression(0)),
-                            new[] { g.ReturnStatement(g.IdentifierName("result")) }));
-                    }
-
-                    statements.Add(g.ReturnStatement(g.LiteralExpression(0)));
-
-                    result = g.AddMembers(result, g.MethodDeclaration("CompareTo",
-                        new[]
-                        {
-                            g.ParameterDeclaration("other", g.TypeExpression(
-                                model.GetDeclaredSymbol(classDeclaration)))
-                        },
-                        returnType: g.TypeExpression(
-                            compilation.GetSpecialType(SpecialType.System_Int32)),
-                        accessibility: Accessibility.Public, statements: statements));
 
                     return result;
                 });
