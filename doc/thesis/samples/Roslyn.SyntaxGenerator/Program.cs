@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpE.Samples.Core;
@@ -48,7 +48,6 @@ namespace CSharpE.Samples.RoslynSyntaxGenerator
                         var field = g.WithName(fieldDeclaration, fieldName);
 
                         var fieldAccess = g.IdentifierName(fieldName);
-
                         var property = g.PropertyDeclaration(
                             propertyName, type, Accessibility.Public,
                             getAccessorStatements: new[]
@@ -70,7 +69,8 @@ namespace CSharpE.Samples.RoslynSyntaxGenerator
             document = document.WithSyntaxRoot(compilationUnit.NormalizeWhitespace());
             document = await Simplifier.ReduceAsync(document);
 
-            Console.WriteLine(await document.GetSyntaxRootAsync());
+            File.WriteAllText(
+                "Entities.cs", (await document.GetSyntaxRootAsync()).ToString());
         }
     }
 }

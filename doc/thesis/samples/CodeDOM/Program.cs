@@ -54,10 +54,11 @@ namespace CSharpE.Samples.CodeDOM
 
             var compileUnit = new CodeCompileUnit { Namespaces = { ns } };
 
-            var stringWriter = new StringWriter();
-            new CSharpCodeProvider().GenerateCodeFromCompileUnit(
-                compileUnit, stringWriter, null);
-            Console.WriteLine(stringWriter);
+            using (var writer = new StreamWriter("Entities.cs"))
+            {
+                new CSharpCodeProvider().GenerateCodeFromCompileUnit(
+                    compileUnit, writer, null);
+            }
         }
     }
 }

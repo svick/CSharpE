@@ -71,7 +71,7 @@ The code highlights another issue with \ac{T4}: indentation. It is hard to keep 
 The code to generate entities for the running example using CodeDOM can be seen in Listing~\ref{codedom-example}.
 
 \begin{listing}
-\inputminted[firstline=14,lastline=60]{csharp}{samples/CodeDOM/Program.cs}
+\inputminted[firstline=14,lastline=61]{csharp}{samples/CodeDOM/Program.cs}
 \caption{CodeDOM example}
 \label{codedom-example}
 \end{listing}
@@ -159,8 +159,6 @@ Code to generate entities for the running example using Reflection.Emit can be s
 \label{refemit-example}
 \end{listing}
 
-\todo{Change all the other examples to save to a file}
-
 Notice how generating properties requires understanding that they are represented using special methods and that generating bodies for those methods requires understanding the \ac{IL} stack machine.
 
 \subsection{Mono.Cecil}
@@ -174,4 +172,4 @@ Notice how generating properties requires understanding that they are represente
 \section{Metaprogramming systems (?)}
 \label{metaprogramming}
 
-\todo{PostSharp, Fody, others}
+\todo{PostSharp, Fody, F\# Type providers, others}

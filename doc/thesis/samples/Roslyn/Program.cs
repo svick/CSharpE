@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using System.Linq;
 using CSharpE.Samples.Core;
 using Microsoft.CodeAnalysis;
@@ -47,7 +47,7 @@ namespace CSharpE.Samples.Roslyn
 
             compilationUnit = compilationUnit.NormalizeWhitespace();
 
-            Console.WriteLine(compilationUnit);
+            File.WriteAllText("Entities.cs", compilationUnit.ToString());
         }
     }
 }
