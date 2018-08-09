@@ -46,7 +46,7 @@ This section describes various approaches for generating and transforming C\# so
 
 \subsection{\acs{T4}}
 
-\ac{T4} is a tool for generating text by interspersing snippets of the text to generate with fragments of C\# code to control how the text is generated. The resulting text can be in any language, including C\#.
+\ac{T4} \cite{T4} is a tool for generating text by interspersing snippets of the text to generate with fragments of C\# code to control how the text is generated. The resulting text can be in any language, including C\#.
 
 \ac{T4} does not have any special way of accessing other source code, which makes it most suitable for generating code based on external data. Its text-based nature gives it flexibility, but also makes using it fairly hard, since generating C\# code effectively requires writing two interleaved programs, without any help from the \ac{IDE}, because \ac{T4} integration into Visual Studio is very limited.
 
@@ -64,7 +64,7 @@ The code highlights another issue with \ac{T4}: indentation. It is hard to keep 
 
 \subsection{CodeDOM}
 
-\ac{CodeDOM} is a library for generating source code by using a language-independent object model. It is fairly easy to use, but is limited in what language features it supports, due to its language-independent nature and due to it not being updated since .NET Framework 2.0. Some of these limitations can be worked around by using string-based "snippet" objects, but using them means negating the advantages that CodeDOM has. Some examples of features it does not support are declaring \cs{static} classes, LINQ query expressions or declaring auto-implemented properties.
+\ac{CodeDOM} \cite{codedom} is a library for generating source code by using a language-independent object model. It is fairly easy to use, but is limited in what language features it supports, due to its language-independent nature and due to it not being updated since .NET Framework 2.0. Some of these limitations can be worked around by using string-based "snippet" objects, but using them means negating the advantages that CodeDOM has. Some examples of features it does not support are declaring \cs{static} classes, LINQ query expressions or declaring auto-implemented properties.
 
 \subsubsection{Example}
 
@@ -147,7 +147,7 @@ Since \ac{IL} is primarily meant to be produced by compilers and consumed by .NE
 
 \subsection{System.Reflection.Emit}
 
-System.Reflection.Emit (Reflection.Emit for short) is a library that can be used to generate an assembly at the \ac{IL} level in memory, and then either directly execute code from that assembly or save the assembly to disk.
+System.Reflection.Emit \cite{refemit} is a library that can be used to generate an assembly at the \ac{IL} level in memory, and then either directly execute code from that assembly or save the assembly to disk.
 
 \subsubsection{Example}
 
@@ -162,6 +162,8 @@ Code to generate entities for the running example using Reflection.Emit can be s
 Notice how generating properties requires understanding that they are represented using special methods and that generating bodies for those methods requires understanding the \ac{IL} stack machine.
 
 \subsection{Mono.Cecil}
+
+Mono.Cecil \cite{cecil} is a library for TODO written as part of the Mono project
 
 \subsection{System.Reflection.Metadata}
 

@@ -10,58 +10,58 @@ namespace CSharpE.Samples.ReflectionEmit
         static void Main()
         {
             var assemblyName = "MyAssembly";
-            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
+            var assembly = AssemblyBuilder.DefineDynamicAssembly(
                 new AssemblyName(assemblyName), AssemblyBuilderAccess.Save);
-            var moduleBuilder =
-                assemblyBuilder.DefineDynamicModule(assemblyName, assemblyName + ".dll");
+            var module =
+                assembly.DefineDynamicModule(assemblyName, assemblyName + ".dll");
 
             foreach (var entityKind in EntityKinds.ToGenerate)
             {
-                var typeBuilder = moduleBuilder.DefineType(entityKind.Name);
+                var type = module.DefineType(entityKind.Name);
 
-                typeBuilder.AddInterfaceImplementation(
-                    typeof(IEquatable<>).MakeGenericType(typeBuilder));
+                type.AddInterfaceImplementation(
+                    typeof(IEquatable<>).MakeGenericType(type));
 
-                foreach (var property in entityKind.Properties)
+                foreach (var propertyInfo in entityKind.Properties)
                 {
-                    var type = Type.GetType(property.Type);
+                    var propertyType = Type.GetType(propertyInfo.Type);
 
-                    var fieldBuilder = typeBuilder.DefineField(
-                        property.LowercaseName, type, FieldAttributes.Private);
+                    var field = type.DefineField(
+                        propertyInfo.LowercaseName, propertyType, FieldAttributes.Private);
 
-                    var propertyBuilder = typeBuilder.DefineProperty(
-                        property.Name, PropertyAttributes.None, type, new Type[0]);
+                    var property = type.DefineProperty(
+                        propertyInfo.Name, PropertyAttributes.None, propertyType, new Type[0]);
 
-                    var getMethod = typeBuilder.DefineMethod("get_" + property.Name,
+                    var getMethod = type.DefineMethod("get_" + propertyInfo.Name,
                         MethodAttributes.Public | MethodAttributes.SpecialName,
-                        type, new Type[0]);
+                        propertyType, new Type[0]);
 
                     var il = getMethod.GetILGenerator();
 
                     il.Emit(OpCodes.Ldarg_0);
-                    il.Emit(OpCodes.Ldfld, fieldBuilder);
+                    il.Emit(OpCodes.Ldfld, field);
                     il.Emit(OpCodes.Ret);
 
-                    propertyBuilder.SetGetMethod(getMethod);
+                    property.SetGetMethod(getMethod);
 
-                    var setMethod = typeBuilder.DefineMethod("set_" + property.Name,
+                    var setMethod = type.DefineMethod("set_" + propertyInfo.Name,
                         MethodAttributes.Public | MethodAttributes.SpecialName,
-                        typeof(void), new[] { type });
+                        typeof(void), new[] { propertyType });
 
                     il = setMethod.GetILGenerator();
 
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldarg_1);
-                    il.Emit(OpCodes.Stfld, fieldBuilder);
+                    il.Emit(OpCodes.Stfld, field);
                     il.Emit(OpCodes.Ret);
 
-                    propertyBuilder.SetSetMethod(setMethod);
+                    property.SetSetMethod(setMethod);
                 }
 
-                typeBuilder.CreateType();
+                type.CreateType();
             }
 
-            assemblyBuilder.Save(assemblyName + ".dll");
+            assembly.Save(assemblyName + ".dll");
         }
     }
 }
