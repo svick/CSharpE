@@ -147,13 +147,11 @@ Since \ac{IL} is primarily meant to be produced by compilers and consumed by .NE
 
 \subsection{System.Reflection.Emit}
 
-System.Reflection.Emit (Reflection.Emit for short)
-
-\todo{Change all the other examples to save to a file}
+System.Reflection.Emit (Reflection.Emit for short) is a library that can be used to generate an assembly at the \ac{IL} level in memory, and then either directly execute code from that assembly or save the assembly to disk.
 
 \subsubsection{Example}
 
-Listing~\ref{refemit-example}
+Code to generate entities for the running example using Reflection.Emit can be seen in Listing~\ref{refemit-example}.
 
 \begin{listing}
 \inputminted[firstline=12,lastline=64]{csharp}{samples/ReflectionEmit/Program.cs}
@@ -161,10 +159,13 @@ Listing~\ref{refemit-example}
 \label{refemit-example}
 \end{listing}
 
+\todo{Change all the other examples to save to a file}
 
-\subsection{System.Reflection.Metadata}
+Notice how generating properties requires understanding that they are represented using special methods and that generating bodies for those methods requires understanding the \ac{IL} stack machine.
 
 \subsection{Mono.Cecil}
+
+\subsection{System.Reflection.Metadata}
 
 \section{Other approaches}
 
