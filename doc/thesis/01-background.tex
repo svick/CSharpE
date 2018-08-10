@@ -161,19 +161,23 @@ Code to generate entities for the running example using Reflection.Emit can be s
 
 Notice how generating properties requires understanding that they are represented using special methods and that generating bodies for those methods requires understanding the \ac{IL} stack machine.
 
-\medskip
-
-The other libraries for manipulating \ac{IL} won't have examples of their usage shown. While their \acp{API} are different, those differences are not relevant to this work.
-
 \subsection{Mono.Cecil}
 
 Mono.Cecil \cite{cecil} is a library that can be used for generating and transforming assemblies. It was written as part of the Mono project.
 
 The main difference between Cecil and Reflection.Emit is that Cecil can be used to read assemblies, including their \ac{IL}, and to modify them, while Reflection.Emit can only be used to create brand new assemblies. Another difference is that Cecil has its own type system, independent from the type system of the .NET runtime. This means that it can be used for example to work with assemblies that target a newer version of .NET than the currently executing one, or to work with assemblies that target an incompatible .NET implementation.
 
+\medskip
+
+Cecil does not have an example of its usage shown here. While its \acp{API} is different from Reflection.Emit, those differences are not relevant to this work.
+
 \section{Other approaches}
 
-\todo{Expression trees}
+While with the approaches mentioned in previous sections, then generated code (either C\# or \ac{IL}) fairly closely corresponds to the generating code, other options are possible. This section describes one such library.
+
+\subsection{Expression trees}
+
+Expression trees, \cite{expression-trees} contained in the System.Linq.Expressions namespace, \dots
 
 \section{Metaprogramming systems (?)}
 \label{metaprogramming}
