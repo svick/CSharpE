@@ -20,9 +20,9 @@ namespace CSharpE.Samples.MonoCecil
             {
                 var type = new TypeDefinition(null, entityKind.Name, TypeAttributes.Class, module.TypeSystem.Object);
 
-                //type.Interfaces.Add(new InterfaceImplementation(module
-                //    .ImportReference(typeof(IEquatable<>))
-                //    .MakeGenericInstanceType(type)));
+                type.Interfaces.Add(new InterfaceImplementation(module
+                    .ImportReference(typeof(IEquatable<>))
+                    .MakeGenericInstanceType(type)));
 
                 foreach (var propertyInfo in entityKind.Properties)
                 {
