@@ -177,9 +177,23 @@ While with the approaches mentioned in previous sections, then generated code (e
 
 \subsection{Expression trees}
 
-Expression trees, \cite{expression-trees} contained in the System.Linq.Expressions namespace, \dots
+Expression trees, \cite{expression-trees} contained in the System.Linq.Expressions namespace, offer another representation of code.
 
-\section{Metaprogramming systems (?)}
+Expression trees were first introduced in .NET Framework 3.5, to support translating of \ac{LINQ} queries to existing query languages, such as \ac{SQL}. This initial version included only expression-like constructs and the C\# language supported compiling of expression lambdas to code that creates the corresponding expression tree.
+
+In .NET Framework 4.0, expression trees were expanded with statement-like constructs, such as blocks, assignments or loops, to support the \ac{DLR}. The result is a "language" that is still expression-based, which means that even constructs such as blocks or loops can have a result. This is somewhat similar to functional languages such as F\#, which also do not differentiate between statements and expressions. The C\# language was not updated to support the new constructs when translating lambdas to expression trees.
+
+An expression tree can be inspected, often in order to be translated to some query language, or it can be executed. Depending on circumstances, executing expression trees is either done by using an interpreter, or by compiling them to \ac{IL} using Reflection.Emit and then executing the result.
+
+Expression trees can only represent expressions and statements, not types or their members, which limits their usefulness when generating code. This also means the running example is not applicable to expression trees.
+
+\section{Metaprogramming systems}
 \label{metaprogramming}
 
-\todo{PostSharp, Fody, F\# Type providers, others}
+\subsection{PostSharp}
+
+\subsection{Fody}
+
+\subsection{F\# type providers}
+
+\todo{others}
