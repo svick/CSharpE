@@ -139,6 +139,8 @@ Note that \cs{SyntaxGenerator} does not support auto-implemented properties, so 
 
 Also note that \cs{SyntaxGenerator} generates overly verbose code (for example, \cs{global::System.IEquatable<global::Person>}), but this is counterweighted by being able to use another Workspace-layer service, \cs{Simplifier}, to make the code simpler.
 
+\todo{Obscure libraries like RoslynDOM}
+
 \section{Manipulating \acs{IL}}
 
 This section describes various libraries that can be used for generating and transforming \ac{IL} code.
@@ -190,13 +192,17 @@ Expression trees can only represent expressions and statements, not types or the
 \section{Metaprogramming systems}
 \label{metaprogramming}
 
+\todo{Obscure libraries, especially those that work with C\#}
+
 \subsection{PostSharp}
 
 PostSharp \cite{postsharp} is a commercial tool for transforming built assemblies at the \ac{IL} level. It focuses on \ac{AOP}, which is the idea that cross-cutting concerns (related pieces of code that are spread over the program, such as logging or code related to thread safety) should be specified separately from the rest of the code.
 
-PostSharp includes many built-in aspects and also allows specifying custom aspects.
+PostSharp includes many built-in aspects and also allows specifying custom aspects. Custom aspects work by calling a user-defined method at a specific point, such as at the start of a method or before another method is called. The user-defined method can also be provided additional information about the modified method, such as its name or arguments.
 
-\todo{Describe how custom aspects work, look at the generated IL and complain about perf if it's bad.}
+This approach makes writing custom aspects easy, but it also means they are limited in what they can do and can have some performance penalty (due to allocation of the object that contains information about the modified method).
+
+Like other tools that work at the \ac{IL} level, PostSharp is also limited when it comes to changes to the shape of types, because any changes it makes will not be visible at compile time, only at runtime.
 
 \subsection{Fody}
 
