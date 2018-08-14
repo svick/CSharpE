@@ -164,6 +164,7 @@ Code to generate entities for the running example using Reflection.Emit can be s
 Notice how generating properties requires understanding that they are represented using special methods and that generating bodies for those methods requires understanding the \ac{IL} stack machine.
 
 \subsection{Mono.Cecil}
+\label{cecil}
 
 Mono.Cecil \cite{cecil} is a library that can be used for generating and transforming assemblies. It was written as part of the Mono project.
 
@@ -205,6 +206,8 @@ This approach makes writing custom aspects easy, but it also means they are limi
 Like other tools that work at the \ac{IL} level, PostSharp is also limited when it comes to changes to the shape of types, because any changes it makes will not be visible at compile time, only at runtime.
 
 \subsection{Fody}
+
+Fody \cite{fody} is an open-source tool for transforming the \ac{IL} of assemblies. There are many published "add-ins" for Fody and custom add-ins can be written by modifying the assembly using the Mono.Cecil \ac{API} (see Section \ref{cecil}). This makes custom add-ins hard to write, but it means they can perform any transformation. Though the limitations of \ac{IL}-based tools still apply: changes to the shape of type will not be visible at compile time.
 
 \subsection{F\# type providers}
 
