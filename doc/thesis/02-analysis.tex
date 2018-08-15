@@ -1,1 +1,13 @@
 \chapter{Possible approaches}
+
+The goal of this work is to create a system for extending the C\# language. It should be possible to use it create a wide variety of extensions, including:
+
+\begin{itemize}
+\item Extension similar to an F\# type providers.
+\item Extension similar to a PostSharp aspects.
+\item Extension for entity types, which can generate constructors, members required for comparison and any other common boilerplate code.
+\item Extension that modifies how existing language feature operates, for example, improving the time complexity of recursive iterators from quadratic to linear.
+\item Extension that can be used to write a single method that performs numeric computation with any numeric type. This is easy to achieve with C++ templates, but impossible with C\# generics, because they don't have a way of specifying operators required by the method.
+\item Extension that optimizes LINQ to Objects queries into efficient imperative code.
+\item Extension that converts an \ac{AoS} into \iac{SoA}, to improve performance of memory accesses in some cases.
+\end{itemize}
