@@ -179,6 +179,7 @@ Cecil does not have an example of its usage shown here. While its \acp{API} is d
 While with the approaches mentioned in previous sections, then generated code (either C\# or \ac{IL}) fairly closely corresponds to the generating code, other options are possible. This section describes one such library.
 
 \subsection{Expression trees}
+\label{expression-trees}
 
 Expression trees, \cite{expression-trees} contained in the System.Linq.Expressions namespace, offer another representation of code.
 
@@ -210,5 +211,9 @@ Like other tools that work at the \ac{IL} level, PostSharp is also limited when 
 Fody \cite{fody} is an open-source tool for transforming the \ac{IL} of assemblies. There are many published "add-ins" for Fody and custom add-ins can be written by modifying the assembly using the Mono.Cecil \ac{API} (see Section \ref{cecil}). This makes custom add-ins hard to write, but it means they can perform any transformation. Though the limitations of \ac{IL}-based tools still apply: changes to the shape of type will not be visible at compile time.
 
 \subsection{F\# type providers}
+
+The F\# language contains a feature called "type providers", \cite{type-providers} meant for easier access to data sources. Type providers generate types at design-time (i.e. while editing code in an \ac{IDE}) based on their input parameters and on usage of the generated types. These types can be either regular types that still exist after compilation (type providers using this approach are called "generative") or their use can be transformed into some other code ("erased type providers").
+
+Type providers use "code quotations" to express code to execute. Code quotations serve a similar purpose in F\# as expression trees do in C\#.
 
 \todo{others}
