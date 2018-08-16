@@ -37,7 +37,12 @@ Now that we know that the \ac{API} will represent C\# code, we need to decide ho
 % start with "details" that will affect the API the most
 
 \begin{itemize}
-\item \todo{Mutable}
+\item The \ac{API} should be mutable.
+
+Immutable persistent \acp{API} (such as the one used by Roslyn) are useful when multiple versions of the same object need to be preserved (for example, for the "Undo" button in a code editor) or when multiple threads need access to the same object. Their disadvantage is that they make modifying objects harder: any change to a leaf of an object tree needs to be propagated to the root of the tree, creating new objects along the way.
+
+This system does not need to keep multiple versions of objects, but it might be useful to parallelize it. For example, when two extensions modify different sections of code, it could be advantageous to execute them in parallel. Nevertheless, because of the focus on ease of use, a mutable \ac{API} is the better choice.
+
 \item \todo{Not too detailed about syntax}
 \item \todo{Not completely faithful about syntax}
 \item \todo{Include semantics}
