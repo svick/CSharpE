@@ -11,3 +11,37 @@ The goal of this work is to create a system for extending the C\# language. It s
 \item Extension that optimizes LINQ to Objects queries into efficient imperative code.
 \item Extension that converts an \ac{AoS} into \iac{SoA}, to improve performance of memory accesses in some cases.
 \end{itemize}
+
+Writing these extensions should be fairly easy and using extensions should not cause performance issues at design-time, build-time or run-time.
+
+\medskip
+
+Such a system will require two major parts: an \ac{API} for representing and modifying code used by extensions; and a component that drives extensions by invoking them at the appropriate time.
+
+\section{Representing code}
+
+The basic choices for representing C\# code in an \ac{API} are: as C\# code, as \ac{IL}, as some other form.
+
+\ac{IL} can be ruled out, because it is hard to use due to its low-level nature, especially when it comes to features like \cs{async}-\cs{await} (the C\# compiler transforms \cs{async} methods into state machines at the \ac{IL} level).
+
+Using a custom form would effectively require creating a new programming language (though one that does not necessarily have a textual form). The main disadvantage of doing that is that users would have to learn the new language and so it is generally the right choice only when no existing language is suitable.
+
+This leaves the last option: using C\#. This approach ensures that extension authors are already familiar with the used language, they only need to learn the \ac{API} used to represent it. It also means that the output of the system will be in C\#, so existing tools for C\# can be used. One disadvantage is that extensions can only use features available from C\#. For example, the \cs{calli} \ac{IL} opcode is out of reach.
+
+Putting this all together: C\# is the best choice for forming the basis of the \ac{API} for representing code for this system.
+
+\medskip
+
+Now that we know that the \ac{API} will represent C\# code, we need to decide how exactly it should look like:
+
+% start with "details" that will affect the API the most
+
+\begin{itemize}
+\item \todo{Mutable}
+\item \todo{Not too detailed about syntax}
+\item \todo{Not completely faithful about syntax}
+\item \todo{Include semantics}
+\item \todo{Succinct: no \cs{Code} prefix, no \cs{new}}
+\item \todo{Not language-independent}
+\item \todo{Handle invalid code (syntactically valid for extensions, invalid for Intelli\-Sense)}
+\end{itemize}
