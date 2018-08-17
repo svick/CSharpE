@@ -12,6 +12,8 @@ The goal of this work is to create a system for extending the C\# language. It s
 \item Extension that converts an \ac{AoS} into \iac{SoA}, to improve performance of memory accesses in some cases.
 \end{itemize}
 
+\todo{More use cases from existing code generators?}
+
 Writing these extensions should be fairly easy and using extensions should not cause performance issues at design-time, build-time or run-time.
 
 \medskip
@@ -34,8 +36,6 @@ Putting this all together: C\# is the best choice for forming the basis of the \
 
 Now that we know that the \ac{API} will represent C\# code, we need to decide how exactly it should look like:
 
-% start with "details" that will affect the API the most
-
 \begin{itemize}
 \item The \ac{API} should be mutable.
 
@@ -43,10 +43,29 @@ Immutable persistent \acp{API} (such as the one used by Roslyn) are useful when 
 
 This system does not need to keep multiple versions of objects, but it might be useful to parallelize it. For example, when two extensions modify different sections of code, it could be advantageous to execute them in parallel. Nevertheless, because of the focus on ease of use, a mutable \ac{API} is the better choice.
 
-\item \todo{Not too detailed about syntax}
-\item \todo{Not completely faithful about syntax}
-\item \todo{Include semantics}
-\item \todo{Succinct: no \cs{Code} prefix, no \cs{new}}
-\item \todo{Not language-independent}
+\item The \ac{API} should not reflect the syntax of C\# too closely.
+
+In contrast with Roslyn, this \ac{API} does not need to be able to represent, preserve and generate every syntactic nuance of C\#, though it has to ensure the semantics of code is not changed. The basic examples of this are whitespace and comments.
+
+A more advanced example is the difference between declaring variables together (\cs{int i, j;}) or separately (\cs{int i; int j;}). The \ac{API} could represent both syntactic forms the same: as a sequence of two variable declarations. 
+
+Another example are parentheses in expressions. They are useful in the (infix) textual representation to change or emphasize the order of operations. But when representing an expression as a tree of objects, the order of operations is clear from the structure of the tree, so parentheses are not necessary.
+
+\item The \ac{API} should respect the syntactic structure of C\#.
+
+In contrast with the previous point, the \ac{API} should not be completely divorced from the syntax of C\#. For example, the general structure of a simple method declaration in C\# is: modifiers, return type, method name, parameters, method body. If possible, the \ac{API} should follow the same order.
+
+\item Make common code simple.
+
+In the previous point, the list of elements of a method declaration was not complete: method declarations can also have attributes, type parameters and constraints. But many methods will not have these optional elements, and it should not be required to explicitly specify that a method does not have some of these elements.
+
+Another example are method arguments. Method argument is commonly just an expression, but it can also have a modifier like \cs{ref} or a name. But generating a method call without these optional elements is likely going to be the most common case, so it should be simple and not burdened by the requirements of more complex cases.
+
+\item The \ac{API} should be succinct.
+
+The structure of real code is often complex, and it is unavoidable that this \ac{API} will be used to generate such code. Because of this, the \ac{API} should avoid any unnecessary repetition, such as \ac{CodeDOM}'s \cs{Code} prefix, Roslyn's \cs{Expression} suffix or even repeated use of the \cs{new} operator. Roslyn's \cs{SyntaxFactory} serves as a fairly good model here: when combined with \cs{using static}, it leads to code that does not repeat itself much.
+
 \item \todo{Handle invalid code (syntactically valid for extensions, invalid for Intelli\-Sense)}
+\item \todo{Include semantics}
+\item \todo{Not language-independent}
 \end{itemize}
