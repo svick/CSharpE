@@ -200,6 +200,8 @@ Expression trees can only represent expressions and statements, not types or the
 
 PostSharp \cite{postsharp} is a commercial tool for transforming built assemblies at the \ac{IL} level. It focuses on \ac{AOP}, which is the idea that cross-cutting concerns (related pieces of code that are spread over the program, such as logging or code related to thread safety) should be specified separately from the rest of the code.
 
+An aspect is applied to the target program element, such as a method, by attaching a specific attribute to it. The attribute can also be attached to a container, such as a type or an assembly, which applies the aspect to all relevant program elements in that container. This is called "attribute multicasting".
+
 PostSharp includes many built-in aspects and also allows specifying custom aspects. Custom aspects work by calling a user-defined method at a specific point, such as at the start of a method or before another method is called. The user-defined method can also be provided additional information about the modified method, such as its name or arguments.
 
 This approach makes writing custom aspects easy, but it also means they are limited in what they can do and can have some performance penalty (due to allocation of the object that contains information about the modified method).
