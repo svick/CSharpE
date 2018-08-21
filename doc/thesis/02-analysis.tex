@@ -1,4 +1,4 @@
-\chapter{Possible approaches}
+\chapter{Analysis}
 
 The goal of this work is to create a system for extending the C\# language. It should be possible to use it create a wide variety of extensions, including:
 
@@ -37,6 +37,7 @@ Putting this all together: C\# is the best choice for forming the basis of the \
 Now that we know that the \ac{API} will represent C\# code, we need to decide how exactly it should look like:
 
 \begin{itemize}
+
 \item The \ac{API} should be a .NET library.
 
 It would be possible to use an existing transformation language (such as \ac{XSLT}) or create a new one.
@@ -53,7 +54,7 @@ This system does not need to keep multiple versions of objects, but it might be 
 
 \item The \ac{API} should not reflect the syntax of C\# too closely.
 
-In contrast with Roslyn, this \ac{API} does not need to be able to represent, preserve and generate every syntactic nuance of C\#, though it has to ensure the semantics of code is not changed. The basic examples of this are whitespace and comments.
+In contrast with Roslyn, this \ac{API} does not need to be able to represent, preserve and generate every syntactic nuance of C\#, though it has to ensure that semantics of code is not changed. The basic examples of this are whitespace and comments.
 
 A more advanced example is the difference between declaring variables together (\cs{int i, j;}) or separately (\cs{int i; int j;}). The \ac{API} could represent both syntactic forms the same: as a sequence of two variable declarations. 
 
@@ -93,8 +94,9 @@ Another reason is that extensions need to work at design-time, while the code is
 
 Several existing \acp{API} for representing C\# code are language-independent, at least to some degree. But the goal of this work is only to make the C\# language extensible, so doing this is outside its scope.
 
+\end{itemize}
+
+An \ac{API} that follows the principles explained above will work the best for its designed purpose: writing extensions for this system. But it could be also used for others purposes, with some limitations. For example, if such \ac{API} was used to write a Roslyn analyzer, it could be used to detect semantic issues ("Was a disposable object correctly disposed?") but would likely have problems detecting syntactic or stylistic issues ("Does the code use \cs{int} and not \cs{Int32}?").
+
 \section{Transformations}
 
-
-
-\end{itemize}

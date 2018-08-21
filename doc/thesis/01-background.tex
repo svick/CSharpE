@@ -19,7 +19,7 @@ Runtimes of .NET implementations are usually using \iac{JIT} compiler, which con
 \medskip
 
 In the .NET ecosystem, class libraries, which are just .NET assemblies, are commonly distributed thorough the NuGet package manager, \cite{nuget} because it makes using those libraries easier.
-And while NuGet is primarily used for regular libraries, which are directly used by programmers in their source code, it can also be used for various kinds of special libraries, such as add-ins for general metaprogramming systems like Fody, or Roslyn analyzers for detecting issues with source code (more on these in section \ref{metaprogramming}).
+And while NuGet is primarily used for regular libraries, which are directly used by programmers in their source code, it can also be used for various kinds of special libraries, such as add-ins for general metaprogramming systems like Fody (more on these in section \ref{metaprogramming}), or Roslyn analyzers for detecting issues with source code.
 
 \medskip
 
@@ -208,7 +208,7 @@ Like other tools that work at the \ac{IL} level, PostSharp is also limited when 
 
 \subsection{Fody}
 
-Fody \cite{fody} is an open-source tool for transforming the \ac{IL} of assemblies. There are many published "add-ins" for Fody and custom add-ins can be written by modifying the assembly using the Mono.Cecil \ac{API} (see Section \ref{cecil}). This makes custom add-ins hard to write, but it means they can perform any transformation. Though the limitations of \ac{IL}-based tools still apply: changes to the shape of type will not be visible at compile time.
+Fody \cite{fody} is an open-source tool for transforming the \ac{IL} of assemblies. There are many published "add-ins" for Fody, usually distributed through NuGet, and custom add-ins can be written by modifying the assembly using the Mono.Cecil \ac{API} (see Section \ref{cecil}). This makes custom add-ins hard to write, but it means they can perform any transformation. Though the limitations of \ac{IL}-based tools still apply: changes to the shape of type will not be visible at compile time.
 
 \subsection{F\# type providers}
 
