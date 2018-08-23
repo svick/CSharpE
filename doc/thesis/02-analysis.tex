@@ -98,6 +98,55 @@ Several existing \acp{API} for representing C\# code are language-independent, a
 
 An \ac{API} that follows the principles explained above will work the best for its designed purpose: writing extensions for this system. But it could be also used for others purposes, with some limitations. For example, if such \ac{API} was used to write a Roslyn analyzer, it should be able to detect semantic issues ("Was a disposable object correctly disposed?") but would likely have problems detecting syntactic or stylistic issues ("Does the code use \cs{int} and not \cs{Int32}?").
 
-\section{Transformations}
+\section{Overall design (?)}
 
-The next step is to consider 
+The next step is to consider how the overall system of executing extensions and applying their transformations should work.
+
+\begin{itemize}
+
+\item The system has to have a design-time component.
+
+The primary purpose of some of the possible extensions mentioned at the start of this chapter is to generate code that is meant to be directly accessed by the extension's user, often generated in response to other parts of the user's code. This means that the generation has to be performed while the user is editing their code, in other words, at design-time.
+
+\item The system has to have a build-time component, which should be separate from the design-time component.
+
+All of the mentioned possible extensions need to modify the build output, so a build-time component is clearly necessary.
+
+And since the design-time component is likely going to be tied to a specific \ac{IDE} or code editor, while the build-time component should work in a variety of situations, like building from the command line or on a build server, the two components should be separate.
+
+\item The system should support extensions with different design-time generation requirements.
+
+Possible extensions have various requirements on code generated at design-time and at build-time, and the system should handle all of them. These include:
+
+\begin{itemize}
+\item An extension that generates different code at design-time and at build-time.
+
+An example of such extension is one that is similar to an erased type provider: At design-time, it generates members with no implementation, which are then accessed by the user. At build-time, the members generated at design-time don't exist and user code that uses them is transformed into some other form.
+
+This effectively requires writing two different transformations, one for each stage.
+
+\item An extension that generates the same code at design-time and at build-time.
+
+An example is an extension similar to a generative type provider: Members are generated at design time and the same members are still used at build time.
+
+There is still a difference between the two stages: it is not necessary to generate implementation of generated members at design-time, which is especially useful since design-time transformations are more time-sensitive. But it shouldn't have be required to write two similar transformations for this.
+
+\item An extension that generates no code at design-time, only at build-time.
+
+An example is an extension similar to an aspect: The extension is activated by attaching an attribute to a code element. The attribute doe not change, so it does not have to be generated and can come from a regular library. This means that no code has to be generated at design-time. At build-time, the relevant code is then transformed based on what the aspect does.
+
+\end{itemize}
+
+\item The system should regenerate only code that depends on modified code at design-time.
+
+incl. API
+
+\item NuGet
+
+\item Reporting errors and warnings
+
+% TODO: ordering?
+
+%TODO: debugging?
+
+\end{itemize}
