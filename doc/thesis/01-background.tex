@@ -139,7 +139,7 @@ Note that \cs{SyntaxGenerator} does not support auto-implemented properties, so 
 
 Also note that \cs{SyntaxGenerator} generates overly verbose code (for example, \cs{global::System.IEquatable<global::Person>}), but this is counterweighted by being able to use another Workspace-layer service, \cs{Simplifier}, to make the code simpler.
 
-\todo{Obscure libraries like RoslynDOM}
+\todo{More obscure libraries like RoslynDOM}
 
 \section{Manipulating \acs{IL}}
 
@@ -194,7 +194,7 @@ Expression trees can only represent expressions and statements, not types or the
 \section{Metaprogramming systems}
 \label{metaprogramming}
 
-\todo{Obscure tools, especially those that work with C\#}
+\todo{More obscure tools, especially those that work with C\#}
 
 \subsection{PostSharp}
 
@@ -217,5 +217,3 @@ Fody \cite{fody} is an open-source tool for transforming the \ac{IL} of assembli
 The F\# language contains a feature called "type providers", \cite{type-providers} meant for easier access to data sources. Type providers generate types at design-time (i.e. while editing code in an \ac{IDE}) based on their input parameters and on usage of the generated types. These types can be either regular types that still exist after compilation (type providers using this approach are called "generative") or their use can be transformed into some other code ("erased type providers").
 
 Type providers use "code quotations" to express code to execute. Code quotations serve a similar purpose in F\# as expression trees do in C\#.
-
-\todo{others}
