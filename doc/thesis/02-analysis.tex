@@ -151,12 +151,18 @@ Doing this might require extending the \ac{API} of the system.
 
 For example, if the system included the \ac{API} suggested in the previous point, using it makes the extension more efficient but also more complicated. Because of that, use of this \ac{API} should be recommended, but optional. This way, experimenting with writing extensions or creating personal extensions is simple thanks to the simple \ac{API}, while production extensions can be efficient thanks to the complex \ac{API}.
 
-\item NuGet
+\item The system should allow distributing extensions through NuGet.
 
-\item Reporting errors and warnings
+NuGet is an established distribution channel for regular .NET libraries, and also for other kinds of libraries, like Roslyn analyzers or Fody add-ins. This makes NuGet a good fit for distributing extensions for this system.
+
+\item The system should allow extensions to report errors and warnings.
+
+Many extensions are likely going to have ways of using their \ac{API} (generated or not) in ways that are suspicious or outright incorrect. The system should let extensions report these issues to the user.
 
 % TODO: ordering?
 
 %TODO: debugging?
 
 \end{itemize}
+
+\todo{Summary}
