@@ -139,7 +139,17 @@ An example is an extension similar to an aspect: The extension is activated by a
 
 \item The system should regenerate only code that depends on modified code at design-time.
 
-incl. API
+Performance of the design-time component is important, because it directly affects user experience when editing code that uses extensions, especially when it comes to auto-completion.
+
+To help with that, we can take advantage of the fact that when the user is editing their code, they usually only change one piece of it at a time. And since parts of an extension's transformation usually only depend on specific pieces of user code, it should be possible to execute only the parts of the transformation that depend on changed pieces of user code.
+
+Another reason why this should be done is that extensions can affect performance of the whole system in unpredictable ways and limiting how much extension code runs also limits that unpredictability.
+
+Doing this might require extending the \ac{API} of the system.
+
+\item The system should make experimenting when creating extensions easy.
+
+For example, if the system included the \ac{API} suggested in the previous point, using it makes the extension more efficient but also more complicated. Because of that, use of this \ac{API} should be recommended, but optional. This way, experimenting with writing extensions or creating personal extensions is simple thanks to the simple \ac{API}, while production extensions can be efficient thanks to the complex \ac{API}.
 
 \item NuGet
 
