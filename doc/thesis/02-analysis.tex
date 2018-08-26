@@ -98,7 +98,7 @@ Several existing \acp{API} for representing C\# code are language-independent, a
 
 An \ac{API} that follows the principles explained above will work the best for its designed purpose: writing extensions for this system. But it could be also used for others purposes, with some limitations. For example, if such \ac{API} was used to write a Roslyn analyzer, it should be able to detect semantic issues ("Was a disposable object correctly disposed?") but would likely have problems detecting syntactic or stylistic issues ("Does the code use \cs{int} and not \cs{Int32}?").
 
-\section{Overall design (?)}
+\section{The system}
 
 The next step is to consider how the overall system of executing extensions and applying their transformations should work.
 
@@ -155,14 +155,14 @@ For example, if the system included the \ac{API} suggested in the previous point
 
 NuGet is an established distribution channel for regular .NET libraries, and also for other kinds of libraries, like Roslyn analyzers or Fody add-ins. This makes NuGet a good fit for distributing extensions for this system.
 
-\item The system should allow extensions to report errors and warnings.
+\item The system should allow extensions to report errors and warnings about code.
 
-Many extensions are likely going to have ways of using their \ac{API} (generated or not) in ways that are suspicious or outright incorrect. The system should let extensions report these issues to the user.
+Many extensions are likely going to have ways of using their \ac{API} (generated or not) in ways that are suspicious or outright incorrect. The system should let extensions report these issues to the user, including identifying the problematic part of their code.
+
+As a side-effect, it would be possible to write an extension that does not perform any transformations, it only reports errors or warnings. Such extension would serve the same purpose as a Roslyn analyzer and would have similar limitations than those mentioned at the end of the previous Section.
 
 % TODO: ordering?
 
 %TODO: debugging?
 
 \end{itemize}
-
-\todo{Summary}
