@@ -96,6 +96,8 @@ Several existing \acp{API} for representing C\# code are language-independent, a
 
 \end{itemize}
 
+Since none of the existing \acp{API} satisfy these criteria well, it will be necessary to create a custom \ac{API} for this system.
+
 An \ac{API} that follows the principles explained above will work the best for its designed purpose: writing extensions for this system. But it could be also used for others purposes, with some limitations. For example, if such \ac{API} was used to write a Roslyn analyzer, it should be able to detect semantic issues ("Was a disposable object correctly disposed?") but would likely have problems detecting syntactic or stylistic issues ("Does the code use \cs{int} and not \cs{Int32}?").
 
 \section{The system}

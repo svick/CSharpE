@@ -89,7 +89,7 @@ Roslyn contains several related \acp{API} for manipulating source code, each use
 
 On the other hand, no semantic information is available from this \ac{API}, so for example for the expression \cs{F(A.B)}, it is not possible to determine whether \cs{F} is a method or a delegate, whether \cs{A} refers to a type or a variable, or whether \cs{B} is a field, a property, or a method group.
 
-The \cs{SyntaxFactory} class can be used to create new nodes for this \cs{API}.
+The \cs{SyntaxFactory} class can be used to create new nodes for this \ac{API}.
 
 \item The \cs{SemanticModel} class can be used to answer semantic questions about some part of a \cs{SyntaxTree}.
 
@@ -108,7 +108,7 @@ For example, for the expression \cs{Console.WriteLine(42)}, this \ac{API} could 
 
 \item The \cs{SyntaxGenerator} class offers an alternative, language-independent way of generating Roslyn syntax nodes. It is part of the Workspaces layer of Roslyn, which means that using it on its own requires some additional setup. \cs{SyntaxGenerator} has a more semantic view of code, which can be easier than generating the exact syntax using \cs{SyntaxFactory}.
 
-Since \cs{SyntaxGenerator} is language-independent, it is using the \cs{SyntaxNode} type  in its \ac{API} to represent any kind of syntax node, because \cs{SyntaxNode} is the common base class for syntax node types in different languages. This approach makes \cs{SyntaxGenerator} less type-safe compared with \cs{SyntaxFactory}, which uses specific \cs{SyntaxNode}-derived types in its \ac{API}.
+Since \cs{SyntaxGenerator} is language-independent, it is using \cs{SyntaxNode} in its \ac{API} to represent any kind of syntax node, because \cs{SyntaxNode} is the common base class for syntax node types in different languages. This approach makes \cs{SyntaxGenerator} less type-safe when compared with \cs{SyntaxFactory}, which uses specific \cs{SyntaxNode}-derived types in its \ac{API}.
 \end{itemize}
 
 \subsubsection{Example}

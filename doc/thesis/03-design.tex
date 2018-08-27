@@ -1,5 +1,27 @@
 \chapter{Design}
 
-\section{Syntax trees}
+Before starting actual design of the system, its name should be decided. This name would be used in names of namespaces, assemblies, NuGet packages and so on, so it should fit well with their requirements and conventions. The name should also be reasonably unique, easy to remember and not too long. The name chosen based on these principles is "CSharpE", meaning "C\#, extensible".
 
-\section{Transformations}
+As explained in the previous chapter, this system has two main tasks: representing code and transforming code. This means it is natural to split the project into two main parts: \cs{CSharpE.Syntax} and \cs{CSharpE.Transform}, respectively.
+
+\section{CSharpE.Syntax}
+
+The \cs{CSharpE.Syntax} namespace contains all the types necessary for representing and modifying C\# code starting from the project level and going down all the way to the expression level. There is no representation for solutions, 
+
+\subsection{Projects}
+
+\subsection{Source files}
+
+\subsection{Types}
+
+\subsection{Members}
+
+\subsection{Statements}
+
+\subsection{Expressions}
+
+\subsection{References}
+
+\section{CSharpE.Transform}
+
+Not just API!
