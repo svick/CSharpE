@@ -50,7 +50,7 @@ namespace System
     // xxHash32 is used for the hash code.
     // https://github.com/Cyan4973/xxHash
 
-    public struct HashCode
+    internal struct HashCode
     {
         private static readonly uint s_seed = (uint)new Random().Next();
 
