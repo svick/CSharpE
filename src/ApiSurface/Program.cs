@@ -35,7 +35,8 @@ namespace CSharpE.ApiSurface
                 if (!s.CanBeReferencedByName)
                     return false;
 
-                if (s.DeclaredAccessibility == Accessibility.Internal)
+                if (s.DeclaredAccessibility == Accessibility.Internal ||
+                    s.DeclaredAccessibility == Accessibility.ProtectedAndInternal)
                     return false;
 
                 if (s.IsOverride)
@@ -49,7 +50,7 @@ namespace CSharpE.ApiSurface
 
             string indent = new string(' ', indentLevel);
 
-            Console.WriteLine($"{indent}{symbol.Kind}: {symbol}");
+            Console.WriteLine($"{indent}{symbol.Kind}: {symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}");
 
             var children = getChildSymbols.Visit(symbol);
 
