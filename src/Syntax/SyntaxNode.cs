@@ -21,7 +21,7 @@ namespace CSharpE.Syntax
         internal FileSpan FileSpan => new FileSpan(Span, SourceFile.GetSyntaxTree());
 
         // returns a copy of Roslyn version of this node that's part of the SourceFile SyntaxTree
-        protected Roslyn::SyntaxNode GetSourceFileNode()
+        private protected Roslyn::SyntaxNode GetSourceFileNode()
         {
             var root = SourceFile.GetSyntaxTree().GetRoot();
 
@@ -42,10 +42,10 @@ namespace CSharpE.Syntax
 
         private protected bool IsAnnotated(Roslyn::SyntaxNode syntax) => syntax.HasAnnotation(MarkerAnnotation);
 
-        protected T Annotate<T>(T syntax) where T : Roslyn::SyntaxNode =>
+        private protected T Annotate<T>(T syntax) where T : Roslyn::SyntaxNode =>
             syntax.WithAdditionalAnnotations(MarkerAnnotation);
 
-        protected void SetNotNull<T>(ref T field, T value) where T : SyntaxNode
+        private protected void SetNotNull<T>(ref T field, T value) where T : SyntaxNode
         {
             if (value == null)
                 throw new ArgumentNullException();
@@ -53,7 +53,7 @@ namespace CSharpE.Syntax
             Set(ref field, value);
         }
 
-        protected void Set<T>(ref T field, T value) where T : SyntaxNode
+        private protected void Set<T>(ref T field, T value) where T : SyntaxNode
         {
             if (field != null)
                 field.Parent = null;
