@@ -202,7 +202,7 @@ namespace CSharpE.Syntax
             return GetWrapped(ref changed);
         }
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
             syntax = syntax.WithRootAndOptions(newSyntax, syntax.Options);
 
         internal override SyntaxNode Clone() => throw new InvalidOperationException();

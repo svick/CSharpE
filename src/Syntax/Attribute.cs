@@ -22,7 +22,7 @@ namespace CSharpE.Syntax
             throw new NotImplementedException();
         }
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => syntax = (AttributeSyntax)newSyntax;
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => syntax = (AttributeSyntax)newSyntax;
 
         internal override SyntaxNode Clone()
         {

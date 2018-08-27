@@ -40,7 +40,7 @@ namespace CSharpE.Syntax
             }
         }
 
-        protected bool IsAnnotated(Roslyn::SyntaxNode syntax) => syntax.HasAnnotation(MarkerAnnotation);
+        private protected bool IsAnnotated(Roslyn::SyntaxNode syntax) => syntax.HasAnnotation(MarkerAnnotation);
 
         protected T Annotate<T>(T syntax) where T : Roslyn::SyntaxNode =>
             syntax.WithAdditionalAnnotations(MarkerAnnotation);
@@ -87,7 +87,7 @@ namespace CSharpE.Syntax
             changeTracker.SetChanged();
         }
 
-        protected abstract void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax);
+        private protected abstract void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax);
 
         private ChangeTracker changeTracker = new ChangeTracker();
 

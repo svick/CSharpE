@@ -31,7 +31,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => syntax = (ThisExpressionSyntax)newSyntax;
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => syntax = (ThisExpressionSyntax)newSyntax;
 
         internal override SyntaxNode Clone() => new ThisExpression();
 

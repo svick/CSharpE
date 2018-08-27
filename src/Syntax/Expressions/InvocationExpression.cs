@@ -76,7 +76,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             syntax = (InvocationExpressionSyntax)newSyntax;
 

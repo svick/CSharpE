@@ -136,7 +136,7 @@ namespace CSharpE.Syntax
         FieldDeclarationSyntax ISyntaxWrapper<FieldDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Init((FieldDeclarationSyntax)newSyntax);
             ResetAttributes();
