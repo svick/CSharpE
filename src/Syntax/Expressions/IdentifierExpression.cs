@@ -14,7 +14,7 @@ namespace CSharpE.Syntax
             throw new System.NotImplementedException();
         }
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             throw new System.NotImplementedException();
         }

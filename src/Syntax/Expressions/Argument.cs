@@ -54,7 +54,7 @@ namespace CSharpE.Syntax
 
         public static implicit operator Argument(Expression expression) => new Argument(expression);
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             syntax = (ArgumentSyntax)newSyntax;
             expression = null;

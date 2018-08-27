@@ -14,7 +14,7 @@ namespace CSharpE.Syntax
 
         CatchClauseSyntax ISyntaxWrapper<CatchClauseSyntax>.GetWrapped(ref bool? changed) => GetWrapped(ref changed);
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             throw new NotImplementedException();
         }

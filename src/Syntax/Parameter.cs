@@ -13,7 +13,7 @@ namespace CSharpE.Syntax
 
         ParameterSyntax ISyntaxWrapper<ParameterSyntax>.GetWrapped(ref bool? changed) => GetWrapped(ref changed);
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             throw new System.NotImplementedException();
         }

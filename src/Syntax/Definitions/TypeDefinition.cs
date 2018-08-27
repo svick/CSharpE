@@ -156,7 +156,7 @@ namespace CSharpE.Syntax
         TypeDeclarationSyntax ISyntaxWrapper<TypeDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Init((TypeDeclarationSyntax)newSyntax);
             ResetAttributes();

@@ -42,7 +42,7 @@ namespace CSharpE.Syntax
             return Syntax;
         }
 
-        protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => Init((LiteralExpressionSyntax)newSyntax);
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => Init((LiteralExpressionSyntax)newSyntax);
 
         internal override SyntaxNode Clone() => new IntLiteralExpression(Value);
     }
