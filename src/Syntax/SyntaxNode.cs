@@ -91,9 +91,9 @@ namespace CSharpE.Syntax
 
         private ChangeTracker changeTracker = new ChangeTracker();
 
-        protected void GetAndResetChanged(ref bool? changed) => changeTracker.GetAndResetChanged(ref changed);
+        private protected void GetAndResetChanged(ref bool? changed) => changeTracker.GetAndResetChanged(ref changed);
 
-        protected void SetChanged(ref bool? changed) => changeTracker.SetChanged(ref changed);
+        private protected void SetChanged(ref bool? changed) => changeTracker.SetChanged(ref changed);
 
         internal abstract SyntaxNode Clone();
 

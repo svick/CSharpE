@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace CSharpE.Syntax.Internals
 {
     // https://stackoverflow.com/a/8105057/41071
-    public class BiDirectionalDictionary<TLeft, TRight> : IEnumerable<KeyValuePair<TLeft, TRight>>
+    internal class BiDirectionalDictionary<TLeft, TRight> : IEnumerable<KeyValuePair<TLeft, TRight>>
     {
         private readonly Dictionary<TLeft, TRight> leftToRight = new Dictionary<TLeft, TRight>();
         private readonly Dictionary<TRight, TLeft> rightToLeft = new Dictionary<TRight, TLeft>();
