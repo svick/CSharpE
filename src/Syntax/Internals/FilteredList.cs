@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace CSharpE.Syntax.Internals
 {
-    public static class FilteredList
+    internal static class FilteredList
     {
         public static IList<TTarget> Create<TSource, TTarget>(IList<TSource> sourceList)
             where TTarget : TSource
@@ -41,7 +41,7 @@ namespace CSharpE.Syntax.Internals
     }
 
     // Note: this type is currently mostly not optimized for perf.
-    class FilteredList<TSource, TTarget> : IList<TTarget> where TTarget : TSource
+    internal class FilteredList<TSource, TTarget> : IList<TTarget> where TTarget : TSource
     {
         private readonly IList<TSource> sourceList;
         private readonly Func<TTarget, bool> filter;
