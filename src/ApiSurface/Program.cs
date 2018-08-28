@@ -13,7 +13,10 @@ namespace CSharpE.ApiSurface
             var references = new[] { typeof(Syntax.Project), typeof(Transform.Project) }
                 .Select(t => MetadataReference.CreateFromFile(t.Assembly.Location)).ToList();
 
-            var compilation = CSharpCompilation.Create(null).AddReferences(references);
+            var compilation = CSharpCompilation.Create(null).AddReferences(references)
+                .AddReferences(
+                    MetadataReference.CreateFromFile(
+                        @"C:\Users\Svick\.nuget\packages\netstandard.library\2.0.3\build\netstandard2.0\ref\netstandard.dll"));
 
             foreach (var reference in references)
             {
@@ -32,7 +35,10 @@ namespace CSharpE.ApiSurface
                 if (s is IAssemblySymbol)
                     return true;
 
-                if (!s.CanBeReferencedByName)
+                if (!s.CanBeReferencedByName &&
+                    !(s is IMethodSymbol methodSymbol &&
+                      (methodSymbol.MethodKind == MethodKind.Conversion ||
+                       methodSymbol.MethodKind == MethodKind.Constructor)))
                     return false;
 
                 if (s.DeclaredAccessibility == Accessibility.Internal ||
