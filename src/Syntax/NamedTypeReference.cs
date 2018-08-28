@@ -11,7 +11,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class NamedTypeReference : TypeReference, IPersistent, IEquatable<NamedTypeReference>
+    public sealed class NamedTypeReference : TypeReference, IEquatable<NamedTypeReference>
     {
         private TypeSyntax syntax;
 

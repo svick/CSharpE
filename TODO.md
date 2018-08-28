@@ -1,4 +1,4 @@
-﻿- remove `IPersistent`, clone args
+﻿- clone args in `CollectionTransformer<,,>.Data`
 
 ---
 
