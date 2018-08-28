@@ -1,6 +1,5 @@
 ﻿using System;
 using CSharpE.Syntax;
-using CSharpE.Syntax.Internals;
 
 namespace CSharpE.Transform.Internals
 {
@@ -9,9 +8,6 @@ namespace CSharpE.Transform.Internals
         public static void ThrowIfNotPersistent<T>(T arg)
         {
             if (arg == null)
-                return;
-
-            if (arg is IPersistent)
                 return;
 
             // disconnected syntax nodes are fine
