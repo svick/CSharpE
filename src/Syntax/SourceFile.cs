@@ -131,7 +131,7 @@ namespace CSharpE.Syntax
             }
         }
 
-        public void EnsureUsingNamespace(string ns) => additionalNamespaces.Add(ns);
+        internal void EnsureUsingNamespace(string ns) => additionalNamespaces.Add(ns);
 
         internal SyntaxTree GetWrapped(ref bool? changed)
         {
