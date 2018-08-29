@@ -40,6 +40,11 @@ namespace CSharpE.Syntax
             }
         }
 
+        public Project(CSharpCompilation compilation)
+        {
+            throw new NotImplementedException();
+        }
+
         public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
         {
             SourceFiles = sourceFiles.ToList();
