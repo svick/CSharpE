@@ -82,7 +82,7 @@ namespace CSharpE.Transform.Smart
         public static void ForEachTypeWithAttribute<TAttribute>(
             this Syntax.SourceFile sourceFile, Action<TypeDefinition> action)
             where TAttribute : System.Attribute =>
-            ForEach(sourceFile, action, f => f.TypesWithAttribute<TAttribute>());
+            ForEach(sourceFile, action, f => f.GetTypesWithAttribute<TAttribute>());
 
         public static void ForEachSourceFile(
             this Syntax.Project project, Action<Syntax.SourceFile> action) =>

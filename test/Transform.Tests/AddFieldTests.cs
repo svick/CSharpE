@@ -12,7 +12,7 @@ namespace CSharpE.Transform.Tests
         {
             public void Process(Syntax.Project project)
             {
-                foreach (var type in project.Types())
+                foreach (var type in project.GetTypes())
                 {
                     type.AddField(typeof(int), "i");
                 }

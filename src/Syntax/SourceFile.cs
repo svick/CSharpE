@@ -13,7 +13,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class SourceFile : SyntaxNode, ITypeContainer, ISyntaxWrapper<CompilationUnitSyntax>
+    public class SourceFile : SyntaxNode, ISyntaxWrapper<CompilationUnitSyntax>
     {
         public string Path { get; }
 
@@ -74,53 +74,44 @@ namespace CSharpE.Syntax
             }
         }
 
-        // TODO: virtual list
-        public IEnumerable<TypeDefinition> Types  
+        public IEnumerable<TypeDefinition> GetTypes()
         {
-            get
+            IEnumerable<TypeDefinition> GetTypes(NamespaceOrTypeDefinition container)
             {
-                IEnumerable<TypeDefinition> GetTypes(NamespaceOrTypeDefinition container)
+                if (container.IsNamespace)
                 {
-                    if (container.IsNamespace)
-                    {
-                        return container.GetNamespaceDefinition().Members.SelectMany(GetTypes);
-                    }
-                    else
-                    {
-                        return new[] { container.GetTypeDefinition() };
-                    }
+                    return container.GetNamespaceDefinition().Members.SelectMany(GetTypes);
                 }
-
-                return Members.SelectMany(GetTypes);
+                else
+                {
+                    return new[] { container.GetTypeDefinition() };
+                }
             }
+
+            return Members.SelectMany(GetTypes);
         }
 
-        IEnumerable<TypeDefinition> ITypeContainer.Types => Types;
-
-        public IEnumerable<TypeDefinition> AllTypes
+        public IEnumerable<TypeDefinition> GetAllTypes()
         {
-            get
+            IEnumerable<TypeDefinition> GetAllTypes(TypeDefinition type)
             {
-                IEnumerable<TypeDefinition> GetAllTypes(ITypeContainer container)
+                yield return type;
+
+                foreach (var directType in type.Types)
                 {
-                    foreach (var directType in container.Types)
+                    foreach (var indirectType in GetAllTypes(directType))
                     {
-                        yield return directType;
-                        
-                        foreach (var indirectType in GetAllTypes(directType))
-                        {
-                            yield return indirectType;
-                        }
+                        yield return indirectType;
                     }
                 }
-
-                return GetAllTypes(this);
             }
+
+            return GetTypes().SelectMany(GetAllTypes);
         }
 
-        public IEnumerable<TypeDefinition> TypesWithAttribute<T>() where T : System.Attribute
+        public IEnumerable<TypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute
         {
-            foreach (var type in Types)
+            foreach (var type in GetTypes())
             {
                 if (type.HasAttribute<T>())
                     yield return type;

@@ -10,7 +10,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class TypeDefinition : MemberDefinition, ITypeContainer, ISyntaxWrapper<TypeDeclarationSyntax>
+    public sealed class TypeDefinition : MemberDefinition, ISyntaxWrapper<TypeDeclarationSyntax>
     {
         private TypeDeclarationSyntax syntax;
         
@@ -77,8 +77,6 @@ namespace CSharpE.Syntax
             get => FilteredList.Create<MemberDefinition, TypeDefinition>(MembersList);
             set => FilteredList.Set(MembersList, value);
         }
-
-        IEnumerable<TypeDefinition> ITypeContainer.Types => Types;
 
         public bool HasAttribute<T>() => HasAttribute(typeof(T));
 
