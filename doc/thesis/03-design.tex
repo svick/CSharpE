@@ -42,7 +42,13 @@ The \cs{Project} class is also point of interoperation between this \ac{API} and
 
 \subsection{Source files}
 
-\subsection{Namespaces (?)}
+Each C\# source file in the project is represented as an instance of the \cs{SourceFile} class. A source file has name, text and a list of members, which are namespace and type definitions.
+
+The object-oriented way to model this list would be to have a common base class or interface shared by \cs{NamespaceDefition} and \cs{TypeDefinition} and use that for items in the list. But because namespace and type definitions do not share many members and there are only two of them, it is likely users would write code specific to each of the two. For this reason, the list instead contains instances of a \cs{struct} named \cs{NamespaceOrTypeDefinition}, which is effectively a discriminated union of the two types. This is an approach common in functional programming.
+
+Since this design is not very user-friendly, it is worth considering other options. One of them would be not having namespace definitions part of the syntax tree, but instead make namespace a property of type definition, which is how namespaces are represented in \ac{IL} and Reflection. The main issue with this approach is that it would diverge too much from the structure of C\# code, which could be confusing to users. For this reason, this option was not chosen.
+
+Notice that \cs{using} directives are not exposed in the \ac{API} at all, because they are managed automatically by the \ac{API}. This makes the \ac{API} easier to use, at the cost of preventing users from choosing which syntax should be used, which is consistent with the principles outlined in the previous Chapter.
 
 \subsection{Types}
 
