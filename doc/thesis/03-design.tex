@@ -24,15 +24,21 @@ A syntax node can have only one parent node, to make sure the syntax tree is act
 
 Syntax nodes can be deep cloned by calling the \cs{Clone} method, which is a generic extension method. It is that way to avoid having to cast its result to the correct type, which would be necessary if \cs{Clone} was a simple instance method on \cs{SyntaxNode}. Syntax nodes are also cloned instead of assigning a new parent node, to maintain the tree shape.
 
-\item Collections of nodes are exposed as \cs{IList<T>}. This interface is the most flexible out of the commonly used collection interfaces in .NET. Using an interface means that the user is shielded from the implementation detail of which specific collection type is used.
+\item Collections of nodes are usually exposed as \cs{IList<T>}. This interface is the most flexible out of the commonly used collection interfaces in .NET. Using an interface means that the user is shielded from the implementation detail of which specific collection type is used.
 
 \item The \ac{API} includes implicit conversion operators when appropriate. Specifically, they can be used to convert from a definition to a reference (e.g. from \cs{TypeDefinition} to \cs{IdentifierExpression} \linebreak[0] \todo[inline, inlinewidth=7.75cm, noinlinepar]{why not \cs{NamedTypeReference}?}) or from a node to a simple wrapper for that node (e.g. from \cs{Expression} to \cs{ExpressionStatement}).
+
+Using implicit conversions makes code shorter, but also harder to understand, because it is an operation that is not visible in the code. For this reason, all implicit conversion operators have an alternative form, usually a constructor of the target type.
 
 \item There is a \cs{SyntaxFactory} type, which exists to make creating syntax nodes more succinct, when combined with \cs{using static}. For example, it means that to use the \cs{this} keyword, it is possible to write just \cs{This()}, instead of  \cs{new ThisExpression()}.
 
 \end{itemize}
 
 \subsection{Projects}
+
+At the top of this \ac{API} is the \cs{Project} class, which represents a collection of C\# source files and library references. It also contains helper methods for accessing types from all files within a project, for extensions that do not care about which file contains which type.
+
+The \cs{Project} class is also point of interoperation between this \ac{API} and Roslyn: \cs{Project} can be constructed from a \cs{CSharpCompilation} and it also exposes a \cs{CSharpCompilation} as a property.
 
 \subsection{Source files}
 
