@@ -19,7 +19,7 @@ namespace CSharpE.Syntax
 
         private SyntaxTree syntax;
 
-        public SourceFile(string path, SyntaxTree syntaxTree)
+        internal SourceFile(string path, SyntaxTree syntaxTree)
         {
             Path = path ?? throw new ArgumentNullException(nameof(path));
             syntax = syntaxTree;
