@@ -40,6 +40,11 @@ namespace CSharpE.Syntax
             }
         }
 
+        public Project(CSharpCompilation compilation)
+        {
+            throw new NotImplementedException();
+        }
+
         public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
         {
             SourceFiles = sourceFiles.ToList();
@@ -68,11 +73,11 @@ namespace CSharpE.Syntax
             : this(sourceFiles, additionalReferencesRepresentatives.Select(t => new AssemblyReference(t)))
         { }
 
-        public IEnumerable<TypeDefinition> TypesWithAttribute<T>() where T : System.Attribute =>
-            SourceFiles.SelectMany(sourceFile => sourceFile.TypesWithAttribute<T>());
+        public IEnumerable<TypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>
+            SourceFiles.SelectMany(sourceFile => sourceFile.GetTypesWithAttribute<T>());
 
-        public IEnumerable<TypeDefinition> Types() => SourceFiles.SelectMany(sourceFile => sourceFile.Types);
+        public IEnumerable<TypeDefinition> GetTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetTypes());
 
-        public IEnumerable<TypeDefinition> AllTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.AllTypes);
+        public IEnumerable<TypeDefinition> GetAllTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetAllTypes());
     }
 }

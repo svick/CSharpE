@@ -70,6 +70,8 @@ namespace CSharpE.Syntax.Internals
                     return new FieldDefinition(fieldDeclarationSyntax, containingType);
                 case MethodDeclarationSyntax methodDeclarationSyntax:
                     return new MethodDefinition(methodDeclarationSyntax, containingType);
+                case ClassDeclarationSyntax classDeclarationSyntax:
+                    return new TypeDefinition(classDeclarationSyntax, containingType);
                 default:
                     throw new NotImplementedException();
             }
