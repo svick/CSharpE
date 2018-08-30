@@ -88,6 +88,10 @@ For some extensions, it will be useful if its users can write code that is not v
 
 Another reason is that extensions need to work at design-time, while the code is being edited, so that auto-completion can include members produced by extensions. This is especially important for extensions similar to F\# type providers, where generating new members is the reason why they exist.
 
+Note that not all invalid code has to be handled equally well. Specifically, it is not clear how to parse or represent  code that is not syntactically valid C\#, such as code that attempts to use an operator that does not exist in C\#. Such code still has to be handled by the \ac{API}, but not necessarily consistently and it could include error nodes, or some similar representation for errors.
+
+On the other hand, for code that is syntactically valid, but semantically invalid, such as the example of interface with no implementation mentioned above, it is clear how to parse such code and so its representation should be consistent and should not include any errors.
+
 \item The \ac{API} should not be language-independent.
 
 \nopagebreak
