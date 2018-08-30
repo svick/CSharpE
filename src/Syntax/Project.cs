@@ -73,11 +73,11 @@ namespace CSharpE.Syntax
             : this(sourceFiles, additionalReferencesRepresentatives.Select(t => new AssemblyReference(t)))
         { }
 
-        public IEnumerable<TypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>
+        public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>
             SourceFiles.SelectMany(sourceFile => sourceFile.GetTypesWithAttribute<T>());
 
-        public IEnumerable<TypeDefinition> GetTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetTypes());
+        public IEnumerable<BaseTypeDefinition> GetTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetTypes());
 
-        public IEnumerable<TypeDefinition> GetAllTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetAllTypes());
+        public IEnumerable<BaseTypeDefinition> GetAllTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetAllTypes());
     }
 }

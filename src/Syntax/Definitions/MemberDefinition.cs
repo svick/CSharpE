@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -51,6 +53,43 @@ namespace CSharpE.Syntax
         }
 
         protected void ResetAttributes() => attributes = null;
+
+        public bool HasAttribute<T>() => HasAttribute(typeof(T));
+
+        public bool HasAttribute(NamedTypeReference attributeType) => HasAttribute(attributeType.FullName);
+
+        private bool HasAttribute(string attributeTypeFullName)
+        {
+            if (!GetAttributeLists(this.GetWrapped()).Any())
+                return false;
+
+            var attributeLists = GetAttributeLists((MemberDeclarationSyntax)GetSourceFileNode());
+
+            var semanticModel = SourceFile.SemanticModel;
+
+            var attributeType = semanticModel.Compilation.GetTypeByMetadataName(attributeTypeFullName);
+
+            foreach (var attributeSyntax in attributeLists.SelectMany(al => al.Attributes))
+            {
+                var typeSymbol = semanticModel.GetTypeInfo(attributeSyntax).Type;
+
+                if (attributeType.Equals(typeSymbol))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static Roslyn::SyntaxList<AttributeListSyntax> GetAttributeLists(MemberDeclarationSyntax syntax)
+        {
+            switch (syntax)
+            {
+                case BaseTypeDeclarationSyntax typeSyntax:
+                    return typeSyntax.AttributeLists;
+            }
+
+            throw new NotImplementedException();
+        }
 
         private MemberModifiers modifiers;
         public MemberModifiers Modifiers

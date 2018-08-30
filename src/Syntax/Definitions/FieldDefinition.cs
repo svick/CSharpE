@@ -96,11 +96,6 @@ namespace CSharpE.Syntax
             Initializer = initializer;
         }
 
-        public TypeDefinition ParentType { get; private set; }
-
-        public static implicit operator MemberAccessExpression(FieldDefinition fieldDefinition) =>
-            new MemberAccessExpression(fieldDefinition);
-
         internal FieldDeclarationSyntax GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
@@ -148,13 +143,14 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Clone() => new FieldDefinition(Modifiers, Type, Name, Initializer);
 
+        private TypeDefinition parent;
         internal override SyntaxNode Parent
         {
-            get => ParentType;
+            get => parent;
             set
             {
                 if (value is TypeDefinition parentType)
-                    ParentType = parentType;
+                    parent = parentType;
                 else
                     throw new ArgumentException(nameof(value));
             }

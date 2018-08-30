@@ -74,13 +74,14 @@ namespace CSharpE.Transform.Smart
             where TItem : SyntaxNode
             => ForEach(parent, parent.SourceFile?.Project, arg1, action, collectionFunction);
 
+        // TODO: limit type kind and use in ActorTransformation
         public static void ForEachTypeWithAttribute<TAttribute>(
-            this Syntax.Project project, Action<TypeDefinition> action)
+            this Syntax.Project project, Action<BaseTypeDefinition> action)
             where TAttribute : System.Attribute =>
             project.ForEachSourceFile(action, (a, sourceFile) => sourceFile.ForEachTypeWithAttribute<TAttribute>(a));
 
         public static void ForEachTypeWithAttribute<TAttribute>(
-            this Syntax.SourceFile sourceFile, Action<TypeDefinition> action)
+            this Syntax.SourceFile sourceFile, Action<BaseTypeDefinition> action)
             where TAttribute : System.Attribute =>
             ForEach(sourceFile, action, f => f.GetTypesWithAttribute<TAttribute>());
 

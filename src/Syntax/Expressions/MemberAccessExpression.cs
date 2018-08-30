@@ -32,15 +32,8 @@ namespace CSharpE.Syntax
             MemberName = memberName;
         }
 
-        public MemberAccessExpression(FieldDefinition fieldDefinition)
-        {
-            if (fieldDefinition.Modifiers.Contains(MemberModifiers.Static))
-                Expression = fieldDefinition.ParentType;
-            else
-                Expression = This();
-
-            MemberName = fieldDefinition.Name;
-        }
+        public MemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
+            : this(expression, fieldDefinition.Name) { }
 
         private Expression expression;
         public Expression Expression

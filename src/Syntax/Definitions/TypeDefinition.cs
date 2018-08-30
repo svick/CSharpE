@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class TypeDefinition : MemberDefinition, ISyntaxWrapper<TypeDeclarationSyntax>
+    public sealed class TypeDefinition : BaseTypeDefinition, ISyntaxWrapper<TypeDeclarationSyntax>
     {
         private TypeDeclarationSyntax syntax;
         
@@ -28,13 +26,6 @@ namespace CSharpE.Syntax
         }
 
         protected override SyntaxList<AttributeListSyntax> GetSyntaxAttributes() => syntax?.AttributeLists ?? default;
-
-        private Identifier name;
-        public string Name
-        {
-            get => name.Text;
-            set => name.Text = value;
-        }
 
         private MemberList members;
         private MemberList MembersList
@@ -76,32 +67,6 @@ namespace CSharpE.Syntax
         {
             get => FilteredList.Create<MemberDefinition, TypeDefinition>(MembersList);
             set => FilteredList.Set(MembersList, value);
-        }
-
-        public bool HasAttribute<T>() => HasAttribute(typeof(T));
-
-        public bool HasAttribute(NamedTypeReference attributeType) => HasAttribute(attributeType.FullName);
-        
-        private bool HasAttribute(string attributeTypeFullName)
-        {
-            if (!syntax.AttributeLists.Any())
-                return false;
-
-            var attributeLists = ((TypeDeclarationSyntax)GetSourceFileNode()).AttributeLists;
-            
-            var semanticModel = SourceFile.SemanticModel;
-
-            var attributeType = semanticModel.Compilation.GetTypeByMetadataName(attributeTypeFullName);
-
-            foreach (var attributeSyntax in attributeLists.SelectMany(al => al.Attributes))
-            {
-                var typeSymbol = semanticModel.GetTypeInfo(attributeSyntax).Type;
-
-                if (attributeType.Equals(typeSymbol))
-                    return true;
-            }
-
-            return false;
         }
 
         public FieldDefinition AddField(
@@ -166,7 +131,5 @@ namespace CSharpE.Syntax
         {
             throw new NotImplementedException();
         }
-
-        internal override SyntaxNode Parent { get; set; }
     }
 }

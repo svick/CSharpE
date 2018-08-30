@@ -13,11 +13,14 @@ namespace CSharpE.Extensions.Actor
     {
         public void Process(Syntax.Project project)
         {
-            project.ForEachTypeWithAttribute<ActorAttribute>(type =>
+            project.ForEachTypeWithAttribute<ActorAttribute>(baseType =>
             {
+                if (!(baseType is TypeDefinition type))
+                    return;
+
                 var actorSemaphoreField = type.AddField(ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
 
-                Expression actorSemaphoreFieldExpression = actorSemaphoreField;
+                Expression actorSemaphoreFieldExpression = MemberAccess(This(), actorSemaphoreField);
 
                 type.ForEachPublicMethod(actorSemaphoreFieldExpression, (asf, method) =>
                 {

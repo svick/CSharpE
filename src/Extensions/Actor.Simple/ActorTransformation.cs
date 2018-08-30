@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpE.Syntax;
@@ -13,9 +14,12 @@ namespace CSharpE.Extensions.Actor
     {
         public void Process(Syntax.Project project)
         {
-            foreach (var type in project.GetTypesWithAttribute<ActorAttribute>())
+            foreach (var type in project.GetTypesWithAttribute<ActorAttribute>().OfType<TypeDefinition>())
             {
-                var actorSemaphoreField = type.AddField(ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
+                var actorSemaphoreField = type.AddField(
+                    ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
+
+                Expression actorSemaphoreFieldExpression = MemberAccess(This(), actorSemaphoreField);
 
                 foreach (var method in type.PublicMethods)
                 {
@@ -24,8 +28,8 @@ namespace CSharpE.Extensions.Actor
 
                     method.Body = new Statement[]
                     {
-                        Await(Call(actorSemaphoreField, "WaitAsync")),
-                        TryFinally(method.Body, new Statement[] { Call(actorSemaphoreField, "Release") })
+                        Await(Call(actorSemaphoreFieldExpression, "WaitAsync")),
+                        TryFinally(method.Body, new Statement[] { Call(actorSemaphoreFieldExpression, "Release") })
                     };
                 }
             }

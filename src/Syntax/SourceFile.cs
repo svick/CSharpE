@@ -74,9 +74,9 @@ namespace CSharpE.Syntax
             }
         }
 
-        public IEnumerable<TypeDefinition> GetTypes()
+        public IEnumerable<BaseTypeDefinition> GetTypes()
         {
-            IEnumerable<TypeDefinition> GetTypes(NamespaceOrTypeDefinition container)
+            IEnumerable<BaseTypeDefinition> GetTypes(NamespaceOrTypeDefinition container)
             {
                 if (container.IsNamespace)
                 {
@@ -91,17 +91,20 @@ namespace CSharpE.Syntax
             return Members.SelectMany(GetTypes);
         }
 
-        public IEnumerable<TypeDefinition> GetAllTypes()
+        public IEnumerable<BaseTypeDefinition> GetAllTypes()
         {
-            IEnumerable<TypeDefinition> GetAllTypes(TypeDefinition type)
+            IEnumerable<BaseTypeDefinition> GetAllTypes(BaseTypeDefinition type)
             {
                 yield return type;
 
-                foreach (var directType in type.Types)
+                if (type is TypeDefinition typeDefinition)
                 {
-                    foreach (var indirectType in GetAllTypes(directType))
+                    foreach (var directType in typeDefinition.Types)
                     {
-                        yield return indirectType;
+                        foreach (var indirectType in GetAllTypes(directType))
+                        {
+                            yield return indirectType;
+                        }
                     }
                 }
             }
@@ -109,7 +112,7 @@ namespace CSharpE.Syntax
             return GetTypes().SelectMany(GetAllTypes);
         }
 
-        public IEnumerable<TypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute
+        public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute
         {
             foreach (var type in GetTypes())
             {

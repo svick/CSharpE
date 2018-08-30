@@ -40,7 +40,7 @@ namespace CSharpE.Syntax.Tests
         {
             var file = new SourceFile("C.cse", @"class C { Foo.Bar f; }");
             new Project(file);
-            var field = file.GetTypes().Single().Fields.Single();
+            var field = file.GetTypes().OfType<TypeDefinition>().Single().Fields.Single();
             var type = (NamedTypeReference)field.Type;
 
             Assert.Equal("Bar", type.Name);
