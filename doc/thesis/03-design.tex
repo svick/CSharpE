@@ -8,7 +8,31 @@ As explained in the previous chapter, this system has two main tasks: representi
 
 The \cs{CSharpE.Syntax} namespace contains all the types necessary for representing and modifying C\# code starting from the project level and going down all the way to the expression level. There is no representation for solutions, because extensions work at the project level, which means solutions are not necessary.
 
-\todo{explain laziness and other non-API designs?}
+Listing~\ref{syntax-types} shows inheritance hierarchy of this namespace.
+
+\begin{listing}
+
+\dirtree{%
+.1 .
+.2 Project.
+.2 NamespaceOrTypeDefinition.
+.2 SyntaxNode.
+.3 SourceFile.
+.3 NamespaceDefition.
+.3 MemberDefinition.
+.4 BaseTypeDefinition.
+.5 TypeDefinition.
+.6 ClassDefinition.
+.6 StructDefinition.
+.6 InterfaceDefinition.
+.5 EnumDefinition.
+.5 DelegateDefinition.
+}
+
+\caption{Inheritance hierarchy of commonly used types in the \cs{CSharpE.Syntax} namespace}
+\label{syntax-types}
+
+\end{listing}
 
 \subsection{General principles}
 
