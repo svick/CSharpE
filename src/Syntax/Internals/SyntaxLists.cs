@@ -25,12 +25,10 @@ namespace CSharpE.Syntax.Internals
 
         protected override NamespaceOrTypeDefinition CreateWrapper(MemberDeclarationSyntax roslynSyntax)
         {
-            switch (roslynSyntax)
-            {
-                case NamespaceDeclarationSyntax ns: return new NamespaceDefinition(ns);
-                case TypeDeclarationSyntax type: return new TypeDefinition(type, Parent);
-                default: throw new InvalidOperationException();
-            }
+            if (roslynSyntax is NamespaceDeclarationSyntax ns)
+                return new NamespaceDefinition(ns, Parent);
+
+            return FromRoslyn.TypeDefinition(roslynSyntax, Parent);
         }
     }
 

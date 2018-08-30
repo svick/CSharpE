@@ -66,15 +66,43 @@ namespace CSharpE.Syntax.Internals
         {
             switch (memberDeclarationSyntax)
             {
-                case FieldDeclarationSyntax fieldDeclarationSyntax:
-                    return new FieldDefinition(fieldDeclarationSyntax, containingType);
-                case MethodDeclarationSyntax methodDeclarationSyntax:
-                    return new MethodDefinition(methodDeclarationSyntax, containingType);
-                case ClassDeclarationSyntax classDeclarationSyntax:
-                    return new TypeDefinition(classDeclarationSyntax, containingType);
+                case FieldDeclarationSyntax fieldDeclaration:
+                    return new FieldDefinition(fieldDeclaration, containingType);
+                case MethodDeclarationSyntax methodDeclaration:
+                    return new MethodDefinition(methodDeclaration, containingType);
+                case BaseTypeDeclarationSyntax baseTypeDeclaration:
+                    return TypeDefinition(baseTypeDeclaration, containingType);
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public static BaseTypeDefinition TypeDefinition(MemberDeclarationSyntax memberDeclarationSyntax, SyntaxNode parent)
+        {
+            switch (memberDeclarationSyntax)
+            {
+                case DelegateDeclarationSyntax delegateDeclaration:
+                    return new DelegateDefinition(delegateDeclaration, parent);
+                case BaseTypeDeclarationSyntax baseTypeDeclaration:
+                    return TypeDefinition(baseTypeDeclaration, parent);
+            }
+            throw new InvalidOperationException();
+        }
+
+        public static BaseTypeDefinition TypeDefinition(BaseTypeDeclarationSyntax typeDeclarationSyntax, SyntaxNode parent)
+        {
+            switch (typeDeclarationSyntax)
+            {
+                case ClassDeclarationSyntax classDeclaration:
+                    return new ClassDefinition(classDeclaration, parent);
+                case StructDeclarationSyntax structDeclaration:
+                    return new StructDefinition(structDeclaration, parent);
+                case InterfaceDeclarationSyntax interfaceDeclaration:
+                    return new InterfaceDefinition(interfaceDeclaration, parent);
+                case EnumDeclarationSyntax enumDeclaration:
+                    return new EnumDefinition(enumDeclaration, parent);
+            }
+            throw new InvalidOperationException();
         }
 
         public static TypeReference TypeReference(TypeSyntax typeSyntax, SyntaxNode parent)

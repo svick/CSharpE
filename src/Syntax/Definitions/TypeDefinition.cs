@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class TypeDefinition : BaseTypeDefinition, ISyntaxWrapper<TypeDeclarationSyntax>
+    public abstract class TypeDefinition : BaseTypeDefinition, ISyntaxWrapper<TypeDeclarationSyntax>
     {
         private TypeDeclarationSyntax syntax;
         
@@ -93,6 +95,8 @@ namespace CSharpE.Syntax
 
         private protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
 
+        private protected abstract SyntaxKind KeywordKind { get; }
+
         internal TypeDeclarationSyntax GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
@@ -104,8 +108,11 @@ namespace CSharpE.Syntax
 
             if (syntax == null || AttributesChanged() || thisChanged == true || !IsAnnotated(syntax))
             {
-                var newSyntax = CSharpSyntaxFactory.ClassDeclaration(
-                    GetNewAttributes(), default, newName, default, default, default, newMembers);
+                var newSyntax = CSharpSyntaxFactory.TypeDeclaration(
+                    SyntaxFacts.GetTypeDeclarationKind(KeywordKind), GetNewAttributes(), default,
+                    CSharpSyntaxFactory.Token(KeywordKind), newName, default, default, default,
+                    CSharpSyntaxFactory.Token(OpenBraceToken), newMembers, CSharpSyntaxFactory.Token(CloseBraceToken),
+                    default);
 
                 syntax = Annotate(newSyntax);
 
@@ -132,5 +139,38 @@ namespace CSharpE.Syntax
         {
             throw new NotImplementedException();
         }
+    }
+
+    public sealed class ClassDefinition : TypeDefinition, ISyntaxWrapper<ClassDeclarationSyntax>
+    {
+        internal ClassDefinition(ClassDeclarationSyntax classDeclarationSyntax, SyntaxNode parent)
+            : base(classDeclarationSyntax, parent) { }
+
+        private protected override SyntaxKind KeywordKind => ClassKeyword;
+
+        ClassDeclarationSyntax ISyntaxWrapper<ClassDeclarationSyntax>.GetWrapped(ref bool? changed) =>
+            (ClassDeclarationSyntax)GetWrapped(ref changed);
+    }
+
+    public sealed class StructDefinition : TypeDefinition, ISyntaxWrapper<StructDeclarationSyntax>
+    {
+        internal StructDefinition(StructDeclarationSyntax structDeclarationSyntax, SyntaxNode parent)
+            : base(structDeclarationSyntax, parent) { }
+
+        private protected override SyntaxKind KeywordKind => StructKeyword;
+
+        StructDeclarationSyntax ISyntaxWrapper<StructDeclarationSyntax>.GetWrapped(ref bool? changed) =>
+            (StructDeclarationSyntax)GetWrapped(ref changed);
+    }
+
+    public sealed class InterfaceDefinition : TypeDefinition, ISyntaxWrapper<InterfaceDeclarationSyntax>
+    {
+        internal InterfaceDefinition(InterfaceDeclarationSyntax interfaceDeclarationSyntax, SyntaxNode parent)
+            : base(interfaceDeclarationSyntax, parent) { }
+
+        private protected override SyntaxKind KeywordKind => InterfaceKeyword;
+
+        InterfaceDeclarationSyntax ISyntaxWrapper<InterfaceDeclarationSyntax>.GetWrapped(ref bool? changed) =>
+            (InterfaceDeclarationSyntax)GetWrapped(ref changed);
     }
 }

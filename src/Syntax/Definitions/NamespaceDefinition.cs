@@ -11,7 +11,7 @@ namespace CSharpE.Syntax
         private SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax> members;
         public IList<NamespaceOrTypeDefinition> Members => members;
 
-        public NamespaceDefinition(NamespaceDeclarationSyntax ns)
+        public NamespaceDefinition(NamespaceDeclarationSyntax ns, SyntaxNode parent)
         {
             throw new System.NotImplementedException();
         }
