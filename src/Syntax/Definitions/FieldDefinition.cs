@@ -14,7 +14,7 @@ namespace CSharpE.Syntax
         private const MemberModifiers ValidFieldModifiers =
             AccessModifiersMask | New | Static | Unsafe | Const | ReadOnly | Volatile;
 
-        protected override void ValidateModifiers(MemberModifiers value)
+        private protected override void ValidateModifiers(MemberModifiers value)
         {
             var invalidModifiers = value & ~ValidFieldModifiers;
             if (invalidModifiers != 0)
@@ -23,7 +23,7 @@ namespace CSharpE.Syntax
 
         private FieldDeclarationSyntax syntax;
 
-        protected override SyntaxList<AttributeListSyntax> GetSyntaxAttributes() => syntax?.AttributeLists ?? default;
+        private protected override MemberDeclarationSyntax Syntax => syntax;
 
         private TypeReference type;
         public TypeReference Type
@@ -126,7 +126,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
+        private protected override MemberDeclarationSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
 
         FieldDeclarationSyntax ISyntaxWrapper<FieldDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);

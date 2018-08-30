@@ -18,7 +18,7 @@ namespace CSharpE.Syntax
             {
                 if (attributes == null)
                 {
-                    attributes = (from attributeList in GetSyntaxAttributes()
+                    attributes = (from attributeList in GetAttributeLists(Syntax)
                         from attribute in attributeList.Attributes
                         select new Attribute(attribute, this)).ToList();
                 }
@@ -28,23 +28,23 @@ namespace CSharpE.Syntax
             set => attributes = value.ToList();
         }
 
-        protected abstract SyntaxList<AttributeListSyntax> GetSyntaxAttributes();
+        private protected abstract MemberDeclarationSyntax Syntax { get; }
 
-        protected bool AttributesChanged()
+        private protected bool AttributesChanged()
         {
             if (attributes == null)
                 return false;
 
             var newAttributes = attributes.Select(a => a.GetWrapped());
-            var oldAttributes = GetSyntaxAttributes().SelectMany(al => al.Attributes);
+            var oldAttributes = GetAttributeLists(Syntax).SelectMany(al => al.Attributes);
 
             return !newAttributes.SequenceEqual(oldAttributes);
         }
 
-        protected SyntaxList<AttributeListSyntax> GetNewAttributes()
+        private protected SyntaxList<AttributeListSyntax> GetNewAttributes()
         {
             if (attributes == null)
-                return GetSyntaxAttributes();
+                return GetAttributeLists(Syntax);
 
             return CSharpSyntaxFactory.List(
                 attributes.Select(
@@ -52,7 +52,7 @@ namespace CSharpE.Syntax
                         CSharpSyntaxFactory.SingletonSeparatedList(a.GetWrapped()))));
         }
 
-        protected void ResetAttributes() => attributes = null;
+        private protected void ResetAttributes() => attributes = null;
 
         public bool HasAttribute<T>() => HasAttribute(typeof(T));
 
@@ -102,11 +102,11 @@ namespace CSharpE.Syntax
             }
         }
 
-        protected abstract void ValidateModifiers(MemberModifiers modifiers);
+        private protected abstract void ValidateModifiers(MemberModifiers modifiers);
 
         MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrappedImpl(ref changed);
 
-        protected abstract MemberDeclarationSyntax GetWrappedImpl(ref bool? changed);
+        private protected abstract MemberDeclarationSyntax GetWrappedImpl(ref bool? changed);
     }
 }

@@ -27,7 +27,7 @@ namespace CSharpE.Syntax
             name = new Identifier(methodDeclarationSyntax.Identifier);
         }
 
-        protected override SyntaxList<AttributeListSyntax> GetSyntaxAttributes() => syntax?.AttributeLists ?? default;
+        private protected override MemberDeclarationSyntax Syntax => syntax;
 
         #region Modifiers
 
@@ -35,11 +35,11 @@ namespace CSharpE.Syntax
             AccessModifiersMask | New | Static | Unsafe | Abstract | Sealed | Virtual | Override | Extern | Partial |
             Async;
 
-        protected override void ValidateModifiers(MemberModifiers value)
+        private protected override void ValidateModifiers(MemberModifiers value)
         {
             var invalidModifiers = value & ~ValidMethodModifiers;
             if (invalidModifiers != 0)
-                throw new ArgumentException(nameof(value), $"The modifiers {invalidModifiers} are not valid for a method.");
+                throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a method.", nameof(value));
         }
 
         public MemberModifiers Accessibility
@@ -194,7 +194,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
+        private protected override MemberDeclarationSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
 
         MethodDeclarationSyntax ISyntaxWrapper<MethodDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -22,10 +21,12 @@ namespace CSharpE.Syntax
         private void Init(TypeDeclarationSyntax typeDeclarationSyntax)
         {
             syntax = typeDeclarationSyntax;
+
             name = new Identifier(syntax.Identifier);
+            Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
         }
 
-        protected override SyntaxList<AttributeListSyntax> GetSyntaxAttributes() => syntax?.AttributeLists ?? default;
+        private protected override MemberDeclarationSyntax Syntax => syntax;
 
         private MemberList members;
         private MemberList MembersList
@@ -90,7 +91,7 @@ namespace CSharpE.Syntax
         // TODO: namespace
         public NamedTypeReference GetReference() => new NamedTypeReference(null, Name);
 
-        protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
+        private protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
 
         internal TypeDeclarationSyntax GetWrapped(ref bool? changed)
         {
@@ -114,7 +115,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override MemberDeclarationSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
+        private protected override MemberDeclarationSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
 
         TypeDeclarationSyntax ISyntaxWrapper<TypeDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);
