@@ -44,7 +44,7 @@ The \cs{Project} class is also point of interoperation between this \ac{API} and
 
 Each C\# source file in the project is represented as an instance of the \cs{SourceFile} class. A source file has name, text and a list of members, which are namespace and type definitions.
 
-The object-oriented way to model this list would be to have a common base class or interface shared by \cs{NamespaceDefition} and \cs{TypeDefinition} and use that for items in the list. But because namespace and type definitions do not share many members and there are only two of them, it is likely users would write code specific to each of the two. For this reason, the list instead contains instances of a \cs{struct} named \cs{NamespaceOrTypeDefinition}, which is effectively a discriminated union of the two types. This is an approach common in functional programming.
+The object-oriented way to model this list would be to have a common base class or interface shared by \cs{NamespaceDefition} and \cs{BaseTypeDefinition} (see next section) and use that for items in the list. But because namespace and type definitions do not share many members and there are only two of them, it is likely users would write code specific to each of the two. For this reason, the list instead contains instances of a \cs{struct} named \cs{NamespaceOrTypeDefinition}, which is effectively a discriminated union of the two types. This is an approach common in functional programming.
 
 Since this design is not very user-friendly, it is worth considering other options. One of them would be not having namespace definitions part of the syntax tree, but instead make namespace a property of type definition, which is how namespaces are represented in \ac{IL} and Reflection. The main issue with this approach is that it would diverge too much from the structure of C\# code, which could be confusing to users. For this reason, this option was not chosen.
 
@@ -52,7 +52,15 @@ Notice that \cs{using} directives are not exposed in the \ac{API} at all, becaus
 
 \subsection{Types}
 
+The types that can be declared in C\# are classes, structs, interfaces, enums and delegates. Classes, structs and interfaces are very similar in that all three can be generic, have a list of base types and have various members. Also, especially when it comes to classes and structs, it could make sense fairly often to manipulate them in the same way. 
+
+This means that a reasonable design would be to have the types for classes, structs and interfaces inherit from a common base class and this base class, along with the types for enums and delegates, should inherit from another base class. The problem with this design is naming: there is no established name that would apply to classes, structs and interfaces, but not to enums and delegates. For this reason, the names chosen for the two base classes are \cs{TypeDefinition} and \cs{BaseTypeDefinition}.
+
+\todo{allowed modifiers and members}
+
 \subsection{Members}
+
+\todo{incl. design of modifiers}
 
 \subsection{Statements}
 
@@ -62,6 +70,6 @@ Notice that \cs{using} directives are not exposed in the \ac{API} at all, becaus
 
 \section{CSharpE.Transform}
 
-\label{no-parent}
+\todo{Not just API!}
 
-Not just API!
+\label{no-parent}
