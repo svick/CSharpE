@@ -5,7 +5,7 @@ using CSharpE.TestUtilities;
 using CSharpE.Transform;
 using Microsoft.CodeAnalysis.CSharp.UnitTests;
 using Xunit;
-using static CSharpE.TestUtilities.TestUtils;
+using static CSharpE.TestUtilities.TransformTestUtils;
 
 namespace CSharpE.Actor.Lazy.Tests
 {

@@ -6,7 +6,7 @@ using static System.Text.RegularExpressions.RegexOptions;
 
 namespace CSharpE.TestUtilities
 {
-    public static class TestUtils
+    public static class TransformTestUtils
     {
         public static string ProcessSingleFile(string code, ITransformation transformation, params Type[] additionalReferencesRepresentatives)
         {

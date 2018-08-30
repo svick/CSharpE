@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax;
 using Xunit;
-using static CSharpE.TestUtilities.TestUtils;
+using static CSharpE.TestUtilities.TransformTestUtils;
 
 namespace CSharpE.Transform.Tests
 {

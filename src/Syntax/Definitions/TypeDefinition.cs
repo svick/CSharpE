@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static CSharpE.Syntax.MemberModifiers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -93,7 +94,15 @@ namespace CSharpE.Syntax
         // TODO: namespace
         public NamedTypeReference GetReference() => new NamedTypeReference(null, Name);
 
-        private protected override void ValidateModifiers(MemberModifiers modifiers) => throw new NotImplementedException();
+        private const MemberModifiers ValidModifiers =
+            AccessModifiersMask | New | Abstract | Sealed | Static | Unsafe | Partial;
+
+        private protected override void ValidateModifiers(MemberModifiers value)
+        {
+            var invalidModifiers = value & ~ValidModifiers;
+            if (invalidModifiers != 0)
+                throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a type.", nameof(value));
+        }
 
         private protected abstract SyntaxKind KeywordKind { get; }
 

@@ -84,8 +84,14 @@ namespace CSharpE.Syntax
         {
             switch (syntax)
             {
-                case BaseTypeDeclarationSyntax typeSyntax:
-                    return typeSyntax.AttributeLists;
+                case null:
+                    return default;
+                case BaseFieldDeclarationSyntax fieldDeclaration:
+                    return fieldDeclaration.AttributeLists;
+                case BaseMethodDeclarationSyntax methodDeclaration:
+                    return methodDeclaration.AttributeLists;
+                case BaseTypeDeclarationSyntax typeDeclaration:
+                    return typeDeclaration.AttributeLists;
             }
 
             throw new NotImplementedException();

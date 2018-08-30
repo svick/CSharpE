@@ -11,12 +11,12 @@ namespace CSharpE.Syntax
 {
     public sealed class FieldDefinition : MemberDefinition, ISyntaxWrapper<FieldDeclarationSyntax>
     {
-        private const MemberModifiers ValidFieldModifiers =
+        private const MemberModifiers ValidModifiers =
             AccessModifiersMask | New | Static | Unsafe | Const | ReadOnly | Volatile;
 
         private protected override void ValidateModifiers(MemberModifiers value)
         {
-            var invalidModifiers = value & ~ValidFieldModifiers;
+            var invalidModifiers = value & ~ValidModifiers;
             if (invalidModifiers != 0)
                 throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a field.", nameof(value));
         }
