@@ -50,7 +50,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override StatementSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
+        protected override StatementSyntax GetWrappedStatement(ref bool? changed) => GetWrapped(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

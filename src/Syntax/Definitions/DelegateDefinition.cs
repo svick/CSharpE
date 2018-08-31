@@ -74,7 +74,7 @@ namespace CSharpE.Syntax
             throw new System.NotImplementedException();
         }
 
-        private protected override MemberDeclarationSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
+        private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) => GetWrapped(ref changed);
 
         DelegateDeclarationSyntax ISyntaxWrapper<DelegateDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);

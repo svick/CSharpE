@@ -129,7 +129,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        private protected override MemberDeclarationSyntax GetWrappedImpl(ref bool? changed) => GetWrapped(ref changed);
+        private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) => GetWrapped(ref changed);
 
         FieldDeclarationSyntax ISyntaxWrapper<FieldDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);

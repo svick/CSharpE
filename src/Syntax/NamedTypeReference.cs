@@ -230,7 +230,7 @@ namespace CSharpE.Syntax
 
         public static implicit operator IdentifierExpression(NamedTypeReference typeReference) => new IdentifierExpression(typeReference.Name);
 
-        protected override TypeSyntax GetWrappedImpl(ref bool? changed)
+        protected override TypeSyntax GetWrappedType(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 

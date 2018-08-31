@@ -11,9 +11,9 @@ namespace CSharpE.Syntax
 
         TypeSyntax ISyntaxWrapper<TypeSyntax>.GetWrapped(ref bool? changed) => GetWrapped(ref changed);
 
-        internal TypeSyntax GetWrapped(ref bool? changed) => GetWrappedImpl(ref changed);
+        internal TypeSyntax GetWrapped(ref bool? changed) => GetWrappedType(ref changed);
 
-        protected abstract TypeSyntax GetWrappedImpl(ref bool? changed);
+        protected abstract TypeSyntax GetWrappedType(ref bool? changed);
 
         internal abstract StringBuilder ComputeFullName(StringBuilder stringBuilder);
     }
