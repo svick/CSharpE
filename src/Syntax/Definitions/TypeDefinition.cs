@@ -39,6 +39,24 @@ namespace CSharpE.Syntax
 
         private protected override MemberDeclarationSyntax Syntax => syntax;
 
+        public bool IsNew
+        {
+            get => Modifiers.Contains(New);
+            set => Modifiers = Modifiers.With(New, value);
+        }
+
+        public bool IsUnsafe
+        {
+            get => Modifiers.Contains(Unsafe);
+            set => Modifiers = Modifiers.With(Unsafe, value);
+        }
+
+        public bool IsPartial
+        {
+            get => Modifiers.Contains(Partial);
+            set => Modifiers = Modifiers.With(Partial, value);
+        }
+
         private MemberList members;
         private MemberList MembersList
         {
@@ -171,6 +189,24 @@ namespace CSharpE.Syntax
             var invalidModifiers = value & ~ValidModifiers;
             if (invalidModifiers != 0)
                 throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a class.", nameof(value));
+        }
+
+        public bool IsAbstract
+        {
+            get => Modifiers.Contains(Abstract);
+            set => Modifiers = Modifiers.With(Abstract, value);
+        }
+
+        public bool IsSealed
+        {
+            get => Modifiers.Contains(Sealed);
+            set => Modifiers = Modifiers.With(Sealed, value);
+        }
+
+        public bool IsStatic
+        {
+            get => Modifiers.Contains(Static);
+            set => Modifiers = Modifiers.With(Static, value);
         }
 
         ClassDeclarationSyntax ISyntaxWrapper<ClassDeclarationSyntax>.GetWrapped(ref bool? changed) =>

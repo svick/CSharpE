@@ -41,18 +41,6 @@ namespace CSharpE.Syntax
                 throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a method.", nameof(value));
         }
 
-        public MemberModifiers Accessibility
-        {
-            get => Modifiers.Accessibility();
-            set => Modifiers = Modifiers.WithAccessibilityModifier(value);
-        }
-
-        public bool IsPublic => Accessibility == Public;
-        public bool IsProtected => Accessibility == Protected;
-        public bool IsInternal => Accessibility == Internal;
-        public bool IsPrivate => Accessibility == Private;
-        public bool IsProtectedInternal => Accessibility == ProtectedInternal;
-
         public bool IsNew
         {
             get => Modifiers.Contains(New);
