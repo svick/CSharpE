@@ -50,7 +50,7 @@ Syntax nodes can be deep cloned by calling the \cs{Clone} method, which is a gen
 
 \item Collections of nodes are usually exposed as \cs{IList<T>}. This interface is the most flexible out of the commonly used collection interfaces in .NET. Using an interface means that the user is shielded from the implementation detail of which specific collection type is used.
 
-\item The \ac{API} includes implicit conversion operators when appropriate. Specifically, they can be used to convert from a definition to a reference (e.g. from \cs{TypeDefinition} to \cs{IdentifierExpression} \linebreak[0] \todo[inline, inlinewidth=7.75cm, noinlinepar]{why not \cs{NamedTypeReference}?}) or from a node to a simple wrapper for that node (e.g. from \cs{Expression} to \cs{ExpressionStatement}).
+\item The \ac{API} includes implicit conversion operators when appropriate. Specifically, they can be used to convert from a definition to a reference (e.g. from \cs{TypeDefinition} to \cs{IdentifierExpression} \linebreak[0] \todo[inlinewidth=7.75cm, noinlinepar]{why not \cs{NamedTypeReference}?}) or from a node to a simple wrapper for that node (e.g. from \cs{Expression} to \cs{ExpressionStatement}).
 
 Using implicit conversions makes code shorter, but also harder to understand, because it is an operation that is not visible in the code. For this reason, all implicit conversion operators have an alternative form, usually a constructor of the target type.
 
@@ -76,15 +76,17 @@ Notice that \cs{using} directives are not exposed in the \ac{API} at all, becaus
 
 \subsection{Types}
 
-The types that can be declared in C\# are classes, structs, interfaces, enums and delegates. Classes, structs and interfaces are very similar in that all three can be generic, have a list of base types and have various members. Also, especially when it comes to classes and structs, it could make sense fairly often to manipulate them in the same way. 
+The types that can be defined in C\# are classes, structs, interfaces, enums and delegates. Classes, structs and interfaces are very similar in that all three can be generic, have a list of base types and have various members. Also, especially when it comes to classes and structs, it could make sense fairly often to manipulate them in the same way. 
 
 This means that a reasonable design would be to have the types for classes, structs and interfaces inherit from a common base class and this base class, along with the types for enums and delegates, should inherit from another base class. The problem with this design is naming: there is no established name that would apply to classes, structs and interfaces, but not to enums and delegates. For this reason, the names chosen for the two base classes are \cs{TypeDefinition} and \cs{BaseTypeDefinition}.
 
-\todo{allowed members}
-
 \subsection{Members}
 
-\todo{incl. design of modifiers}
+Class, struct and interface definitions can contain various kinds of members, namely fields, methods, properties, events, indexers, operators, constructors, destructors (also known as finalizers) and nested type definitions. Not all kinds of members are valid for all three kinds of types, but since invalid members might be useful to some extensions, the \ac{API} still allows them.
+
+All kinds of members can have modifiers. While in source, member modifiers can be defined in different order (for example, both \cs{public static} and \cs{static public} are valid modifiers for a method), this order does not make a difference. For this reason, this \ac{API} represents all modifiers using a single flags enum, \cs{MemberModifiers}. 
+
+Because manipulating flags enums using bitwise operators can be cumbersome, the \ac{API} also includes helper read-write properties for most valid modifiers for each kind of member. The exception to this are access modifiers. Because a member can have only one kind of declared accessibility (which includes all the access modifiers on their own and also the combinations \cs{protected internal} and \cs{private protected}), access modifiers are surfaced as a read-write property named \cs{Accessibility}, along with a read-only property for each kind of declared accessibility.
 
 \subsection{Statements}
 
