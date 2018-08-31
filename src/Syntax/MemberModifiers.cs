@@ -14,11 +14,12 @@ namespace CSharpE.Syntax
         None      = 0b0000_0000_0000_0000_0000,
 
         // Access modifiers
-        Public    = 0b0000_0000_0000_0000_0001,
+        Private   = 0b0000_0000_0000_0000_0001,
         Protected = 0b0000_0000_0000_0000_0010,
         Internal  = 0b0000_0000_0000_0000_0100,
-        Private   = 0b0000_0000_0000_0000_1000,
+        Public    = 0b0000_0000_0000_0000_1000,
         ProtectedInternal = Protected | Internal,
+        PrivateProtected = Private | Protected,
         AccessModifiersMask = Public | Protected | Internal | Private,
 
         // Common modifiers
@@ -68,10 +69,10 @@ namespace CSharpE.Syntax
         internal static readonly BiDirectionalDictionary<MemberModifiers, SyntaxKind> ModifiersMapping =
             new BiDirectionalDictionary<MemberModifiers, SyntaxKind>
             {
-                { Public, PublicKeyword },
+                { Private, PrivateKeyword },
                 { Protected, ProtectedKeyword },
                 { Internal, InternalKeyword },
-                { Private, PrivateKeyword },
+                { Public, PublicKeyword },
                 { New, NewKeyword },
                 { Static, StaticKeyword },
                 { Unsafe, UnsafeKeyword },

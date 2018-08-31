@@ -122,6 +122,7 @@ namespace CSharpE.Syntax
         public bool IsInternal => Accessibility == Internal;
         public bool IsPrivate => Accessibility == Private;
         public bool IsProtectedInternal => Accessibility == ProtectedInternal;
+        public bool IsPrivateProtected => Accessibility == PrivateProtected;
 
         MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrappedImpl(ref changed);
