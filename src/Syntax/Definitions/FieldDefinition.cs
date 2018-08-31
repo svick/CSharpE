@@ -96,6 +96,9 @@ namespace CSharpE.Syntax
             Initializer = initializer;
         }
 
+        public FieldDefinition(TypeReference type, string name, Expression initializer = null)
+            : this(None, type, name, initializer) { }
+
         internal FieldDeclarationSyntax GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);

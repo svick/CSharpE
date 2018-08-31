@@ -42,34 +42,5 @@ interface I
             Assert.Equal(MemberModifiers.Static, method.Modifiers);
             Assert.Equal("System.Void", method.ReturnType.ToString());
         }
-
-        [Fact]
-        public void StructsCanHaveInvalidModifiers()
-        {
-
-            string code = @"
-abstract struct S0 {}
-static struct S1 {}
-sealed struct S2 {}";
-
-            var file = new SourceFile("S.cs", code);
-
-            var structDefinitions = file.Members.Select(ntd => ntd.GetTypeDefinition()).Cast<StructDefinition>().ToList();
-
-            var struct0 = structDefinitions[0];
-
-            Assert.Equal("S0", struct0.Name);
-            Assert.Equal(MemberModifiers.Abstract, struct0.Modifiers);
-
-            var struct1 = structDefinitions[1];
-
-            Assert.Equal("S1", struct1.Name);
-            Assert.Equal(MemberModifiers.Static, struct1.Modifiers);
-
-            var struct2 = structDefinitions[2];
-
-            Assert.Equal("S2", struct2.Name);
-            Assert.Equal(MemberModifiers.Sealed, struct2.Modifiers);
-        }
     }
 }

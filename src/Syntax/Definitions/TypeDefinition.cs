@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -27,6 +28,13 @@ namespace CSharpE.Syntax
 
             name = new Identifier(syntax.Identifier);
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
+        }
+
+        public TypeDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+        {
+            Modifiers = modifiers;
+            Name = name;
+            Members = members?.ToList();
         }
 
         private protected override MemberDeclarationSyntax Syntax => syntax;
@@ -94,16 +102,6 @@ namespace CSharpE.Syntax
         // TODO: namespace
         public NamedTypeReference GetReference() => new NamedTypeReference(null, Name);
 
-        private const MemberModifiers ValidModifiers =
-            AccessModifiersMask | New | Abstract | Sealed | Static | Unsafe | Partial;
-
-        private protected override void ValidateModifiers(MemberModifiers value)
-        {
-            var invalidModifiers = value & ~ValidModifiers;
-            if (invalidModifiers != 0)
-                throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a type.", nameof(value));
-        }
-
         private protected abstract SyntaxKind KeywordKind { get; }
 
         internal TypeDeclarationSyntax GetWrapped(ref bool? changed)
@@ -112,13 +110,15 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
+            var newModifiers = Modifiers;
             var newName = name.GetWrapped(ref thisChanged);
             var newMembers = members?.GetWrapped(ref thisChanged) ?? syntax.Members;
 
-            if (syntax == null || AttributesChanged() || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || AttributesChanged() || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
+                thisChanged == true || !IsAnnotated(syntax))
             {
                 var newSyntax = CSharpSyntaxFactory.TypeDeclaration(
-                    SyntaxFacts.GetTypeDeclarationKind(KeywordKind), GetNewAttributes(), default,
+                    SyntaxFacts.GetTypeDeclarationKind(KeywordKind), GetNewAttributes(), newModifiers.GetWrapped(),
                     CSharpSyntaxFactory.Token(KeywordKind), newName, default, default, default,
                     CSharpSyntaxFactory.Token(OpenBraceToken), newMembers, CSharpSyntaxFactory.Token(CloseBraceToken),
                     default);
@@ -155,7 +155,23 @@ namespace CSharpE.Syntax
         internal ClassDefinition(ClassDeclarationSyntax classDeclarationSyntax, SyntaxNode parent)
             : base(classDeclarationSyntax, parent) { }
 
+        public ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+            : base(modifiers, name, members) { }
+
+        public ClassDefinition(string name, IEnumerable<MemberDefinition> members = null)
+            : this(MemberModifiers.None, name, members) { }
+
         private protected override SyntaxKind KeywordKind => ClassKeyword;
+
+        private const MemberModifiers ValidModifiers =
+            AccessModifiersMask | New | Abstract | Sealed | Static | Unsafe | Partial;
+
+        private protected override void ValidateModifiers(MemberModifiers value)
+        {
+            var invalidModifiers = value & ~ValidModifiers;
+            if (invalidModifiers != 0)
+                throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a class.", nameof(value));
+        }
 
         ClassDeclarationSyntax ISyntaxWrapper<ClassDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             (ClassDeclarationSyntax)GetWrapped(ref changed);
@@ -166,7 +182,22 @@ namespace CSharpE.Syntax
         internal StructDefinition(StructDeclarationSyntax structDeclarationSyntax, SyntaxNode parent)
             : base(structDeclarationSyntax, parent) { }
 
+        public StructDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+            : base(modifiers, name, members) { }
+
+        public StructDefinition(string name, IEnumerable<MemberDefinition> members = null)
+            : this(MemberModifiers.None, name, members) { }
+
         private protected override SyntaxKind KeywordKind => StructKeyword;
+
+        private const MemberModifiers ValidModifiers = AccessModifiersMask | New | Unsafe | Partial;
+
+        private protected override void ValidateModifiers(MemberModifiers value)
+        {
+            var invalidModifiers = value & ~ValidModifiers;
+            if (invalidModifiers != 0)
+                throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a struct.", nameof(value));
+        }
 
         StructDeclarationSyntax ISyntaxWrapper<StructDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             (StructDeclarationSyntax)GetWrapped(ref changed);
@@ -177,7 +208,22 @@ namespace CSharpE.Syntax
         internal InterfaceDefinition(InterfaceDeclarationSyntax interfaceDeclarationSyntax, SyntaxNode parent)
             : base(interfaceDeclarationSyntax, parent) { }
 
+        public InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+            : base(modifiers, name, members) { }
+
+        public InterfaceDefinition(string name, IEnumerable<MemberDefinition> members = null)
+            : this(MemberModifiers.None, name, members) { }
+
         private protected override SyntaxKind KeywordKind => InterfaceKeyword;
+
+        private const MemberModifiers ValidModifiers = AccessModifiersMask | New | Unsafe | Partial;
+
+        private protected override void ValidateModifiers(MemberModifiers value)
+        {
+            var invalidModifiers = value & ~ValidModifiers;
+            if (invalidModifiers != 0)
+                throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for an interface.", nameof(value));
+        }
 
         InterfaceDeclarationSyntax ISyntaxWrapper<InterfaceDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             (InterfaceDeclarationSyntax)GetWrapped(ref changed);
