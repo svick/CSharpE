@@ -37,7 +37,7 @@ namespace CSharpE.Syntax
             Members = members?.ToList();
         }
 
-        private protected override MemberDeclarationSyntax Syntax => syntax;
+        private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 
         public bool IsNew
         {

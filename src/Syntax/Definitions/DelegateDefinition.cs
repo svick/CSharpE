@@ -62,7 +62,7 @@ namespace CSharpE.Syntax
             throw new System.NotImplementedException();
         }
 
-        private protected override MemberDeclarationSyntax Syntax => syntax;
+        private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 
         private protected override void ValidateModifiers(MemberModifiers modifiers)
         {

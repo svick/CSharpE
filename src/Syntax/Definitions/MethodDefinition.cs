@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
@@ -8,7 +7,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class MethodDefinition : MemberDefinition, ISyntaxWrapper<MethodDeclarationSyntax>
+    public sealed class MethodDefinition : BaseMethodDefinition, ISyntaxWrapper<MethodDeclarationSyntax>
     {
         private MethodDeclarationSyntax syntax;
 
@@ -26,7 +25,7 @@ namespace CSharpE.Syntax
             name = new Identifier(methodDeclarationSyntax.Identifier);
         }
 
-        private protected override MemberDeclarationSyntax Syntax => syntax;
+        private protected override BaseMethodDeclarationSyntax BaseMethodSyntax => syntax;
 
         #region Modifiers
 
@@ -53,12 +52,6 @@ namespace CSharpE.Syntax
             set => Modifiers = Modifiers.With(Static, value);
         }
 
-        public bool IsUnsafe
-        {
-            get => Modifiers.Contains(Unsafe);
-            set => Modifiers = Modifiers.With(Unsafe, value);
-        }
-
         public bool IsAbstract
         {
             get => Modifiers.Contains(Abstract);
@@ -81,12 +74,6 @@ namespace CSharpE.Syntax
         {
             get => Modifiers.Contains(Override);
             set => Modifiers = Modifiers.With(Override, value);
-        }
-
-        public bool IsExtern
-        {
-            get => Modifiers.Contains(Extern);
-            set => Modifiers = Modifiers.With(Extern, value);
         }
 
         public bool IsPartial
@@ -123,35 +110,6 @@ namespace CSharpE.Syntax
             set => name.Text = value;
         }
 
-        private SeparatedSyntaxList<Parameter, ParameterSyntax> parameters;
-        public IList<Parameter> Parameters
-        {
-            get
-            {
-                if (parameters == null)
-                    parameters = new SeparatedSyntaxList<Parameter, ParameterSyntax>(
-                        syntax.ParameterList.Parameters, this);
-
-                return parameters;
-            }
-            set => SetList(ref parameters, new SeparatedSyntaxList<Parameter, ParameterSyntax>(value, this));
-        }
-
-        // TODO: methods without body and with expression body
-        private StatementList body;
-        public IList<Statement> Body
-        {
-            get
-            {
-                if (body == null)
-                    body = new StatementList(syntax.Body.Statements, this);
-
-                return body;
-            }
-            set => SetList(ref body, new StatementList(value, this));
-        }
-
-        public TypeDefinition ParentType { get; private set; }
 
         internal MethodDeclarationSyntax GetWrapped(ref bool? changed)
         {
@@ -181,7 +139,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) =>
+        private protected override BaseMethodDeclarationSyntax GetWrappedBaseMethod(ref bool? changed) =>
             GetWrapped(ref changed);
 
         MethodDeclarationSyntax ISyntaxWrapper<MethodDeclarationSyntax>.GetWrapped(ref bool? changed) =>
@@ -200,18 +158,6 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone()
         {
             throw new NotImplementedException();
-        }
-
-        internal override SyntaxNode Parent
-        {
-            get => ParentType;
-            set
-            {
-                if (value is TypeDefinition parentType)
-                    ParentType = parentType;
-                else
-                    throw new ArgumentException(nameof(value));
-            }
         }
     }
 }

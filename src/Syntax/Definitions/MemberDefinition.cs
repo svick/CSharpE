@@ -12,6 +12,8 @@ namespace CSharpE.Syntax
 {
     public abstract class MemberDefinition : SyntaxNode, ISyntaxWrapper<MemberDeclarationSyntax>
     {
+        private protected abstract MemberDeclarationSyntax MemberSyntax { get; }
+
         private List<Attribute> attributes;
         public IList<Attribute> Attributes
         {
@@ -19,7 +21,7 @@ namespace CSharpE.Syntax
             {
                 if (attributes == null)
                 {
-                    attributes = (from attributeList in GetAttributeLists(Syntax)
+                    attributes = (from attributeList in GetAttributeLists(MemberSyntax)
                         from attribute in attributeList.Attributes
                         select new Attribute(attribute, this)).ToList();
                 }
@@ -29,15 +31,13 @@ namespace CSharpE.Syntax
             set => attributes = value.ToList();
         }
 
-        private protected abstract MemberDeclarationSyntax Syntax { get; }
-
         private protected bool AttributesChanged()
         {
             if (attributes == null)
                 return false;
 
             var newAttributes = attributes.Select(a => a.GetWrapped());
-            var oldAttributes = GetAttributeLists(Syntax).SelectMany(al => al.Attributes);
+            var oldAttributes = GetAttributeLists(MemberSyntax).SelectMany(al => al.Attributes);
 
             return !newAttributes.SequenceEqual(oldAttributes);
         }
@@ -45,7 +45,7 @@ namespace CSharpE.Syntax
         private protected SyntaxList<AttributeListSyntax> GetNewAttributes()
         {
             if (attributes == null)
-                return GetAttributeLists(Syntax);
+                return GetAttributeLists(MemberSyntax);
 
             return CSharpSyntaxFactory.List(
                 attributes.Select(
@@ -123,6 +123,19 @@ namespace CSharpE.Syntax
         public bool IsPrivate => Accessibility == Private;
         public bool IsProtectedInternal => Accessibility == ProtectedInternal;
         public bool IsPrivateProtected => Accessibility == PrivateProtected;
+
+        private TypeDefinition parent;
+        internal override SyntaxNode Parent
+        {
+            get => parent;
+            set
+            {
+                if (value is TypeDefinition parentType)
+                    parent = parentType;
+                else
+                    throw new ArgumentException(nameof(value));
+            }
+        }
 
         MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrappedMember(ref changed);

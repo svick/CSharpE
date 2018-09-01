@@ -23,7 +23,7 @@ namespace CSharpE.Syntax
 
         private FieldDeclarationSyntax syntax;
 
-        private protected override MemberDeclarationSyntax Syntax => syntax;
+        private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 
         private TypeReference type;
         public TypeReference Type
@@ -145,18 +145,5 @@ namespace CSharpE.Syntax
         }
 
         internal override SyntaxNode Clone() => new FieldDefinition(Modifiers, Type, Name, Initializer);
-
-        private TypeDefinition parent;
-        internal override SyntaxNode Parent
-        {
-            get => parent;
-            set
-            {
-                if (value is TypeDefinition parentType)
-                    parent = parentType;
-                else
-                    throw new ArgumentException(nameof(value));
-            }
-        }
     }
 }
