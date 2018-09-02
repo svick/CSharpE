@@ -13,16 +13,13 @@ namespace CSharpE.Syntax
 
         public NamespaceDefinition(NamespaceDeclarationSyntax ns, SyntaxNode parent)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        internal NamespaceDeclarationSyntax GetWrapped(ref bool? changed)
+        NamespaceDeclarationSyntax ISyntaxWrapper<NamespaceDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
-
-        NamespaceDeclarationSyntax ISyntaxWrapper<NamespaceDeclarationSyntax>.GetWrapped(ref bool? changed) =>
-            GetWrapped(ref changed);
 
         private NamespaceDefinition parent;
         internal override SyntaxNode Parent

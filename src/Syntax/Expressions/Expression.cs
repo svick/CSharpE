@@ -8,8 +8,9 @@ namespace CSharpE.Syntax
         public static implicit operator ExpressionStatement(Expression expression) =>
             new ExpressionStatement(expression);
 
-        internal abstract ExpressionSyntax GetWrapped(ref bool? changed);
+        private protected abstract ExpressionSyntax GetWrappedExpression(ref bool? changed);
 
-        ExpressionSyntax ISyntaxWrapper<ExpressionSyntax>.GetWrapped(ref bool? changed) => GetWrapped(ref changed);
+        ExpressionSyntax ISyntaxWrapper<ExpressionSyntax>.GetWrapped(ref bool? changed) =>
+            GetWrappedExpression(ref changed);
     }
 }

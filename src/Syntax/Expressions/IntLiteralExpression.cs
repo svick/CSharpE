@@ -27,7 +27,7 @@ namespace CSharpE.Syntax
 
         protected override object ValueImpl => Value;
 
-        internal override ExpressionSyntax GetWrapped(ref bool? changed)
+        private protected override LiteralExpressionSyntax GetWrappedLiteral(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 

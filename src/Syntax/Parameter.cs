@@ -6,12 +6,10 @@ namespace CSharpE.Syntax
 {
     public class Parameter : SyntaxNode, ISyntaxWrapper<ParameterSyntax>
     {
-        internal ParameterSyntax GetWrapped(ref bool? changed)
+        ParameterSyntax ISyntaxWrapper<ParameterSyntax>.GetWrapped(ref bool? changed)
         {
             throw new System.NotImplementedException();
         }
-
-        ParameterSyntax ISyntaxWrapper<ParameterSyntax>.GetWrapped(ref bool? changed) => GetWrapped(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

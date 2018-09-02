@@ -7,6 +7,6 @@ namespace CSharpE.Syntax
     {
         StatementSyntax ISyntaxWrapper<StatementSyntax>.GetWrapped(ref bool? changed) => GetWrappedStatement(ref changed);
 
-        protected abstract StatementSyntax GetWrappedStatement(ref bool? changed);
+        private protected abstract StatementSyntax GetWrappedStatement(ref bool? changed);
     }
 }

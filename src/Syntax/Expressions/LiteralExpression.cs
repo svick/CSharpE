@@ -1,15 +1,24 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
-    public abstract class LiteralExpression : Expression
+    public abstract class LiteralExpression : Expression, ISyntaxWrapper<LiteralExpressionSyntax>
     {
-        protected LiteralExpressionSyntax Syntax;
+        private protected LiteralExpressionSyntax Syntax;
 
         public object Value => ValueImpl;
         
         protected abstract object ValueImpl { get; }
 
         internal override SyntaxNode Parent { get; set; }
+
+        private protected abstract LiteralExpressionSyntax GetWrappedLiteral(ref bool? changed);
+
+        LiteralExpressionSyntax ISyntaxWrapper<LiteralExpressionSyntax>.GetWrapped(ref bool? changed) =>
+            GetWrappedLiteral(ref changed);
+
+        private protected sealed override ExpressionSyntax GetWrappedExpression(ref bool? changed) =>
+            GetWrappedLiteral(ref changed);
     }
 }

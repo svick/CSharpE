@@ -1,11 +1,12 @@
 ﻿using System;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class ThisExpression : Expression
+    public sealed class ThisExpression : Expression, ISyntaxWrapper<ThisExpressionSyntax>
     {
         private ThisExpressionSyntax syntax;
 
@@ -17,7 +18,7 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        internal override ExpressionSyntax GetWrapped(ref bool? changed)
+        ThisExpressionSyntax ISyntaxWrapper<ThisExpressionSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -30,6 +31,9 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed) =>
+            this.GetWrapped<ThisExpressionSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => syntax = (ThisExpressionSyntax)newSyntax;
 

@@ -4,7 +4,7 @@ using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
 {
-    internal struct Identifier : ISyntaxWrapper<SyntaxToken>
+    internal struct Identifier
     {
         private SyntaxToken syntax;
 
@@ -31,6 +31,8 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
+        // this type does not implement ISyntaxWrapper, because that would lead to temporary boxing
+        // which would mean that the change in syntax would not be remembered by the original instance
         internal SyntaxToken GetWrapped(ref bool? changed)
         {
             var newText = text ?? syntax.ValueText;
@@ -44,7 +46,5 @@ namespace CSharpE.Syntax.Internals
 
             return syntax;
         }
-
-        SyntaxToken ISyntaxWrapper<SyntaxToken>.GetWrapped(ref bool? changed) => GetWrapped(ref changed);
     }
 }

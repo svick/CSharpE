@@ -146,7 +146,7 @@ namespace CSharpE.Syntax.Internals
 
         private ChangeTracker changeTracker = new ChangeTracker();
 
-        public TList GetWrapped(ref bool? changed)
+        TList ISyntaxWrapper<TList>.GetWrapped(ref bool? changed)
         {
             changeTracker.GetAndResetChanged(ref changed);
 

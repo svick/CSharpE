@@ -9,9 +9,7 @@ namespace CSharpE.Syntax
     {
         public static implicit operator TypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 
-        TypeSyntax ISyntaxWrapper<TypeSyntax>.GetWrapped(ref bool? changed) => GetWrapped(ref changed);
-
-        internal TypeSyntax GetWrapped(ref bool? changed) => GetWrappedType(ref changed);
+        TypeSyntax ISyntaxWrapper<TypeSyntax>.GetWrapped(ref bool? changed) => GetWrappedType(ref changed);
 
         protected abstract TypeSyntax GetWrappedType(ref bool? changed);
 

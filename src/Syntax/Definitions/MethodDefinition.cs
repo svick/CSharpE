@@ -111,7 +111,7 @@ namespace CSharpE.Syntax
         }
 
 
-        internal MethodDeclarationSyntax GetWrapped(ref bool? changed)
+        MethodDeclarationSyntax ISyntaxWrapper<MethodDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -140,10 +140,7 @@ namespace CSharpE.Syntax
         }
 
         private protected override BaseMethodDeclarationSyntax GetWrappedBaseMethod(ref bool? changed) =>
-            GetWrapped(ref changed);
-
-        MethodDeclarationSyntax ISyntaxWrapper<MethodDeclarationSyntax>.GetWrapped(ref bool? changed) =>
-            GetWrapped(ref changed);
+            this.GetWrapped<MethodDeclarationSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

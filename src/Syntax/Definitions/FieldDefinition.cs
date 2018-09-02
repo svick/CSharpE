@@ -99,7 +99,7 @@ namespace CSharpE.Syntax
         public FieldDefinition(TypeReference type, string name, Expression initializer = null)
             : this(None, type, name, initializer) { }
 
-        internal FieldDeclarationSyntax GetWrapped(ref bool? changed)
+        FieldDeclarationSyntax ISyntaxWrapper<FieldDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -129,10 +129,8 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) => GetWrapped(ref changed);
-
-        FieldDeclarationSyntax ISyntaxWrapper<FieldDeclarationSyntax>.GetWrapped(ref bool? changed) =>
-            GetWrapped(ref changed);
+        private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) =>
+            this.GetWrapped<FieldDeclarationSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

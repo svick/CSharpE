@@ -8,7 +8,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class InvocationExpression : Expression
+    public sealed class InvocationExpression : Expression, ISyntaxWrapper<InvocationExpressionSyntax>
     {
         private InvocationExpressionSyntax syntax;
 
@@ -56,7 +56,7 @@ namespace CSharpE.Syntax
             set => SetList(ref arguments, new SeparatedSyntaxList<Argument, ArgumentSyntax>(value, this));
         }
 
-        internal override ExpressionSyntax GetWrapped(ref bool? changed)
+        InvocationExpressionSyntax ISyntaxWrapper<InvocationExpressionSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -75,6 +75,9 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed) =>
+            this.GetWrapped<InvocationExpressionSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

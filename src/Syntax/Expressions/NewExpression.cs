@@ -9,7 +9,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 namespace CSharpE.Syntax
 {
     // TODO: object initializer, anonymous types
-    public sealed class NewExpression : Expression
+    public sealed class NewExpression : Expression, ISyntaxWrapper<ObjectCreationExpressionSyntax>
     {
         private ObjectCreationExpressionSyntax syntax;
 
@@ -57,7 +57,8 @@ namespace CSharpE.Syntax
             set => SetList(ref arguments, new SeparatedSyntaxList<Argument, ArgumentSyntax>(value, this));
         }
 
-        internal override ExpressionSyntax GetWrapped(ref bool? changed)
+        
+        ObjectCreationExpressionSyntax ISyntaxWrapper<ObjectCreationExpressionSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -76,6 +77,9 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed) =>
+            this.GetWrapped<ObjectCreationExpressionSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

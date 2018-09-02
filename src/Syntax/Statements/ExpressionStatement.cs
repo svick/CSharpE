@@ -6,7 +6,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class ExpressionStatement : Statement
+    public sealed class ExpressionStatement : Statement, ISyntaxWrapper<ExpressionStatementSyntax>
     {
         private ExpressionStatementSyntax syntax;
 
@@ -32,7 +32,7 @@ namespace CSharpE.Syntax
             set => SetNotNull(ref expression, value);
         }
 
-        internal ExpressionStatementSyntax GetWrapped(ref bool? changed)
+        ExpressionStatementSyntax ISyntaxWrapper<ExpressionStatementSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -50,7 +50,8 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        protected override StatementSyntax GetWrappedStatement(ref bool? changed) => GetWrapped(ref changed);
+        private protected override StatementSyntax GetWrappedStatement(ref bool? changed) =>
+            this.GetWrapped<ExpressionStatementSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

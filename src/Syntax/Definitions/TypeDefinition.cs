@@ -122,7 +122,7 @@ namespace CSharpE.Syntax
 
         private protected abstract SyntaxKind KeywordKind { get; }
 
-        internal TypeDeclarationSyntax GetWrapped(ref bool? changed)
+        private protected TypeDeclarationSyntax GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -149,7 +149,8 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) => GetWrapped(ref changed);
+        private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) =>
+            GetWrapped(ref changed);
 
         TypeDeclarationSyntax ISyntaxWrapper<TypeDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);

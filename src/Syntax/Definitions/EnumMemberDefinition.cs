@@ -83,12 +83,9 @@ namespace CSharpE.Syntax
             throw new NotImplementedException();
         }
 
-        public EnumMemberDeclarationSyntax GetWrapped(ref bool? changed)
+        EnumMemberDeclarationSyntax ISyntaxWrapper<EnumMemberDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
             throw new NotImplementedException();
         }
-
-        EnumMemberDeclarationSyntax ISyntaxWrapper<EnumMemberDeclarationSyntax>.GetWrapped(ref bool? changed) =>
-            GetWrapped(ref changed);
     }
 }

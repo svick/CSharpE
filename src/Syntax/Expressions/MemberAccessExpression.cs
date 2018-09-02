@@ -1,15 +1,13 @@
-﻿using System;
-using CSharpE.Syntax.Internals;
+﻿using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static CSharpE.Syntax.SyntaxFactory;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
     // TODO: generics
-    public sealed class MemberAccessExpression : Expression
+    public sealed class MemberAccessExpression : Expression, ISyntaxWrapper<MemberAccessExpressionSyntax>
     {
         private MemberAccessExpressionSyntax syntax;
 
@@ -55,7 +53,8 @@ namespace CSharpE.Syntax
             set => memberName.Text = value;
         }
 
-        internal override ExpressionSyntax GetWrapped(ref bool? changed)
+        
+        MemberAccessExpressionSyntax ISyntaxWrapper<MemberAccessExpressionSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -75,6 +74,9 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed) =>
+            this.GetWrapped<MemberAccessExpressionSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

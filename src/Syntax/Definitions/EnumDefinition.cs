@@ -65,14 +65,12 @@ namespace CSharpE.Syntax
             throw new System.NotImplementedException();
         }
 
-        internal EnumDeclarationSyntax GetWrapped(ref bool? changed)
+        EnumDeclarationSyntax ISyntaxWrapper<EnumDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
             throw new System.NotImplementedException();
         }
 
-        private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) => GetWrapped(ref changed);
-
-        EnumDeclarationSyntax ISyntaxWrapper<EnumDeclarationSyntax>.GetWrapped(ref bool? changed) =>
-            GetWrapped(ref changed);
+        private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) =>
+            this.GetWrapped<EnumDeclarationSyntax>(ref changed);
     }
 }
