@@ -1,4 +1,5 @@
 using CSharpE.Extensions.Actor;
+using CSharpE.TestUtilities;
 using Xunit;
 using static CSharpE.TestUtilities.TransformTestUtils;
 
@@ -19,7 +20,7 @@ class C
         return 42;
     }
 }";
-            
+
             string expectedOutput = @"using CSharpE.Extensions.Actor;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,7 +46,7 @@ class C
 
             var transformation = new ActorTransformation();
             
-            Assert.Equal(expectedOutput, ProcessSingleFile(input, transformation, typeof(ActorAttribute)));
+            AssertEx.LinesEqual(expectedOutput, ProcessSingleFile(input, transformation, typeof(ActorAttribute)));
         }
     }
 }

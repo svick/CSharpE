@@ -21,3 +21,5 @@ x86/
 
 # ReSharper is a .NET coding add-in
 *.DotSettings.user
+
+.idea/

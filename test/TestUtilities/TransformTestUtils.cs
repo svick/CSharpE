@@ -17,7 +17,7 @@ namespace CSharpE.TestUtilities
             return project.SourceFiles.Single().GetText();
         }
 
-        private static readonly Regex Optional = new Regex(@"\[\|(.*?)\|\]", Compiled | Singleline);
+        private static readonly Regex Optional = new Regex(@"\[\|(.*?)\|\]", Singleline);
 
         public static string IgnoreOptional(string input) => Optional.Replace(input, string.Empty);
         public static string Includeptional(string input) => Optional.Replace(input, "$1");

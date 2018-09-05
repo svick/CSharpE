@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax;
+using CSharpE.TestUtilities;
 using Xunit;
 using static CSharpE.TestUtilities.TransformTestUtils;
 
@@ -35,7 +36,7 @@ namespace CSharpE.Transform.Tests
 
             var transformation = new AddFieldTransformation();
 
-            Assert.Equal(expectedOutput, ProcessSingleFile(input, transformation));
+            AssertEx.LinesEqual(expectedOutput, ProcessSingleFile(input, transformation));
         }
     }
 }
