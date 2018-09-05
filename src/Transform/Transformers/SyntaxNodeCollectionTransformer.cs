@@ -13,7 +13,8 @@ using SyntaxNode = CSharpE.Syntax.SyntaxNode;
 namespace CSharpE.Transform.Transformers
 {
     // transformer for a collection of syntax nodes from the same file
-    internal class SyntaxNodeCollectionTransformer<TParent, TItem, TData> : CollectionTransformer<TParent, TItem, TData>
+    internal class SyntaxNodeCollectionTransformer<TParent, TItem, TData, TIntermediate, TResult>
+        : CollectionTransformer<TParent, TItem, TData, TIntermediate, TResult>
         where TParent : SyntaxNode
         where TItem : SyntaxNode
     {
@@ -21,19 +22,20 @@ namespace CSharpE.Transform.Transformers
 
         private SyntaxTree oldTree;
         private List<TextSpan> oldItemsSpans;
-        private List<CodeTransformer<TItem>> oldTransformers;
+        private List<CodeTransformer<TItem, TIntermediate>> oldTransformers;
 
-        public SyntaxNodeCollectionTransformer(TParent parent, ActionInvoker<TData, TItem> action, TData data)
+        public SyntaxNodeCollectionTransformer(
+            TParent parent, ActionInvoker<TData, TItem, TIntermediate, TResult> action, TData data)
             : base(action, data) => parentFileSpan = parent.FileSpan;
 
-        public override void Transform(TransformProject project, IEnumerable<TItem> input)
+        public override TResult Transform(TransformProject project, IEnumerable<TItem> input)
         {
             var items = input.ToList();
 
             var newFile = items.FirstOrDefault()?.SourceFile;
             var newTree = newFile?.GetSyntaxTree();
             var newItemsSpans = items.Select(x => x.Span).ToList();
-            var newTransformers = new List<CodeTransformer<TItem>>(items.Count);
+            var newTransformers = new List<CodeTransformer<TItem, TIntermediate>>(items.Count);
 
             var diff = (oldTree != null && newTree != null) ? newTree.GetChangeRanges(oldTree) : null;
 
@@ -42,7 +44,7 @@ namespace CSharpE.Transform.Transformers
 
             while (newIndex < items.Count)
             {
-                CodeTransformer<TItem> itemTransformer = null;
+                CodeTransformer<TItem, TIntermediate> itemTransformer = null;
 
                 if (oldIndex < oldItemsSpans?.Count)
                 {
@@ -66,13 +68,14 @@ namespace CSharpE.Transform.Transformers
                 }
 
                 if (itemTransformer == null)
-                    itemTransformer = CodeTransformer<TItem>.Create(i => Action.Invoke(Data, i));
+                    itemTransformer = CodeTransformer<TItem, TIntermediate>.Create(i => Action.Invoke(Data, i));
 
                 var newItem = items[newIndex];
 
                 Debug.Assert(ReferenceEquals(newFile, newItem.SourceFile));
 
-                itemTransformer.Transform(project, newItem);
+                var intermediate = itemTransformer.Transform(project, newItem);
+                Action.ProvideIntermediate(intermediate);
 
                 newTransformers.Add(itemTransformer);
 
@@ -82,9 +85,12 @@ namespace CSharpE.Transform.Transformers
             oldTree = newTree;
             oldItemsSpans = newItemsSpans;
             oldTransformers = newTransformers;
+
+            return Action.GetResult();
         }
 
-        public override bool Matches(TParent newParent, ActionInvoker<TData, TItem> newAction, TData newData)
+        public override bool Matches(
+            TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction, TData newData)
         {
             var newParentFileSpan = newParent.FileSpan;
 

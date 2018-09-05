@@ -1,17 +1,19 @@
-﻿namespace CSharpE.Transform.Transformers
+﻿using CSharpE.Transform.Internals;
+
+namespace CSharpE.Transform.Transformers
 {
     internal abstract class Transformer { }
 
-    internal abstract class Transformer<TInput> : Transformer
+    internal abstract class Transformer<TInput, TOutput> : Transformer
     {
-        public abstract void Transform(TransformProject project, TInput input);
+        public abstract TOutput Transform(TransformProject project, TInput input);
     }
 
     internal class TransformationTransformer
     {
         private readonly ITransformation transformation;
 
-        private Transformer<TransformProject> innerTransformer;
+        private Transformer<TransformProject, Unit> innerTransformer;
 
         public TransformationTransformer(ITransformation transformation) => this.transformation = transformation;
 

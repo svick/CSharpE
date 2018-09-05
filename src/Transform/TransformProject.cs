@@ -4,13 +4,11 @@ using System.IO;
 using System.Linq;
 using CSharpE.Syntax;
 using CSharpE.Syntax.Internals;
+using CSharpE.Transform.Internals;
 using CSharpE.Transform.Transformers;
 
 namespace CSharpE.Transform
 {
-    /// <summary>
-    /// Project that hides source files that cannot be transformed.
-    /// </summary>
     internal class TransformProject : Syntax.Project
     {
         private readonly Action<LogAction> onLog;
@@ -42,11 +40,15 @@ namespace CSharpE.Transform
         /// <summary>
         /// Runs transformation and returns a transformer that can be used to rerun the same transformation.
         /// </summary>
-        public Transformer<TransformProject> RunTransformation(ITransformation transformation)
+        public Transformer<TransformProject, Unit> RunTransformation(ITransformation transformation)
         {
             this.References.AddRange(transformation.AdditionalReferences);
 
-            var transformer = CodeTransformer<TransformProject>.Create(transformation.Process);
+            var transformer = CodeTransformer<TransformProject, Unit>.Create(project =>
+            {
+                transformation.Process(project);
+                return Unit.Value;
+            });
 
             transformer.Transform(this, this);
 

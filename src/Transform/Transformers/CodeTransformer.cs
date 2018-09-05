@@ -2,28 +2,29 @@
 using System.Collections.Generic;
 using CSharpE.Syntax;
 using CSharpE.Syntax.Internals;
+using CSharpE.Transform.Internals;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Transform.Transformers
 {
-    internal class CodeTransformer<TInput> : Transformer<TInput>
+    internal class CodeTransformer<TInput, TOutput> : Transformer<TInput, TOutput>
     {
-        private readonly Action<TInput> codeAction;
+        private readonly Func<TInput, TOutput> codeAction;
 
         private List<Transformer> transformers;
 
-        public static CodeTransformer<TInput> Create(Action<TInput> codeAction)
+        public static CodeTransformer<TInput, TOutput> Create(Func<TInput, TOutput> codeAction)
         {
             if (typeof(SyntaxNode).IsAssignableFrom(typeof(TInput)))
-                return (CodeTransformer<TInput>)Activator.CreateInstance(
-                    typeof(SyntaxNodeCodeTransfomer<>).MakeGenericType(typeof(TInput)), codeAction);
+                return (CodeTransformer<TInput, TOutput>) Activator.CreateInstance(
+                    typeof(SyntaxNodeCodeTransfomer<,>).MakeGenericType(typeof(TInput), typeof(TOutput)), codeAction);
 
-            return new CodeTransformer<TInput>(codeAction);
+            return new CodeTransformer<TInput, TOutput>(codeAction);
         }
 
-        protected CodeTransformer(Action<TInput> codeAction) => this.codeAction = codeAction;
+        protected CodeTransformer(Func<TInput, TOutput> codeAction) => this.codeAction = codeAction;
 
-        public override void Transform(TransformProject project, TInput input)
+        public override TOutput Transform(TransformProject project, TInput input)
         {
             var transformerBuilder = new TransformerBuilder(project, transformers);
 
@@ -32,23 +33,27 @@ namespace CSharpE.Transform.Transformers
 
             project.Log(typeof(TInput).Name, LogInfo.GetName(input), "transform");
 
-            codeAction(input);
+            var result = codeAction(input);
 
             project.TransformerBuilder = oldTransformerBuilder;
 
             transformers = transformerBuilder.Transformers;
+
+            return result;
         }
     }
 
-    internal sealed class SyntaxNodeCodeTransfomer<TInput> : CodeTransformer<TInput>
+    internal sealed class SyntaxNodeCodeTransfomer<TInput, TOutput> : CodeTransformer<TInput, TOutput>
         where TInput : SyntaxNode, ISyntaxWrapper<Roslyn::SyntaxNode>
     {
         private Roslyn::SyntaxNode beforeSyntax;
         private Roslyn::SyntaxNode afterSyntax;
 
-        public SyntaxNodeCodeTransfomer(Action<TInput> codeAction) : base(codeAction) { }
+        private TOutput cachedOutput;
 
-        public override void Transform(TransformProject project, TInput input)
+        public SyntaxNodeCodeTransfomer(Func<TInput, TOutput> codeAction) : base(codeAction) { }
+
+        public override TOutput Transform(TransformProject project, TInput input)
         {
             var newBeforeSyntax = input.GetWrapped();
 
@@ -60,11 +65,13 @@ namespace CSharpE.Transform.Transformers
             }
             else
             {
-                base.Transform(project, input);
+                cachedOutput = base.Transform(project, input);
 
                 beforeSyntax = newBeforeSyntax;
                 afterSyntax = input.GetWrapped();
             }
+
+            return Cloner.DeepClone(cachedOutput);
         }
     }
 }

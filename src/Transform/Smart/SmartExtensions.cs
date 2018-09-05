@@ -18,7 +18,7 @@ namespace CSharpE.Transform.Smart
             if (project is TransformProject transformProject)
             {
                 transformProject.TransformerBuilder.Collection(
-                    parent, collectionFunction, ActionInvoker<TItem>.Create(action), Unit.Value);
+                    parent, collectionFunction, ActionInvoker.Create(action), Unit.Value);
             }
             else
             {
@@ -52,7 +52,7 @@ namespace CSharpE.Transform.Smart
             if (project is TransformProject transformProject)
             {
                 transformProject.TransformerBuilder.Collection(
-                    parent, collectionFunction, ActionInvoker<T1, TItem>.Create(action), arg1);
+                    parent, collectionFunction, ActionInvoker.Create(action), arg1);
             }
             else
             {
@@ -61,6 +61,47 @@ namespace CSharpE.Transform.Smart
                     action(arg1, item);
                 }
             }
+        }
+
+        private static IReadOnlyList<TResult> ForEach<TParent, TItem, TResult>(
+            TParent parent, Func<TItem, TResult> action,
+            Func<TParent, IEnumerable<TItem>> collectionFunction)
+            where TParent : SyntaxNode
+            where TItem : SyntaxNode
+            => ForEach(parent, parent.SourceFile?.Project, action, collectionFunction);
+
+        private static IReadOnlyList<TResult> ForEach<TParent, TItem, TResult>(
+            TParent parent, Syntax.Project project, Func<TItem, TResult> action,
+            Func<TParent, IEnumerable<TItem>> collectionFunction)
+            where TParent : class
+            where TItem : SyntaxNode
+        {
+            ClosureChecker.ThrowIfHasClosure(action);
+
+            List<TResult> result;
+
+            if (project is TransformProject transformProject)
+            {
+                result = transformProject.TransformerBuilder.Collection(
+                    parent, collectionFunction, ActionInvoker.Create<TItem, TResult, List<TResult>>(
+                        action, (maybeList, item) =>
+                        {
+                            var list = maybeList ?? new List<TResult>();
+                            list.Add(item);
+                            return list;
+                        }), Unit.Value);
+            }
+            else
+            {
+                result = new List<TResult>();
+                
+                foreach (var item in collectionFunction(parent))
+                {
+                    result.Add(action(item));
+                }
+            }
+
+            return result.AsReadOnly();
         }
 
         private static void ForEach<TItem, T1>(
@@ -99,5 +140,13 @@ namespace CSharpE.Transform.Smart
         public static void ForEachPublicMethod<T1>(
             this TypeDefinition type, T1 arg1, Action<T1, MethodDefinition> action) =>
             ForEach(type, arg1, action, t => t.PublicMethods);
+
+        public static void ForEachField(this TypeDefinition type, Action<FieldDefinition> action) =>
+            ForEach(type, action, t => t.Fields);
+
+        public static IReadOnlyList<TResult> ForEachField<TResult>(
+            this TypeDefinition type, Func<FieldDefinition, TResult> action) =>
+            ForEach(type, action, t => t.Fields);
+
     }
 }
