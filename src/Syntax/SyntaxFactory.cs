@@ -7,7 +7,7 @@ namespace CSharpE.Syntax
     {
         #region General
 
-        public static TypeReference TypeReference(Type type) => type;
+        public static NamedTypeReference TypeReference(Type type) => type;
 
         public static NamedTypeReference TypeReference(
             NamedTypeReference openGenericType, params TypeReference[] typeParameters) =>
@@ -35,6 +35,14 @@ namespace CSharpE.Syntax
         public static AwaitExpression Await(Expression operand) => new AwaitExpression(operand);
         
         public static ThrowExpression Throw(Expression operand) => new ThrowExpression(operand);
+        
+        public static IdentifierExpression Identifier(string identifier) => new IdentifierExpression(identifier);
+
+        public static NullExpression Null => new NullExpression();
+        
+        public static BoolLiteralExpression True => new BoolLiteralExpression(true);
+        
+        public static BoolLiteralExpression False => new BoolLiteralExpression(false);
 
         #endregion
 
@@ -56,7 +64,17 @@ namespace CSharpE.Syntax
         public static TryStatement TryFinally(
             IEnumerable<Statement> tryStatements, IEnumerable<Statement> finallyStatements) =>
             new TryStatement(tryStatements, finallyStatements);
+
+        public static IfStatement If(Expression condition, IEnumerable<Statement> thenStatements) =>
+            new IfStatement(condition, thenStatements);
+
+        public static IfStatement If(Expression condition, params Statement[] thenStatements) =>
+            new IfStatement(condition, thenStatements);
         
+        public static ReturnStatement Return() => new ReturnStatement();
+        
+        public static ReturnStatement Return(Expression expression) => new ReturnStatement(expression);
+
         #endregion
     }
 }

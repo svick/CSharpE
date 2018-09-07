@@ -49,7 +49,31 @@ namespace CSharpE.Extensions.Record
                         type.AddMethod(Public | Override, typeof(bool), nameof(object.Equals),
                             new[] {Parameter(typeof(object), "obj")}, NotImplementedStatement);
 
-                        type.AddMethod(Public | Override, typeof(int), nameof(object.GetHashCode), null,
+                        type.AddMethod(Public | Override, typeof(int), nameof(GetHashCode), null,
+                            NotImplementedStatement);
+                    });
+                }
+                else
+                {
+                    typeDefinition.Segment(type =>
+                    {
+                        var other = Identifier("other");
+
+                        var equalsStatements = new Statement[]
+                        {
+                            If(Call(TypeReference(typeof(object)), nameof(ReferenceEquals), other, Null),
+                                Return(False)),
+                            If(Call(TypeReference(typeof(object)), nameof(ReferenceEquals), other, This()),
+                                Return(True))
+                        };
+
+                        type.AddMethod(Public, typeof(bool), nameof(IEquatable<object>.Equals),
+                            new[] {Parameter(type.GetReference(), "other")}, equalsStatements);
+
+                        type.AddMethod(Public | Override, typeof(bool), nameof(object.Equals),
+                            new[] {Parameter(typeof(object), "obj")}, NotImplementedStatement);
+
+                        type.AddMethod(Public | Override, typeof(int), nameof(GetHashCode), null,
                             NotImplementedStatement);
                     });
                 }
