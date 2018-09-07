@@ -35,6 +35,7 @@ namespace CSharpE.Syntax
             Modifiers = modifiers;
             Name = name;
             Members = members?.ToList();
+            baseTypes = new SeparatedSyntaxList<BaseType, BaseTypeSyntax>(this);
         }
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
@@ -57,6 +58,21 @@ namespace CSharpE.Syntax
             set => Modifiers = Modifiers.With(Partial, value);
         }
 
+        private SeparatedSyntaxList<BaseType, BaseTypeSyntax> baseTypes;
+        public IList<TypeReference> BaseTypes
+        {
+            get
+            {
+                if (baseTypes == null)
+                    baseTypes = new SeparatedSyntaxList<BaseType, BaseTypeSyntax>(
+                        syntax.BaseList?.Types ?? default, this);
+
+                return ProjectionList.Create(
+                    baseTypes, baseType => baseType.Type, reference => new BaseType(reference, this));
+            }
+            set => ProjectionList.Set(baseTypes, reference => new BaseType(reference, this), value);
+        }
+
         private MemberList members;
         private MemberList MembersList
         {
@@ -75,6 +91,7 @@ namespace CSharpE.Syntax
             set => SetList(ref members, new MemberList(value, this));
         }
 
+        // PERF: allocations
         public IList<FieldDefinition> Fields
         {
             get => FilteredList.Create<MemberDefinition, FieldDefinition>(MembersList);
@@ -131,6 +148,19 @@ namespace CSharpE.Syntax
             return property;
         }
 
+        public MethodDefinition AddMethod(
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
+            params Statement[] body)
+        {
+            var method = new MethodDefinition(modifiers, returnType, name, parameters, body);
+            
+            this.Members.Add(method);
+
+            method.Parent = this;
+
+            return method;
+        }
+
         public static implicit operator IdentifierExpression(TypeDefinition typeDefinition) =>
             new IdentifierExpression(typeDefinition.Name);
 
@@ -147,14 +177,17 @@ namespace CSharpE.Syntax
 
             var newModifiers = Modifiers;
             var newName = name.GetWrapped(ref thisChanged);
+            var newBaseTypes = baseTypes?.GetWrapped(ref thisChanged) ?? syntax.BaseList?.Types ?? default;
             var newMembers = members?.GetWrapped(ref thisChanged) ?? syntax.Members;
 
             if (syntax == null || AttributesChanged() || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
                 thisChanged == true || !IsAnnotated(syntax))
             {
+                var newBaseList = newBaseTypes.Any() ? CSharpSyntaxFactory.BaseList(newBaseTypes) : default;
+                
                 var newSyntax = CSharpSyntaxFactory.TypeDeclaration(
                     SyntaxFacts.GetTypeDeclarationKind(KeywordKind), GetNewAttributes(), newModifiers.GetWrapped(),
-                    CSharpSyntaxFactory.Token(KeywordKind), newName, default, default, default,
+                    CSharpSyntaxFactory.Token(KeywordKind), newName, default, newBaseList, default,
                     CSharpSyntaxFactory.Token(OpenBraceToken), newMembers, CSharpSyntaxFactory.Token(CloseBraceToken),
                     default);
 

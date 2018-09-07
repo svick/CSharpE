@@ -126,6 +126,17 @@ namespace CSharpE.Transform.Smart
             where TAttribute : System.Attribute =>
             ForEach(sourceFile, action, f => f.GetTypesWithAttribute<TAttribute>());
 
+        public static void ForEachTypeWithAttribute<TAttribute, T1>(
+            this Syntax.Project project, T1 arg1, Action<T1, BaseTypeDefinition> action)
+            where TAttribute : System.Attribute =>
+            project.ForEachSourceFile((arg1, action),
+                (t, sourceFile) => sourceFile.ForEachTypeWithAttribute<TAttribute, T1>(t.arg1, t.action));
+
+        public static void ForEachTypeWithAttribute<TAttribute, T1>(
+            this Syntax.SourceFile sourceFile, T1 arg1, Action<T1, BaseTypeDefinition> action)
+            where TAttribute : System.Attribute =>
+            ForEach(sourceFile, arg1, action, f => f.GetTypesWithAttribute<TAttribute>());
+
         public static void ForEachSourceFile(
             this Syntax.Project project, Action<Syntax.SourceFile> action) =>
             ForEach(project, action, p => p.SourceFiles);
@@ -147,6 +158,25 @@ namespace CSharpE.Transform.Smart
         public static IReadOnlyList<TResult> ForEachField<TResult>(
             this TypeDefinition type, Func<FieldDefinition, TResult> action) =>
             ForEach(type, action, t => t.Fields);
+        
+        public static void Segment<TNode>(this TNode node, Action<TNode> action)
+            where TNode : SyntaxNode
+            => Segment(node, node.SourceFile?.Project, action);
+
+        private static void Segment<TNode>(TNode node, Syntax.Project project, Action<TNode> action)
+            where TNode : SyntaxNode
+        {
+            ClosureChecker.ThrowIfHasClosure(action);
+            
+            if (project is TransformProject transformProject)
+            {
+                transformProject.TransformerBuilder.Segment(node, ActionInvoker.Create(action), Unit.Value);
+            }
+            else
+            {
+                action(node);
+            }
+        }
 
         public static void Segment<TNode, T1>(this TNode node, T1 arg1, Action<T1, TNode> action)
             where TNode : SyntaxNode

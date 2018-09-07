@@ -10,7 +10,7 @@ namespace CSharpE.Transform.Internals
             if (arg == null)
                 return;
 
-            if (arg is int || arg is string)
+            if (arg is Unit || arg is bool || arg is int || arg is string)
                 return;
 
             // disconnected syntax nodes are fine

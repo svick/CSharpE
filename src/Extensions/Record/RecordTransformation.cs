@@ -12,10 +12,15 @@ namespace CSharpE.Extensions.Record
     {
         public override void Process(Syntax.Project project, bool designTime)
         {
-            project.ForEachTypeWithAttribute<RecordAttribute>(baseType =>
+            project.ForEachTypeWithAttribute<RecordAttribute, bool>(designTime, (isDesignTime, baseType) =>
             {
                 if (!(baseType is TypeDefinition typeDefinition))
                     return;
+                
+                typeDefinition.Segment(type =>
+                {
+                    type.BaseTypes.Add(TypeReference(typeof(IEquatable<>), type.GetReference()));
+                });
                 
                 var fieldsList = typeDefinition.ForEachField(field =>
                 {
@@ -33,6 +38,13 @@ namespace CSharpE.Extensions.Record
                         type.AddAutoProperty(Public, field.Type, field.Name);
                     }
                 });
+
+                if (isDesignTime)
+                {
+                    typeDefinition.Segment(type =>
+                    {
+                    });
+                }
             });
         }
 

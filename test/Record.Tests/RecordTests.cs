@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using CSharpE.Extensions.Record;
 using CSharpE.TestUtilities;
 using Xunit;
@@ -21,9 +20,10 @@ class Person
 }";
 
             string expectedOutput = @"using CSharpE.Extensions.Record;
+using System;
 
 [Record]
-class Person
+class Person : IEquatable<Person>
 {
     public string Name
     {

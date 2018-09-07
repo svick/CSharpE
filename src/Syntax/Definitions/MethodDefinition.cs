@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
@@ -10,6 +12,8 @@ namespace CSharpE.Syntax
     public sealed class MethodDefinition : BaseMethodDefinition, ISyntaxWrapper<MethodDeclarationSyntax>
     {
         private MethodDeclarationSyntax syntax;
+
+        private protected override BaseMethodDeclarationSyntax BaseMethodSyntax => syntax;
 
         internal MethodDefinition(MethodDeclarationSyntax syntax, TypeDefinition parent)
         {
@@ -25,7 +29,17 @@ namespace CSharpE.Syntax
             name = new Identifier(methodDeclarationSyntax.Identifier);
         }
 
-        private protected override BaseMethodDeclarationSyntax BaseMethodSyntax => syntax;
+        public MethodDefinition(
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
+            IEnumerable<Statement> body)
+        {
+            Modifiers = modifiers;
+            ReturnType = returnType;
+            Name = name;
+            Parameters = parameters.ToList();
+            Body = body.ToList();
+        }
+
 
         #region Modifiers
 
