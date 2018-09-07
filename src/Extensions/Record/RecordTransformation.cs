@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpE.Syntax;
 using CSharpE.Transform;
 using CSharpE.Transform.Smart;
@@ -55,17 +56,24 @@ namespace CSharpE.Extensions.Record
                 }
                 else
                 {
-                    typeDefinition.Segment(type =>
+                    typeDefinition.Segment(fieldsList, (fields, type) =>
                     {
                         var other = Identifier("other");
 
-                        var equalsStatements = new Statement[]
+                        var equalsStatements = new List<Statement>
                         {
-                            If(Call(TypeReference(typeof(object)), nameof(ReferenceEquals), other, Null),
+                            If(TypeReference(typeof(object)).Call(nameof(ReferenceEquals), other, Null),
                                 Return(False)),
-                            If(Call(TypeReference(typeof(object)), nameof(ReferenceEquals), other, This()),
+                            If(TypeReference(typeof(object)).Call(nameof(ReferenceEquals), other, This()),
                                 Return(True))
                         };
+
+                        // EqualityComparer<T>.Default.Equals(this.F, other.F)
+                        var comparisons = fields.Select(f => TypeReference(typeof(EqualityComparer<>), f.Type)
+                            .MemberAccess(nameof(EqualityComparer<object>.Default))
+                            .Call(nameof(EqualityComparer<object>.Equals), This().MemberAccess(f.Name), other.MemberAccess(f.Name)));
+
+                        // TODO: add &&
 
                         type.AddMethod(Public, typeof(bool), nameof(IEquatable<object>.Equals),
                             new[] {Parameter(type.GetReference(), "other")}, equalsStatements);

@@ -3,7 +3,7 @@ using CSharpE.TestUtilities;
 using Xunit;
 using static CSharpE.TestUtilities.TransformTestUtils;
 
-namespace Record.Tests
+namespace CSharpE.Record.Tests
 {
     public class RecordTests
     {

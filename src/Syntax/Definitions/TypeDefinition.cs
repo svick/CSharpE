@@ -150,7 +150,12 @@ namespace CSharpE.Syntax
 
         public MethodDefinition AddMethod(
             MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
-            params Statement[] body)
+            params Statement[] body) =>
+            AddMethod(modifiers, returnType, name, parameters, body.AsEnumerable());
+
+        public MethodDefinition AddMethod(
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
+            IEnumerable<Statement> body)
         {
             var method = new MethodDefinition(modifiers, returnType, name, parameters, body);
             

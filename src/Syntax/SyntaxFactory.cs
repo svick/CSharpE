@@ -20,11 +20,20 @@ namespace CSharpE.Syntax
 
         #region Expressions
 
-        public static InvocationExpression Call(Expression receiver, string methodName, params Expression[] arguments) =>
+        public static InvocationExpression Call(this NamedTypeReference receiver, string methodName, params Expression[] arguments) =>
             new InvocationExpression(new MemberAccessExpression(receiver, methodName), arguments);
 
-        public static MemberAccessExpression MemberAccess(Expression expression, FieldDefinition field) =>
+        public static InvocationExpression Call(this Expression receiver, string methodName, params Expression[] arguments) =>
+            new InvocationExpression(new MemberAccessExpression(receiver, methodName), arguments);
+
+        public static MemberAccessExpression MemberAccess(this Expression expression, FieldDefinition field) =>
             new MemberAccessExpression(expression, field);
+
+        public static MemberAccessExpression MemberAccess(this NamedTypeReference type, string mermberName) =>
+            new MemberAccessExpression(type, mermberName);
+
+        public static MemberAccessExpression MemberAccess(this Expression expression, string mermberName) =>
+            new MemberAccessExpression(expression, mermberName);
 
         public static NewExpression New(TypeReference type, params Expression[] arguments) => new NewExpression(type, arguments);
 
