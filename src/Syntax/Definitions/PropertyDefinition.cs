@@ -1,7 +1,10 @@
 using System;
+using System.Linq;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
+using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -24,6 +27,13 @@ namespace CSharpE.Syntax
             
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
             name = new Identifier(syntax.Identifier);
+        }
+        
+        public PropertyDefinition(MemberModifiers modifiers, TypeReference type, string name)
+        {
+            Modifiers = modifiers;
+            Type = type;
+            Name = name;
         }
 
         private const MemberModifiers ValidModifiers =
@@ -54,7 +64,35 @@ namespace CSharpE.Syntax
 
         PropertyDeclarationSyntax ISyntaxWrapper<PropertyDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            throw new NotImplementedException();
+            GetAndResetChanged(ref changed);
+
+            bool? thisChanged = false;
+
+            var newModifiers = Modifiers;
+            var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
+            var newName = name.GetWrapped(ref thisChanged);
+            var newGetAccessor = getAccessorSet
+                ? getAccessor?.GetWrapped(ref thisChanged)
+                : FindAccessor(SyntaxKind.GetAccessorDeclaration);
+            var newSetAccessor = setAccessorSet
+                ? setAccessor?.GetWrapped(ref thisChanged)
+                : FindAccessor(SyntaxKind.SetAccessorDeclaration);
+
+            if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
+                thisChanged == true || !IsAnnotated(syntax))
+            {
+                var accessors = CSharpSyntaxFactory.List(new[] {newGetAccessor, newSetAccessor}.Where(a => a != null));
+
+                var newSyntax = CSharpSyntaxFactory.PropertyDeclaration(
+                    GetNewAttributes(), newModifiers.GetWrapped(), newType, null, newName,
+                    CSharpSyntaxFactory.AccessorList(accessors));
+
+                syntax = Annotate(newSyntax);
+
+                SetChanged(ref changed);
+            }
+
+            return syntax;
         }
 
         private protected override BasePropertyDeclarationSyntax GetWrappedBaseProperty(ref bool? changed) =>

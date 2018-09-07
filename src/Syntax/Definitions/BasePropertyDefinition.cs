@@ -54,8 +54,11 @@ namespace CSharpE.Syntax
             set => Modifiers = Modifiers.With(MemberModifiers.Unsafe, value);
         }
 
-        private bool getAccessorSet;
-        private AccessorDefinition getAccessor;
+        private protected AccessorDeclarationSyntax FindAccessor(SyntaxKind accessorKind) =>
+            BasePropertySyntax.AccessorList.Accessors.FirstOrDefault(a => a.IsKind(accessorKind));
+
+        private protected bool getAccessorSet;
+        private protected AccessorDefinition getAccessor;
         public AccessorDefinition GetAccessor
         {
             get
@@ -63,8 +66,7 @@ namespace CSharpE.Syntax
                 if (!getAccessorSet)
                 {
                     // TODO: properties with more than one of each kind of accessor should probably be error nodes
-                    var declaration = BasePropertySyntax.AccessorList.Accessors
-                        .FirstOrDefault(a => a.IsKind(SyntaxKind.GetAccessorDeclaration));
+                    var declaration = FindAccessor(SyntaxKind.GetAccessorDeclaration);
                     
                     if (declaration != null)
                         getAccessor = new AccessorDefinition(declaration, this);
@@ -76,12 +78,13 @@ namespace CSharpE.Syntax
             set
             {
                 Set(ref getAccessor, value);
+                getAccessor.Kind = SyntaxKind.GetAccessorDeclaration;
                 getAccessorSet = true;
             }
         }
         
-        private bool setAccessorSet;
-        private AccessorDefinition setAccessor;
+        private protected bool setAccessorSet;
+        private protected AccessorDefinition setAccessor;
         public AccessorDefinition SetAccessor
         {
             get
@@ -102,11 +105,12 @@ namespace CSharpE.Syntax
             set
             {
                 Set(ref setAccessor, value);
+                setAccessor.Kind = SyntaxKind.SetAccessorDeclaration;
                 setAccessorSet = true;
             }
         }
         
-        private TypeReference type;
+        private protected TypeReference type;
         public TypeReference Type
         {
             get

@@ -114,6 +114,23 @@ namespace CSharpE.Syntax
         public FieldDefinition AddField(TypeReference type, string name, Expression initializer = null) =>
             AddField(MemberModifiers.None, type, name, initializer);
 
+        public PropertyDefinition AddAutoProperty(
+            MemberModifiers modifiers, TypeReference type, string name, bool getOnly = false)
+        {
+            var property = new PropertyDefinition(modifiers, type, name);
+            
+            property.GetAccessor = new AccessorDefinition();
+            
+            if (!getOnly)
+                property.SetAccessor = new AccessorDefinition();
+            
+            this.Members.Add(property);
+
+            property.Parent = this;
+
+            return property;
+        }
+
         public static implicit operator IdentifierExpression(TypeDefinition typeDefinition) =>
             new IdentifierExpression(typeDefinition.Name);
 
