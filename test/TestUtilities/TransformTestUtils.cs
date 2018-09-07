@@ -8,11 +8,18 @@ namespace CSharpE.TestUtilities
 {
     public static class TransformTestUtils
     {
-        public static string ProcessSingleFile(string code, ITransformation transformation, params Type[] additionalReferencesRepresentatives)
+        public static string ProcessSingleFile(
+            string code, ITransformation transformation, params Type[] additionalReferencesRepresentatives) =>
+            ProcessSingleFile(code, transformation, false, additionalReferencesRepresentatives);
+
+        public static string ProcessSingleFile(
+            string code, ITransformation transformation, bool designTime,
+            params Type[] additionalReferencesRepresentatives)
         {
-            var project = new Syntax.Project(new[] { new Syntax.SourceFile("source.cse", code) }, additionalReferencesRepresentatives);
-            
-            transformation.Process(project);
+            var project = new Syntax.Project(
+                new[] {new Syntax.SourceFile("source.cse", code)}, additionalReferencesRepresentatives);
+
+            transformation.Process(project, designTime);
 
             return project.SourceFiles.Single().GetText();
         }

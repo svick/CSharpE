@@ -8,9 +8,9 @@ using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Extensions.Record
 {
-    public class RecordTransformation : ITransformation
+    public class RecordTransformation : Transformation
     {
-        public void Process(Syntax.Project project)
+        public override void Process(Syntax.Project project, bool designTime)
         {
             project.ForEachTypeWithAttribute<RecordAttribute>(baseType =>
             {
@@ -36,7 +36,7 @@ namespace CSharpE.Extensions.Record
             });
         }
 
-        public IEnumerable<LibraryReference> AdditionalReferences =>
+        public override IEnumerable<LibraryReference> AdditionalReferences =>
             new[] { new AssemblyReference(typeof(RecordAttribute)) };
     }
 }

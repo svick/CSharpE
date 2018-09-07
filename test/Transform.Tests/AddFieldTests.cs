@@ -9,9 +9,9 @@ namespace CSharpE.Transform.Tests
 {
     public class AddFieldTests
     {
-        class AddFieldTransformation : ITransformation
+        class AddFieldTransformation : SimpleTransformation
         {
-            public void Process(Syntax.Project project)
+            protected override void Process(Syntax.Project project)
             {
                 foreach (var type in project.GetTypes().OfType<TypeDefinition>())
                 {
@@ -19,7 +19,7 @@ namespace CSharpE.Transform.Tests
                 }
             }
 
-            public IEnumerable<LibraryReference> AdditionalReferences => Enumerable.Empty<LibraryReference>();
+            public override IEnumerable<LibraryReference> AdditionalReferences => Enumerable.Empty<LibraryReference>();
         }
 
         [Fact]

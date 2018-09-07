@@ -40,13 +40,13 @@ namespace CSharpE.Transform
         /// <summary>
         /// Runs transformation and returns a transformer that can be used to rerun the same transformation.
         /// </summary>
-        public Transformer<TransformProject, Unit> RunTransformation(ITransformation transformation)
+        public Transformer<TransformProject, Unit> RunTransformation(ITransformation transformation, bool designTime)
         {
             this.References.AddRange(transformation.AdditionalReferences);
 
             var transformer = CodeTransformer<TransformProject, Unit>.Create(project =>
             {
-                transformation.Process(project);
+                transformation.Process(project, designTime);
                 return Unit.Value;
             });
 

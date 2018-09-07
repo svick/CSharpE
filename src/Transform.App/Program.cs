@@ -34,7 +34,7 @@ namespace CSharpE.Transform.App
             {
                 var transformation = (ITransformation)Activator.CreateInstance(transformationType);
 
-                transformation.Process(project);
+                transformation.Process(project, designTime: false);
             }
 
             foreach (var sourceFile in project.SourceFiles)

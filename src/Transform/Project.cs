@@ -31,14 +31,14 @@ namespace CSharpE.Transform
 
         public event Action<LogAction> Log;
 
-        public Project Transform()
+        public Project Transform(bool designTime = false)
         {
             var transformProject = new TransformProject(
                 SourceFiles.Select(f => f.ToSyntaxSourceFile()), AdditionalReferences, Log);
 
             foreach (var transformer in transformers)
             {
-                transformer.Transform(transformProject);
+                transformer.Transform(transformProject, designTime);
             }
 
             return new Project(

@@ -8,7 +8,7 @@ namespace CSharpE.Transform.Internals
         private static bool IsImmutable<T>(T arg)
         {
             // TODO: detect other immutable types
-            return arg is int || arg is string;
+            return arg is Unit || arg is int || arg is string;
         }        
 
         

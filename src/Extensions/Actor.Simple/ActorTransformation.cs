@@ -10,9 +10,9 @@ using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Extensions.Actor
 {
-    public class ActorTransformation : ITransformation
+    public class ActorTransformation : SimpleTransformation
     {
-        public void Process(Syntax.Project project)
+        protected override void Process(Syntax.Project project)
         {
             foreach (var type in project.GetTypesWithAttribute<ActorAttribute>().OfType<TypeDefinition>())
             {
@@ -35,6 +35,6 @@ namespace CSharpE.Extensions.Actor
             }
         }
 
-        public IEnumerable<LibraryReference> AdditionalReferences => throw new NotImplementedException();
+        public override IEnumerable<LibraryReference> AdditionalReferences => throw new NotImplementedException();
     }
 }

@@ -17,11 +17,11 @@ namespace CSharpE.Transform.Transformers
 
         public TransformationTransformer(ITransformation transformation) => this.transformation = transformation;
 
-        public void Transform(TransformProject project)
+        public void Transform(TransformProject project, bool designTime)
         {
             if (innerTransformer == null)
             {
-                innerTransformer = project.RunTransformation(transformation);
+                innerTransformer = project.RunTransformation(transformation, designTime);
             }
             else
             {
