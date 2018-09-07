@@ -148,5 +148,25 @@ namespace CSharpE.Transform.Smart
             this TypeDefinition type, Func<FieldDefinition, TResult> action) =>
             ForEach(type, action, t => t.Fields);
 
+        public static void Segment<TNode, T1>(this TNode node, T1 arg1, Action<T1, TNode> action)
+            where TNode : SyntaxNode
+            => Segment(node, node.SourceFile?.Project, arg1, action);
+
+        private static void Segment<TNode, T1>(TNode node, Syntax.Project project, T1 arg1,
+            Action<T1, TNode> action)
+            where TNode : SyntaxNode
+        {
+            ClosureChecker.ThrowIfHasClosure(action);
+            Persistence.ThrowIfNotPersistent(arg1);
+            
+            if (project is TransformProject transformProject)
+            {
+                transformProject.TransformerBuilder.Segment(node, ActionInvoker.Create(action), arg1);
+            }
+            else
+            {
+                action(arg1, node);
+            }
+        }
     }
 }

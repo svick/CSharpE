@@ -46,5 +46,32 @@ namespace CSharpE.Transform.Transformers
 
             return result;
         }
+        
+        public TResult Segment<TNode, TData, TResult>(
+            TNode node, ActionInvoker<TData, TNode, TResult, TResult> action, TData data)
+            where TNode : SyntaxNode
+        {
+            // segment is implemented as a single-element collection
+            
+            CollectionTransformer<TNode, TNode, TData, TResult, TResult> transformer = null;
+
+            var oldTransformer = oldTransformers?.ElementAtOrDefault(oldTransformersIndex++);
+
+            if (oldTransformer is CollectionTransformer<TNode, TNode, TData, TResult, TResult> oldCollectionTransformer)
+            {
+                if (oldCollectionTransformer.Matches(node, action, data))
+                    transformer = oldCollectionTransformer;
+            }
+
+            if (transformer == null)
+                transformer = CollectionTransformer.Create(node, action, data);
+
+            var result = transformer.Transform(project, new[] { node });
+
+            Transformers.Add(transformer);
+
+            return result;
+        }
+        
     }
 }
