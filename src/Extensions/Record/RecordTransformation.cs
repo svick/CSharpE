@@ -43,6 +43,14 @@ namespace CSharpE.Extensions.Record
                 {
                     typeDefinition.Segment(type =>
                     {
+                        type.AddMethod(Public, typeof(bool), nameof(IEquatable<object>.Equals),
+                            new[] {Parameter(type.GetReference(), "other")}, NotImplementedStatement);
+
+                        type.AddMethod(Public | Override, typeof(bool), nameof(object.Equals),
+                            new[] {Parameter(typeof(object), "obj")}, NotImplementedStatement);
+
+                        type.AddMethod(Public | Override, typeof(int), nameof(object.GetHashCode), null,
+                            NotImplementedStatement);
                     });
                 }
             });

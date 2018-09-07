@@ -36,8 +36,8 @@ namespace CSharpE.Syntax
             Modifiers = modifiers;
             ReturnType = returnType;
             Name = name;
-            Parameters = parameters.ToList();
-            Body = body.ToList();
+            Parameters = parameters?.ToList();
+            Body = body?.ToList();
         }
 
 

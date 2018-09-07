@@ -19,3 +19,4 @@
   - "lambda" parameters for inlining other code blocks
 - ensure no Roslyn types are exposed in the public interface
 - consider rewriting existing Roslyn-based rewriter project into CSharpE, like LinqAF
+- think of how to handle segments that don't change in design time, but do change in build time (see `RecordTransformation`)

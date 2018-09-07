@@ -13,6 +13,8 @@ namespace CSharpE.Syntax
             NamedTypeReference openGenericType, params TypeReference[] typeParameters) =>
             new NamedTypeReference(
                 openGenericType.Namespace, openGenericType.Container, openGenericType.Name, typeParameters);
+        
+        public static Parameter Parameter(TypeReference type, string name) => new Parameter(type, name);
 
         #endregion
 
@@ -31,6 +33,8 @@ namespace CSharpE.Syntax
         public static ThisExpression This() => new ThisExpression();
         
         public static AwaitExpression Await(Expression operand) => new AwaitExpression(operand);
+        
+        public static ThrowExpression Throw(Expression operand) => new ThrowExpression(operand);
 
         #endregion
 

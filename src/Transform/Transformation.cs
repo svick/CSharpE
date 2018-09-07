@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using CSharpE.Syntax;
+using static CSharpE.Syntax.SyntaxFactory;
 
 namespace CSharpE.Transform
 {
@@ -9,7 +11,6 @@ namespace CSharpE.Transform
         
         public abstract IEnumerable<LibraryReference> AdditionalReferences { get; }
 
-        // TODO
-        //public static Statement NotImplementedStatement { get; } = ...;
+        public static Statement NotImplementedStatement { get; } = Throw(New(typeof(NotImplementedException)));
     }
 }

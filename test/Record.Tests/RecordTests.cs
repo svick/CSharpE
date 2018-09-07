@@ -8,7 +8,7 @@ namespace Record.Tests
     public class RecordTests
     {
         [Fact]
-        public void Test()
+        public void TestDesignTime()
         {
             string input = @"using CSharpE.Extensions.Record;
 
@@ -36,11 +36,27 @@ class Person : IEquatable<Person>
         get;
         set;
     }
+
+    public bool Equals(Person other)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override bool Equals(object obj)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override int GetHashCode()
+    {
+        throw new NotImplementedException();
+    }
 }";
             
             var transformation = new RecordTransformation();
-            
-            AssertEx.LinesEqual(expectedOutput, ProcessSingleFile(input, transformation, typeof(RecordAttribute)));
+
+            AssertEx.LinesEqual(
+                expectedOutput, ProcessSingleFile(input, transformation, designTime: true, typeof(RecordAttribute)));
         }
     }
 }

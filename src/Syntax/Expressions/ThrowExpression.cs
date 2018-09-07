@@ -6,17 +6,17 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class AwaitExpression : Expression, ISyntaxWrapper<AwaitExpressionSyntax>
+    public sealed class ThrowExpression : Expression, ISyntaxWrapper<ThrowExpressionSyntax>
     {
-        private AwaitExpressionSyntax syntax;
-
-        internal AwaitExpression(AwaitExpressionSyntax syntax, SyntaxNode parent)
+        private ThrowExpressionSyntax syntax;
+        
+        internal ThrowExpression(ThrowExpressionSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax;
             Parent = parent;
         }
 
-        public AwaitExpression(Expression operand) =>
+        public ThrowExpression(Expression operand) =>
             Operand = operand ?? throw new ArgumentNullException(nameof(operand));
 
         private Expression operand;
@@ -32,7 +32,7 @@ namespace CSharpE.Syntax
             set => SetNotNull(ref operand, value);
         }
         
-        AwaitExpressionSyntax ISyntaxWrapper<AwaitExpressionSyntax>.GetWrapped(ref bool? changed)
+        ThrowExpressionSyntax ISyntaxWrapper<ThrowExpressionSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -42,7 +42,7 @@ namespace CSharpE.Syntax
 
             if (syntax == null || thisChanged == true)
             {
-                syntax = CSharpSyntaxFactory.AwaitExpression(newOperand);
+                syntax = CSharpSyntaxFactory.ThrowExpression(newOperand);
 
                 SetChanged(ref changed);
             }
@@ -51,16 +51,16 @@ namespace CSharpE.Syntax
         }
 
         private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
-            => this.GetWrapped<AwaitExpressionSyntax>(ref changed);
+            => this.GetWrapped<ThrowExpressionSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            syntax = (AwaitExpressionSyntax)newSyntax;
+            syntax = (ThrowExpressionSyntax)newSyntax;
 
             Set(ref operand, null);
         }
 
-        internal override SyntaxNode Clone() => new AwaitExpression(Operand);
+        internal override SyntaxNode Clone() => new ThrowExpression(Operand);
 
         internal override SyntaxNode Parent { get; set; }
     }
