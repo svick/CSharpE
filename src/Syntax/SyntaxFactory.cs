@@ -53,6 +53,8 @@ namespace CSharpE.Syntax
         
         public static BoolLiteralExpression False => new BoolLiteralExpression(false);
 
+        public static LogicalAndExpression LogicalAnd(Expression left, Expression right) => new LogicalAndExpression(left, right);
+
         #endregion
 
         #region Statements

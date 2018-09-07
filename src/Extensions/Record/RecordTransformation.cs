@@ -60,20 +60,21 @@ namespace CSharpE.Extensions.Record
                     {
                         var other = Identifier("other");
 
-                        var equalsStatements = new List<Statement>
+                        // EqualityComparer<T>.Default.Equals(this.F1, other.F1) && ...
+                        var comparisons = fields
+                            .Select(f => TypeReference(typeof(EqualityComparer<>), f.Type)
+                                .MemberAccess(nameof(EqualityComparer<object>.Default))
+                                .Call(nameof(EqualityComparer<object>.Equals), This().MemberAccess(f.Name), other.MemberAccess(f.Name)))
+                            .Aggregate<Expression>((l, r) => LogicalAnd(l, r));
+
+                        var equalsStatements = new Statement[]
                         {
                             If(TypeReference(typeof(object)).Call(nameof(ReferenceEquals), other, Null),
                                 Return(False)),
                             If(TypeReference(typeof(object)).Call(nameof(ReferenceEquals), other, This()),
-                                Return(True))
+                                Return(True)),
+                            Return(comparisons)
                         };
-
-                        // EqualityComparer<T>.Default.Equals(this.F, other.F)
-                        var comparisons = fields.Select(f => TypeReference(typeof(EqualityComparer<>), f.Type)
-                            .MemberAccess(nameof(EqualityComparer<object>.Default))
-                            .Call(nameof(EqualityComparer<object>.Equals), This().MemberAccess(f.Name), other.MemberAccess(f.Name)));
-
-                        // TODO: add &&
 
                         type.AddMethod(Public, typeof(bool), nameof(IEquatable<object>.Equals),
                             new[] {Parameter(type.GetReference(), "other")}, equalsStatements);

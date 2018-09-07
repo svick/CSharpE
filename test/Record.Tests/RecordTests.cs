@@ -91,6 +91,8 @@ class Person : IEquatable<Person>
         {
             return true;
         }
+
+        return EqualityComparer
     }
 
     public override bool Equals(object obj)
@@ -106,7 +108,7 @@ class Person : IEquatable<Person>
             
             var transformation = new RecordTransformation();
 
-            AssertEx.LinesEqual(
+            Assert.Equal(
                 expectedOutput, ProcessSingleFile(input, transformation, designTime: false, typeof(RecordAttribute)));
         }
         
