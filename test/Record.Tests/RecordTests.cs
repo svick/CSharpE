@@ -103,7 +103,7 @@ class Person : IEquatable<Person>
 
     public override int GetHashCode()
     {
-        throw new NotImplementedException();
+        return (this.Name, this.Age).GetHashCode();
     }
 }";
             

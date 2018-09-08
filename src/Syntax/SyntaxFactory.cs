@@ -57,6 +57,10 @@ namespace CSharpE.Syntax
 
         public static AsExpression As(Expression left, TypeReference right) => new AsExpression(left, right);
 
+        public static TupleExpression Tuple(params Expression[] expressions) => new TupleExpression(expressions);
+
+        public static TupleExpression Tuple(IEnumerable<Expression> expressions) => new TupleExpression(expressions);
+
         #endregion
 
         #region Statements

@@ -84,7 +84,7 @@ namespace CSharpE.Extensions.Record
                             Return(This().Call("Equals", As(Identifier("obj"), type.GetReference()))));
 
                         type.AddMethod(Public | Override, typeof(int), nameof(GetHashCode), null,
-                            NotImplementedStatement);
+                            Return(Tuple(fields.Select(f => This().MemberAccess(f.Name))).Call(nameof(GetHashCode))));
                     });
                 }
             });
