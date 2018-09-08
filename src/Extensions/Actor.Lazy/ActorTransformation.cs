@@ -20,7 +20,7 @@ namespace CSharpE.Extensions.Actor
 
                 var actorSemaphoreField = type.AddField(ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
 
-                Expression actorSemaphoreFieldExpression = MemberAccess(This(), actorSemaphoreField);
+                Expression actorSemaphoreFieldExpression = This().MemberAccess(actorSemaphoreField);
 
                 type.ForEachPublicMethod(actorSemaphoreFieldExpression, (asf, method) =>
                 {
@@ -29,8 +29,8 @@ namespace CSharpE.Extensions.Actor
 
                     method.Body = new Statement[]
                     {
-                        Await(Call(asf, "WaitAsync")),
-                        TryFinally(method.Body, new Statement[] { Call(asf, "Release") })
+                        Await(asf.Call("WaitAsync")),
+                        TryFinally(method.Body, new Statement[] { asf.Call("Release") })
                     };
                 });
             });

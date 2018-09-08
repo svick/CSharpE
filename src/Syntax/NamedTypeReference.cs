@@ -228,10 +228,7 @@ namespace CSharpE.Syntax
 
         public static implicit operator NamedTypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 
-        // TODO: fix this for generics, maybe by creating a trivial TypeExpression?
-        public static implicit operator IdentifierExpression(NamedTypeReference typeReference) => new IdentifierExpression(typeReference.Name);
-
-        protected override TypeSyntax GetWrappedType(ref bool? changed)
+        private protected override TypeSyntax GetWrappedType(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 

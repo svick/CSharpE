@@ -64,6 +64,7 @@ class Person : IEquatable<Person>
         {
             string expectedOutput = @"using CSharpE.Extensions.Record;
 using System;
+using System.Collections.Generic;
 
 [Record]
 class Person : IEquatable<Person>
@@ -82,17 +83,17 @@ class Person : IEquatable<Person>
 
     public bool Equals(Person other)
     {
-        if (Object.ReferenceEquals(other, null))
+        if (object.ReferenceEquals(other, null))
         {
             return false;
         }
 
-        if (Object.ReferenceEquals(other, this))
+        if (object.ReferenceEquals(other, this))
         {
             return true;
         }
 
-        return EqualityComparer
+        return EqualityComparer<string>.Default.Equals(this.Name, other.Name) && EqualityComparer<int>.Default.Equals(this.Age, other.Age);
     }
 
     public override bool Equals(object obj)
