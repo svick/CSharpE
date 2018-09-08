@@ -80,7 +80,8 @@ namespace CSharpE.Extensions.Record
                             new[] {Parameter(type.GetReference(), "other")}, equalsStatements);
 
                         type.AddMethod(Public | Override, typeof(bool), nameof(object.Equals),
-                            new[] {Parameter(typeof(object), "obj")}, NotImplementedStatement);
+                            new[] {Parameter(typeof(object), "obj")},
+                            Return(This().Call("Equals", As(Identifier("obj"), type.GetReference()))));
 
                         type.AddMethod(Public | Override, typeof(int), nameof(GetHashCode), null,
                             NotImplementedStatement);

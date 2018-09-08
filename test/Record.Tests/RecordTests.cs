@@ -98,7 +98,7 @@ class Person : IEquatable<Person>
 
     public override bool Equals(object obj)
     {
-        throw new NotImplementedException();
+        return this.Equals(obj as Person);
     }
 
     public override int GetHashCode()

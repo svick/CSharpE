@@ -55,6 +55,8 @@ namespace CSharpE.Syntax
 
         public static LogicalAndExpression LogicalAnd(Expression left, Expression right) => new LogicalAndExpression(left, right);
 
+        public static AsExpression As(Expression left, TypeReference right) => new AsExpression(left, right);
+
         #endregion
 
         #region Statements
