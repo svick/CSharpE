@@ -198,5 +198,29 @@ namespace CSharpE.Transform.Smart
                 action(arg1, node);
             }
         }
+
+        public static void Segment<TNode, T1, T2>(this TNode node, T1 arg1, T2 arg2, Action<T1, T2, TNode> action)
+            where TNode : SyntaxNode
+            => Segment(node, node.SourceFile?.Project, arg1, arg2, action);
+
+        private static void Segment<TNode, T1, T2>(TNode node, Syntax.Project project, T1 arg1, T2 arg2,
+            Action<T1, T2, TNode> action)
+            where TNode : SyntaxNode
+        {
+            ClosureChecker.ThrowIfHasClosure(action);
+            Persistence.ThrowIfNotPersistent(arg1);
+            
+            if (project is TransformProject transformProject)
+            {
+                transformProject.TransformerBuilder.Segment(
+                    node, ActionInvoker.Create<(T1, T2), TNode>((tuple, n) => action(tuple.Item1, tuple.Item2, n)),
+                    (arg1, arg2));
+            }
+            else
+            {
+                action(arg1, arg2, node);
+            }
+        }
+
     }
 }

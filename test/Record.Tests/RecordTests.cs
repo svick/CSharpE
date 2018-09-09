@@ -25,16 +25,19 @@ using System;
 [Record]
 class Person : IEquatable<Person>
 {
+    public Person(string name, int age)
+    {
+        throw new NotImplementedException();
+    }
+
     public string Name
     {
         get;
-        set;
     }
 
     public int Age
     {
         get;
-        set;
     }
 
     public bool Equals(Person other)
@@ -55,7 +58,7 @@ class Person : IEquatable<Person>
             
             var transformation = new RecordTransformation();
 
-            AssertEx.LinesEqual(
+            Assert.Equal(
                 expectedOutput, ProcessSingleFile(input, transformation, designTime: true, typeof(RecordAttribute)));
         }
         
@@ -69,16 +72,20 @@ using System.Collections.Generic;
 [Record]
 class Person : IEquatable<Person>
 {
+    public Person(string name, int age)
+    {
+        this.Name = name;
+        this.Age = age;
+    }
+
     public string Name
     {
         get;
-        set;
     }
 
     public int Age
     {
         get;
-        set;
     }
 
     public bool Equals(Person other)

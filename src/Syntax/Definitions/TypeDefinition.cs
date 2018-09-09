@@ -166,6 +166,18 @@ namespace CSharpE.Syntax
             return method;
         }
 
+        public ConstructorDefinition AddConstructor(
+            MemberModifiers modifiers, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
+        {
+            var contructor = new ConstructorDefinition(modifiers, parameters, body);
+            
+            this.Members.Add(contructor);
+
+            contructor.Parent = this;
+
+            return contructor;
+        }
+
         public static implicit operator IdentifierExpression(TypeDefinition typeDefinition) =>
             new IdentifierExpression(typeDefinition.Name);
 

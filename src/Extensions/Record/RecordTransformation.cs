@@ -30,13 +30,19 @@ namespace CSharpE.Extensions.Record
                     return (field.Name, Type: field.Type.Clone());
                 });
 
-                typeDefinition.Segment(fieldsList, (fields, type) =>
+                typeDefinition.Segment(fieldsList, isDesignTime, (fields, dt, type) =>
                 {
                     type.Fields.Clear();
 
+                    var constructorBody = dt
+                        ? new Statement[] { NotImplementedStatement }
+                        : fields.Select(f => (Statement)Assignment(This().MemberAccess(f.Name), Identifier(f.Name.ToLowerInvariant())));
+
+                    type.AddConstructor(Public, fields.Select(f => Parameter(f.Type, f.Name.ToLowerInvariant())), constructorBody);
+
                     foreach (var field in fields)
                     {
-                        type.AddAutoProperty(Public, field.Type, field.Name);
+                        type.AddAutoProperty(Public, field.Type, field.Name, getOnly: true);
                     }
                 });
 

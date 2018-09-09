@@ -34,6 +34,8 @@ namespace CSharpE.Syntax
             Modifiers = modifiers;
             Type = type;
             Name = name;
+            getAccessorSet = true;
+            setAccessorSet = true;
         }
 
         private const MemberModifiers ValidModifiers =

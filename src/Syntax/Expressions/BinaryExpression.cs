@@ -7,13 +7,13 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public abstract class BinaryExpression : Expression, ISyntaxWrapper<BinaryExpressionSyntax>
+    public abstract class BinaryExpression : Expression
     {
-        private protected BinaryExpressionSyntax Syntax;
+        private protected ExpressionSyntax Syntax;
 
         internal override SyntaxNode Parent { get; set; }
 
-        internal BinaryExpression(BinaryExpressionSyntax syntax, SyntaxNode parent)
+        internal BinaryExpression(ExpressionSyntax syntax, SyntaxNode parent)
         {
             Syntax = syntax;
             Parent = parent;
@@ -25,17 +25,37 @@ namespace CSharpE.Syntax
             Right = right;
         }
 
+        ExpressionSyntax GetLeft(ExpressionSyntax expression)
+        {
+            switch (expression)
+            {
+                case BinaryExpressionSyntax binary: return binary.Left;
+                case AssignmentExpressionSyntax assignment: return assignment.Left;
+                default: throw new InvalidOperationException();
+            }
+        }
+
         private Expression left;
         public Expression Left
         {
             get
             {
                 if (left == null)
-                    left = FromRoslyn.Expression(Syntax.Left, this);
+                    left = FromRoslyn.Expression(GetLeft(Syntax), this);
 
                 return left;
             }
             set => SetNotNull(ref left, value);
+        }
+
+        ExpressionSyntax GetRight(ExpressionSyntax expression)
+        {
+            switch (expression)
+            {
+                case BinaryExpressionSyntax binary: return binary.Right;
+                case AssignmentExpressionSyntax assignment: return assignment.Right;
+                default: throw new InvalidOperationException();
+            }
         }
 
         private Expression right;
@@ -44,7 +64,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (right == null)
-                    right = FromRoslyn.Expression(Syntax.Right, this);
+                    right = FromRoslyn.Expression(GetRight(Syntax), this);
 
                 return right;
             }
@@ -53,18 +73,22 @@ namespace CSharpE.Syntax
         
         private protected abstract SyntaxKind Kind { get; }
 
-        BinaryExpressionSyntax ISyntaxWrapper<BinaryExpressionSyntax>.GetWrapped(ref bool? changed)
+        private protected virtual bool IsAssignment => false;
+
+        private protected sealed override ExpressionSyntax GetWrappedExpression(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
             bool? thisChanged = false;
 
-            var newLeft = left?.GetWrapped(ref thisChanged) ?? Syntax.Left;
-            var newRight = right?.GetWrapped(ref thisChanged) ?? Syntax.Right;
+            var newLeft = left?.GetWrapped(ref thisChanged) ?? GetLeft(Syntax);
+            var newRight = right?.GetWrapped(ref thisChanged) ?? GetRight(Syntax);
 
             if (Syntax == null || thisChanged == true)
             {
-                Syntax = CSharpSyntaxFactory.BinaryExpression(Kind, newLeft, newRight);
+                Syntax = IsAssignment 
+                    ? (ExpressionSyntax)CSharpSyntaxFactory.AssignmentExpression(Kind, newLeft, newRight)
+                    : CSharpSyntaxFactory.BinaryExpression(Kind, newLeft, newRight);
 
                 SetChanged(ref changed);
             }
@@ -72,11 +96,7 @@ namespace CSharpE.Syntax
             return Syntax;
         }
 
-        private protected sealed override ExpressionSyntax GetWrappedExpression(ref bool? changed) =>
-            this.GetWrapped<BinaryExpressionSyntax>(ref changed);
-
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
             throw new NotImplementedException();
-
     }
 }

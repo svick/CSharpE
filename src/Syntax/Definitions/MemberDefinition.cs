@@ -136,6 +136,7 @@ namespace CSharpE.Syntax
                     throw new ArgumentException(nameof(value));
             }
         }
+        private protected TypeDefinition ParentType => parent;
 
         MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrappedMember(ref changed);
