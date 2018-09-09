@@ -37,6 +37,8 @@ namespace CSharpE.Syntax
 
         public static NewExpression New(TypeReference type, params Expression[] arguments) => new NewExpression(type, arguments);
 
+        public static NewExpression New(TypeReference type, IEnumerable<Expression> arguments) => new NewExpression(type, arguments);
+
         public static IntLiteralExpression Literal(int value) => new IntLiteralExpression(value);
         
         public static ThisExpression This() => new ThisExpression();

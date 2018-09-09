@@ -35,9 +35,19 @@ class Person : IEquatable<Person>
         get;
     }
 
+    public Person WithName(string name)
+    {
+        throw new NotImplementedException();
+    }
+
     public int Age
     {
         get;
+    }
+
+    public Person WithAge(int age)
+    {
+        throw new NotImplementedException();
     }
 
     public bool Equals(Person other)
@@ -83,9 +93,19 @@ class Person : IEquatable<Person>
         get;
     }
 
+    public Person WithName(string name)
+    {
+        return new Person(name, this.Age);
+    }
+
     public int Age
     {
         get;
+    }
+
+    public Person WithAge(int age)
+    {
+        return new Person(this.Name, age);
     }
 
     public bool Equals(Person other)

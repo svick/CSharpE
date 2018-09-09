@@ -34,15 +34,25 @@ namespace CSharpE.Extensions.Record
                 {
                     type.Fields.Clear();
 
+                    string paramName(string name) => name.ToLowerInvariant();
+
                     var constructorBody = dt
                         ? new Statement[] { NotImplementedStatement }
-                        : fields.Select(f => (Statement)Assignment(This().MemberAccess(f.Name), Identifier(f.Name.ToLowerInvariant())));
+                        : fields.Select(f => (Statement)Assignment(This().MemberAccess(f.Name), Identifier(paramName(f.Name))));
 
-                    type.AddConstructor(Public, fields.Select(f => Parameter(f.Type, f.Name.ToLowerInvariant())), constructorBody);
+                    type.AddConstructor(Public, fields.Select(f => Parameter(f.Type, paramName(f.Name))), constructorBody);
 
                     foreach (var field in fields)
                     {
                         type.AddAutoProperty(Public, field.Type, field.Name, getOnly: true);
+
+                        var witherBody = dt
+                            ? NotImplementedStatement
+                            : Return(New(
+                                type.GetReference(),
+                                fields.Select(f => f.Name == field.Name ? (Expression)Identifier(paramName(f.Name)) : This().MemberAccess(f.Name))));
+
+                        type.AddMethod(Public, type.GetReference(), $"With{field.Name}", new[] { Parameter(field.Type, paramName(field.Name)) }, witherBody);
                     }
                 });
 
