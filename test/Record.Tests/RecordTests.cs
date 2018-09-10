@@ -68,7 +68,7 @@ class Person : IEquatable<Person>
             
             var transformation = new RecordTransformation();
 
-            Assert.Equal(
+            AssertEx.LinesEqual(
                 expectedOutput, ProcessSingleFile(input, transformation, designTime: true, typeof(RecordAttribute)));
         }
         
@@ -136,7 +136,7 @@ class Person : IEquatable<Person>
             
             var transformation = new RecordTransformation();
 
-            Assert.Equal(
+            AssertEx.LinesEqual(
                 expectedOutput, ProcessSingleFile(input, transformation, designTime: false, typeof(RecordAttribute)));
         }
         
