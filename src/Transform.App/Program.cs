@@ -107,6 +107,9 @@ namespace CSharpE.Transform.App
                         }
 
                         break;
+                    case "i":
+                        // TODO: intellisense
+                        break;
                     default:
                         Console.WriteLine($"Invalid input {input}.");
                         break;

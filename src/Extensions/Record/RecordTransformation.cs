@@ -29,6 +29,7 @@ namespace CSharpE.Extensions.Record
 
                 typeDefinition.Fields.Clear();
 
+                // TODO: does not seem to cache correctly
                 typeDefinition.LimitedSegment(fieldsList, isDesignTime, (fields, dt, type) =>
                 {
                     string paramName(string name) => name.ToLowerInvariant();
