@@ -22,7 +22,7 @@ namespace CSharpE.Transform
 
         internal Syntax.SourceFile ToSyntaxSourceFile() => new Syntax.SourceFile(Path, Tree);
 
-        internal static SourceFile FromSyntaxSourceFile(Syntax.SourceFile syntaxSourceFile) =>
+        public static SourceFile FromSyntaxSourceFile(Syntax.SourceFile syntaxSourceFile) =>
             new SourceFile(syntaxSourceFile.Path, syntaxSourceFile.GetSyntaxTree());
     }
 }

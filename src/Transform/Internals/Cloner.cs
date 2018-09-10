@@ -19,6 +19,9 @@ namespace CSharpE.Transform.Internals
 
             if (input is SyntaxNode syntaxNode)
                 return (T) (object) syntaxNode.Clone();
+
+            if (TupleHandler.IsTuple(input))
+                return TupleHandler.DeepClone(input);
             
             throw new InvalidOperationException($"The object {input} has to be cloneable.");
         }

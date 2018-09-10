@@ -53,8 +53,6 @@ namespace CSharpE.Transform.Internals
     {
         public static ActionInvoker<Unit, T, Unit, Unit> Create<T>(Action<T> action)
         {
-            Debug.Assert(!ClosureChecker.HasClosure(action));
-
             return new ActionInvoker<Unit, T, Unit, Unit>((_, x) =>
             {
                 action(x);
@@ -64,8 +62,6 @@ namespace CSharpE.Transform.Internals
         
         public static ActionInvoker<T1, T2, Unit, Unit> Create<T1, T2>(Action<T1, T2> action)
         {
-            Debug.Assert(!ClosureChecker.HasClosure(action));
-
             return new ActionInvoker<T1, T2, Unit, Unit>((arg1, arg2) =>
             {
                 action(arg1, arg2);
@@ -76,7 +72,6 @@ namespace CSharpE.Transform.Internals
         public static ActionInvoker<Unit, T, TIntermediate, TResult> Create<T, TIntermediate, TResult>(
             Func<T, TIntermediate> action, Func<TResult, TIntermediate, TResult> combine)
         {
-            Debug.Assert(!ClosureChecker.HasClosure(action));
             Debug.Assert(!ClosureChecker.HasClosure(combine));
 
             return new ActionInvoker<Unit, T, TIntermediate, TResult>(
@@ -86,7 +81,6 @@ namespace CSharpE.Transform.Internals
         public static ActionInvoker<T1, T2, TIntermediate, TResult> Create<T1, T2, TIntermediate, TResult>(
             Func<T1, T2, TIntermediate> action, Func<TResult, TIntermediate, TResult> combine)
         {
-            Debug.Assert(!ClosureChecker.HasClosure(action));
             Debug.Assert(!ClosureChecker.HasClosure(combine));
 
             return new ActionInvoker<T1, T2, TIntermediate, TResult>(action, combine, (action.Method, combine.Method));

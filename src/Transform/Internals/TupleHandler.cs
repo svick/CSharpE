@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CSharpE.Transform.Internals
 {
@@ -33,6 +35,13 @@ namespace CSharpE.Transform.Internals
             {
                 Persistence.ThrowIfNotPersistent(item);
             }
+        }
+
+        public static T DeepClone<T>(T input)
+        {
+            var clones = GetItems(input).Select(Cloner.DeepClone);
+
+            return (T)Activator.CreateInstance(input.GetType(), clones.ToArray());
         }
     }
 }

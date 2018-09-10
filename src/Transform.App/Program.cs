@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
+using CSharpE.Syntax;
 
 namespace CSharpE.Transform.App
 {
@@ -19,33 +21,76 @@ namespace CSharpE.Transform.App
                 return;
             }
 
+            bool interactive = false;
+            if (args[0] == "-i")
+            {
+                interactive = true;
+                args = args.Skip(1).ToArray();
+            }
+
             string transformationAssemblyPath = args[0];
             var inputFilePaths = args.Skip(1);
 
-            var transformationAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(transformationAssemblyPath);
+            var transformationAssembly =
+                AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetFullPath(transformationAssemblyPath));
 
             var transformationTypes = transformationAssembly.ExportedTypes.Where(t => typeof(ITransformation).IsAssignableFrom(t));
 
             var inputFiles = await Task.WhenAll(inputFilePaths.Select(Syntax.SourceFile.OpenAsync));
 
-            var project = new Syntax.Project(inputFiles);
+            List<ITransformation> transformations =
+                transformationTypes.Select(tt => (ITransformation) Activator.CreateInstance(tt)).ToList();
 
-            foreach (var transformationType in transformationTypes)
+            if (!interactive)
             {
-                var transformation = (ITransformation)Activator.CreateInstance(transformationType);
+                var project = new Syntax.Project(inputFiles);
 
-                transformation.Process(project, designTime: false);
+                foreach (var transformation in transformations)
+                {
+                    transformation.Process(project, designTime: false);
+                }
+
+                foreach (var sourceFile in project.SourceFiles)
+                {
+                    File.WriteAllText(Path.ChangeExtension(sourceFile.Path, "g.cs"), sourceFile.GetText());
+                }
+
+                return;
             }
 
-            foreach (var sourceFile in project.SourceFiles)
+            var transformProject = new Project(
+                inputFiles.Select(SourceFile.FromSyntaxSourceFile), new LibraryReference[0], transformations);
+
+            transformProject.Log += Console.WriteLine;
+
+            while (true)
             {
-                File.WriteAllText(Path.ChangeExtension(sourceFile.Path, "g.cs"), sourceFile.GetText());
+                string input = Console.ReadLine();
+
+                switch (input)
+                {
+                    case "d":
+                    default:
+                        var transformed = transformProject.Transform(designTime: true);
+
+                        foreach (var sourceFile in transformed.SourceFiles)
+                        {
+                            var newPath = Path.Combine(Path.GetDirectoryName(sourceFile.Path), "design",
+                                Path.GetFileName(sourceFile.Path));
+
+                            Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+
+                            File.WriteAllText(newPath, sourceFile.Text);
+                        }
+
+                        break;
+                }
             }
         }
 
         private static void Usage()
         {
-            Console.WriteLine("Usage: transformation-assembly input-files");
+            Console.WriteLine("Usage: [-i] transformation-assembly input-files");
         }
     }
 }

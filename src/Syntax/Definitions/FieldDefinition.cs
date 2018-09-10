@@ -113,15 +113,18 @@ namespace CSharpE.Syntax
             var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : declarator?.Initializer?.Value;
 
             if (syntax == null || AttributesChanged() ||
-                FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || thisChanged == true)
+                FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || thisChanged == true ||
+                !IsAnnotated(syntax))
             {
                 var equalsValueClause =
                     newInitializer == null ? null : CSharpSyntaxFactory.EqualsValueClause(newInitializer);
 
-                syntax = CSharpSyntaxFactory.FieldDeclaration(
+                var newSyntax = CSharpSyntaxFactory.FieldDeclaration(
                     GetNewAttributes(), newModifiers.GetWrapped(), CSharpSyntaxFactory.VariableDeclaration(
                         newType, CSharpSyntaxFactory.SingletonSeparatedList(
                             CSharpSyntaxFactory.VariableDeclarator(newName, null, equalsValueClause))));
+
+                syntax = Annotate(newSyntax);
 
                 SetChanged(ref changed);
             }

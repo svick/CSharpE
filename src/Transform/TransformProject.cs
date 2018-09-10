@@ -26,7 +26,7 @@ namespace CSharpE.Transform
         }
 
         private TransformProject(List<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
-            : base(sourceFiles.Where(f => Path.GetExtension(f.Path) == ".cse"), additionalReferences)
+            : base(sourceFiles, additionalReferences)
         {
             additionalSourceFiles = sourceFiles.Except(SourceFiles).ToList();
         }
