@@ -78,7 +78,7 @@ namespace CSharpE.Extensions.Record
                             .Select(f => TypeReference(typeof(EqualityComparer<>), f.Type)
                                 .MemberAccess(nameof(EqualityComparer<object>.Default))
                                 .Call(nameof(EqualityComparer<object>.Equals), This().MemberAccess(f.Name), other.MemberAccess(f.Name)))
-                            .Aggregate<Expression>((l, r) => LogicalAnd(l, r));
+                            .Aggregate<Expression>(LogicalAnd);
 
                         var equalsStatements = new Statement[]
                         {

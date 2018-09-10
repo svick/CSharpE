@@ -60,23 +60,27 @@ namespace CSharpE.Transform.App
 
             var transformInputFiles = await Task.WhenAll(inputFilePaths.Select(SourceFile.OpenAsync));
 
-            var transformProject = new Project(transformInputFiles, new LibraryReference[0], transformations);
+            var designProject = new Project(transformInputFiles, new LibraryReference[0], transformations);
 
-            transformProject.Log += Console.WriteLine;
+            designProject.Log += Console.WriteLine;
+            
+            var buildProject = new Project(transformInputFiles, new LibraryReference[0], transformations);
 
+            buildProject.Log += Console.WriteLine;
+            
             while (true)
             {
                 string input = Console.ReadLine();
 
                 switch (input)
                 {
+                    case "":
                     case "d":
-                    default:
-                        await transformProject.ReloadSourceFilesAsync();
+                        await designProject.ReloadSourceFilesAsync();
                         
-                        var transformed = transformProject.Transform(designTime: true);
+                        var designTransformed = designProject.Transform(designTime: true);
 
-                        foreach (var sourceFile in transformed.SourceFiles)
+                        foreach (var sourceFile in designTransformed.SourceFiles)
                         {
                             var newPath = Path.Combine(Path.GetDirectoryName(sourceFile.Path), "design",
                                 Path.GetFileName(sourceFile.Path));
@@ -86,6 +90,25 @@ namespace CSharpE.Transform.App
                             File.WriteAllText(newPath, sourceFile.Text);
                         }
 
+                        break;
+                    case "b":
+                        await buildProject.ReloadSourceFilesAsync();
+                        
+                        var buildTransformed = buildProject.Transform(designTime: false);
+
+                        foreach (var sourceFile in buildTransformed.SourceFiles)
+                        {
+                            var newPath = Path.Combine(Path.GetDirectoryName(sourceFile.Path), "build",
+                                Path.GetFileName(sourceFile.Path));
+
+                            Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+
+                            File.WriteAllText(newPath, sourceFile.Text);
+                        }
+
+                        break;
+                    default:
+                        Console.WriteLine($"Invalid input {input}.");
                         break;
                 }
             }
