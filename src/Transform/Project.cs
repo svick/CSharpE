@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CSharpE.Syntax;
+using CSharpE.Syntax.Internals;
 using CSharpE.Transform.Transformers;
 
 namespace CSharpE.Transform
@@ -26,7 +28,13 @@ namespace CSharpE.Transform
         {
             SourceFiles = sourceFiles.ToList();
             AdditionalReferences = additionalReferences.ToList();
-            transformers = transformations.Select(t => new TransformationTransformer(t)).ToList();
+            transformers = new List<TransformationTransformer>();
+            
+            foreach (var transformation in transformations)
+            {
+                AdditionalReferences.AddRange(transformation.AdditionalReferences);
+                transformers.Add(new TransformationTransformer(transformation));
+            }
         }
 
         public event Action<LogAction> Log;
@@ -44,6 +52,14 @@ namespace CSharpE.Transform
             return new Project(
                 transformProject.SourceFiles.Select(SourceFile.FromSyntaxSourceFile),
                 Enumerable.Empty<LibraryReference>(), Enumerable.Empty<ITransformation>());
+        }
+
+        public async Task ReloadSourceFilesAsync()
+        {
+            foreach (var sourceFile in SourceFiles)
+            {
+                await sourceFile.ReopenAsync();
+            }
         }
     }
 

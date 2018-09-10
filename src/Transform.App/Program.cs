@@ -29,20 +29,20 @@ namespace CSharpE.Transform.App
             }
 
             string transformationAssemblyPath = args[0];
-            var inputFilePaths = args.Skip(1);
+            var inputFilePaths = args.Skip(1).ToArray();
 
             var transformationAssembly =
                 AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetFullPath(transformationAssemblyPath));
 
             var transformationTypes = transformationAssembly.ExportedTypes.Where(t => typeof(ITransformation).IsAssignableFrom(t));
 
-            var inputFiles = await Task.WhenAll(inputFilePaths.Select(Syntax.SourceFile.OpenAsync));
-
             List<ITransformation> transformations =
                 transformationTypes.Select(tt => (ITransformation) Activator.CreateInstance(tt)).ToList();
 
             if (!interactive)
             {
+                var inputFiles = await Task.WhenAll(inputFilePaths.Select(Syntax.SourceFile.OpenAsync));
+
                 var project = new Syntax.Project(inputFiles);
 
                 foreach (var transformation in transformations)
@@ -58,8 +58,9 @@ namespace CSharpE.Transform.App
                 return;
             }
 
-            var transformProject = new Project(
-                inputFiles.Select(SourceFile.FromSyntaxSourceFile), new LibraryReference[0], transformations);
+            var transformInputFiles = await Task.WhenAll(inputFilePaths.Select(SourceFile.OpenAsync));
+
+            var transformProject = new Project(transformInputFiles, new LibraryReference[0], transformations);
 
             transformProject.Log += Console.WriteLine;
 
@@ -71,6 +72,8 @@ namespace CSharpE.Transform.App
                 {
                     case "d":
                     default:
+                        await transformProject.ReloadSourceFilesAsync();
+                        
                         var transformed = transformProject.Transform(designTime: true);
 
                         foreach (var sourceFile in transformed.SourceFiles)

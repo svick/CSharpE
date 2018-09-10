@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace CSharpE.Transform
@@ -24,5 +25,15 @@ namespace CSharpE.Transform
 
         public static SourceFile FromSyntaxSourceFile(Syntax.SourceFile syntaxSourceFile) =>
             new SourceFile(syntaxSourceFile.Path, syntaxSourceFile.GetSyntaxTree());
+
+        public static async Task<SourceFile> OpenAsync(string path) =>
+            FromSyntaxSourceFile(await Syntax.SourceFile.OpenAsync(path));
+
+        public async Task ReopenAsync()
+        {
+            var syntaxFile = await Syntax.SourceFile.OpenAsync(Path);
+
+            Tree = syntaxFile.GetSyntaxTree();
+        }
     }
 }

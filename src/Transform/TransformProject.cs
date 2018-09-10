@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using CSharpE.Syntax;
-using CSharpE.Syntax.Internals;
 using CSharpE.Transform.Internals;
 using CSharpE.Transform.Transformers;
 
@@ -42,8 +40,6 @@ namespace CSharpE.Transform
         /// </summary>
         public Transformer<TransformProject, Unit> RunTransformation(ITransformation transformation, bool designTime)
         {
-            this.References.AddRange(transformation.AdditionalReferences);
-
             var transformer = CodeTransformer<TransformProject, Unit>.Create(project =>
             {
                 transformation.Process(project, designTime);
