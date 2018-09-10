@@ -27,6 +27,8 @@ namespace CSharpE.Transform.Transformers
 
         protected CodeTransformer(Func<TInput, TOutput> codeAction) => this.codeAction = codeAction;
 
+        private protected virtual string GetTargetKind(TInput input) => input.GetType().Name; 
+
         public override TOutput Transform(TransformProject project, TInput input)
         {
             var transformerBuilder = new TransformerBuilder(project, transformers);
@@ -34,7 +36,7 @@ namespace CSharpE.Transform.Transformers
             var oldTransformerBuilder = project.TransformerBuilder;
             project.TransformerBuilder = transformerBuilder;
 
-            project.Log(typeof(TInput).Name, LogInfo.GetName(input), "transform");
+            project.Log(GetTargetKind(input), LogInfo.GetName(input), "transform");
 
             var result = codeAction(input);
 
@@ -113,13 +115,16 @@ namespace CSharpE.Transform.Transformers
             };
         }
 
+        private protected override string GetTargetKind(TInput input) =>
+            limited ? "Segment" : base.GetTargetKind(input);
+
         public override TOutput Transform(TransformProject project, TInput input)
         {
             var newBeforeSyntax = Limit(input.GetWrapped());
 
             if (beforeSyntax != null && beforeSyntax.IsEquivalentTo(newBeforeSyntax))
             {
-                project.Log(typeof(TInput).Name, LogInfo.GetName(input), "cached");
+                project.Log(GetTargetKind(input), LogInfo.GetName(input), "cached");
 
                 syntaxChangesApplier.Invoke(input);
             }

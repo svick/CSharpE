@@ -1,4 +1,6 @@
-﻿namespace CSharpE.Syntax.Internals
+﻿using System.IO;
+
+namespace CSharpE.Syntax.Internals
 {
     internal static class LogInfo
     {
@@ -6,9 +8,10 @@
         {
             switch (obj)
             {
-                case SourceFile sourceFile: return sourceFile.Path;
-                case TypeDefinition typeDefinition: return typeDefinition.Name;
+                case SourceFile sourceFile: return Path.GetFileName(sourceFile.Path);
+                case BaseTypeDefinition typeDefinition: return typeDefinition.Name;
                 case MethodDefinition methodDefinition: return methodDefinition.Name;
+                case FieldDefinition fieldDefinition: return fieldDefinition.Name;
             }
 
             return null;
