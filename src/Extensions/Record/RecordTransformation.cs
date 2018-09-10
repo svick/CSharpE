@@ -18,10 +18,7 @@ namespace CSharpE.Extensions.Record
                 if (!(baseType is TypeDefinition typeDefinition))
                     return;
                 
-                typeDefinition.Segment(type =>
-                {
-                    type.BaseTypes.Add(TypeReference(typeof(IEquatable<>), type.GetReference()));
-                });
+                typeDefinition.BaseTypes.Add(TypeReference(typeof(IEquatable<>), typeDefinition.GetReference()));
                 
                 var fieldsList = typeDefinition.ForEachField(field =>
                 {
@@ -30,14 +27,14 @@ namespace CSharpE.Extensions.Record
                     return (field.Name, Type: field.Type.Clone());
                 });
 
-                typeDefinition.Segment(fieldsList, isDesignTime, (fields, dt, type) =>
-                {
-                    type.Fields.Clear();
+                typeDefinition.Fields.Clear();
 
+                typeDefinition.LimitedSegment(fieldsList, isDesignTime, (fields, dt, type) =>
+                {
                     string paramName(string name) => name.ToLowerInvariant();
 
                     var constructorBody = dt
-                        ? new Statement[] { NotImplementedStatement }
+                        ? new[] { NotImplementedStatement }
                         : fields.Select(f => (Statement)Assignment(This().MemberAccess(f.Name), Identifier(paramName(f.Name))));
 
                     type.AddConstructor(Public, fields.Select(f => Parameter(f.Type, paramName(f.Name))), constructorBody);
@@ -58,7 +55,7 @@ namespace CSharpE.Extensions.Record
 
                 if (isDesignTime)
                 {
-                    typeDefinition.Segment(type =>
+                    typeDefinition.LimitedSegment(type =>
                     {
                         type.AddMethod(Public, typeof(bool), nameof(IEquatable<object>.Equals),
                             new[] {Parameter(type.GetReference(), "other")}, NotImplementedStatement);
@@ -72,7 +69,7 @@ namespace CSharpE.Extensions.Record
                 }
                 else
                 {
-                    typeDefinition.Segment(fieldsList, (fields, type) =>
+                    typeDefinition.LimitedSegment(fieldsList, (fields, type) =>
                     {
                         var other = Identifier("other");
 

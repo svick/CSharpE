@@ -11,7 +11,32 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public abstract class TypeDefinition : BaseTypeDefinition, ISyntaxWrapper<TypeDeclarationSyntax>
+    public interface ILimitedTypeDefinition
+    {
+        NamedTypeReference GetReference();
+        
+        FieldDefinition AddField(
+            MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null);
+
+        FieldDefinition AddField(TypeReference type, string name, Expression initializer = null);
+
+        PropertyDefinition AddAutoProperty(
+            MemberModifiers modifiers, TypeReference type, string name, bool getOnly = false);
+
+        MethodDefinition AddMethod(
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
+            params Statement[] body);
+
+        MethodDefinition AddMethod(
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
+            IEnumerable<Statement> body);
+
+        ConstructorDefinition AddConstructor(
+            MemberModifiers modifiers, IEnumerable<Parameter> parameters, IEnumerable<Statement> body);
+    }
+    
+    public abstract class TypeDefinition
+        : BaseTypeDefinition, ISyntaxWrapper<TypeDeclarationSyntax>, ILimitedTypeDefinition
     {
         private TypeDeclarationSyntax syntax;
         

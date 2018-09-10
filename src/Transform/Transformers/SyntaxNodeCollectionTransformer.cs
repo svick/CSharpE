@@ -18,15 +18,21 @@ namespace CSharpE.Transform.Transformers
         where TParent : SyntaxNode
         where TItem : SyntaxNode
     {
+        private readonly bool limitedComparison;
         private FileSpan parentFileSpan;
 
         private SyntaxTree oldTree;
         private List<TextSpan> oldItemsSpans;
         private List<CodeTransformer<TItem, TIntermediate>> oldTransformers;
 
-        public SyntaxNodeCollectionTransformer(
-            TParent parent, ActionInvoker<TData, TItem, TIntermediate, TResult> action, TData data)
-            : base(action, data) => parentFileSpan = parent.FileSpan;
+        public SyntaxNodeCollectionTransformer(TParent parent,
+            ActionInvoker<TData, TItem, TIntermediate, TResult> action, TData data, bool limitedComparison)
+            : base(action, data)
+        {
+            this.limitedComparison = limitedComparison;
+
+            parentFileSpan = parent.FileSpan;
+        }
 
         public override TResult Transform(TransformProject project, IEnumerable<TItem> input)
         {
@@ -68,7 +74,8 @@ namespace CSharpE.Transform.Transformers
                 }
 
                 if (itemTransformer == null)
-                    itemTransformer = CodeTransformer<TItem, TIntermediate>.Create(i => Action.Invoke(Data, i));
+                    itemTransformer =
+                        CodeTransformer<TItem, TIntermediate>.Create(i => Action.Invoke(Data, i), limitedComparison);
 
                 var newItem = items[newIndex];
 
@@ -89,14 +96,15 @@ namespace CSharpE.Transform.Transformers
             return Action.GetResult();
         }
 
-        public override bool Matches(
-            TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction, TData newData)
+        public override bool Matches(TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction,
+            TData newData, bool newLimitedComparison)
         {
             var newParentFileSpan = newParent.FileSpan;
 
             var result = Action.Equals(newAction) &&
                          EqualityComparer<TData>.Default.Equals(Data, newData) &&
-                         parentFileSpan.Matches(newParentFileSpan);
+                         parentFileSpan.Matches(newParentFileSpan) &&
+                         limitedComparison == newLimitedComparison;
 
             // to make following matches simpler
             if (result)

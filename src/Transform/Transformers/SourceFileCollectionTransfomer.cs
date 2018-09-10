@@ -42,7 +42,8 @@ namespace CSharpE.Transform.Transformers
         }
 
         public override bool Matches(Syntax.Project newParent,
-            ActionInvoker<TData, Syntax.SourceFile, TIntermediate, TResult> newAction, TData newData) =>
+            ActionInvoker<TData, Syntax.SourceFile, TIntermediate, TResult> newAction, TData newData,
+            bool newLimitedComparison) =>
             Action.Equals(newAction) && EqualityComparer<TData>.Default.Equals(Data, newData);
     }
 }

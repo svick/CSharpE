@@ -33,12 +33,12 @@ namespace CSharpE.Transform.Transformers
 
             if (oldTransformer is CollectionTransformer<TParent, TItem, TData, TIntermediate, TResult> oldCollectionTransformer)
             {
-                if (oldCollectionTransformer.Matches(parent, action, data))
+                if (oldCollectionTransformer.Matches(parent, action, data, newLimitedComparison: false))
                     transformer = oldCollectionTransformer;
             }
 
             if (transformer == null)
-                transformer = CollectionTransformer.Create(parent, action, data);
+                transformer = CollectionTransformer.Create(parent, action, data, limitedComparison: false);
 
             var result = transformer.Transform(project, collectionFunction(parent));
 
@@ -47,11 +47,11 @@ namespace CSharpE.Transform.Transformers
             return result;
         }
         
-        public TResult Segment<TNode, TData, TResult>(
+        public TResult LimitedSegment<TNode, TData, TResult>(
             TNode node, ActionInvoker<TData, TNode, TResult, TResult> action, TData data)
             where TNode : SyntaxNode
         {
-            // segment is implemented as a single-element collection
+            // segment is implemented as a single-element collection, because CodeTransformer doesn't handle data
             
             CollectionTransformer<TNode, TNode, TData, TResult, TResult> transformer = null;
 
@@ -59,12 +59,12 @@ namespace CSharpE.Transform.Transformers
 
             if (oldTransformer is CollectionTransformer<TNode, TNode, TData, TResult, TResult> oldCollectionTransformer)
             {
-                if (oldCollectionTransformer.Matches(node, action, data))
+                if (oldCollectionTransformer.Matches(node, action, data, newLimitedComparison: true))
                     transformer = oldCollectionTransformer;
             }
 
             if (transformer == null)
-                transformer = CollectionTransformer.Create(node, action, data);
+                transformer = CollectionTransformer.Create(node, action, data, limitedComparison: true);
 
             var result = transformer.Transform(project, new[] { node });
 

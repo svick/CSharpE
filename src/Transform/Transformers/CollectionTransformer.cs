@@ -19,32 +19,38 @@ namespace CSharpE.Transform.Transformers
             Data = data;
         }
 
-        public abstract bool Matches(
-            TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction, TData newData);
+        public abstract bool Matches(TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction,
+            TData newData, bool newLimitedComparison);
     }
 
     internal static class CollectionTransformer
     {
         public static CollectionTransformer<TParent, TItem, TData, TIntermediate, TOutput> Create<TParent, TItem, TData, TIntermediate, TOutput>(
-            TParent parent, ActionInvoker<TData, TItem, TIntermediate, TOutput> action, TData data)
+            TParent parent, ActionInvoker<TData, TItem, TIntermediate, TOutput> action, TData data,
+            bool limitedComparison)
             where TParent : class
             where TItem : SyntaxNode
         {
-            Type transfomerType;
-
-            // PERF: SourceFileCollectionTransformer doesn't need reflection
             // SyntaxNodeCollectionTransformer might profit from ExpressionTree-based cache
 
+            object result;
+
             if (typeof(TParent) == typeof(Syntax.Project) && typeof(TItem) == typeof(Syntax.SourceFile))
-                transfomerType = typeof(SourceFileCollectionTransformer<TData, TIntermediate, TOutput>);
+            {
+                result = new SourceFileCollectionTransformer<TData, TIntermediate, TOutput>(
+                    (Syntax.Project)(object)parent,
+                    (ActionInvoker<TData, Syntax.SourceFile, TIntermediate, TOutput>)(object)action, data);
+            }
             else if (typeof(SyntaxNode).IsAssignableFrom(typeof(TParent)))
-                transfomerType = typeof(SyntaxNodeCollectionTransformer<,,,,>).MakeGenericType(
+            {
+                var transfomerType = typeof(SyntaxNodeCollectionTransformer<,,,,>).MakeGenericType(
                     typeof(TParent), typeof(TItem), typeof(TData), typeof(TIntermediate), typeof(TOutput));
+                result = Activator.CreateInstance(transfomerType, parent, action, data, limitedComparison);
+            }
             else
                 throw new InvalidOperationException();
 
-            return (CollectionTransformer<TParent, TItem, TData, TIntermediate, TOutput>)Activator.CreateInstance(
-                transfomerType, parent, action, data);
+            return (CollectionTransformer<TParent, TItem, TData, TIntermediate, TOutput>)result;
         }
     }
 }

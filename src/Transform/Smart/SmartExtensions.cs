@@ -159,18 +159,18 @@ namespace CSharpE.Transform.Smart
             this TypeDefinition type, Func<FieldDefinition, TResult> action) =>
             ForEach(type, action, t => t.Fields);
         
-        public static void Segment<TNode>(this TNode node, Action<TNode> action)
-            where TNode : SyntaxNode
-            => Segment(node, node.SourceFile?.Project, action);
+        public static void LimitedSegment(this TypeDefinition node, Action<ILimitedTypeDefinition> action)
+            => LimitedSegment(node, node.SourceFile?.Project, action);
 
-        private static void Segment<TNode>(TNode node, Syntax.Project project, Action<TNode> action)
-            where TNode : SyntaxNode
+        private static void LimitedSegment(
+            TypeDefinition node, Syntax.Project project, Action<ILimitedTypeDefinition> action)
         {
             ClosureChecker.ThrowIfHasClosure(action);
             
             if (project is TransformProject transformProject)
             {
-                transformProject.TransformerBuilder.Segment(node, ActionInvoker.Create(action), Unit.Value);
+                transformProject.TransformerBuilder.LimitedSegment(
+                    node, ActionInvoker.Create<TypeDefinition>(action), Unit.Value);
             }
             else
             {
@@ -178,20 +178,20 @@ namespace CSharpE.Transform.Smart
             }
         }
 
-        public static void Segment<TNode, T1>(this TNode node, T1 arg1, Action<T1, TNode> action)
-            where TNode : SyntaxNode
-            => Segment(node, node.SourceFile?.Project, arg1, action);
+        public static void LimitedSegment<T1>(
+            this TypeDefinition node, T1 arg1, Action<T1, ILimitedTypeDefinition> action)
+            => LimitedSegment(node, node.SourceFile?.Project, arg1, action);
 
-        private static void Segment<TNode, T1>(TNode node, Syntax.Project project, T1 arg1,
-            Action<T1, TNode> action)
-            where TNode : SyntaxNode
+        private static void LimitedSegment<T1>(TypeDefinition node, Syntax.Project project, T1 arg1,
+            Action<T1, ILimitedTypeDefinition> action)
         {
             ClosureChecker.ThrowIfHasClosure(action);
             Persistence.ThrowIfNotPersistent(arg1);
             
             if (project is TransformProject transformProject)
             {
-                transformProject.TransformerBuilder.Segment(node, ActionInvoker.Create(action), arg1);
+                transformProject.TransformerBuilder.LimitedSegment(
+                    node, ActionInvoker.Create<T1, TypeDefinition>((a1, n) => action(a1, node)), arg1);
             }
             else
             {
@@ -199,21 +199,20 @@ namespace CSharpE.Transform.Smart
             }
         }
 
-        public static void Segment<TNode, T1, T2>(this TNode node, T1 arg1, T2 arg2, Action<T1, T2, TNode> action)
-            where TNode : SyntaxNode
-            => Segment(node, node.SourceFile?.Project, arg1, arg2, action);
+        public static void LimitedSegment<T1, T2>(
+            this TypeDefinition node, T1 arg1, T2 arg2, Action<T1, T2, ILimitedTypeDefinition> action)
+            => LimitedSegment(node, node.SourceFile?.Project, arg1, arg2, action);
 
-        private static void Segment<TNode, T1, T2>(TNode node, Syntax.Project project, T1 arg1, T2 arg2,
-            Action<T1, T2, TNode> action)
-            where TNode : SyntaxNode
+        private static void LimitedSegment<T1, T2>(TypeDefinition node, Syntax.Project project, T1 arg1, T2 arg2,
+            Action<T1, T2, ILimitedTypeDefinition> action)
         {
             ClosureChecker.ThrowIfHasClosure(action);
             Persistence.ThrowIfNotPersistent(arg1);
             
             if (project is TransformProject transformProject)
             {
-                transformProject.TransformerBuilder.Segment(
-                    node, ActionInvoker.Create<(T1, T2), TNode>((tuple, n) => action(tuple.Item1, tuple.Item2, n)),
+                transformProject.TransformerBuilder.LimitedSegment(node,
+                    ActionInvoker.Create<(T1, T2), TypeDefinition>((tuple, n) => action(tuple.Item1, tuple.Item2, n)),
                     (arg1, arg2));
             }
             else
