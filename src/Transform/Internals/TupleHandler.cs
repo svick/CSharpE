@@ -33,15 +33,20 @@ namespace CSharpE.Transform.Internals
         {
             foreach (var item in GetItems(arg))
             {
-                Persistence.ThrowIfNotPersistent(item);
+                GeneralHandler.ThrowIfNotPersistent(item);
             }
         }
 
         public static T DeepClone<T>(T input)
         {
-            var clones = GetItems(input).Select(Cloner.DeepClone);
+            var clones = GetItems(input).Select(GeneralHandler.DeepClone);
 
             return (T)Activator.CreateInstance(input.GetType(), clones.ToArray());
         }
+
+				public static bool Equals<T>(T arg1, T arg2)
+				{
+						return CollectionHandler.Equals(GetItems(arg1), GetItems(arg2));
+				}
     }
 }

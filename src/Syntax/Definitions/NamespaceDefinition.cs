@@ -8,8 +8,7 @@ namespace CSharpE.Syntax
 {
     public class NamespaceDefinition : SyntaxNode, ISyntaxWrapper<NamespaceDeclarationSyntax>
     {
-        private SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax> members;
-        public IList<NamespaceOrTypeDefinition> Members => members;
+        public IList<NamespaceOrTypeDefinition> Members => throw new NotImplementedException();
 
         public NamespaceDefinition(NamespaceDeclarationSyntax ns, SyntaxNode parent)
         {

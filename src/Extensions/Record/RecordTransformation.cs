@@ -22,14 +22,11 @@ namespace CSharpE.Extensions.Record
                 
                 var fieldsList = typeDefinition.ForEachField(field =>
                 {
-                    // TODO: errors for initializers and attributes
-
                     return (field.Name, Type: field.Type.Clone());
                 });
 
                 typeDefinition.Fields.Clear();
 
-                // TODO: does not seem to cache correctly
                 typeDefinition.LimitedSegment(fieldsList, isDesignTime, (fields, dt, type) =>
                 {
                     string paramName(string name) => name.ToLowerInvariant();

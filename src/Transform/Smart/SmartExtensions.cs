@@ -47,7 +47,7 @@ namespace CSharpE.Transform.Smart
             where TItem : SyntaxNode
         {
             ClosureChecker.ThrowIfHasClosure(action);
-            Persistence.ThrowIfNotPersistent(arg1);
+            GeneralHandler.ThrowIfNotPersistent(arg1);
 
             if (project is TransformProject transformProject)
             {
@@ -186,7 +186,7 @@ namespace CSharpE.Transform.Smart
             Action<T1, ILimitedTypeDefinition> action)
         {
             ClosureChecker.ThrowIfHasClosure(action);
-            Persistence.ThrowIfNotPersistent(arg1);
+            GeneralHandler.ThrowIfNotPersistent(arg1);
             
             if (project is TransformProject transformProject)
             {
@@ -207,7 +207,7 @@ namespace CSharpE.Transform.Smart
             Action<T1, T2, ILimitedTypeDefinition> action)
         {
             ClosureChecker.ThrowIfHasClosure(action);
-            Persistence.ThrowIfNotPersistent(arg1);
+            GeneralHandler.ThrowIfNotPersistent(arg1);
             
             if (project is TransformProject transformProject)
             {

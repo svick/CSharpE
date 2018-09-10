@@ -139,7 +139,7 @@ namespace CSharpE.Transform.Transformers
                 syntaxChangesApplier = differ(input);
             }
 
-            return Cloner.DeepClone(cachedOutput);
+            return GeneralHandler.DeepClone(cachedOutput);
         }
     }
 }

@@ -89,13 +89,15 @@ namespace CSharpE.Syntax
                     return default;
                 case BaseFieldDeclarationSyntax fieldDeclaration:
                     return fieldDeclaration.AttributeLists;
+								case BasePropertyDeclarationSyntax propertyDeclaration:
+										return propertyDeclaration.AttributeLists;
                 case BaseMethodDeclarationSyntax methodDeclaration:
                     return methodDeclaration.AttributeLists;
                 case BaseTypeDeclarationSyntax typeDeclaration:
                     return typeDeclaration.AttributeLists;
             }
 
-            throw new NotImplementedException();
+            throw new NotImplementedException(syntax.GetType().Name);
         }
 
         private MemberModifiers modifiers;

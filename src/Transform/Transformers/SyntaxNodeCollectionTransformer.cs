@@ -102,7 +102,7 @@ namespace CSharpE.Transform.Transformers
             var newParentFileSpan = newParent.FileSpan;
 
             var result = Action.Equals(newAction) &&
-                         EqualityComparer<TData>.Default.Equals(Data, newData) &&
+                         GeneralHandler.Equals(Data, newData) &&
                          parentFileSpan.Matches(newParentFileSpan) &&
                          limitedComparison == newLimitedComparison;
 
