@@ -95,6 +95,8 @@ namespace CSharpE.Syntax
                     return methodDeclaration.AttributeLists;
                 case BaseTypeDeclarationSyntax typeDeclaration:
                     return typeDeclaration.AttributeLists;
+                case DelegateDeclarationSyntax delegateDeclaration:
+                    return delegateDeclaration.AttributeLists;
             }
 
             throw new NotImplementedException(syntax.GetType().Name);

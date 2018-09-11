@@ -47,10 +47,13 @@ namespace CSharpE.Extensions.Logging
         {
             project.ForEachMethod(method =>
             {
-                Statement loggingStatement = TypeReference(typeof(Console))
-                    .Call(nameof(Console.WriteLine), BuildWriteLineParameters(method));
+                if (method.Body != null)
+                {
+                    Statement loggingStatement = TypeReference(typeof(Console))
+                        .Call(nameof(Console.WriteLine), BuildWriteLineParameters(method));
 
-                method.Body = Block(loggingStatement, method.Body);
+                    method.Body = Block(loggingStatement, method.Body);
+                }
             });            
         }
     }

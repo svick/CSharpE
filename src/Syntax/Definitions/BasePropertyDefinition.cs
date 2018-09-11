@@ -55,7 +55,7 @@ namespace CSharpE.Syntax
         }
 
         private protected AccessorDeclarationSyntax FindAccessor(SyntaxKind accessorKind) =>
-            BasePropertySyntax.AccessorList.Accessors.FirstOrDefault(a => a.IsKind(accessorKind));
+            BasePropertySyntax.AccessorList?.Accessors.FirstOrDefault(a => a.IsKind(accessorKind));
 
         private protected bool getAccessorSet;
         private protected AccessorDefinition getAccessor;

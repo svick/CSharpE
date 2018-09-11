@@ -68,14 +68,20 @@ namespace CSharpE.Syntax.Internals
             {
                 case FieldDeclarationSyntax fieldDeclaration:
                     return new FieldDefinition(fieldDeclaration, containingType);
-								case PropertyDeclarationSyntax propertyDeclaration:
-										return new PropertyDefinition(propertyDeclaration, containingType);
+                case PropertyDeclarationSyntax propertyDeclaration:
+                    return new PropertyDefinition(propertyDeclaration, containingType);
                 case MethodDeclarationSyntax methodDeclaration:
                     return new MethodDefinition(methodDeclaration, containingType);
-								case ConstructorDeclarationSyntax constructorDeclaration:
-										return new ConstructorDefinition(constructorDeclaration, containingType);
+                case ConstructorDeclarationSyntax constructorDeclaration:
+                    return new ConstructorDefinition(constructorDeclaration, containingType);
+                case OperatorDeclarationSyntax operatorDeclaration:
+                    return new OperatorDefinition(operatorDeclaration, containingType);
+                case ConversionOperatorDeclarationSyntax conversionOperatorDeclaration:
+                    return new OperatorDefinition(conversionOperatorDeclaration, containingType);
                 case BaseTypeDeclarationSyntax baseTypeDeclaration:
                     return TypeDefinition(baseTypeDeclaration, containingType);
+                case DelegateDeclarationSyntax delegateDeclaration:
+                    return new DelegateDefinition(delegateDeclaration, containingType);
                 default:
                     throw new NotImplementedException(memberDeclarationSyntax.GetType().Name);
             }

@@ -66,13 +66,13 @@ namespace CSharpE.Syntax
 
             var newModifiers = Modifiers;
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
-            var newBody = body?.GetWrapped(ref thisChanged) ?? syntax.Body;
+            var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
 
             if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || !IsAnnotated(syntax))
             {
                 if (Parent == null)
-                    throw new InvalidOperationException("Can't create syntax ndoe for constructor with no parent type.");
+                    throw new InvalidOperationException("Can't create syntax node for constructor with no parent type.");
 
                 var newSyntax = CSharpSyntaxFactory.ConstructorDeclaration(
                     GetNewAttributes(), newModifiers.GetWrapped(), CSharpSyntaxFactory.Identifier(ParentType.Name),

@@ -72,6 +72,7 @@ namespace CSharpE.Syntax
 
                 return members;
             }
+            set => SetList(ref members, new NamespaceOrTypeList(value, this));
         }
 
         public IEnumerable<BaseTypeDefinition> GetTypes()

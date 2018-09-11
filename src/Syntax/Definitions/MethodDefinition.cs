@@ -135,7 +135,7 @@ namespace CSharpE.Syntax
             var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? syntax.ReturnType;
             var newName = name.GetWrapped(ref thisChanged);
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
-            var newBody = body?.GetWrapped(ref thisChanged) ?? syntax.Body;
+            var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
 
             if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || !IsAnnotated(syntax))

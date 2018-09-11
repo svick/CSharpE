@@ -2,34 +2,79 @@
 using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class NamespaceDefinition : SyntaxNode, ISyntaxWrapper<NamespaceDeclarationSyntax>
+    public sealed class NamespaceDefinition : SyntaxNode, ISyntaxWrapper<NamespaceDeclarationSyntax>
     {
-        public IList<NamespaceOrTypeDefinition> Members => throw new NotImplementedException();
-
-        public NamespaceDefinition(NamespaceDeclarationSyntax ns, SyntaxNode parent)
+        private NamespaceDeclarationSyntax syntax;
+        
+        public NamespaceDefinition(NamespaceDeclarationSyntax syntax, SyntaxNode parent)
         {
-            throw new NotImplementedException();
+            Init(syntax);
+            Parent = parent;
+        }
+
+        private void Init(NamespaceDeclarationSyntax syntax)
+        {
+            this.syntax = syntax;
+
+            Name = syntax.Name.ToString();
+        }
+
+        // TODO: cache NameSyntax
+        public string Name { get; set; }
+
+        private NamespaceOrTypeList members;
+        public IList<NamespaceOrTypeDefinition> Members
+        {
+            get
+            {
+                if (members == null)
+                    members = new NamespaceOrTypeList(syntax.Members, this);
+
+                return members;
+            }
+            set => SetList(ref members, new NamespaceOrTypeList(value, this));
         }
 
         NamespaceDeclarationSyntax ISyntaxWrapper<NamespaceDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            throw new NotImplementedException();
+            GetAndResetChanged(ref changed);
+
+            bool? thisChanged = false;
+
+            var newMembers = members?.GetWrapped(ref thisChanged) ?? syntax.Members;
+
+            if (syntax == null || thisChanged == true || Name != syntax.Name.ToString())
+            {
+                syntax = CSharpSyntaxFactory.NamespaceDeclaration(
+                    CSharpSyntaxFactory.ParseName(Name), default, default, newMembers);
+
+                SetChanged(ref changed);
+            }
+
+            return syntax;
         }
 
-        private NamespaceDefinition parent;
+        private SyntaxNode parent;
         internal override SyntaxNode Parent
         {
             get => parent;
             set
             {
-                if (value is NamespaceDefinition parentNamespace)
-                    parent = parentNamespace;
-                else
-                    throw new ArgumentException(nameof(value));
+                switch (value)
+                {
+                    case null:
+                    case NamespaceDefinition _:
+                    case SourceFile _:
+                        parent = value;
+                        break;
+                    default:
+                        throw new ArgumentException(nameof(value));
+                }
             }
         }
 

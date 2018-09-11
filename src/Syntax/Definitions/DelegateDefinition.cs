@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static CSharpE.Syntax.MemberModifiers;
+using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -64,14 +67,38 @@ namespace CSharpE.Syntax
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 
-        private protected override void ValidateModifiers(MemberModifiers modifiers)
+        private const MemberModifiers ValidModifiers = AccessModifiersMask | New | Unsafe;
+        private protected override void ValidateModifiers(MemberModifiers value)
         {
-            throw new System.NotImplementedException();
+            var invalidModifiers = value & ~ValidModifiers;
+            if (invalidModifiers != 0)
+                throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a delegate.", nameof(value));
         }
 
         DelegateDeclarationSyntax ISyntaxWrapper<DelegateDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            throw new System.NotImplementedException();
+            GetAndResetChanged(ref changed);
+
+            bool? thisChanged = false;
+
+            var newModifiers = Modifiers;
+            var newName = name.GetWrapped(ref thisChanged);
+            var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? syntax.ReturnType;
+            var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
+
+            if (syntax == null || AttributesChanged() || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
+                thisChanged == true || !IsAnnotated(syntax))
+            {
+                var newSyntax = CSharpSyntaxFactory.DelegateDeclaration(
+                    GetNewAttributes(), newModifiers.GetWrapped(), newReturnType, newName, default,
+                    CSharpSyntaxFactory.ParameterList(newParameters), default);
+
+                syntax = Annotate(newSyntax);
+
+                SetChanged(ref changed);
+            }
+
+            return syntax;
         }
 
         private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) =>

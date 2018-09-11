@@ -37,18 +37,26 @@ namespace CSharpE.Syntax
         }
 
         // TODO: methods without body and with expression body
-        
+
+        private protected bool bodySet;
         private protected BlockStatement body;
         public BlockStatement Body
         {
             get
             {
-                if (body == null)
-                    body = new BlockStatement(BaseMethodSyntax.Body, this);
+                if (!bodySet)
+                {
+                    body = BaseMethodSyntax.Body == null ? null : new BlockStatement(BaseMethodSyntax.Body, this); 
+                    bodySet = true;
+                }
 
                 return body;
             }
-            set => Set(ref body, value);
+            set
+            {
+                Set(ref body, value);
+                bodySet = true;
+            }
         }
 
         BaseMethodDeclarationSyntax ISyntaxWrapper<BaseMethodDeclarationSyntax>.GetWrapped(ref bool? changed) =>

@@ -25,10 +25,12 @@ namespace CSharpE.Transform.App
             }
 
             bool interactive = false;
+            string outputDirectory = null;
             if (args[0] == "-i")
             {
                 interactive = true;
-                args = args.Skip(1).ToArray();
+                outputDirectory = args[1];
+                args = args.Skip(2).ToArray();
             }
 
             string transformationAssemblyPath = args[0];
@@ -94,7 +96,8 @@ namespace CSharpE.Transform.App
 
                         foreach (var sourceFile in designTransformed.SourceFiles)
                         {
-                            var newPath = Path.Combine(Path.GetDirectoryName(sourceFile.Path), "design",
+                            // TODO: figure out a better way to handle this
+                            var newPath = Path.Combine(outputDirectory, "design",
                                 Path.ChangeExtension(Path.GetFileName(sourceFile.Path), ".cse"));
 
                             Directory.CreateDirectory(Path.GetDirectoryName(newPath));
@@ -110,7 +113,7 @@ namespace CSharpE.Transform.App
 
                         foreach (var sourceFile in buildTransformed.SourceFiles)
                         {
-                            var newPath = Path.Combine(Path.GetDirectoryName(sourceFile.Path), "build",
+                            var newPath = Path.Combine(outputDirectory, "build",
                                 Path.ChangeExtension(Path.GetFileName(sourceFile.Path), ".cse"));
 
                             Directory.CreateDirectory(Path.GetDirectoryName(newPath));
@@ -177,7 +180,8 @@ namespace CSharpE.Transform.App
 
         private static void Usage()
         {
-            Console.WriteLine("Usage: [-i] transformation-assembly input-files");
+            Console.WriteLine("Usage: transformation-assembly input-files");
+            Console.WriteLine("       -i output-directory transformation-assembly input-files");
         }
     }
 }
