@@ -32,7 +32,12 @@ namespace CSharpE.Transform.App
             }
 
             string transformationAssemblyPath = args[0];
-            var inputFilePaths = args.Skip(1).ToArray();
+            var inputPaths = args.Skip(1);
+
+            var inputFilePaths = inputPaths.SelectMany(path => Directory.Exists(path)
+                    ? Directory.EnumerateFiles(path, "*.cs", SearchOption.AllDirectories)
+                    : new[] {path})
+                .ToList();
 
             var transformationAssembly =
                 AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetFullPath(transformationAssemblyPath));
