@@ -319,7 +319,7 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxKind KeywordKind => StructKeyword;
 
-        private const MemberModifiers ValidModifiers = AccessModifiersMask | New | Unsafe | Partial;
+        private const MemberModifiers ValidModifiers = AccessModifiersMask | New | Unsafe | Partial | ReadOnly;
 
         private protected override void ValidateModifiers(MemberModifiers value)
         {

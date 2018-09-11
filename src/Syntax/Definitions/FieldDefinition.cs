@@ -7,6 +7,7 @@ using static CSharpE.Syntax.MemberModifiers;
 using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
+// TODO: field declarations with more than one field
 namespace CSharpE.Syntax
 {
     public sealed class FieldDefinition : MemberDefinition, ISyntaxWrapper<FieldDeclarationSyntax>
@@ -80,12 +81,9 @@ namespace CSharpE.Syntax
         {
             syntax = fieldDeclarationSyntax;
 
-            if (fieldDeclarationSyntax.Declaration.Variables.Count > 1)
-                throw new NotImplementedException("Field declarations with more than one field are not currently supported.");
-
             // initialize non-lazy properties
             Modifiers = FromRoslyn.MemberModifiers(fieldDeclarationSyntax.Modifiers);
-            name = new Identifier(fieldDeclarationSyntax.Declaration.Variables.Single().Identifier);
+            name = new Identifier(fieldDeclarationSyntax.Declaration.Variables.First().Identifier);
         }
 
         public FieldDefinition(MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null)
@@ -103,7 +101,7 @@ namespace CSharpE.Syntax
         {
             GetAndResetChanged(ref changed);
 
-            var declarator = syntax?.Declaration.Variables.Single();
+            var declarator = syntax?.Declaration.Variables.First();
 
             bool? thisChanged = false;
 
