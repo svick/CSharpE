@@ -27,10 +27,10 @@ namespace CSharpE.Extensions.Actor
                     method.ReturnType = TypeReference(typeof(Task<>), method.ReturnType);
                     method.IsAsync = true;
 
-                    method.Body = new Statement[]
+                    method.Body.Statements = new Statement[]
                     {
                         Await(asf.Call("WaitAsync")),
-                        TryFinally(method.Body, new Statement[] { asf.Call("Release") })
+                        TryFinally(method.Body.Statements, new Statement[] { asf.Call("Release") })
                     };
                 });
             });

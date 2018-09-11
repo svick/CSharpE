@@ -26,10 +26,10 @@ namespace CSharpE.Extensions.Actor
                     method.ReturnType = TypeReference(typeof(Task<>), method.ReturnType);
                     method.IsAsync = true;
 
-                    method.Body = new Statement[]
+                    method.Body.Statements = new Statement[]
                     {
                         Await(actorSemaphoreFieldExpression.Call("WaitAsync")),
-                        TryFinally(method.Body, new Statement[] { actorSemaphoreFieldExpression.Call("Release") })
+                        TryFinally(method.Body.Statements, new Statement[] { actorSemaphoreFieldExpression.Call("Release") })
                     };
                 }
             }

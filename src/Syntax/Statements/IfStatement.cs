@@ -89,6 +89,5 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new IfStatement(Condition, ThenStatements);
 
         internal override SyntaxNode Parent { get; set; }
-
     }
 }

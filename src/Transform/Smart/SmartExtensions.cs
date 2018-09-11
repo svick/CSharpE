@@ -137,6 +137,12 @@ namespace CSharpE.Transform.Smart
             where TAttribute : System.Attribute =>
             ForEach(sourceFile, arg1, action, f => f.GetTypesWithAttribute<TAttribute>());
 
+        public static void ForEachType(this Syntax.SourceFile sourceFile, Action<BaseTypeDefinition> action) =>
+            ForEach(sourceFile, action, f => f.GetTypes());
+
+        public static void ForEachType<T1>(this Syntax.SourceFile sourceFile, T1 arg1, Action<T1, BaseTypeDefinition> action) =>
+            ForEach(sourceFile, arg1, action, f => f.GetTypes());
+        
         public static void ForEachSourceFile(
             this Syntax.Project project, Action<Syntax.SourceFile> action) =>
             ForEach(project, action, p => p.SourceFiles);
@@ -158,7 +164,20 @@ namespace CSharpE.Transform.Smart
         public static IReadOnlyList<TResult> ForEachField<TResult>(
             this TypeDefinition type, Func<FieldDefinition, TResult> action) =>
             ForEach(type, action, t => t.Fields);
-        
+
+        public static void ForEachMethod(this TypeDefinition type, Action<MethodDefinition> action) =>
+            ForEach(type, action, t => t.Methods);
+
+        public static void ForEachMethod(this Syntax.SourceFile sourceFile, Action<MethodDefinition> action) =>
+            sourceFile.ForEachType(action, (a, t) =>
+            {
+                if (t is TypeDefinition typeDefinition)
+                    typeDefinition.ForEachMethod(a);
+            });
+
+        public static void ForEachMethod(this Syntax.Project project, Action<MethodDefinition> action) =>
+            project.ForEachSourceFile(action, (a, f) => f.ForEachMethod(a));
+
         public static void LimitedSegment(this TypeDefinition node, Action<ILimitedTypeDefinition> action)
             => LimitedSegment(node, node.SourceFile?.Project, action);
 
@@ -220,6 +239,5 @@ namespace CSharpE.Transform.Smart
                 action(arg1, arg2, node);
             }
         }
-
     }
 }

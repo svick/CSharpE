@@ -176,7 +176,7 @@ class C
                 new LogAction[]
                 {
                     ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "transform"),
-                    ("BaseTypeDefinition", "C", "transform"), ("MethodDefinition", "M1", "transform"),
+                    ("ClassDefinition", "C", "transform"), ("MethodDefinition", "M1", "transform"),
                     ("MethodDefinition", "M2", "transform")
                 }, recorder.Read());
 
@@ -187,7 +187,7 @@ class C
                 new LogAction[]
                 {
                     ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "transform"),
-                    ("BaseTypeDefinition", "C", "transform"), ("MethodDefinition", "M1", "cached"),
+                    ("ClassDefinition", "C", "transform"), ("MethodDefinition", "M1", "cached"),
                     ("MethodDefinition", "M2", "transform")
                 }, recorder.Read());
 

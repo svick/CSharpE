@@ -37,17 +37,18 @@ namespace CSharpE.Syntax
         }
 
         // TODO: methods without body and with expression body
-        private protected StatementList body;
-        public IList<Statement> Body
+        
+        private protected BlockStatement body;
+        public BlockStatement Body
         {
             get
             {
                 if (body == null)
-                    body = new StatementList(BaseMethodSyntax.Body.Statements, this);
+                    body = new BlockStatement(BaseMethodSyntax.Body, this);
 
                 return body;
             }
-            set => SetList(ref body, new StatementList(value, this));
+            set => Set(ref body, value);
         }
 
         BaseMethodDeclarationSyntax ISyntaxWrapper<BaseMethodDeclarationSyntax>.GetWrapped(ref bool? changed) =>

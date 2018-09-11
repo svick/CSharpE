@@ -33,7 +33,7 @@ namespace CSharpE.Syntax
         {
             Modifiers = modifiers;
             Parameters = parameters?.ToList();
-            Body = body?.ToList();
+            Body = new BlockStatement(body?.ToList());
         }
 
         #region Modifiers
@@ -66,7 +66,7 @@ namespace CSharpE.Syntax
 
             var newModifiers = Modifiers;
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
-            var newBody = body?.GetWrapped(ref thisChanged) ?? syntax.Body.Statements;
+            var newBody = body?.GetWrapped(ref thisChanged) ?? syntax.Body;
 
             if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || !IsAnnotated(syntax))
@@ -76,7 +76,7 @@ namespace CSharpE.Syntax
 
                 var newSyntax = CSharpSyntaxFactory.ConstructorDeclaration(
                     GetNewAttributes(), newModifiers.GetWrapped(), CSharpSyntaxFactory.Identifier(ParentType.Name),
-                    CSharpSyntaxFactory.ParameterList(newParameters), default, CSharpSyntaxFactory.Block(newBody));
+                    CSharpSyntaxFactory.ParameterList(newParameters), default, newBody);
 
                 syntax = Annotate(newSyntax);
 

@@ -37,7 +37,7 @@ namespace CSharpE.Syntax
             ReturnType = returnType;
             Name = name;
             Parameters = parameters?.ToList();
-            Body = body?.ToList();
+            Body = new BlockStatement(body?.ToList());
         }
 
 
@@ -135,15 +135,14 @@ namespace CSharpE.Syntax
             var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? syntax.ReturnType;
             var newName = name.GetWrapped(ref thisChanged);
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
-            var newBody = body?.GetWrapped(ref thisChanged) ?? syntax.Body.Statements;
+            var newBody = body?.GetWrapped(ref thisChanged) ?? syntax.Body;
 
             if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || !IsAnnotated(syntax))
             {
                 var newSyntax = CSharpSyntaxFactory.MethodDeclaration(
                     GetNewAttributes(), newModifiers.GetWrapped(), newReturnType, null, newName, null,
-                    CSharpSyntaxFactory.ParameterList(newParameters), default, CSharpSyntaxFactory.Block(newBody),
-                    null);
+                    CSharpSyntaxFactory.ParameterList(newParameters), default, newBody, null);
 
                 syntax = Annotate(newSyntax);
 
