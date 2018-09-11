@@ -6,8 +6,8 @@ class Person
     string Name;
     System.Int32 Age;
 
-    void M()
+    static void M(Person p)
     {
-        _ = this.
+        _ = p.
     }
 }

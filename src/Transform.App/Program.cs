@@ -5,6 +5,9 @@ using System.Linq;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
 using CSharpE.Syntax;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Completion;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Transform.App
 {
@@ -67,6 +70,8 @@ namespace CSharpE.Transform.App
             var buildProject = new Project(transformInputFiles, new LibraryReference[0], transformations);
 
             buildProject.Log += Console.WriteLine;
+
+            Project designTransformed = null;
             
             while (true)
             {
@@ -80,7 +85,7 @@ namespace CSharpE.Transform.App
                     case "d":
                         await designProject.ReloadSourceFilesAsync();
                         
-                        var designTransformed = designProject.Transform(designTime: true);
+                        designTransformed = designProject.Transform(designTime: true);
 
                         foreach (var sourceFile in designTransformed.SourceFiles)
                         {
@@ -110,13 +115,59 @@ namespace CSharpE.Transform.App
 
                         break;
                     case "i":
-                        // TODO: intellisense
+                        if (designTransformed == null)
+                        {
+                            Console.WriteLine("Have to perform design-time transformation before accessing IntelliSense.");
+                            break;
+                        }
+
+                        var roslynProject = ToRoslynProject(designTransformed);
+                        var document = roslynProject.Documents.First();
+
+                        var completionService = CompletionService.GetService(document);
+
+                        var rootNode = await document.GetSyntaxRootAsync();
+
+                        var missingToken = rootNode.DescendantTokens().FirstOrDefault(t => t.IsMissing);
+
+                        if (missingToken == default)
+                        {
+                            Console.WriteLine("Didn't find any missing tokens, not sure where to run IntelliSense.");
+                            break;
+                        }
+
+                        var completions = await completionService.GetCompletionsAsync(
+                            document, missingToken.GetLocation().SourceSpan.Start);
+
+                        if (completions == null)
+                        {
+                            Console.WriteLine("No completions.");
+                            break;
+                        }
+                        
+                        foreach (var item in completions.Items)
+                        {
+                            Console.WriteLine(item);
+                        }
                         break;
                     default:
                         Console.WriteLine($"Invalid input {input}.");
                         break;
                 }
             }
+        }
+
+        private static Roslyn::Project ToRoslynProject(Project project)
+        {
+            var workspace = new AdhocWorkspace();
+            var roslynProject = workspace.AddProject("Project", LanguageNames.CSharp);
+            
+            foreach (var sourceFile in project.SourceFiles)
+            {
+                roslynProject = roslynProject.AddDocument(sourceFile.Path, sourceFile.Text).Project;
+            }
+
+            return roslynProject;
         }
 
         private static void Usage()
