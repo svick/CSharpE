@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using LinqExpression = System.Linq.Expressions.Expression;
 
 namespace CSharpE.Syntax.Internals
@@ -9,9 +10,23 @@ namespace CSharpE.Syntax.Internals
         {
             var param = LinqExpression.Parameter(typeof(TSyntax));
 
+            // TODO: does this step actually ever work?
             var constructorInfo = typeof(TSyntaxWrapper).GetConstructor(new[] { typeof(TSyntax) });
-            var lambda = LinqExpression.Lambda<Func<TSyntax, TSyntaxWrapper>>(
-                LinqExpression.New(constructorInfo, param), param);
+            LinqExpression constructorExpression;
+            if (constructorInfo != null)
+            {
+                constructorExpression = LinqExpression.New(constructorInfo, param);
+            }
+            else
+            {
+                constructorInfo = typeof(TSyntaxWrapper).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
+                    null, new[] {typeof(TSyntax), typeof(SyntaxNode)}, null);
+                
+                constructorExpression = LinqExpression.New(
+                    constructorInfo, param, LinqExpression.Constant(null, typeof(SyntaxNode)));
+            }
+
+            var lambda = LinqExpression.Lambda<Func<TSyntax, TSyntaxWrapper>>(constructorExpression, param);
 
             return lambda.Compile();
         }

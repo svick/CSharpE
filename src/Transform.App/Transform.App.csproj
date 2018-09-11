@@ -14,6 +14,7 @@
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
     <ProjectReference Include="..\Transform\Transform.csproj" />
     <ProjectReference Include="..\Extensions\Record\Record.csproj" />
+    <ProjectReference Include="..\Extensions\Logging\Logging.csproj" />
   </ItemGroup>
 
 </Project>

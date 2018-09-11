@@ -20,12 +20,12 @@ namespace CSharpE.Syntax
 
         #region Expressions
 
-        public static InvocationExpression Call(this NamedTypeReference receiver, string methodName, params Expression[] arguments) =>
-            new InvocationExpression(new MemberAccessExpression(receiver, methodName), arguments);
-
         public static InvocationExpression Call(this Expression receiver, string methodName, params Expression[] arguments) =>
             new InvocationExpression(new MemberAccessExpression(receiver, methodName), arguments);
 
+        public static InvocationExpression Call(this Expression receiver, string methodName, IEnumerable<Expression> arguments) =>
+            new InvocationExpression(new MemberAccessExpression(receiver, methodName), arguments);
+        
         public static MemberAccessExpression MemberAccess(this Expression expression, FieldDefinition field) =>
             new MemberAccessExpression(expression, field);
 
@@ -40,6 +40,8 @@ namespace CSharpE.Syntax
         public static NewExpression New(TypeReference type, IEnumerable<Expression> arguments) => new NewExpression(type, arguments);
 
         public static IntLiteralExpression Literal(int value) => new IntLiteralExpression(value);
+        
+        public static StringLiteralExpression Literal(string value) => new StringLiteralExpression(value);
         
         public static ThisExpression This() => new ThisExpression();
         
@@ -95,6 +97,10 @@ namespace CSharpE.Syntax
         public static ReturnStatement Return() => new ReturnStatement();
         
         public static ReturnStatement Return(Expression expression) => new ReturnStatement(expression);
+        
+        public static BlockStatement Block(params Statement[] statements) => new BlockStatement(statements);
+        
+        public static BlockStatement Block(IEnumerable<Statement> statements) => new BlockStatement(statements);
 
         #endregion
     }

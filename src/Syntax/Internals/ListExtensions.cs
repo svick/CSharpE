@@ -7,6 +7,9 @@ namespace CSharpE.Syntax.Internals
     {
         public static void AddRange<T>(this IList<T> list, IEnumerable<T> collection)
         {
+            if (collection == null)
+                return;
+            
             foreach (var value in collection)
             {
                 list.Add(value);
