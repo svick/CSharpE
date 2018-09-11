@@ -70,6 +70,8 @@ namespace CSharpE.Transform.App
             
             while (true)
             {
+                Console.Write("Enter a command: ");
+            
                 string input = Console.ReadLine();
 
                 switch (input)
@@ -83,7 +85,7 @@ namespace CSharpE.Transform.App
                         foreach (var sourceFile in designTransformed.SourceFiles)
                         {
                             var newPath = Path.Combine(Path.GetDirectoryName(sourceFile.Path), "design",
-                                Path.GetFileName(sourceFile.Path));
+                                Path.ChangeExtension(Path.GetFileName(sourceFile.Path), ".cse"));
 
                             Directory.CreateDirectory(Path.GetDirectoryName(newPath));
 
@@ -99,7 +101,7 @@ namespace CSharpE.Transform.App
                         foreach (var sourceFile in buildTransformed.SourceFiles)
                         {
                             var newPath = Path.Combine(Path.GetDirectoryName(sourceFile.Path), "build",
-                                Path.GetFileName(sourceFile.Path));
+                                Path.ChangeExtension(Path.GetFileName(sourceFile.Path), ".cse"));
 
                             Directory.CreateDirectory(Path.GetDirectoryName(newPath));
 

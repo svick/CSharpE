@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
     <ProjectReference Include="..\Transform\Transform.csproj" />
+    <ProjectReference Include="..\Extensions\Record\Record.csproj" />
   </ItemGroup>
 
 </Project>

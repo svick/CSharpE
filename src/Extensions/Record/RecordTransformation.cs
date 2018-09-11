@@ -29,7 +29,7 @@ namespace CSharpE.Extensions.Record
 
                 typeDefinition.LimitedSegment(fieldsList, isDesignTime, (fields, dt, type) =>
                 {
-                    string paramName(string name) => name.ToLowerInvariant();
+                    string paramName(string name) => name.Substring(0, 1).ToLowerInvariant() + name.Substring(1);
 
                     var constructorBody = dt
                         ? new[] { NotImplementedStatement }
