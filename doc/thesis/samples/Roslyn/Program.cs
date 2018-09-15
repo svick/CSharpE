@@ -23,10 +23,8 @@ namespace CSharpE.Samples.Roslyn
                             GenericName("IEquatable").AddTypeArgumentListArguments(
                                 IdentifierName(classDeclaration.Identifier)))));
 
-                    var fields = classDeclaration.ChildNodes()
-                        .OfType<FieldDeclarationSyntax>();
-
-                    classDeclaration = classDeclaration.ReplaceNodes(fields,
+                    classDeclaration = classDeclaration.ReplaceNodes(
+                        classDeclaration.ChildNodes().OfType<FieldDeclarationSyntax>(),
                         (__, fieldDeclaration) =>
                         {
                             var type = fieldDeclaration.Declaration.Type;

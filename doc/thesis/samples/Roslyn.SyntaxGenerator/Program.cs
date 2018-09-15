@@ -21,12 +21,12 @@ namespace CSharpE.Samples.RoslynSyntaxGenerator
                 project.AddDocument("Entities.cs", EntityKinds.ToGenerateFromSource);
             var g = SyntaxGenerator.GetGenerator(document);
 
-            var compilationUnit = (await document.GetSyntaxTreeAsync()).GetRoot();
+            var rootNode = await document.GetSyntaxRootAsync();
             var model = await document.GetSemanticModelAsync();
             var compilation = model.Compilation;
 
-            compilationUnit = compilationUnit.ReplaceNodes(
-                compilationUnit.DescendantNodes().OfType<ClassDeclarationSyntax>(),
+            rootNode = rootNode.ReplaceNodes(
+                rootNode.DescendantNodes().OfType<ClassDeclarationSyntax>(),
                 (_, classDeclaration) =>
                 {
                     SyntaxNode result = classDeclaration;
@@ -66,7 +66,7 @@ namespace CSharpE.Samples.RoslynSyntaxGenerator
                     return result;
                 });
 
-            document = document.WithSyntaxRoot(compilationUnit.NormalizeWhitespace());
+            document = document.WithSyntaxRoot(rootNode.NormalizeWhitespace());
             document = await Simplifier.ReduceAsync(document);
 
             File.WriteAllText(

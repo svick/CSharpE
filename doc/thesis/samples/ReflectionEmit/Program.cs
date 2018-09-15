@@ -26,11 +26,11 @@ namespace CSharpE.Samples.ReflectionEmit
                 {
                     var propertyType = Type.GetType(propertyInfo.Type);
 
-                    var field = type.DefineField(
-                        propertyInfo.LowercaseName, propertyType, FieldAttributes.Private);
+                    var field = type.DefineField(propertyInfo.LowercaseName, propertyType,
+                        FieldAttributes.Private);
 
-                    var property = type.DefineProperty(
-                        propertyInfo.Name, PropertyAttributes.None, propertyType, new Type[0]);
+                    var property = type.DefineProperty(propertyInfo.Name,
+                        PropertyAttributes.None, propertyType, new Type[0]);
 
                     var getMethod = type.DefineMethod("get_" + propertyInfo.Name,
                         MethodAttributes.Public | MethodAttributes.SpecialName,

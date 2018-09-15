@@ -40,6 +40,36 @@ For example, for an entity named \cs{Person} with properties \cs{Name} of type \
 
 If an approach supports transforming C\# code, not just generating it, the example will instead be transforming simple classes containing only fields with the right types and names into the form above. Such transformation is too simple to be useful in practice, but it is sufficient as a demonstration.
 
+All examples will use the \cs{EntityKinds} class and related types as their data source. Their relevant parts are shown in Listing~\ref{entitykinds}.
+
+\begin{listing}
+\begin{minted}{csharp}
+public static class EntityKinds
+{
+    // used for generating code
+    public static IEnumerable<EntityKind> ToGenerate { get; }
+    
+    // used for transforming code
+    public static string ToGenerateFromSource { get; }
+}
+
+public class EntityKind
+{
+    public string Name { get; }
+    public IReadOnlyList<Property> Properties { get; }
+}
+
+public class Property
+{
+    public string Type { get; }
+    public string Name { get; }
+    public string LowercaseName { get; }
+}
+\end{minted}
+\caption{Running example data source}
+\label{entitykinds}
+\end{listing}
+
 \section{Manipulating C\# source code}
 
 This section describes various approaches for generating and transforming C\# source code. The resulting code then needs to be compiled by the C\# compiler, as usual.
@@ -60,7 +90,9 @@ The code to generate entities using \ac{T4}, as required by the running example,
 \label{t4-example}
 \end{listing}
 
-The code highlights another issue with \ac{T4}: indentation. It is hard to keep indentation of both the generated code and the generating code consistent, especially since any whitespace outside of \ac{T4} tags will be included in the output.
+The example shows that a \ac{T4} file contains text blocks written in the target language (in this case, C\#), but also \ac{T4} directives and control blocks, enclosed in \cs{<#} and \cs{#>}. \ac{T4} directives provide information to the tool, for example which assemblies to reference or what the file extension of the output file should be. Control blocks can contain C\# statements, which decide how the text blocks they surround execute, or C\# expressions, which parametrize these text blocks.
+
+The example code highlights another issue with \ac{T4}: indentation. It is hard to keep indentation of both the generated code and the generating code consistent, especially since any whitespace outside of \ac{T4} tags will be included in the output.
 
 \subsection{CodeDOM}
 
@@ -68,13 +100,15 @@ The code highlights another issue with \ac{T4}: indentation. It is hard to keep 
 
 \subsubsection{Example}
 
-The code to generate entities for the running example using CodeDOM can be seen in Listing~\ref{codedom-example}.
+The code to generate entities for the running example using CodeDOM is in Listing~\ref{codedom-example}.
 
 \begin{listing}
 \inputminted[firstline=14,lastline=61]{csharp}{samples/CodeDOM/Program.cs}
 \caption{CodeDOM example}
 \label{codedom-example}
 \end{listing}
+
+As can be seen from the example, generating code using \ac{CodeDOM} requires first building the object model. Its structure resembles the structure of a C\# code file: a namespace (\cs{CodeNamespace}) contains a class (\cs{CodeTypeDeclaration}), which has base types and contains fields (\cs{CodeMemberField}) and properties (\cs{CodeMemberProperty}), which contain \cs{get} and \cs{set} accessors. The \cs{get} accessor contains a \cs{return} statement (\cs{CodeMethodReturnStatement}), which contains an expression referencing a field (\cs{CodeFieldReferenceExpession}). In several cases, object initializers are used to make the code to create these objects more readable. The resulting model is then converted to C\# code using \cs{CSharpCodeProvider}.
 
 Especially notice that the code has to manually generate backing fields for properties, because CodeDOM does not support auto-implemented properties.
 
@@ -115,13 +149,15 @@ Since \cs{SyntaxGenerator} is language-independent, it is using \cs{SyntaxNode} 
 
 The code to transform entities for the running example using the \cs{SyntaxTree} \ac{API} can be seen in Listing~\ref{syntaxtree-example}.
 
-Note that this code is heavily using \cs{SyntaxFactory} to create new syntax nodes, but that type is not visible due to use of \cs{using static}, to make the code more succinct.
-
 \begin{listing}
-\inputminted[firstline=15,lastline=50]{csharp}{samples/Roslyn/Program.cs}
+\inputminted[firstline=15,lastline=48]{csharp}{samples/Roslyn/Program.cs}
 \caption{Roslyn \cs{SyntaxTree} example}
 \label{syntaxtree-example}
 \end{listing}
+
+The example first parses the input code into a \cs{CompilationUnitSyntax}. Then it replaces each class (\cs{ClassDeclarationSyntax}) with a modified version that has an added base type (\cs{BaseTypeSyntax}) and which replaces each field (\cs{FieldDeclarationSyntax}) with a property (\cs{PropertyDeclarationSyntax}). In the end, whitespace is added to the new nodes before writing the result to a file.
+
+Note that this code is heavily using \cs{SyntaxFactory} to create new syntax nodes, but that type is not visible due to use of \cs{using static}, to make the code more succinct.
 
 Also notice how immutability makes transforming code harder by requiring the use of methods such as \cs{ReplaceNodes} and how the level of detail leads to very verbose code, in some cases requiring even the specification of individual semicolons.
 
@@ -135,7 +171,9 @@ Code to transform entities for the running example using \cs{SyntaxGenerator} ca
 \label{syntaxgenerator-example}
 \end{listing}
 
-Note that \cs{SyntaxGenerator} does not support auto-implemented properties, so the example has to create properties with backing fields.
+Using \cs{SyntaxGenerator} requires some setup. The first step is to create a workspace (\cs{AdhocWorkspace}) containing a project (\cs{Project}) containing a document (\cs{Document}). The next step is to access the root node and semantic model (\cs{SemanticModel}) for the document and compilation (\cs{Compilation}) for the project. The semantic model and compilation will be used to access symbols declared in the document and referenced by the project, respectively.
+
+The overall structure of the rest of the code is similar to the \cs{SyntaxTree} example, except that nodes are created and modified using the \cs{SyntaxGenerator}. Another difference is that \cs{SyntaxGenerator} does not support auto-implemented properties, so the example has to create properties with backing fields.
 
 Also note that \cs{SyntaxGenerator} generates overly verbose code (for example, \cs{global::System.IEquatable<global::Person>}), but this is counterweighted by being able to use another Workspace-layer service, \cs{Simplifier}, to make the code simpler.
 
@@ -161,7 +199,16 @@ Code to generate entities for the running example using Reflection.Emit can be s
 \label{refemit-example}
 \end{listing}
 
-Notice how generating properties requires understanding that they are represented using special methods and that generating bodies for those methods requires understanding the \ac{IL} stack machine.
+Since Reflection.Emit directly manipulates \ac{IL} code, it does not use documents or compilation units. Instead, the code creates an assembly (\cs{AssemblyBuilder}) containing a module\footnote{Modules exist so that a single assembly could be composed of multiple separately compiled parts. This is rarely used in practice and so the vast majority of assemblies will have exactly one module.} (\cs{ModuleBuilder}), containing types (\cs{TypeBuilder}).
+
+At the \ac{IL} level, a property is just a named grouping of methods and the code reflects that: to create the equivalent of an auto-generated property, the code creates the backing field (\cs{FieldBuilder}), the property (\cs{PropertyBuilder}) and the \cs{get} and \cs{set} accessors as methods (\cs{MethodBuilder}). The body of each method is defined using instructions for the \ac{IL} virtual stack machine. For example, the instructions used in the \cs{set} accessor method are:
+
+\begin{enumerate}
+\item \cs{ldarg.0}: Load the value of the \cs{this} hidden argument on the stack.
+\item \cs{ldarg.1}: Load the value of the first actual argument on the stack, which contains the value to set to the property.
+\item \cs{stfld} \emph{\cs{field}}: Store the value at the top of the stack to an instance field \emph{\cs{field}} of object just below the top of the stack. Then pop both used values from the stack.
+\item \cs{ret}: Return from the method. Since the stack is empty at this point, no value is returned.
+\end{enumerate}
 
 \subsection{Mono.Cecil}
 \label{cecil}
