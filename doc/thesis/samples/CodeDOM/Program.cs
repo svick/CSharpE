@@ -1,5 +1,4 @@
-﻿using System;
-using System.CodeDom;
+﻿using System.CodeDom;
 using System.IO;
 using CSharpE.Samples.Core;
 using Microsoft.CSharp;

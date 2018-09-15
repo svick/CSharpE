@@ -1,4 +1,5 @@
 \chapter{Background}
+\label{background}
 
 The .NET ecosystem is composed of programming languages (including C\#, F\# and \acl{VB}), \cite{tour} .NET implementations (including .NET Framework, .NET Core and Mono), \cite{implementations} class libraries, commonly distributed through the NuGet package manager, and tooling, including command-line tools and tools integrated into code editors and \acp{IDE}.
 
@@ -27,6 +28,7 @@ The C\# language contains some basic extensibility features itself, namely virtu
 But for more advanced use cases, it is necessary ot manipulate code in some form and the .NET ecosystem has various approaches to achieve that, including those that manipulate C\# code, those that manipulate \ac{IL} and those that use a custom model for representing code. Some of these approaches will be described in following sections.
 
 \section{Example}
+\label{running-example}
 
 To demonstrate various code generation approaches, a running example of generating a simple entity class with a set of properties and having \cs{IEquatable<T>} as an implemented interface will be used. (To make the examples shorter, the \cs{Equals} method required to properly implement the interface will not be included.)
 
@@ -103,7 +105,7 @@ The example code highlights another issue with \ac{T4}: indentation. It is hard 
 The code to generate entities for the running example using CodeDOM is in Listing~\ref{codedom-example}.
 
 \begin{listing}
-\inputminted[firstline=14,lastline=61]{csharp}{samples/CodeDOM/Program.cs}
+\inputminted[firstline=13,lastline=60]{csharp}{samples/CodeDOM/Program.cs}
 \caption{CodeDOM example}
 \label{codedom-example}
 \end{listing}

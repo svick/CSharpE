@@ -78,6 +78,8 @@ namespace CSharpE.Syntax
 
         public IEnumerable<BaseTypeDefinition> GetTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetTypes());
 
+        public IEnumerable<ClassDefinition> GetClasses() => SourceFiles.SelectMany(sourceFile => sourceFile.GetClasses());
+
         public IEnumerable<BaseTypeDefinition> GetAllTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetAllTypes());
     }
 }

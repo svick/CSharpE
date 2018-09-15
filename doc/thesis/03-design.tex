@@ -8,31 +8,19 @@ As explained in the previous chapter, this system has two main tasks: representi
 
 The \cs{CSharpE.Syntax} namespace contains all the types necessary for representing and modifying C\# code starting from the project level and going down all the way to the expression level. There is no representation for solutions, because extensions work at the project level, which means solutions are not necessary.
 
-Listing~\ref{syntax-types} shows inheritance hierarchy of this namespace.
+\subsection{Example}
+
+Before explaining details about the design of this namespace, it might be useful to see an example of its usage. Listing~\ref{csharpesyntax-example} shows how the running example from Section~\ref{running-example} could be implemented using this \ac{API}. Notice how the code is very short, when compared with the previously shown examples from Chapter~\ref{background}, without resorting to a custom language that mixes two programs, like \ac{T4} does. This is thanks to following the guidelines from Section~\ref{representing-code}.
 
 \begin{listing}
-
-\dirtree{%
-.1 .
-.2 Project.
-.2 NamespaceOrTypeDefinition.
-.2 SyntaxNode.
-.3 SourceFile.
-.3 NamespaceDefition.
-.3 MemberDefinition.
-.4 BaseTypeDefinition.
-.5 TypeDefinition.
-.6 ClassDefinition.
-.6 StructDefinition.
-.6 InterfaceDefinition.
-.5 EnumDefinition.
-.5 DelegateDefinition.
-}
-
-\caption{Inheritance hierarchy of commonly used types in the \cs{CSharpE.Syntax} namespace}
-\label{syntax-types}
-
+\inputminted[firstline=15,lastline=31]{csharp}{samples/CSharpE.Syntax/Program.cs}
+\caption{CSharpE.Syntax example}
+\label{csharpesyntax-example}
 \end{listing}
+
+Specifically, what the code does is to create a project (\cs{Project}) containing one source file (\cs{SourceFile}) that contains the initial code. Then it finds classes (\cs{ClassDefinition}) in the project and for each of them, adds \cs{IEquatable<T>} to the list of base types and also changes all its fields (\cs{FieldDefinition}) to auto-implemented properties (\cs{PropertyDefinition}).
+
+The rest of this chapter describes the \ac{API} in detail.
 
 \subsection{General principles}
 
@@ -57,6 +45,33 @@ Using implicit conversions makes code shorter, but also harder to understand, be
 \item There is a \cs{SyntaxFactory} type, which exists to make creating syntax nodes more succinct, when combined with \cs{using static}. For example, it means that to use the \cs{this} keyword, it is possible to write just \cs{This()}, instead of  \cs{new ThisExpression()}.
 
 \end{itemize}
+
+Listing~\ref{syntax-types} shows inheritance hierarchy of the \cs{CSharpE.Syntax} namespace.
+
+\begin{listing}
+	
+\dirtree{%
+.1 .
+.2 Project.
+.2 NamespaceOrTypeDefinition.
+.2 SyntaxNode.
+.3 SourceFile.
+.3 NamespaceDefition.
+.3 MemberDefinition.
+.4 BaseTypeDefinition.
+.5 TypeDefinition.
+.6 ClassDefinition.
+.6 StructDefinition.
+.6 InterfaceDefinition.
+.5 EnumDefinition.
+.5 DelegateDefinition.
+}
+
+\caption{Inheritance hierarchy of commonly used types in the \cs{CSharpE.Syntax} namespace}
+\label{syntax-types}
+	
+\end{listing}
+
 
 \subsection{Projects}
 

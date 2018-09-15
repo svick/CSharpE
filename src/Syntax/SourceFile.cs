@@ -92,6 +92,8 @@ namespace CSharpE.Syntax
             return Members.SelectMany(GetTypes);
         }
 
+        public IEnumerable<ClassDefinition> GetClasses() => GetTypes().OfType<ClassDefinition>();
+
         public IEnumerable<BaseTypeDefinition> GetAllTypes()
         {
             IEnumerable<BaseTypeDefinition> GetAllTypes(BaseTypeDefinition type)

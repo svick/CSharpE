@@ -8,6 +8,7 @@
 - allow modifying lists while iterating them
   - optional: make it more efficient using copy on write 
 - detect reading of References/Symbols, then rerun when those symbols change
+- when `Clear()`ing a list of members, or more generally resetting `Parent` to `null`, make sure semantics of detached nodes still work by storing cached versions of necessary Roslyn types
 
 ---
 
