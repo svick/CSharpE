@@ -18,7 +18,7 @@ namespace CSharpE.Samples.CSharpESyntax
             foreach (var classDefinition in project.GetClasses())
             {
                 classDefinition.BaseTypes.Add(
-                    TypeReference(typeof(IEquatable<>), classDefinition.GetReference()));
+                    TypeReference(typeof(IEquatable<>), classDefinition));
 
                 foreach (var field in classDefinition.Fields)
                 {

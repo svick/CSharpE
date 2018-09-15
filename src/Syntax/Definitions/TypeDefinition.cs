@@ -194,17 +194,17 @@ namespace CSharpE.Syntax
         public ConstructorDefinition AddConstructor(
             MemberModifiers modifiers, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
         {
-            var contructor = new ConstructorDefinition(modifiers, parameters, body);
+            var constructor = new ConstructorDefinition(modifiers, parameters, body);
             
-            this.Members.Add(contructor);
+            this.Members.Add(constructor);
 
-            contructor.Parent = this;
+            constructor.Parent = this;
 
-            return contructor;
+            return constructor;
         }
 
-        public static implicit operator IdentifierExpression(TypeDefinition typeDefinition) =>
-            new IdentifierExpression(typeDefinition.Name);
+        public static implicit operator NamedTypeReference(TypeDefinition typeDefinition) =>
+            typeDefinition.GetReference();
 
         // TODO: namespace
         public NamedTypeReference GetReference() => new NamedTypeReference(null, Name);

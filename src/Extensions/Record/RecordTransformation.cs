@@ -18,7 +18,7 @@ namespace CSharpE.Extensions.Record
                 if (!(baseType is TypeDefinition typeDefinition))
                     return;
                 
-                typeDefinition.BaseTypes.Add(TypeReference(typeof(IEquatable<>), typeDefinition.GetReference()));
+                typeDefinition.BaseTypes.Add(TypeReference(typeof(IEquatable<>), typeDefinition));
                 
                 var fieldsList = typeDefinition.ForEachField(field =>
                 {
