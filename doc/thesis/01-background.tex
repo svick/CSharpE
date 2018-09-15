@@ -264,3 +264,11 @@ Fody \cite{fody} is an open-source tool for transforming the \ac{IL} of assembli
 The F\# language contains a feature called "type providers", \cite{type-providers} meant for easier access to data sources. Type providers generate types at design-time (i.e. while editing code in an \ac{IDE}) based on their input parameters and on usage of the generated types. These types can be either regular types that still exist after compilation (type providers using this approach are called "generative") or their use can be transformed into some other code ("erased type providers").
 
 Type providers use "code quotations" to express code to execute. Code quotations serve a similar purpose in F\# as expression trees do in C\#.
+
+\section{Summary}
+
+This chapter described various existing approaches for manipulating code in .NET and also several metaprogramming systems.
+
+All of the described metaprogramming systems have severe limitations: The \ac{IL}-based systems don't work well when changing the shape of a type is desired. F\# type providers are a special-purpose system for accessing data sources, and also can't be directly used from C\#. Because of that, a general metaprogramming system for C\# that would not have these limitations would be a useful addition to the .NET ecosystem.
+
+As for manipulating code, Section~\ref{representing-code} describes in detail how an ideal approach for such a system would look like. And even if it turns out that the existing approaches are not a good fit, they can still be used for inspiration, or as part of the implementation.
