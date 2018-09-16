@@ -40,7 +40,7 @@ namespace CSharpE.Syntax.Internals
         }
     }
 
-    // Note: this type is currently mostly not optimized for perf.
+    // PERF: this type is currently not optimized for perf
     internal class FilteredList<TSource, TTarget> : IList<TTarget> where TTarget : TSource
     {
         private readonly IList<TSource> sourceList;

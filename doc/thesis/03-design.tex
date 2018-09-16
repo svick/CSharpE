@@ -111,9 +111,22 @@ The types that can be defined in C\# are classes, structs, interfaces, enums and
 
 This means that a reasonable design would be to have the types for classes, structs and interfaces inherit from a common base class and this base class, along with the types for enums and delegates, should inherit from another base class. The problem with this design is naming: there is no established name that would apply to classes, structs and interfaces, but not to enums and delegates. For this reason, the names chosen for the two base classes are \cs{TypeDefinition} and \cs{BaseTypeDefinition}.
 
-\todo{Fields etc.}
+\medskip
 
-\todo{AddFields etc.}
+For a \cs{TypeDefinition}, all its members are contained in the \cs{Members} list, while various kinds of members like fields or methods are also contained in their own lists (for example, \cs{Fields} or \cs{Methods}). These smaller lists are kept synchronized with the main list of members. This means these lists effectively act as filtered views on the main list.
+
+To make adding new members easier, \cs{TypeDefinition} also contains methods like \cs{AddFields}. For example, consider the following code:
+
+\begin{minted}{csharp}
+var field = new FieldDefinition(...);
+type.Fields.Add(field);
+\end{minted}
+
+By using the \cs{AddFields} method, that code can be simplified to:
+
+\begin{minted}{csharp}
+var field = type.AddField(...);
+\end{minted}
 
 \subsection{Members}
 
