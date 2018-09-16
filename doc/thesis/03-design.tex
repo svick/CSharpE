@@ -36,7 +36,9 @@ A syntax node can have only one parent node, to make sure the syntax tree is act
 
 Syntax nodes can be deep cloned by calling the \cs{Clone} method, which is a generic extension method. It is that way to avoid having to cast its result to the correct type, which would be necessary if \cs{Clone} was a simple instance method on \cs{SyntaxNode}. Syntax nodes are also cloned instead of assigning a new parent node, to maintain the tree shape.
 
-\item Collections of nodes are usually exposed as \cs{IList<T>}. This interface is the most flexible out of the commonly used collection interfaces in .NET. Using an interface means that the user is shielded from the implementation detail of which specific collection type is used.
+\item Collections of nodes are usually exposed as properties of type \cs{IList<T>}. This interface is the most flexible out of the commonly used collection interfaces in .NET. Using an interface means that the user is shielded from the implementation detail of which specific collection type is used.
+
+For convenience, some collections are also exposed on higher levels as methods. For example, \cs{TypeDefintion} contains the \cs{Methods} property, while \cs{SourceFile} and \cs{Project} contain the \cs{GetMethods} method, which returns methods from the whole file or project, respectively. Such methods return \cs{IEnumerable<T>}, because it does not make sense to for example add a method directly to a file or a project, it has to be added to a specific type.
 
 \item The \ac{API} includes implicit conversion operators when appropriate. Specifically, they can be used to convert from a definition to a reference (e.g. from \cs{TypeDefinition} to \cs{NamedTypeReference}) or from a node to a simple wrapper for that node (e.g. from \cs{Expression} to \cs{ExpressionStatement}).
 
@@ -83,17 +85,35 @@ The \cs{Project} class is also point of interoperation between this \ac{API} and
 
 Each C\# source file in the project is represented as an instance of the \cs{SourceFile} class. A source file has name, text and a list of members, which are namespace and type definitions.
 
-The object-oriented way to model this list would be to have a common base class or interface shared by \cs{NamespaceDefition} and \cs{BaseTypeDefinition} (see next section) and use that for items in the list. But because namespace and type definitions do not share many members and there are only two of them, it is likely users would write code specific to each of the two. For this reason, the list instead contains instances of a \cs{struct} named \cs{NamespaceOrTypeDefinition}, which is effectively a discriminated union of the two types. This is an approach common in functional programming.
+\medskip
 
-Since this design is not very user-friendly, it is worth considering other options. One of them would be not having namespace definitions part of the syntax tree, but instead make namespace a property of type definition, which is how namespaces are represented in \ac{IL} and Reflection. The main issue with this approach is that it would diverge too much from the structure of C\# code, which could be confusing to users. For this reason, this option was not chosen.
+The obvious object-oriented way to model this list would be to have a common base class shared by the namespace definition class and the type definition class. The problem with this is that types can be members of other types, while namespaces cannot. So, we would want type definition to inherit from the member definition class (along with other kinds of type members), and namespace definition to not inherit from that class. But this is not possible, because .NET does not allow multiple inheritance of classes.
 
-Notice that \cs{using} directives are not exposed in the \ac{API} at all, because they are managed automatically by the \ac{API}. This makes the \ac{API} easier to use, at the cost of preventing users from choosing which syntax should be used, which is consistent with the principles outlined in the previous Chapter.
+There are several options of how to resolve this:
+
+\begin{itemize}
+\item Make the common base class of namespace definition and type definition into an interface, since multiple inheritance of interfaces is allowed. This interface would not be very useful on its own, since namespace and type definitions are not very similar and generally require different processing.
+\item Make namespace definition inherit from the member definition class. This would allow adding namespace definitions as members of types, which is not valid C\#, so it is undesirable.
+\item Don't have namespace definitions in the syntax tree at all, instead the namespace of a type definition is surfaced as a property. This is how namespaces are represented in \ac{IL} and Reflection. The problem with this is that deviates from the syntax of C\# too much, which could be confusing to users.
+\item Use a different class for representing nested type definitions. This way, there is no issue with multiple inheritance, because each base class would be inherited by a different class. The problem here is that users will probably expect that nested types behave the same as regular types, since both have the same syntax in C\#.
+\item Instead of a common base type, use a discriminated union. The biggest issue with this approach is that it is not commonly used in object-oriented design and so it might be unfamiliar to C\# programmers and it also would not fit well with the rest of this object-oriented \ac{API}.
+\end{itemize}
+
+The option chosen from the above was to use discriminated union \cs{struct} called \cs{NamespaceOrTypeDefinition}, because it fits the best with the expected usage pattern of these types, where nested types and regular types are handled the same, while namespaces and types are handled in separate code paths.
+
+\medskip
+
+Notice that \cs{using} directives are not exposed in the \ac{API} at all, because they are managed automatically. This makes the \ac{API} easier to use, at the cost of preventing users from choosing which syntax should be used, which is consistent with the principles outlined in the previous chapter.
 
 \subsection{Types}
 
 The types that can be defined in C\# are classes, structs, interfaces, enums and delegates. Classes, structs and interfaces are very similar in that all three can be generic, have a list of base types and have various members. Also, especially when it comes to classes and structs, it could make sense fairly often to manipulate them in the same way. 
 
 This means that a reasonable design would be to have the types for classes, structs and interfaces inherit from a common base class and this base class, along with the types for enums and delegates, should inherit from another base class. The problem with this design is naming: there is no established name that would apply to classes, structs and interfaces, but not to enums and delegates. For this reason, the names chosen for the two base classes are \cs{TypeDefinition} and \cs{BaseTypeDefinition}.
+
+\todo{Fields etc.}
+
+\todo{AddFields etc.}
 
 \subsection{Members}
 
@@ -102,6 +122,8 @@ Class, struct and interface definitions can contain various kinds of members, na
 All kinds of members can have modifiers. While in source, member modifiers can be defined in different order (for example, both \cs{public static} and \cs{static public} are valid modifiers for a method), this order does not make a difference. For this reason, this \ac{API} represents all modifiers using a single flags enum, \cs{MemberModifiers}. 
 
 Because manipulating flags enums using bitwise operators can be cumbersome, the \ac{API} also includes helper read-write properties for most valid modifiers for each kind of member. The exception to this are access modifiers. Because a member can have only one kind of declared accessibility (which includes all the access modifiers on their own and also the combinations \cs{protected internal} and \cs{private protected}), access modifiers are surfaced as a read-write property named \cs{Accessibility}, along with a read-only property for each kind of declared accessibility.
+
+\todo{MemberDefinition}
 
 \subsection{Statements}
 
