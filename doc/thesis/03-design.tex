@@ -67,6 +67,18 @@ Listing~\ref{syntax-types} shows inheritance hierarchy of the \cs{CSharpE.Syntax
 .6 InterfaceDefinition.
 .5 EnumDefinition.
 .5 DelegateDefinition.
+.4 BaseMethodDefinition.
+.5 MethodDefinition.
+.5 ConstructorDefinition.
+.5 DestructorDefinition.
+.5 OperatorDefinition.
+.4 BasePropertyDefinition.
+.5 PropertyDefinition.
+.5 IndexerDefinition.
+.4 FieldDefinition.
+.4 EventDefinition.
+.3 Statement.
+.3 Expression.
 }
 
 \caption{Inheritance hierarchy of commonly used types in the \cs{CSharpE.Syntax} namespace}
@@ -136,7 +148,35 @@ All kinds of members can have modifiers. While in source, member modifiers can b
 
 Because manipulating flags enums using bitwise operators can be cumbersome, the \ac{API} also includes helper read-write properties for most valid modifiers for each kind of member. The exception to this are access modifiers. Because a member can have only one kind of declared accessibility (which includes all the access modifiers on their own and also the combinations \cs{protected internal} and \cs{private protected}), access modifiers are surfaced as a read-write property named \cs{Accessibility}, along with a read-only property for each kind of declared accessibility.
 
-\todo{MemberDefinition}
+\medskip
+
+Even though the list of kinds of members above might make it seem like the mapping between syntactic forms of members from the C\# specification and types in this \ac{API} should be obvious, it is not. The cases that are not obvious are:
+
+\begin{itemize}
+\item Constants, fields and field-like events can define more than one member with each declaration, for example, \cs{private int x, y;}. With considered designs, this ability makes processing all declarations of these kinds significantly harder, even those that declare just one member. For this reason, each member defined in this way is actually represented as a distinct instance of the appropriate type. For example, the previously shown declaration would be represented as two instances of the \cs{FieldDefinition} type.
+
+\item The specification lists constants separately from fields. But since constants are very similar to fields with the \cs{const} modifier, that is how they are represented: both are \cs{FieldDefinition}, the difference is only in modifiers. This also makes changing a field to a constant or vice versa easier.
+
+\item The specification lists two syntactic forms of events: field-like events and events with accessors. Since both define the same kind of member, they are both represented as \cs{EventDefinition}.
+
+This is made easier by splitting a single declaration with multiple definitions into separate instances, as mentioned before, because otherwise the same type would have to represent quite distinct values: a field-like event declaration that has no accessors, but could define more than one event; and a declaration of an event with accessors, which always defines exactly one event.
+
+\item The specification lists three syntactic forms of operators: unary operators, binary operators and conversion operators. It would be possible to have a separate type for each form, but a simpler solution is to have just one type, \cs{OperatorDefinition}, which represents all three forms. An \cs{OperatorDefinition} then has a kind, which is \cs{Implicit} or \cs{Explicit} for conversion operators, or the name of one of the overloadable unary or binary operators (for example, \cs{Addition} or \cs{Xor}).
+
+\item The specification lists instance constructors and static constructors separately. But since \cs{Static} already exists as a member modifier for other kinds of members, it could be confusing if it did not work for constructors. For this reason, both instance and static constructors are represented as \cs{ConstructorDefinition}.
+\end{itemize}
+
+\medskip
+
+Another set of decisions to make are about the inheritance hierarchy of member definitions:
+
+\begin{itemize}
+\item Classes for all kinds of member definitions derive from a common base class, \cs{MemberDefinition}. This includes type definitions, to support nested types, as has been described in previous sections.
+\item Methods, constructors, destructors and operators all have parameters and a body, so they inherit from the \cs{BaseMethodDefinition} class. This could make processing method-like definitions easier.
+\item Properties and indexers both have a type and also \cs{get} and \cs{set} accessors, so they inherit from \cs{BasePropertyDefinition}. Events also have a type and accessors, but they are a different set of accessors (\cs{add} and \cs{remove}), so they are not included.
+\end{itemize}
+
+\todo{Bodies}
 
 \subsection{Statements}
 
@@ -145,6 +185,8 @@ Because manipulating flags enums using bitwise operators can be cumbersome, the 
 \subsection{References}
 
 \section{CSharpE.Transform}
+
+\todo{Consider avoiding combinatorial explosion of \cs{ForEach}es by using \cs{ForEach(collection, ...)}}
 
 \todo{Not just API!}
 
