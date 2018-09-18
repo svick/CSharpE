@@ -98,7 +98,7 @@ namespace CSharpE.Transform.App
                         {
                             // TODO: figure out a better way to handle this
                             var newPath = Path.Combine(outputDirectory, "design",
-                                Path.ChangeExtension(Path.GetFileName(sourceFile.Path), ".cse"));
+                                Path.ChangeExtension(Path.GetFileName(sourceFile.Path), ".cs"));
 
                             Directory.CreateDirectory(Path.GetDirectoryName(newPath));
 
@@ -114,7 +114,7 @@ namespace CSharpE.Transform.App
                         foreach (var sourceFile in buildTransformed.SourceFiles)
                         {
                             var newPath = Path.Combine(outputDirectory, "build",
-                                Path.ChangeExtension(Path.GetFileName(sourceFile.Path), ".cse"));
+                                Path.ChangeExtension(Path.GetFileName(sourceFile.Path), ".cs"));
 
                             Directory.CreateDirectory(Path.GetDirectoryName(newPath));
 

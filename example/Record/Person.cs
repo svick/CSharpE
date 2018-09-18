@@ -8,6 +8,6 @@ class Person
 
     static void M(Person p)
     {
-        _ = p.
+        p.
     }
 }
