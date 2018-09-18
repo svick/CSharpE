@@ -45,7 +45,7 @@ namespace CSharpE.Extensions.Logging
         
         protected override void Process(Syntax.Project project)
         {
-            project.ForEachMethod(method =>
+            Smart.ForEach(project.GetMethods(), method =>
             {
                 if (method.Body != null)
                 {

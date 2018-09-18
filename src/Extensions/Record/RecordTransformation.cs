@@ -13,21 +13,21 @@ namespace CSharpE.Extensions.Record
     {
         public override void Process(Syntax.Project project, bool designTime)
         {
-            project.ForEachTypeWithAttribute<RecordAttribute, bool>(designTime, (isDesignTime, baseType) =>
+            Smart.ForEach(project.GetTypesWithAttribute<RecordAttribute>(), designTime, (isDesignTime, baseType) =>
             {
                 if (!(baseType is TypeDefinition typeDefinition))
                     return;
                 
                 typeDefinition.BaseTypes.Add(TypeReference(typeof(IEquatable<>), typeDefinition));
                 
-                var fieldsList = typeDefinition.ForEachField(field =>
+                var fieldsList = Smart.ForEach(typeDefinition.Fields, field =>
                 {
                     return (field.Name, Type: field.Type.Clone());
                 });
 
                 typeDefinition.Fields.Clear();
 
-                typeDefinition.LimitedSegment(fieldsList, isDesignTime, (fields, dt, type) =>
+                Smart.Segment(typeDefinition, fieldsList, isDesignTime, (fields, dt, type) =>
                 {
                     string paramName(string name) => name.Substring(0, 1).ToLowerInvariant() + name.Substring(1);
 
@@ -53,7 +53,7 @@ namespace CSharpE.Extensions.Record
 
                 if (isDesignTime)
                 {
-                    typeDefinition.LimitedSegment(type =>
+                    Smart.Segment(typeDefinition, type =>
                     {
                         type.AddMethod(Public, typeof(bool), nameof(IEquatable<object>.Equals),
                             new[] {Parameter(type.GetReference(), "other")}, NotImplementedStatement);
@@ -67,7 +67,7 @@ namespace CSharpE.Extensions.Record
                 }
                 else
                 {
-                    typeDefinition.LimitedSegment(fieldsList, (fields, type) =>
+                    Smart.Segment(typeDefinition, fieldsList, (fields, type) =>
                     {
                         var other = Identifier("other");
 

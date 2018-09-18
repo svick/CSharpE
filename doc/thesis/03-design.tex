@@ -38,6 +38,8 @@ Syntax nodes can be deep cloned by calling the \cs{Clone} method, which is a gen
 
 \item Collections of nodes are usually exposed as properties of type \cs{IList<T>}. This interface is the most flexible out of the commonly used collection interfaces in .NET. Using an interface means that the user is shielded from the implementation detail of which specific collection type is used.
 
+Using this interface, which is implemented by commonly used types like arrays or \cs{List<T>}, also means that collection properties can have easily usable setters. For example, to set the body of a method to a specific sequence of statements, one could use code similar to the following: \cs{method.Body.Statements = new Statement[] { ... };}.
+
 For convenience, some collections are also exposed on higher levels as methods. For example, \cs{TypeDefintion} contains the \cs{Methods} property, while \cs{SourceFile} and \cs{Project} contain the \cs{GetMethods} method, which returns methods from the whole file or project, respectively. Such methods return \cs{IEnumerable<T>}, because it does not make sense to for example add a method directly to a file or a project, it has to be added to a specific type.
 
 \item The \ac{API} includes implicit conversion operators when appropriate. Specifically, they can be used to convert from a definition to a reference (e.g. from \cs{TypeDefinition} to \cs{NamedTypeReference}) or from a node to a simple wrapper for that node (e.g. from \cs{Expression} to \cs{ExpressionStatement}).

@@ -13,7 +13,7 @@ namespace CSharpE.Extensions.Actor
     {
         protected override void Process(Syntax.Project project)
         {
-            project.ForEachTypeWithAttribute<ActorAttribute>(baseType =>
+            Smart.ForEach(project.GetTypesWithAttribute<ActorAttribute>(), baseType =>
             {
                 if (!(baseType is TypeDefinition type))
                     return;
@@ -22,7 +22,7 @@ namespace CSharpE.Extensions.Actor
 
                 Expression actorSemaphoreFieldExpression = This().MemberAccess(actorSemaphoreField);
 
-                type.ForEachPublicMethod(actorSemaphoreFieldExpression, (asf, method) =>
+                Smart.ForEach(type.PublicMethods, actorSemaphoreFieldExpression, (asf, method) =>
                 {
                     method.ReturnType = TypeReference(typeof(Task<>), method.ReturnType);
                     method.IsAsync = true;

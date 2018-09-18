@@ -41,13 +41,16 @@ namespace CSharpE.Syntax.Internals
     }
 
     // PERF: this type is currently not optimized for perf
-    internal class FilteredList<TSource, TTarget> : IList<TTarget> where TTarget : TSource
+    internal class FilteredList<TSource, TTarget> : IList<TTarget>, ISyntaxCollection<TTarget> where TTarget : TSource
     {
         private readonly IList<TSource> sourceList;
         private readonly Func<TTarget, bool> filter;
 
         public FilteredList(IList<TSource> sourceList, Func<TTarget, bool> filter = null)
         {
+            if (!(sourceList is SyntaxListBase))
+                throw new ArgumentException(nameof(sourceList));
+
             this.sourceList = sourceList;
             this.filter = filter;
         }
@@ -138,5 +141,8 @@ namespace CSharpE.Syntax.Internals
                 sourceList[sourceIndex] = value;
             }
         }
+
+        void ISyntaxCollection<TTarget>.Visit(ISyntaxCollectionVisitor<TTarget> visitor) =>
+            visitor.Visit(((SyntaxListBase)sourceList).Parent, this);
     }
 }

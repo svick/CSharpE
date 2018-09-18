@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace CSharpE.Syntax
@@ -73,13 +74,16 @@ namespace CSharpE.Syntax
             : this(sourceFiles, additionalReferencesRepresentatives.Select(t => new AssemblyReference(t)))
         { }
 
+        // TODO: limit type kind and use in ActorTransformation
         public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>
-            SourceFiles.SelectMany(sourceFile => sourceFile.GetTypesWithAttribute<T>());
+            NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetTypesWithAttribute<T>());
 
         public IEnumerable<BaseTypeDefinition> GetTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetTypes());
 
         public IEnumerable<ClassDefinition> GetClasses() => SourceFiles.SelectMany(sourceFile => sourceFile.GetClasses());
 
         public IEnumerable<BaseTypeDefinition> GetAllTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetAllTypes());
+
+        public IEnumerable<MethodDefinition> GetMethods() => NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetMethods());
     }
 }

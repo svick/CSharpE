@@ -31,7 +31,7 @@ namespace CSharpE.Transform.Transformers
             where TParent : class
             where TItem : SyntaxNode
         {
-            // SyntaxNodeCollectionTransformer might profit from ExpressionTree-based cache
+            // PERF: SyntaxNodeCollectionTransformer might profit from ExpressionTree-based cache
 
             object result;
 

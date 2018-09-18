@@ -22,7 +22,7 @@ namespace CSharpE.Transform.Transformers
         public List<Transformer> Transformers { get; } = new List<Transformer>();
 
         public TResult Collection<TParent, TItem, TData, TIntermediate, TResult>(
-            TParent parent, Func<TParent, IEnumerable<TItem>> collectionFunction,
+            TParent parent, IEnumerable<TItem> collection,
             ActionInvoker<TData, TItem, TIntermediate, TResult> action, TData data)
             where TParent : class
             where TItem : SyntaxNode
@@ -40,7 +40,7 @@ namespace CSharpE.Transform.Transformers
             if (transformer == null)
                 transformer = CollectionTransformer.Create(parent, action, data, limitedComparison: false);
 
-            var result = transformer.Transform(project, collectionFunction(parent));
+            var result = transformer.Transform(project, collection);
 
             Transformers.Add(transformer);
 

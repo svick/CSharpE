@@ -115,14 +115,17 @@ namespace CSharpE.Syntax
             return GetTypes().SelectMany(GetAllTypes);
         }
 
-        public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute
-        {
-            foreach (var type in GetTypes())
+        public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>
+            SimpleCollection.Create(this, GetTypes().Where(type => type.HasAttribute<T>()));
+
+        public IEnumerable<MethodDefinition> GetMethods() => NestedCollection.Create(
+            this, GetTypes(), baseType =>
             {
-                if (type.HasAttribute<T>())
-                    yield return type;
-            }
-        }
+                if (baseType is TypeDefinition type)
+                    return type.Methods;
+
+                return SimpleCollection.Create(this, Enumerable.Empty<MethodDefinition>());
+            });
 
         private readonly HashSet<string> additionalNamespaces = new HashSet<string>();
 

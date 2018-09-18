@@ -12,7 +12,7 @@ namespace CSharpE.Syntax.Internals
         internal abstract SyntaxNode Parent { get; set; }
     }
 
-    internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : SyntaxListBase, IList<TSyntax>, ISyntaxWrapper<TList>
+    internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : SyntaxListBase, IList<TSyntax>, ISyntaxWrapper<TList>, ISyntaxCollection<TSyntax>
         where TSyntax : ISyntaxWrapper<TRoslynSyntax>
         where TRoslynSyntax : Roslyn::SyntaxNode
         where TList : struct, IReadOnlyList<TRoslynSyntax>
@@ -174,6 +174,8 @@ namespace CSharpE.Syntax.Internals
 
             return roslynList;
         }
+
+        void ISyntaxCollection<TSyntax>.Visit(ISyntaxCollectionVisitor<TSyntax> visitor) => visitor.Visit(Parent, this);
     }
 
     internal class SyntaxList<TSyntax, TRoslynSyntax>
