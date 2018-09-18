@@ -147,7 +147,8 @@ namespace CSharpE.Transform.Smart
 
         public static IReadOnlyList<TResult> ForEach<TNode, TArg, TResult>(
             IEnumerable<TNode> nodes, TArg arg, Func<TArg, TNode, TResult> action) where TNode : SyntaxNode =>
-            ForEach<TNode, TArg, TResult, List<TResult>>(nodes, arg, action, AddItemToList, AddListToList);
+            ForEach<TNode, TArg, TResult, List<TResult>>(nodes, arg, action, AddItemToList, AddListToList) ??
+            new List<TResult>();
 
         private static TResult ForEach<TNode, TArg, TIntermediate, TResult>(
             IEnumerable<TNode> nodes, TArg arg, Func<TArg, TNode, TIntermediate> action,
@@ -166,14 +167,15 @@ namespace CSharpE.Transform.Smart
 
         private static List<TResult> AddItemToList<TResult>(List<TResult> list, TResult item)
         {
+            list = list ?? new List<TResult>();
             list.Add(item);
             return list;
         }
 
         private static List<TResult> AddListToList<TResult>(List<TResult> oldList, List<TResult> newList)
         {
-            oldList.AddRange(newList);
-            return oldList;
+            oldList?.AddRange(newList);
+            return oldList ?? newList;
         }
 
         public static void Segment(TypeDefinition node, Action<ILimitedTypeDefinition> action) =>
