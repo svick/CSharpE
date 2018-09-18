@@ -10,7 +10,19 @@ namespace CSharpE.Extensions.Logging
 {
     public class LoggingTransformation : BuildTimeTransformation
     {
-        public override IEnumerable<LibraryReference> AdditionalReferences { get; }
+        protected override void Process(Syntax.Project project)
+        {
+            project.ForEachMethod(method =>
+            {
+                if (method.Body != null)
+                {
+                    Statement loggingStatement = TypeReference(typeof(Console))
+                        .Call(nameof(Console.WriteLine), BuildWriteLineParameters(method));
+
+                    method.Body = Block(loggingStatement, method.Body);
+                }
+            });
+        }
 
         private static IEnumerable<Expression> BuildWriteLineParameters(MethodDefinition method)
         {
@@ -43,18 +55,6 @@ namespace CSharpE.Extensions.Logging
             return args;
         }
         
-        protected override void Process(Syntax.Project project)
-        {
-            project.ForEachMethod(method =>
-            {
-                if (method.Body != null)
-                {
-                    Statement loggingStatement = TypeReference(typeof(Console))
-                        .Call(nameof(Console.WriteLine), BuildWriteLineParameters(method));
-
-                    method.Body = Block(loggingStatement, method.Body);
-                }
-            });            
-        }
+        public override IEnumerable<LibraryReference> AdditionalReferences { get; }
     }
 }
