@@ -11,7 +11,7 @@ namespace CSharpE.Extensions.Actor
 {
     public class ActorTransformation : SimpleTransformation
     {
-        protected override void Process(Syntax.Project project)
+        protected override void Process(Project project)
         {
             Smart.ForEach(project.GetTypesWithAttribute<ActorAttribute>(), baseType =>
             {

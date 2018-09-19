@@ -11,7 +11,7 @@ namespace CSharpE.Extensions.Record
 {
     public class RecordTransformation : Transformation
     {
-        public override void Process(Syntax.Project project, bool designTime)
+        public override void Process(Project project, bool designTime)
         {
             Smart.ForEach(project.GetTypesWithAttribute<RecordAttribute>(), designTime, (isDesignTime, baseType) =>
             {

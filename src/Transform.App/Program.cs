@@ -5,9 +5,11 @@ using System.Linq;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
 using CSharpE.Syntax;
+using CSharpE.Transform.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
 using Roslyn = Microsoft.CodeAnalysis;
+using SourceFile = CSharpE.Transform.Execution.SourceFile;
 
 namespace CSharpE.Transform.App
 {
@@ -70,15 +72,15 @@ namespace CSharpE.Transform.App
 
             var transformInputFiles = await Task.WhenAll(inputFilePaths.Select(SourceFile.OpenAsync));
 
-            var designProject = new Project(transformInputFiles, new LibraryReference[0], transformations);
+            var designProject = new ProjectTransformer(transformInputFiles, new LibraryReference[0], transformations);
 
             designProject.Log += Console.WriteLine;
             
-            var buildProject = new Project(transformInputFiles, new LibraryReference[0], transformations);
+            var buildProject = new ProjectTransformer(transformInputFiles, new LibraryReference[0], transformations);
 
             buildProject.Log += Console.WriteLine;
 
-            Project designTransformed = null;
+            ProjectTransformer designTransformed = null;
             
             while (true)
             {
@@ -165,12 +167,12 @@ namespace CSharpE.Transform.App
             }
         }
 
-        private static Roslyn::Project ToRoslynProject(Project project)
+        private static Roslyn::Project ToRoslynProject(ProjectTransformer projectTransformer)
         {
             var workspace = new AdhocWorkspace();
             var roslynProject = workspace.AddProject("Project", LanguageNames.CSharp);
             
-            foreach (var sourceFile in project.SourceFiles)
+            foreach (var sourceFile in projectTransformer.SourceFiles)
             {
                 roslynProject = roslynProject.AddDocument(sourceFile.Path, sourceFile.Text).Project;
             }

@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace CSharpE.Transform
+namespace CSharpE.Transform.Execution
 {
     public class SourceFile
     {

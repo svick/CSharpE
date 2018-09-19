@@ -3,6 +3,7 @@ using System.Linq;
 using CSharpE.Extensions.Actor;
 using CSharpE.TestUtilities;
 using CSharpE.Transform;
+using CSharpE.Transform.Execution;
 using Microsoft.CodeAnalysis.CSharp.UnitTests;
 using Xunit;
 using static CSharpE.TestUtilities.TransformTestUtils;
@@ -92,7 +93,7 @@ class C
 
             var sourceFile = new SourceFile("source.cse", input);
 
-            var project = new Project(
+            var project = new ProjectTransformer(
                 new[] { sourceFile }, new[] { typeof(ActorAttribute) },
                 new ITransformation[] { new ActorTransformation() });
 
@@ -154,7 +155,7 @@ class C
 }";
 
             var sourceFile = new SourceFile("source.cse", input);
-            var project = new Project(
+            var project = new ProjectTransformer(
                 new[] { sourceFile }, new[] { typeof(ActorAttribute) },
                 new ITransformation[] { new ActorTransformation() });
 

@@ -6,23 +6,23 @@ using CSharpE.Syntax;
 using CSharpE.Syntax.Internals;
 using CSharpE.Transform.Transformers;
 
-namespace CSharpE.Transform
+namespace CSharpE.Transform.Execution
 {
-    public class Project
+    public class ProjectTransformer
     {
         public IList<SourceFile> SourceFiles { get; }
         public IList<LibraryReference> AdditionalReferences { get; }
 
         private readonly List<TransformationTransformer> transformers;
 
-        public Project(
+        public ProjectTransformer(
             IEnumerable<SourceFile> sourceFiles, IEnumerable<Type> additionalReferencesRepresentatives,
             IEnumerable<ITransformation> transformations)
             : this(
                 sourceFiles, additionalReferencesRepresentatives.Select(t => new AssemblyReference(t)),
                 transformations) { }
 
-        public Project(
+        public ProjectTransformer(
             IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
             IEnumerable<ITransformation> transformations)
         {
@@ -39,7 +39,7 @@ namespace CSharpE.Transform
 
         public event Action<LogAction> Log;
 
-        public Project Transform(bool designTime = false)
+        public ProjectTransformer Transform(bool designTime = false)
         {
             var transformProject = new TransformProject(
                 SourceFiles.Select(f => f.ToSyntaxSourceFile()), AdditionalReferences, Log);
@@ -49,7 +49,7 @@ namespace CSharpE.Transform
                 transformer.Transform(transformProject, designTime);
             }
 
-            return new Project(
+            return new ProjectTransformer(
                 transformProject.SourceFiles.Select(SourceFile.FromSyntaxSourceFile),
                 Enumerable.Empty<LibraryReference>(), Enumerable.Empty<ITransformation>());
         }

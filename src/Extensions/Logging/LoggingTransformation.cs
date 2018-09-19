@@ -10,7 +10,7 @@ namespace CSharpE.Extensions.Logging
 {
     public class LoggingTransformation : BuildTimeTransformation
     {
-        protected override void Process(Syntax.Project project)
+        protected override void Process(Project project)
         {
             Smart.ForEach(project.GetMethods(), method =>
             {

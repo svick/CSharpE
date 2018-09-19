@@ -12,7 +12,7 @@ namespace CSharpE.Extensions.Actor
 {
     public class ActorTransformation : SimpleTransformation
     {
-        protected override void Process(Syntax.Project project)
+        protected override void Process(Project project)
         {
             foreach (var type in project.GetTypesWithAttribute<ActorAttribute>().OfType<TypeDefinition>())
             {
