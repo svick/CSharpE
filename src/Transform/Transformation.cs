@@ -7,10 +7,10 @@ namespace CSharpE.Transform
 {
     public abstract class Transformation : ITransformation
     {
-        public abstract void Process(Syntax.Project project, bool designTime);
-        
-        public abstract IEnumerable<LibraryReference> AdditionalReferences { get; }
+        public abstract void Process(Project project, bool designTime);
 
-        public static Statement NotImplementedStatement { get; } = Throw(New(typeof(NotImplementedException)));
+        public virtual IEnumerable<LibraryReference> AdditionalReferences => null;
+
+        protected static Statement NotImplementedStatement { get; } = Throw(New(typeof(NotImplementedException)));
     }
 }

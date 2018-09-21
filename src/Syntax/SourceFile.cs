@@ -89,10 +89,11 @@ namespace CSharpE.Syntax
                 }
             }
 
-            return Members.SelectMany(GetTypes);
+            return SimpleCollection.Create(this, Members.SelectMany(GetTypes));
         }
 
-        public IEnumerable<ClassDefinition> GetClasses() => GetTypes().OfType<ClassDefinition>();
+        public IEnumerable<ClassDefinition> GetClasses() =>
+            SimpleCollection.Create(this, GetTypes().OfType<ClassDefinition>());
 
         public IEnumerable<BaseTypeDefinition> GetAllTypes()
         {
@@ -112,7 +113,7 @@ namespace CSharpE.Syntax
                 }
             }
 
-            return GetTypes().SelectMany(GetAllTypes);
+            return SimpleCollection.Create(this, GetTypes().SelectMany(GetAllTypes));
         }
 
         public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>

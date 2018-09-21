@@ -1,8 +1,10 @@
+using CSharpE.Syntax;
+
 namespace CSharpE.Transform
 {
     public abstract class BuildTimeTransformation : Transformation
     {
-        public sealed override void Process(Syntax.Project project, bool designTime)
+        public sealed override void Process(Project project, bool designTime)
         {
             if (designTime)
                 return;
@@ -10,6 +12,6 @@ namespace CSharpE.Transform
             Process(project);
         }
 
-        protected abstract void Process(Syntax.Project project);
+        protected abstract void Process(Project project);
     }
 }

@@ -11,15 +11,13 @@ namespace CSharpE.Transform.Tests
     {
         class AddFieldTransformation : SimpleTransformation
         {
-            protected override void Process(Syntax.Project project)
+            protected override void Process(Project project)
             {
                 foreach (var type in project.GetTypes().OfType<TypeDefinition>())
                 {
                     type.AddField(typeof(int), "i");
                 }
             }
-
-            public override IEnumerable<LibraryReference> AdditionalReferences => Enumerable.Empty<LibraryReference>();
         }
 
         [Fact]

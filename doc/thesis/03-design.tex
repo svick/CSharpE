@@ -188,8 +188,106 @@ Another set of decisions to make are about the inheritance hierarchy of member d
 
 \section{CSharpE.Transform}
 
+Now that the \ac{API} for representing and modifying code has been designed, it is time to decide how is the system going to transform a project for some extension. Per Section~\ref{extensions-are-dotnet-libraries}, extensions are distributed as .NET libraries. This means the system will need some way to recognize what transformations an extension wants to perform and then execute them.
 
+A reasonable way to do this is to have an interface that is implemented by each transformation. The system would then create an instance of the type (or types) that implements this interface and call a method on it whenever the transformation needs to be performed.
 
-\todo{Not just API!}
+As has been explained before, the transformation that need to be performed can be different at design time and at build time, so the interface should account for that. Also, different extensions will have different relationships between the two transformation, so the \ac{API} should account for that. The solutions to these two requirements are that the interface will include a parameter that specifies which transformation should be performed and there will also be abstract classes that hide this parameter for transformations that do not need it. This way, full flexibility of using an interface is maintained, while recommended patterns are communicated using the abstract classes.
 
+Listing~\ref{csharpetransform-simple-example} shows how the running example from Section~\ref{running-example} could be implemented as a transformation. Notice that it uses one of the aforementioned abstract classes and that the body of the method is the same as the main part of Listing~\ref{csharpesyntax-example}.
+
+\begin{listing}
+\inputminted[firstline=9,lastline=27]{csharp}{samples/CSharpETransform.Simple/EntityTransformation.cs}
+\caption{CSharpE.Transform simple example}
+\label{csharpetransform-simple-example}
+\end{listing}
+
+\medskip
+
+A much more complicate question is: how to make design-time transformations efficient, by regenerating only code that depends on modified code? As can be seen from the previous example, transformations are often structured around \cs{foreach} loops over syntax nodes: the transformation applies for each class, or for each type with an attribute, or for each method. And this includes \cs{foreach} loops that are hidden by convenience methods from \cs{CSharpE.Syntax}. For example, the following code iterating over all methods in a project:
+
+\begin{minted}{csharp}
+foreach (var method in project.Methods())
+{
+   ...
+}
+\end{minted}
+
+Is effectively the same as the following code, which does not use convenience methods:
+
+\begin{minted}{csharp}
+foreach (var file in project.SourceFiles)
+{
+    foreach (var type in file.GetTypes())
+    {
+        foreach (var method in type.Methods)
+        {
+            ...
+        }
+    }
+}
+\end{minted}
+
+This, combined with the fact that a programmer editing their code usually focuses at a single higher-level syntax node (like a method or a class) at a time, makes \cs{foreach} loops the ideal point where to decide whether transformation code should be executed again.
+
+But the regular \cs{foreach} loop does not offer sufficient flexibility for the kind of operations that will be required to implement this "smart" \cs{foreach} loop. Instead, a method with a lambda parameter will be used, similar to the \cs{Parallel.ForEach} method in .NET. \cite{parallel-foreach}
+
+\medskip
+
+To make this more concrete, Listing~\ref{csharpetransform-smart-example} shows how the "smart" \cs{foreach} loop could be used in the running example. Notice that the outer \cs{foreach} loop from Listing~\ref{csharpetransform-simple-example} was replaced with a call to the \cs{Smart.ForEach} method, with a lambda serving as the loop body. Why the inner loop was not similarly changed will be explained at a later point.
+
+\begin{listing}
+\inputminted[firstline=9,lastline=27]{csharp}{samples/CSharpETransform.Smart/EntityTransformation.cs}
+\caption{Example of CSharpE.Transform smart \cs{foreach} loop}
+\label{csharpetransform-smart-example}
+\end{listing}
+
+\medskip
+
+In general, how this works is that each loop iteration has its own inputs and outputs. Inputs are the syntax nodes and other data that the iteration has access to. Outputs are any changes made to those syntax nodes and also any data it returns (while a regular \cs{foreach} loop cannot return anything, a \cs{foreach}-like method can).
+
+When the loop is executed for the first time, its body is invoked as if it was a regular \cs{foreach} loop, but at the same time, its inputs and outputs are recorded. When it is executed again, the new inputs are compared with the recorded one. If the new inputs match the recorded ones, instead of invoking the loop body, the recorded outputs are used. This way, if only a small part of the input changes, there is a good chance that only small part of the transformation will have to be executed again.
+
+\medskip
+
+As an example, consider a project with two files, each of which contains two classes and a transformation that uses a smart \cs{foreach} loop over the project's classes. Since the loop over classes in a project includes a hidden loop over files in the project, the first time this transformation is ran, an iteration of the first loop will be executed for each of the two files and an iteration of the second loop will be executed for each of the four classes.
+
+If the second class in the second file is modified and the transformation is ran again, the first iteration of the first loop will not be executed, because nothing in the first file changed. The previously recorded outputs will be used for this iteration. The second iteration will be executed, because the second file changed. The iteration for the first class in the second file will not be executed, because the code of this class did not change. The only class for which any code from the transformation will be executed is the one that changed: the second class of the second file.
+
+Listing~\ref{csharpetransform-log} shows the output of internal logging for this scenario. Each line represents a section of code to be executed. The first entry on each line is the name of the type of the object that is being processed. The second entry is the name of the object (empty in the case of a project). The last entry indicates whether the section of code was actually executed: \cs{transform} means that it was executed, \cs{cached} means that it was not executed and that its recorded outputs were used.
+
+\begin{listing}
+\begin{minted}{text}
+(TransformProject, , transform)
+(SourceFile, File1.cs, transform)
+(ClassDefinition, Class1A, transform)
+(ClassDefinition, Class1B, transform)
+(SourceFile, File2.cs, transform)
+(ClassDefinition, Class2A, transform)
+(ClassDefinition, Class2B, transform)
+
+(TransformProject, , transform)
+(SourceFile, File1.cs, cached)
+(SourceFile, File2.cs, transform)
+(ClassDefinition, Class2A, cached)
+(ClassDefinition, Class2B, transform)
+\end{minted}
+\caption{Log output for running a transformation twice, with a change between the runs}
+\label{csharpetransform-log}
+\end{listing}
+
+\medskip
+
+When it comes to designing how exactly the "smart" \cs{foreach} loop will look like, there are several considerations:
+
+\begin{itemize}
 \label{no-parent}
+\item changing nodes
+\item passing data in
+\item passing data out
+\item extension method
+\item combinatorial explosion
+\end{itemize}
+
+\todo{mention that I considered transformation transformation}
+\todo{Not just API!}

@@ -4,7 +4,7 @@ using CSharpE.Syntax;
 using CSharpE.Syntax.Internals;
 using CSharpE.Transform.Internals;
 
-namespace CSharpE.Transform.Smart
+namespace CSharpE.Transform
 {
     public static class Smart
     {

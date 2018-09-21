@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax;
 using CSharpE.Transform;
-using CSharpE.Transform.Smart;
 using static CSharpE.Syntax.SyntaxFactory;
 using static CSharpE.Syntax.MemberModifiers;
 

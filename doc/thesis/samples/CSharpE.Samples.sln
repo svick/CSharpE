@@ -22,11 +22,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReflectionEmit", "Reflectio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoCecil", "MonoCecil\MonoCecil.csproj", "{B386F386-883F-4790-ACE6-F85AEDB59062}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpESyntax", "CSharpE.Syntax\CSharpESyntax.csproj", "{2B841D1A-21A8-4335-B341-A6EE953EC39B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpESyntax", "CSharpE.Syntax\CSharpESyntax.csproj", "{2B841D1A-21A8-4335-B341-A6EE953EC39B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Syntax", "..\..\..\src\Syntax\Syntax.csproj", "{08DC998E-D9DA-4470-AD11-B7D6F6659532}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{DABCB00D-361F-4947-9425-CD13A6719744}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transform", "..\..\..\src\Transform\Transform.csproj", "{8485A1F3-B3AE-481F-A0FC-3960287F1742}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpETransform.Simple", "CSharpETransform.Simple\CSharpETransform.Simple.csproj", "{BE1DDFBA-7A42-4C5B-8FC3-2704F373DAED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpETransform.Smart", "CSharpETransform.Smart\CSharpETransform.Smart.csproj", "{47262304-7FF9-4469-B404-43C2F1FDBDAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpETransform.Smart2", "CSharpETransform.Smart2\CSharpETransform.Smart2.csproj", "{979CDCF5-17D6-4C83-95FC-B4D4DF3E7B06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,12 +78,29 @@ Global
 		{08DC998E-D9DA-4470-AD11-B7D6F6659532}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08DC998E-D9DA-4470-AD11-B7D6F6659532}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08DC998E-D9DA-4470-AD11-B7D6F6659532}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8485A1F3-B3AE-481F-A0FC-3960287F1742}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8485A1F3-B3AE-481F-A0FC-3960287F1742}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8485A1F3-B3AE-481F-A0FC-3960287F1742}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8485A1F3-B3AE-481F-A0FC-3960287F1742}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE1DDFBA-7A42-4C5B-8FC3-2704F373DAED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE1DDFBA-7A42-4C5B-8FC3-2704F373DAED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE1DDFBA-7A42-4C5B-8FC3-2704F373DAED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE1DDFBA-7A42-4C5B-8FC3-2704F373DAED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47262304-7FF9-4469-B404-43C2F1FDBDAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47262304-7FF9-4469-B404-43C2F1FDBDAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47262304-7FF9-4469-B404-43C2F1FDBDAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47262304-7FF9-4469-B404-43C2F1FDBDAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{979CDCF5-17D6-4C83-95FC-B4D4DF3E7B06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{979CDCF5-17D6-4C83-95FC-B4D4DF3E7B06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{979CDCF5-17D6-4C83-95FC-B4D4DF3E7B06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{979CDCF5-17D6-4C83-95FC-B4D4DF3E7B06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{08DC998E-D9DA-4470-AD11-B7D6F6659532} = {DABCB00D-361F-4947-9425-CD13A6719744}
+		{8485A1F3-B3AE-481F-A0FC-3960287F1742} = {DABCB00D-361F-4947-9425-CD13A6719744}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {754DF790-C891-4DD9-9B9E-AB3BE0D39E17}

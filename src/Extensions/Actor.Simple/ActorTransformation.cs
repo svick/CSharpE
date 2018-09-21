@@ -34,7 +34,5 @@ namespace CSharpE.Extensions.Actor
                 }
             }
         }
-
-        public override IEnumerable<LibraryReference> AdditionalReferences => throw new NotImplementedException();
     }
 }

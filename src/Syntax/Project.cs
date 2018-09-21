@@ -78,12 +78,16 @@ namespace CSharpE.Syntax
         public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>
             NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetTypesWithAttribute<T>());
 
-        public IEnumerable<BaseTypeDefinition> GetTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetTypes());
+        public IEnumerable<BaseTypeDefinition> GetTypes() =>
+            NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetTypes());
 
-        public IEnumerable<ClassDefinition> GetClasses() => SourceFiles.SelectMany(sourceFile => sourceFile.GetClasses());
+        public IEnumerable<ClassDefinition> GetClasses() =>
+            NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetClasses());
 
-        public IEnumerable<BaseTypeDefinition> GetAllTypes() => SourceFiles.SelectMany(sourceFile => sourceFile.GetAllTypes());
+        public IEnumerable<BaseTypeDefinition> GetAllTypes() =>
+            NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetAllTypes());
 
-        public IEnumerable<MethodDefinition> GetMethods() => NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetMethods());
+        public IEnumerable<MethodDefinition> GetMethods() =>
+            NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetMethods());
     }
 }

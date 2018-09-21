@@ -5,7 +5,7 @@ namespace CSharpE.Transform
 {
     public interface ITransformation
     {
-        void Process(Syntax.Project project, bool designTime);
+        void Process(Project project, bool designTime);
 
         IEnumerable<LibraryReference> AdditionalReferences { get; }
     }

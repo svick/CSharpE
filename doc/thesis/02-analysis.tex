@@ -162,6 +162,10 @@ For example, if the system included the \ac{API} suggested in the previous point
 
 NuGet is an established distribution channel for regular .NET libraries, and also for other kinds of libraries, like Roslyn analyzers or Fody add-ins. This makes NuGet a good fit for distributing extensions for this system.
 
+\label{extensions-are-dotnet-libraries}
+
+This also effectively implies that extensions should be distributed as .NET libraries. While NuGet can work for other kinds of artifacts, it works best for .NET libraries.
+
 \item The system should allow extensions to report errors and warnings about code.
 
 Many extensions are likely going to have ways of using their \ac{API} (generated or not) in ways that are suspicious or outright incorrect. The system should let extensions report these issues to the user, including identifying the problematic part of their code.
