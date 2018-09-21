@@ -189,6 +189,8 @@ Another set of decisions to make are about the inheritance hierarchy of member d
 
 \section{CSharpE.Transform}
 
+\todo{subsections}
+
 Now that the \ac{API} for representing and modifying code has been designed, it is time to decide how is the system going to transform a project for some extension. Per Section~\ref{extensions-are-dotnet-libraries}, extensions are distributed as .NET libraries. This means the system will need some way to recognize what transformations an extension wants to perform and then execute them.
 
 A reasonable way to do this is to have an interface that is implemented by each transformation. The system would then create an instance of the type (or types) that implements this interface and call a method on it whenever the transformation needs to be performed.
@@ -205,7 +207,7 @@ Listing~\ref{csharpetransform-simple-example} shows how the running example from
 
 \medskip
 
-A much more complicate question is: how to make design-time transformations efficient, by regenerating only code that depends on modified code? As can be seen from the previous example, transformations are often structured around \cs{foreach} loops over syntax nodes: the transformation applies for each class, or for each type with an attribute, or for each method. And this includes \cs{foreach} loops that are hidden by convenience methods from \cs{CSharpE.Syntax}. For example, the following code iterating over all methods in a project:
+A much more complicate question is: how to make design-time transformations efficient, by regenerating only code that depends on modified code? As can be seen from the previous example, transformations are often structured around \cs{foreach} loops over syntax nodes: the transformation applies for each class, or for each type with an attribute, or for each method. And this includes \cs{foreach} loops that are hidden by convenience methods from \cs{CSharpE.Syntax}. For example, consider the following code iterating over all methods in a project:
 
 \begin{minted}{csharp}
 foreach (var method in project.Methods())
@@ -214,7 +216,7 @@ foreach (var method in project.Methods())
 }
 \end{minted}
 
-Is effectively the same as the following code, which does not use convenience methods:
+The above code is effectively the same as the following code, which does not use convenience methods:
 
 \begin{minted}{csharp}
 foreach (var file in project.SourceFiles)
