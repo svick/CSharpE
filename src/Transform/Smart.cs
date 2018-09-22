@@ -133,17 +133,8 @@ namespace CSharpE.Transform
         }
 
         public static IReadOnlyList<TResult> ForEach<TNode, TResult>(
-            IEnumerable<TNode> nodes, Func<TNode, TResult> action) where TNode : SyntaxNode
-        {
-            if (!(nodes is ISyntaxCollection<TNode> syntaxCollection))
-                throw new ArgumentException("Collection has to be provided by CSharpE.");
-            ClosureChecker.ThrowIfHasClosure(action);
-
-            var visitor = new Visitor<TNode, Func<TNode, TResult>, TResult, List<TResult>>(
-                action, (a, node) => a(node), AddItemToList, AddListToList);
-            syntaxCollection.Visit(visitor);
-            return visitor.Result;
-        }
+            IEnumerable<TNode> nodes, Func<TNode, TResult> action) where TNode : SyntaxNode =>
+            ForEach(nodes, action, (a, node) => a(node));
 
         public static IReadOnlyList<TResult> ForEach<TNode, TArg, TResult>(
             IEnumerable<TNode> nodes, TArg arg, Func<TArg, TNode, TResult> action) where TNode : SyntaxNode =>

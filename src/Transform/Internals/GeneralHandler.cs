@@ -57,6 +57,9 @@ namespace CSharpE.Transform.Internals
 
         public static T DeepClone<T>(T input)
         {
+            if (input == null)
+                return input;
+
             if (IsImmutable(input))
                 return input;
 
