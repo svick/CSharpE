@@ -284,7 +284,27 @@ Listing~\ref{csharpetransform-log} shows the output of internal logging for this
 When it comes to designing how exactly the "smart" \cs{foreach} loop should look like, there are several considerations:
 
 \begin{itemize}
+\item The system assumes that code in a loop iteration body is deterministic and free of unrecognized side-effects.
+
+For smart loops to work correctly, the output of each loop iteration has to depend only on its inputs and all its outputs have to be recognized by the system. Otherwise, when the recognized inputs stay the same, the iteration is not re-executed, and the end result is different than what it would be without a smart loop.
+
+This does not mean non-determinism or side-effects are completely forbidden in transformations, but it does mean they are severely limited. Some examples:
+
+\begin{itemize}
+\item If an iteration needs access to the current date, it should not read the \cs{DateTime.Today} property itself. Instead, its value can be passed as an input.
+\item If an iteration logs what it does to a file, it might be acceptable that the log file is only updated when the inputs change.
+\item If an iteration updates some global cache, then that is technically a side-effect. But if that cache is only used to make the code more efficient and no code relies on it for correctness, then this side-effect does not cause any issues.
+\item If an iteration uses a randomized algorithm, the fact that the output of the algorithm could change with each execution is generally not a positive feature. In this case, skipping re-execution should be acceptable.
+\item Mutating the syntax node that is being processed by the iteration is explicitly allowed. This is because any changes to that node are recognized by the system and are re-applied even if execution of the iteration is skipped.
+\end{itemize}
+
+Because determinism and unrecognized side-effects can sometimes be desirable, and because .NET does not have a good way of recognizing them, the system does not have any mechanism of preventing them.
+
+Also note that non-determinism might be undesirable in a transformation, even when ignoring its effects on smart loops. This is because a transformation can decide what code is valid and how the code behaves when executed. So, code that compiles and works correctly now could stop compiling or it could change its behavior in the future, which is generally undesirable.
+
 \item Access to syntax nodes has to be controlled.
+
+\nopagebreak
 
 When some part of some syntax node is accessed by a loop iteration, and this part of the syntax node is changed between two executions of that iteration, the iteration has to be re-executed, because that change could alter its output. While it would be possible to track which parts of which syntax nodes are accessed by an iteration, the system described in this work does not attempt to do so, on the assumption that it is not necessary to achieve sufficient performance for design-time transformations.
 
