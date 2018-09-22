@@ -74,8 +74,8 @@ namespace CSharpE.Transform.Transformers
                 }
 
                 if (itemTransformer == null)
-                    itemTransformer =
-                        CodeTransformer<TItem, TIntermediate>.Create(i => Action.Invoke(Data, i), limitedComparison);
+                    itemTransformer = CodeTransformer<TItem, TIntermediate>.Create(
+                        i => Action.Invoke(GeneralHandler.DeepClone(Data), i), limitedComparison);
 
                 var newItem = items[newIndex];
 
@@ -96,8 +96,9 @@ namespace CSharpE.Transform.Transformers
             return Action.GetResult();
         }
 
-        public override bool Matches(TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction,
-            TData newData, bool newLimitedComparison)
+        public override bool Matches(
+            TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction, TData newData,
+            bool newLimitedComparison)
         {
             var newParentFileSpan = newParent.FileSpan;
 

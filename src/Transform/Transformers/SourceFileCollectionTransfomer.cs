@@ -7,7 +7,7 @@ namespace CSharpE.Transform.Transformers
     internal class SourceFileCollectionTransformer<TData, TIntermediate, TResult>
         : CollectionTransformer<Syntax.Project, Syntax.SourceFile, TData, TIntermediate, TResult>
     {
-        private Dictionary<string, CodeTransformer<Syntax.SourceFile, TIntermediate>> oldTransfomers;
+        private Dictionary<string, CodeTransformer<Syntax.SourceFile, TIntermediate>> oldTransformers;
 
         public SourceFileCollectionTransformer(
             Syntax.Project parent, ActionInvoker<TData, Syntax.SourceFile, TIntermediate, TResult> action, TData data)
@@ -23,11 +23,11 @@ namespace CSharpE.Transform.Transformers
 
                 var path = sourceFile.Path;
 
-                oldTransfomers?.TryGetValue(path, out fileTransformer);
+                oldTransformers?.TryGetValue(path, out fileTransformer);
 
                 if (fileTransformer == null)
-                    fileTransformer =
-                        CodeTransformer<Syntax.SourceFile, TIntermediate>.Create(f => Action.Invoke(Data, f));
+                    fileTransformer = CodeTransformer<Syntax.SourceFile, TIntermediate>.Create(
+                        f => Action.Invoke(GeneralHandler.DeepClone(Data), f));
 
                 var intermediate = fileTransformer.Transform(project, sourceFile);
                 
@@ -36,7 +36,7 @@ namespace CSharpE.Transform.Transformers
                 newTransformers[path] = fileTransformer;
             }
 
-            oldTransfomers = newTransformers;
+            oldTransformers = newTransformers;
 
             return Action.GetResult();
         }

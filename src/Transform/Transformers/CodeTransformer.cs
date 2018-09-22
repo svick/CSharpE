@@ -19,7 +19,7 @@ namespace CSharpE.Transform.Transformers
         {
             if (typeof(SyntaxNode).IsAssignableFrom(typeof(TInput)))
                 return (CodeTransformer<TInput, TOutput>) Activator.CreateInstance(
-                    typeof(SyntaxNodeCodeTransfomer<,>).MakeGenericType(typeof(TInput), typeof(TOutput)), codeAction,
+                    typeof(SyntaxNodeCodeTransformer<,>).MakeGenericType(typeof(TInput), typeof(TOutput)), codeAction,
                     limitedComparison);
 
             return new CodeTransformer<TInput, TOutput>(codeAction);
@@ -48,7 +48,7 @@ namespace CSharpE.Transform.Transformers
         }
     }
 
-    internal sealed class SyntaxNodeCodeTransfomer<TInput, TOutput> : CodeTransformer<TInput, TOutput>
+    internal sealed class SyntaxNodeCodeTransformer<TInput, TOutput> : CodeTransformer<TInput, TOutput>
         where TInput : SyntaxNode, ISyntaxWrapper<Roslyn::SyntaxNode>
     {
         private readonly bool limited;
@@ -58,7 +58,7 @@ namespace CSharpE.Transform.Transformers
         private TOutput cachedOutput;
         private Action<TInput> syntaxChangesApplier;
 
-        public SyntaxNodeCodeTransfomer(Func<TInput, TOutput> codeAction, bool limited)
+        public SyntaxNodeCodeTransformer(Func<TInput, TOutput> codeAction, bool limited)
             : base(codeAction)
             => this.limited = limited;
 

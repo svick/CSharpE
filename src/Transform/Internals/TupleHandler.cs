@@ -14,7 +14,8 @@ namespace CSharpE.Transform.Internals
 
             var type = arg.GetType();
 
-            return type.IsGenericType && type.GetGenericTypeDefinition().FullName.StartsWith("System.ValueTuple`");
+            return type.IsGenericType &&
+                   type.GetGenericTypeDefinition().FullName?.StartsWith("System.ValueTuple`") == true;
         }
 
         private static IEnumerable<object> GetItems<T>(T arg)
@@ -44,9 +45,6 @@ namespace CSharpE.Transform.Internals
             return (T)Activator.CreateInstance(input.GetType(), clones.ToArray());
         }
 
-				public static bool Equals<T>(T arg1, T arg2)
-				{
-						return CollectionHandler.Equals(GetItems(arg1), GetItems(arg2));
-				}
+        public static bool Equals<T>(T arg1, T arg2) => CollectionHandler.Equals(GetItems(arg1), GetItems(arg2));
     }
 }

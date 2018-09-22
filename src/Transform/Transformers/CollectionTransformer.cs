@@ -35,17 +35,17 @@ namespace CSharpE.Transform.Transformers
 
             object result;
 
-            if (typeof(TParent) == typeof(Syntax.Project) && typeof(TItem) == typeof(Syntax.SourceFile))
+            if (typeof(TParent) == typeof(Project) && typeof(TItem) == typeof(SourceFile))
             {
                 result = new SourceFileCollectionTransformer<TData, TIntermediate, TOutput>(
-                    (Syntax.Project)(object)parent,
-                    (ActionInvoker<TData, Syntax.SourceFile, TIntermediate, TOutput>)(object)action, data);
+                    (Project)(object)parent,
+                    (ActionInvoker<TData, SourceFile, TIntermediate, TOutput>)(object)action, data);
             }
             else if (typeof(SyntaxNode).IsAssignableFrom(typeof(TParent)))
             {
-                var transfomerType = typeof(SyntaxNodeCollectionTransformer<,,,,>).MakeGenericType(
+                var transformerType = typeof(SyntaxNodeCollectionTransformer<,,,,>).MakeGenericType(
                     typeof(TParent), typeof(TItem), typeof(TData), typeof(TIntermediate), typeof(TOutput));
-                result = Activator.CreateInstance(transfomerType, parent, action, data, limitedComparison);
+                result = Activator.CreateInstance(transformerType, parent, action, data, limitedComparison);
             }
             else
                 throw new InvalidOperationException();

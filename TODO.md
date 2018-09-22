@@ -1,8 +1,4 @@
-﻿- clone args in `CollectionTransformer<,,>.Data`
-
----
-
-- fix moving `NamedTypeReference`s between files (doesn't update `using`s)
+﻿- fix moving `NamedTypeReference`s between files (doesn't update `using`s)
 - make most classes `sealed`
 - allow modifying lists while iterating them
   - optional: make it more efficient using copy on write 

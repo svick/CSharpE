@@ -17,21 +17,21 @@ namespace CSharpE.Transform.Internals
             }
         }
 
-				public static bool Equals<T>(T arg1, T arg2)
-				{
-						var collection1 = ((IEnumerable)arg1).Cast<object>().ToList();
-						var collection2 = ((IEnumerable)arg2).Cast<object>().ToList();
+        public static bool Equals<T>(T arg1, T arg2)
+        {
+            var collection1 = ((IEnumerable)arg1).Cast<object>().ToList();
+            var collection2 = ((IEnumerable)arg2).Cast<object>().ToList();
 
-						if (collection1.Count != collection2.Count)
-								return false;
+            if (collection1.Count != collection2.Count)
+                return false;
 
-						for (int i = 0; i < collection1.Count; i++)
-						{
-								if (!GeneralHandler.Equals(collection1[i], collection2[i]))
-									return false;
-						}
+            for (int i = 0; i < collection1.Count; i++)
+            {
+                if (!GeneralHandler.Equals(collection1[i], collection2[i]))
+                    return false;
+            }
 
-						return true;
-				}
+            return true;
+        }
     }
 }
