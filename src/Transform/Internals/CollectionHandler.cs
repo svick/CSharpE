@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CSharpE.Transform.Internals
@@ -15,6 +17,24 @@ namespace CSharpE.Transform.Internals
             {
                 GeneralHandler.ThrowIfNotPersistent(item);
             }
+        }
+
+        private static T[] DeepCloneArray<T>(T[] array) => Array.ConvertAll(array, GeneralHandler.DeepClone);
+
+        private static List<T> DeepCloneList<T>(List<T> list) => list.ConvertAll(GeneralHandler.DeepClone);
+
+        public static T DeepClone<T>(T input)
+        {
+            var type = input.GetType();
+
+            // the second condition makes sure the array is not "weird" (i.e. a multi-dimensional array, or array with lower bound other than 0)
+            if (type.IsArray && type == type.GetElementType().MakeArrayType())
+                return DeepCloneArray((dynamic)input);
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+                return DeepCloneList((dynamic)input);
+
+            throw new InvalidOperationException($"The collection type {input.GetType()} cannot be cloned.");
         }
 
         public static bool Equals<T>(T arg1, T arg2)

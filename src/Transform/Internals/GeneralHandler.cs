@@ -44,6 +44,7 @@ namespace CSharpE.Transform.Internals
         private static bool IsImmutable<T>(T arg)
         {
             // TODO: detect other immutable types
+
             if (arg is Unit || arg is bool || arg is int || arg is string)
                 return true;
 
@@ -64,6 +65,9 @@ namespace CSharpE.Transform.Internals
 
             if (TupleHandler.IsTuple(input))
                 return TupleHandler.DeepClone(input);
+
+            if (CollectionHandler.IsCollection(input))
+                return CollectionHandler.DeepClone(input);
 
             throw new InvalidOperationException($"The object {input} has to be cloneable.");
         }

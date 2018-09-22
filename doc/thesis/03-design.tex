@@ -314,10 +314,16 @@ Instead, whenever any syntax node accessible by a loop iteration changes, that i
 Instead of providing no parent references whatsoever, another option would be to have parent references on all node types, but prohibit accessing "dangerous" parents at runtime (attempting to do so could result in throwing an exception or returning \cs{null}). But because this could be confusing to users and because parent references are not necessary, this option was not chosen.
 
 Another consequence of these node accessibility rules is that care has to be taken about which other nodes, apart from the one being processed by the loop iteration, are accessible. This is considered along with other kinds of input in the next point.
-\item passing data in
+
+\item All data that is passed in has to be tracked.
+
+The system has to understand all inputs of a loop iteration. This includes the syntax that is being processed by the iteration, but also any other data. \dots
+
+The natural way of passing additional data into a lambda is by directly accessing variables from the outer scope. When such lambda is compiled, any variables from the outer scope that it accesses are stored in a closure object, that then becomes part of the delegate that represents the lambda.
+
 \item passing data out
 \item extension method
-\item combinatorial explosion
+\item understanding MLM (and the combinatorial explosion)
 \end{itemize}
 
 \todo{mention that I considered transformation transformation}
