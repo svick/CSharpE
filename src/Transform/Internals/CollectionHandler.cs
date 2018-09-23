@@ -7,7 +7,18 @@ namespace CSharpE.Transform.Internals
 {
     internal static class CollectionHandler
     {
-        public static bool IsCollection<T>(T arg) => arg is IEnumerable && !(arg is string);
+        // the second condition makes sure the array is not "weird" (i.e. a multi-dimensional array, or array with lower bound other than 0)
+        private static bool IsArrayType(Type type) => type.IsArray && type == type.GetElementType().MakeArrayType();
+
+        private static bool IsListType(Type type) =>
+            type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
+
+        public static bool IsCollection<T>(T arg)
+        {
+            var type = arg.GetType();
+
+            return IsArrayType(type) || IsListType(type);
+        }
 
         public static void ThrowIfNotPersistent<T>(T arg)
         {
@@ -27,11 +38,10 @@ namespace CSharpE.Transform.Internals
         {
             var type = input.GetType();
 
-            // the second condition makes sure the array is not "weird" (i.e. a multi-dimensional array, or array with lower bound other than 0)
-            if (type.IsArray && type == type.GetElementType().MakeArrayType())
+            if (IsArrayType(type))
                 return DeepCloneArray((dynamic)input);
 
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            if (IsListType(type))
                 return DeepCloneList((dynamic)input);
 
             throw new InvalidOperationException($"The collection type {input.GetType()} cannot be cloned.");

@@ -38,6 +38,8 @@ namespace CSharpE.Transform.Internals
             }
         }
 
+        public static bool IsImmutable<T>(T arg) => GetItems(arg).All(GeneralHandler.IsImmutable);
+
         public static T DeepClone<T>(T input)
         {
             var clones = GetItems(input).Select(GeneralHandler.DeepClone);

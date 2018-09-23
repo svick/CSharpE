@@ -26,8 +26,7 @@ namespace CSharpE.Transform.Transformers
                 oldTransformers?.TryGetValue(path, out fileTransformer);
 
                 if (fileTransformer == null)
-                    fileTransformer = CodeTransformer<Syntax.SourceFile, TIntermediate>.Create(
-                        f => Action.Invoke(GeneralHandler.DeepClone(Data), f));
+                    fileTransformer = CodeTransformer<Syntax.SourceFile, TIntermediate>.Create(InvokeAndCheck);
 
                 var intermediate = fileTransformer.Transform(project, sourceFile);
                 

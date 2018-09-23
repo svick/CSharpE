@@ -74,8 +74,7 @@ namespace CSharpE.Transform.Transformers
                 }
 
                 if (itemTransformer == null)
-                    itemTransformer = CodeTransformer<TItem, TIntermediate>.Create(
-                        i => Action.Invoke(GeneralHandler.DeepClone(Data), i), limitedComparison);
+                    itemTransformer = CodeTransformer<TItem, TIntermediate>.Create(InvokeAndCheck, limitedComparison);
 
                 var newItem = items[newIndex];
 

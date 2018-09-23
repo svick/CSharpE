@@ -41,7 +41,7 @@ namespace CSharpE.Transform.Internals
             throw new ArgumentNotPersistentException($"The given {arg.GetType()} is not persistent.");
         }
 
-        private static bool IsImmutable<T>(T arg)
+        public static bool IsImmutable<T>(T arg)
         {
             // TODO: detect other immutable types
 
@@ -51,6 +51,9 @@ namespace CSharpE.Transform.Internals
             // delegates without closures are considered immutable
             if (arg is Delegate del && !ClosureChecker.HasClosure(del))
                 return true;
+
+            if (TupleHandler.IsTuple(arg))
+                return TupleHandler.IsImmutable(arg);
 
             return false;
         }

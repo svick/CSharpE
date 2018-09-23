@@ -21,6 +21,21 @@ namespace CSharpE.Transform.Transformers
 
         public abstract bool Matches(TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction,
             TData newData, bool newLimitedComparison);
+
+        protected TIntermediate InvokeAndCheck(TItem item)
+        {
+            if (GeneralHandler.IsImmutable(Data))
+                return Action.Invoke(Data, item);
+
+            var oldData = GeneralHandler.DeepClone(Data);
+            var result = Action.Invoke(Data, item);
+
+            if (!GeneralHandler.Equals(oldData, Data))
+                throw new InvalidOperationException(
+                    "It is not allowed to mutate inputs of smart methods in their bodies.");
+
+            return result;
+        }
     }
 
     internal static class CollectionTransformer
