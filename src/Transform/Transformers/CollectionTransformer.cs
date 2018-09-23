@@ -16,7 +16,7 @@ namespace CSharpE.Transform.Transformers
         protected CollectionTransformer(ActionInvoker<TData, TItem, TIntermediate, TResult> action, TData data)
         {
             Action = action;
-            Data = data;
+            Data = GeneralHandler.DeepClone(data);
         }
 
         public abstract bool Matches(TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction,

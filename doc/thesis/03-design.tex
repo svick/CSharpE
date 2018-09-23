@@ -317,9 +317,19 @@ Another consequence of these node accessibility rules is that care has to be tak
 
 \item All data that is passed in has to be tracked.
 
-The system has to understand all inputs of a loop iteration. This includes the syntax that is being processed by the iteration, but also any other data. \dots
+The system has to understand all inputs of a loop iteration. This includes the syntax node that is being processed by the iteration, but also any other data. For that data, the system has to:
+
+\begin{itemize}
+\item understand when they change, so that it can correctly decide when to re-execute the loop,
+\item ensure loop iterations do not mutate them, which would be considered an unrecognized output,
+\item deep clone them, so that further mutations after the smart loop do not affect following executions.
+\end{itemize}
+
+For these reasons, the system strictly controls which data types are allowed as additional inputs. The allowed types are: primitive types (such as \cs{int} and \cs{bool}), \cs{string}, delegates without closures, syntax nodes, and also tuples, arrays and lists of allowed types. This set of types should be sufficient for most use cases, but if it turns out it is not, it can be easily extended in the future.
 
 The natural way of passing additional data into a lambda is by directly accessing variables from the outer scope. When such lambda is compiled, any variables from the outer scope that it accesses are stored in a closure object, that then becomes part of the delegate that represents the lambda.
+
+\todo{explain why I'm not actually using closures: closure could include too many variables, is not explicit and depends on compiler implementation details}
 
 \item passing data out
 \item extension method

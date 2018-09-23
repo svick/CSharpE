@@ -8,21 +8,11 @@ namespace CSharpE.Transform.Internals
     {
         public static void ThrowIfNotPersistent<T>(T arg)
         {
-            if (arg == null)
-                return;
-
             if (IsImmutable(arg))
                 return;
 
-            // disconnected syntax nodes are fine
-            if (arg is SyntaxNode node)
-            {
-                if (node.SourceFile == null)
-                    return;
-
-                throw new ArgumentNotPersistentException(
-                    $"The given syntax node {arg.GetType()} is not persistent, because it's part of a source file.");
-            }
+            if (arg is SyntaxNode)
+                return;
 
             if (CollectionHandler.IsCollection(arg))
             {
@@ -43,9 +33,12 @@ namespace CSharpE.Transform.Internals
 
         public static bool IsImmutable<T>(T arg)
         {
+            if (arg == null)
+                return true;
+
             // TODO: detect other immutable types
 
-            if (arg is Unit || arg is bool || arg is int || arg is string)
+            if (arg is Unit || arg is string || arg.GetType().IsPrimitive)
                 return true;
 
             // delegates without closures are considered immutable
@@ -60,9 +53,6 @@ namespace CSharpE.Transform.Internals
 
         public static T DeepClone<T>(T input)
         {
-            if (input == null)
-                return input;
-
             if (IsImmutable(input))
                 return input;
 

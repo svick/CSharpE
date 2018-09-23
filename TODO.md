@@ -1,9 +1,14 @@
-﻿- fix moving `NamedTypeReference`s between files (doesn't update `using`s)
+﻿- remove the "persistent" term from the codebase (and maybe also "cloneable"?)
+
+---
+
+- fix moving `NamedTypeReference`s between files (doesn't update `using`s)
 - make most classes `sealed`
 - allow modifying lists while iterating them
   - optional: make it more efficient using copy on write 
 - detect reading of References/Symbols, then rerun when those symbols change
 - when `Clear()`ing a list of members, or more generally resetting `Parent` to `null`, make sure semantics of detached nodes still work by storing cached versions of necessary Roslyn types
+- add tests ensuring mutating smart inputs (incl. syntax nodes) throws 
 
 ---
 
