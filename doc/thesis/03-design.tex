@@ -195,7 +195,7 @@ Now that the \ac{API} for representing and modifying code has been designed, it 
 
 A reasonable way to do this is to have an interface that is implemented by each transformation. The system would then create an instance of the type (or types) that implements this interface and call a method on it whenever the transformation needs to be performed.
 
-As has been explained before, the transformation that need to be performed can be different at design time and at build time, so the interface should account for that. Also, different extensions will have different relationships between the two transformation, so the \ac{API} should account for that. The solutions to these two requirements are that the interface will include a parameter that specifies which transformation should be performed and there will also be abstract classes that hide this parameter for transformations that do not need it. This way, full flexibility of using an interface is maintained, while recommended patterns are communicated using the abstract classes.
+As has been explained before, the transformations that need to be performed can be different at design time and at build time, so the interface should account for that. Also, different extensions will have different relationships between the two transformations, so the \ac{API} should account for that. The solutions to these two requirements are that the interface will include a parameter that specifies which transformation should be performed and there will also be abstract classes that hide this parameter for transformations that do not need it. This way, full flexibility of using an interface is maintained, while recommended patterns are communicated using the abstract classes.
 
 Listing~\ref{csharpetransform-simple-example} shows how the running example from Section~\ref{running-example} could be implemented as a transformation. Notice that it uses one of the aforementioned abstract classes and that the body of the method is the same as the main part of Listing~\ref{csharpesyntax-example}.
 
@@ -207,7 +207,7 @@ Listing~\ref{csharpetransform-simple-example} shows how the running example from
 
 \medskip
 
-A much more complicate question is: how to make design-time transformations efficient, by regenerating only code that depends on modified code? As can be seen from the previous example, transformations are often structured around \cs{foreach} loops over syntax nodes: the transformation applies for each class, or for each type with an attribute, or for each method. And this includes \cs{foreach} loops that are hidden by convenience methods from \cs{CSharpE.Syntax}. For example, consider the following code iterating over all methods in a project:
+A much more complicated question is: how to make design-time transformations efficient, by regenerating only code that depends on modified code? As can be seen from the previous example, transformations are often structured around \cs{foreach} loops over syntax nodes: the transformation applies for each class, or for each type with an attribute, or for each method. And this includes \cs{foreach} loops that are hidden by convenience methods from \cs{CSharpE.Syntax}. For example, consider the following code iterating over all methods in a project:
 
 \begin{minted}{csharp}
 foreach (var method in project.Methods())
@@ -231,7 +231,7 @@ foreach (var file in project.SourceFiles)
 }
 \end{minted}
 
-This, combined with the fact that a programmer editing their code usually focuses at a single higher-level syntax node (like a method or a class) at a time, makes \cs{foreach} loops the ideal point where to decide whether transformation code should be executed again.
+This, combined with the fact that a programmer editing their code usually focuses at a single higher-level syntax node (like a method or a class) at a time, makes \cs{foreach} loops the ideal point where to decide whether transformation code should be executed again: the system could make this decision for each iteration of a \cs{foreach} loop, based primarily on whether the syntax node that is being processed by that iteration changed.
 
 But the regular \cs{foreach} loop does not offer sufficient flexibility for the kind of operations that will be required to implement this "smart" \cs{foreach} loop. Instead, a method with a lambda parameter will be used, similar to the \cs{Parallel.ForEach} method in .NET. \cite{parallel-foreach}
 
