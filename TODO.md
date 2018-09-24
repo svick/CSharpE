@@ -21,3 +21,7 @@
 - ensure no Roslyn types are exposed in the public interface
 - consider rewriting existing Roslyn-based rewriter project into CSharpE, like LinqAF
 - think of how to handle segments that don't change in design time, but do change in build time (see `RecordTransformation`)
+- consider smart foreach for user data
+  - probably using levenstein distance for diffing
+    - no need to use levenstein, if you can be unordered and set-based?
+  - and/or maybe some kind of cache/factory?
