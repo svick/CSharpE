@@ -117,6 +117,7 @@ namespace CSharpE.Syntax
 
         public override int GetHashCode()
         {
+            // TODO: this whole method is wrong; either fix it or switch Equals to something that guarantees Equals() means the strings are equal
             if (SourceFile != null)
                 return base.GetHashCode();
 
