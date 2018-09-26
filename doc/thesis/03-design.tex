@@ -368,7 +368,12 @@ For these reasons, passing additional data to a smart loop through closure objec
 
 Instead, additional data is passed as arguments to the \cs{Smart.ForEach} method, and accessed by the loop body as additional parameters to the lambda. One disadvantage of this approach is that it effectively requires having two different names for the same variable (one outside the loop, and one inside), because C\# does not allow variable shadowing within methods.
 
-\item passing data out
+\item All data that is passed out has to be tracked.
+
+Regular loops in C\# do not return values, instead, they usually mutate some object from the outer scope (for example, an iteration could call \cs{Add} on a \cs{List<T>} that is declared outside the loop). Since this is not allowed according to the rules described in the previous point, an alternative approach that can be more easily controlled by the system would be very useful.
+
+The approach used by the system is to allow the lambda that represents the body of the loop to return a value. The whole loop then returns a list of these values (specifically, \cs{IReadOnlyList<T>}), one for each iteration. When an iteration is not re-executed, the previously returned value is used again. To make sure further changes to returned values do not affect following executions, the values returned from loop iterations are deep cloned. For this reason, they also have the same limitation on allowed types as input values.
+
 \item extension method
 \item understanding MLM (and the combinatorial explosion)
 \end{itemize}
