@@ -317,6 +317,8 @@ Another consequence of these node accessibility rules is that care has to be tak
 
 \item All data that is passed in has to be tracked.
 
+\nopagebreak
+
 The system has to understand all inputs of a loop iteration. This includes the syntax node that is being processed by the iteration, but also any other data. For that data, the system has to:
 
 \begin{itemize}
@@ -327,9 +329,44 @@ The system has to understand all inputs of a loop iteration. This includes the s
 
 For these reasons, the system strictly controls which data types are allowed as additional inputs. The allowed types are: primitive types (such as \cs{int} and \cs{bool}), \cs{string}, delegates without closures, syntax nodes, and also tuples, arrays and lists of allowed types. This set of types should be sufficient for most use cases, but if it turns out it is not, it can be easily extended in the future.
 
+\medskip
+
 The natural way of passing additional data into a lambda is by directly accessing variables from the outer scope. When such lambda is compiled, any variables from the outer scope that it accesses are stored in a closure object, that then becomes part of the delegate that represents the lambda.
 
-\todo{explain why I'm not actually using closures: closure could include too many variables, is not explicit and depends on compiler implementation details}
+The system could attempt to recognize this closure object as part of the inputs to a smart loop, but this approach has several issues:
+
+\begin{itemize}
+\item Depending on how exactly the compiler decided to form the closure object, it could include more variables than necessary.
+
+For example, consider the following code:
+
+\begin{minted}{csharp}
+int a = 1, b = 2;
+
+SomeMethod(() => a);
+SomeMethod(() => b);
+\end{minted}
+
+The current version of the compiler creates a single shared closure object for both lambdas, which means inspecting the closure object for either lambda will reveal fields for both local variables.
+
+For smart loops, this would mean that the system would have to assume that all fields in the closure object are inputs, which would lead to unnecessary re-executions when a variable is included in the closure object, but is not actually used by the lambda.
+
+\item The exact shape of the closure object is an implementation detail of the compiler, which the system would have to understand.
+
+There is no specification that governs what shape closure objects created by the compiler should have. The compiler can behave differently in different situations and its behavior can also change between versions.
+
+The system would need to have a fairly deep understanding of this behavior, so that it could understand when the data changes, ensure it is not mutated by loop iterations and deep clone it, as explained previously.
+
+\item It is not explicit.
+
+In most cases, it is not important to understand which variables from the outer scope are accessed by a lambda in regular C\# code, which is why C\# does not have any built-in way of determining or controlling this (unlike for example C++, where the capture list has to be explicitly specified for each lambda).
+
+But this is different for the lambda that forms the body of a smart loop, because each additional accessed variable could be the cause of re-execution, which would make understanding which variables are accessed by a lambda important.
+\end{itemize}
+
+For these reasons, passing additional data to a smart loop through closure objects is not allowed. In fact, the system checks that the lambda passed as the body of a smart loop does not access any variables from the outer scope and throws an exception if it does. This still relies on implementation details of the compiler,\footnote{The representation of lambdas that do not access any variables from the outer scope did indeed change in the past. With the compiler for C\# 5.0 or older, the closure object for such lambdas was \cs{null}. With the compiler for C\# 6.0 or newer, the closure object is instead an instance of a compiler-generated class with no instance fields. The system accepts both approaches.} but to a lesser degree, so it should be less brittle than allowing passing data through closure objects.
+
+Instead, additional data is passed as arguments to the \cs{Smart.ForEach} method, and accessed by the loop body as additional parameters to the lambda. One disadvantage of this approach is that it effectively requires having two different names for the same variable (one outside the loop, and one inside), because C\# does not allow variable shadowing within methods.
 
 \item passing data out
 \item extension method
