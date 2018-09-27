@@ -29,7 +29,7 @@ The basic choices for representing C\# code in an \ac{API} are: as C\# code, as 
 
 Using a custom form would effectively require creating a new programming language (though one that does not necessarily have a textual form). The main disadvantage of doing that is that users would have to learn the new language and so it is generally the right choice only when no existing language is suitable.
 
-This leaves the last option: using C\#. This approach ensures that extension authors are already familiar with the used language, they only need to learn the \ac{API} used to represent it. It also means that the output of the system will be in C\#, so existing tools for C\# can be used. One disadvantage is that extensions can only use features available from C\#. For example, the \cs{calli} \ac{IL} opcode is out of reach.
+This leaves the last option: using C\#. This approach ensures that extension authors are already familiar with the used language, they only need to learn the \ac{API} used to represent it. It also means that the output of the system will be in C\#, so existing tools for C\# can be used. One disadvantage is that extensions can only use features available from C\#. For example, module initializers or the \cs{calli} \ac{IL} opcode are out of reach.
 
 Putting this all together: C\# is the best choice for forming the basis of the \ac{API} for representing code for this system.
 
