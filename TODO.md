@@ -3,12 +3,13 @@
 ---
 
 - fix moving `NamedTypeReference`s between files (doesn't update `using`s)
-- make most classes `sealed`
-- allow modifying lists while iterating them
-  - optional: make it more efficient using copy on write 
 - detect reading of References/Symbols, then rerun when those symbols change
 - when `Clear()`ing a list of members, or more generally resetting `Parent` to `null`, make sure semantics of detached nodes still work by storing cached versions of necessary Roslyn types
-- add tests ensuring mutating smart inputs (incl. syntax nodes) throws 
+- allow `Where` in smart loops; check there are no sideefects on the node same as `ForEach`
+- allow modifying lists while iterating them
+  - optional: make it more efficient using copy on write 
+- add tests ensuring mutating smart inputs (incl. syntax nodes) throws
+- make most classes `sealed`
 
 ---
 
