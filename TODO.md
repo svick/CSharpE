@@ -1,4 +1,9 @@
-﻿- remove the "persistent" term from the codebase (and maybe also "cloneable"?)
+﻿1. try changing the language of *.cs files in VS to `CSharpE` by using `IContentTypeRegistryService`
+2. if that doesn't work, use the hack of setting `ServiceLayer` to `Host`
+
+---
+
+- remove the "persistent" term from the codebase (and maybe also "cloneable"?)
 
 ---
 
