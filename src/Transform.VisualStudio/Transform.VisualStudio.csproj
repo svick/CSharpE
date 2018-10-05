@@ -13,8 +13,8 @@
     <ProjectGuid>{F5AC9ADB-1EBB-4916-95D5-547997BCDC35}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CSharpE.Transform.VisualStudio2</RootNamespace>
-    <AssemblyName>CSharpE.Transform.VisualStudio2</AssemblyName>
+    <RootNamespace>CSharpE.Transform.VisualStudio</RootNamespace>
+    <AssemblyName>CSharpE.Transform.VisualStudio</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
