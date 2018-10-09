@@ -3,6 +3,7 @@
   <PropertyGroup>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -44,16 +45,28 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CSharpECompletionService.cs" />
-    <Compile Include="Matadata.cs" />
+    <Compile Include="Compilation.cs" />
+    <Compile Include="CompletionService.cs" />
+    <Compile Include="SyntaxTree.cs" />
+    <Compile Include="CompilationFactoryService.cs" />
+    <Compile Include="SyntaxTreeFactoryService.cs" />
+    <Compile Include="LanguageServices.cs" />
+    <Compile Include="Metadata.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Wrapping.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <PropertyGroup>
+    <InternalsAssemblyNames>Microsoft.CodeAnalysis;Microsoft.CodeAnalysis.Workspaces</InternalsAssemblyNames>
+  </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="IgnoresAccessChecksToGenerator">
+      <Version>0.4.0</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features">
       <Version>2.9.0</Version>
     </PackageReference>

@@ -5,45 +5,34 @@ using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Composition;
-using System;
 using System.Collections.Immutable;
 using System.Composition;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static Microsoft.CodeAnalysis.LanguageNames;
+using RoslynCompletionService = Microsoft.CodeAnalysis.Completion.CompletionService;
 
 namespace CSharpE.Transform.VisualStudio
 {
-    [ExportLanguageServiceFactory(typeof(CompletionService), CSharp, ServiceLayer.Host)]
-    internal sealed class CSharpECompletionServiceFactory : ILanguageServiceFactory
+    [ExportLanguageServiceFactory(typeof(RoslynCompletionService), CSharp, ServiceLayer.Host)]
+    internal sealed class CompletionServiceFactory : ILanguageServiceFactory
     {
         private readonly ExportProvider exportProvider;
 
         [ImportingConstructor]
-        public CSharpECompletionServiceFactory(ExportProvider exportProvider) => this.exportProvider = exportProvider;
+        public CompletionServiceFactory(ExportProvider exportProvider) => this.exportProvider = exportProvider;
 
         public ILanguageService CreateLanguageService(HostLanguageServices languageServices) =>
-            new CSharpECompletionService(exportProvider, languageServices);
+            new CompletionService(exportProvider, languageServices);
     }
 
-    internal sealed class CSharpECompletionService : CompletionService
+    internal sealed class CompletionService : RoslynCompletionService
     {
-        private readonly CompletionService cSharpCompletionService;
+        private readonly RoslynCompletionService roslynCompletionService;
 
-        public CSharpECompletionService(ExportProvider exportProvider, HostLanguageServices languageServices)
-        {
-            // based on code from Microsoft.CodeAnalysis.Host.Mef.MefLanguageServices
-            cSharpCompletionService = (CompletionService)exportProvider
-                .GetExports<ILanguageServiceFactory, LanguageServiceMetadata>()
-                .Select(
-                    lz => new Lazy<ILanguageService, LanguageServiceMetadata>(
-                        () => lz.Value.CreateLanguageService(languageServices), lz.Metadata))
-                .Single(
-                    lz => lz.Metadata.Language == CSharp &&
-                          lz.Metadata.ServiceType == typeof(CompletionService).AssemblyQualifiedName &&
-                          lz.Metadata.Layer == ServiceLayer.Default).Value;
-        }
+        public CompletionService(ExportProvider exportProvider, HostLanguageServices languageServices) =>
+            roslynCompletionService =
+                LanguageServices.GetCSharpService<RoslynCompletionService>(exportProvider, languageServices);
 
         public override string Language => CSharp;
 
@@ -52,7 +41,7 @@ namespace CSharpE.Transform.VisualStudio
             ImmutableHashSet<string> roles = null, OptionSet options = null,
             CancellationToken cancellationToken = default)
         {
-            var completionList = await cSharpCompletionService.GetCompletionsAsync(
+            var completionList = await roslynCompletionService.GetCompletionsAsync(
                 document, caretPosition, trigger, roles, options, cancellationToken);
 
             return completionList.WithItems(completionList.Items.Insert(0, CompletionItem.Create("CSHARPEEE")));
@@ -60,25 +49,25 @@ namespace CSharpE.Transform.VisualStudio
 
         public override ImmutableArray<CompletionItem> FilterItems(
             Document document, ImmutableArray<CompletionItem> items, string filterText) =>
-            cSharpCompletionService.FilterItems(document, items, filterText);
+            roslynCompletionService.FilterItems(document, items, filterText);
 
         public override Task<CompletionChange> GetChangeAsync(
             Document document, CompletionItem item, char? commitCharacter = null,
             CancellationToken cancellationToken = default) =>
-            cSharpCompletionService.GetChangeAsync(document, item, commitCharacter, cancellationToken);
+            roslynCompletionService.GetChangeAsync(document, item, commitCharacter, cancellationToken);
 
         public override TextSpan GetDefaultCompletionListSpan(SourceText text, int caretPosition) =>
-            cSharpCompletionService.GetDefaultCompletionListSpan(text, caretPosition);
+            roslynCompletionService.GetDefaultCompletionListSpan(text, caretPosition);
 
         public override Task<CompletionDescription> GetDescriptionAsync(
             Document document, CompletionItem item, CancellationToken cancellationToken = default) =>
-            cSharpCompletionService.GetDescriptionAsync(document, item, cancellationToken);
+            roslynCompletionService.GetDescriptionAsync(document, item, cancellationToken);
 
-        public override CompletionRules GetRules() => cSharpCompletionService.GetRules();
+        public override CompletionRules GetRules() => roslynCompletionService.GetRules();
 
         public override bool ShouldTriggerCompletion(
             SourceText text, int caretPosition, CompletionTrigger trigger, ImmutableHashSet<string> roles = null,
             OptionSet options = null) =>
-            cSharpCompletionService.ShouldTriggerCompletion(text, caretPosition, trigger, roles, options);
+            roslynCompletionService.ShouldTriggerCompletion(text, caretPosition, trigger, roles, options);
     }
 }
