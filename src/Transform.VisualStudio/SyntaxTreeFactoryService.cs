@@ -12,7 +12,7 @@ using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
 
 namespace CSharpE.Transform.VisualStudio
 {
-    [ExportLanguageServiceFactory(typeof(ISyntaxTreeFactoryService), LanguageNames.CSharp, ServiceLayer.Host), Shared]
+    //[ExportLanguageServiceFactory(typeof(ISyntaxTreeFactoryService), LanguageNames.CSharp, ServiceLayer.Host), Shared]
     internal sealed class SyntaxTreeFactoryServiceFactory : ILanguageServiceFactory
     {
         private readonly ExportProvider exportProvider;

@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Compilation.cs" />
     <Compile Include="CompletionService.cs" />
+    <Compile Include="SemanticModel.cs" />
     <Compile Include="SyntaxTree.cs" />
     <Compile Include="CompilationFactoryService.cs" />
     <Compile Include="SyntaxTreeFactoryService.cs" />
@@ -74,6 +75,14 @@
       <Version>15.8.98</Version>
     </PackageReference>
   </ItemGroup>
+  <!-- based on code from https://github.com/NuGet/Home/issues/4989#issuecomment-310565840 -->
+  <Target Name="SetAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+    <ItemGroup>
+      <ReferencePath Condition="'%(FileName)' == 'Microsoft.CodeAnalysis'">
+        <Aliases>global,msca</Aliases>
+      </ReferencePath>
+    </ItemGroup>
+  </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

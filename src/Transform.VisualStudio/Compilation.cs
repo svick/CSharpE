@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Symbols;
 using RoslynCompilation = Microsoft.CodeAnalysis.Compilation;
+using RoslynSemanticModel = Microsoft.CodeAnalysis.SemanticModel;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
 using static CSharpE.Transform.VisualStudio.Wrapping;
 
@@ -22,7 +23,7 @@ namespace CSharpE.Transform.VisualStudio
         private RoslynCompilation roslynCompilation;
 
         public Compilation(RoslynCompilation roslynCompilation)
-            : base(roslynCompilation.AssemblyName, roslynCompilation.References.ToImmutableArray(), null /* TODO? */, roslynCompilation.IsSubmission, roslynCompilation.EventQueue)
+            : base(roslynCompilation.AssemblyName, roslynCompilation.References.ToImmutableArray(), new Dictionary<string, string>() /* TODO? */, roslynCompilation.IsSubmission, roslynCompilation.EventQueue)
             => this.roslynCompilation = roslynCompilation;
 
         protected override RoslynCompilation CommonClone()
@@ -30,9 +31,10 @@ namespace CSharpE.Transform.VisualStudio
             return Wrap(roslynCompilation.Clone());
         }
 
-        protected override SemanticModel CommonGetSemanticModel(RoslynSyntaxTree syntaxTree, bool ignoreAccessibility)
+        protected override RoslynSemanticModel CommonGetSemanticModel(RoslynSyntaxTree syntaxTree, bool ignoreAccessibility)
         {
-            return roslynCompilation.GetSemanticModel(((SyntaxTree)syntaxTree).RoslynTree, ignoreAccessibility);
+            var roslynModel = roslynCompilation.GetSemanticModel(Unwrap(syntaxTree), ignoreAccessibility);
+            return new SemanticModel(roslynModel);
         }
 
         protected override INamedTypeSymbol CommonCreateErrorTypeSymbol(INamespaceOrTypeSymbol container, string name, int arity)
@@ -205,7 +207,7 @@ namespace CSharpE.Transform.VisualStudio
 
         public override AnalyzerDriver AnalyzerForLanguage(ImmutableArray<DiagnosticAnalyzer> analyzers, AnalyzerManager analyzerManager)
         {
-            throw new NotImplementedException();
+            return roslynCompilation.AnalyzerForLanguage(analyzers, analyzerManager);
         }
 
         public override RoslynCompilation WithEventQueue(AsyncQueue<CompilationEvent> eventQueue)

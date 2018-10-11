@@ -41,10 +41,8 @@ namespace CSharpE.Transform.VisualStudio
             ImmutableHashSet<string> roles = null, OptionSet options = null,
             CancellationToken cancellationToken = default)
         {
-            var completionList = await roslynCompletionService.GetCompletionsAsync(
+            return await roslynCompletionService.GetCompletionsAsync(
                 document, caretPosition, trigger, roles, options, cancellationToken);
-
-            return completionList.WithItems(completionList.Items.Insert(0, CompletionItem.Create("CSHARPEEE")));
         }
 
         public override ImmutableArray<CompletionItem> FilterItems(
