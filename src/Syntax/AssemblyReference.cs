@@ -4,35 +4,29 @@ using Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class AssemblyReference : LibraryReference, IEquatable<AssemblyReference>
+    public sealed class AssemblyReference : LibraryReference, IEquatable<AssemblyReference>
     {
-        public Assembly Assembly { get; }
+        public string Path { get; }
 
-        public AssemblyReference(Assembly assembly) =>
-            Assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
+        public AssemblyReference(string path) => Path = path ?? throw new ArgumentNullException(nameof(path));
+
+        public AssemblyReference(Assembly assembly) : this(assembly.Location) { }
 
         public AssemblyReference(Type assemblyRepresentativeType)
-            : this(assemblyRepresentativeType.Assembly)
-        { }
+            : this(assemblyRepresentativeType.Assembly) { }
 
-        internal override MetadataReference GetMetadataReference() =>
-            MetadataReference.CreateFromFile(Assembly.Location);
+        public override MetadataReference GetMetadataReference() =>
+            MetadataReference.CreateFromFile(Path);
 
         public bool Equals(AssemblyReference other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(Assembly, other.Assembly);
+            return Equals(Path, other.Path);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((AssemblyReference) obj);
-        }
+        public override bool Equals(object obj) => Equals(obj as AssemblyReference);
 
-        public override int GetHashCode() => Assembly.GetHashCode();
+        public override int GetHashCode() => Path.GetHashCode();
     }
 }

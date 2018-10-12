@@ -15,11 +15,14 @@ namespace CSharpE.Transform.Execution
         public SourceFile(string path, string text)
             : this(path, CSharpSyntaxTree.ParseText(text)) { }
 
-        private SourceFile(string path, SyntaxTree tree)
+        public SourceFile(string path, SyntaxTree tree)
         {
             Path = path;
             Tree = tree;
         }
+
+        public SourceFile(SyntaxTree tree)
+            : this(tree.FilePath, tree) { }
 
         internal Syntax.SourceFile ToSyntaxSourceFile() => new Syntax.SourceFile(Path, Tree);
 

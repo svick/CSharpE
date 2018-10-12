@@ -13,8 +13,6 @@ namespace CSharpE.Syntax
         
         public IList<SourceFile> SourceFiles { get; }
 
-        protected virtual IEnumerable<SourceFile> ActualSourceFiles => SourceFiles;
-        
         public IList<LibraryReference> References { get; }
 
         private CSharpCompilation compilation;
@@ -24,7 +22,7 @@ namespace CSharpE.Syntax
             {
                 // TODO: if References changed, alter the compilation
 
-                var trees = ActualSourceFiles.Select(file => file.GetSyntaxTree()).ToList();
+                var trees = SourceFiles.Select(file => file.GetSyntaxTree()).ToList();
 
                 if (compilation == null)
                 {

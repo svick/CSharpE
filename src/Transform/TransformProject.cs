@@ -8,13 +8,9 @@ using CSharpE.Transform.Transformers;
 
 namespace CSharpE.Transform
 {
-    internal class TransformProject : Syntax.Project
+    internal sealed class TransformProject : Project
     {
         private readonly Action<LogAction> onLog;
-
-        private readonly List<Syntax.SourceFile> additionalSourceFiles;
-
-        protected override IEnumerable<Syntax.SourceFile> ActualSourceFiles => SourceFiles.Concat(additionalSourceFiles);
 
         public TransformProject(
             IEnumerable<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
@@ -27,12 +23,11 @@ namespace CSharpE.Transform
         private TransformProject(List<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
             : base(sourceFiles, additionalReferences)
         {
-            additionalSourceFiles = sourceFiles.Except(SourceFiles).ToList();
         }
 
         public TransformProject(IEnumerable<Syntax.SourceFile> sourceFiles) : this(sourceFiles, Array.Empty<LibraryReference>()) { }
 
-        public TransformProject(Syntax.Project project) : this(project.SourceFiles, project.References) { }
+        public TransformProject(Project project) : this(project.SourceFiles, project.References) { }
 
         internal TransformerBuilder TransformerBuilder { get; set; }
 

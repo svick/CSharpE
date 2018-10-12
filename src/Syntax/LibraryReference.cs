@@ -4,6 +4,6 @@ namespace CSharpE.Syntax
 {
     public abstract class LibraryReference
     {
-        internal abstract MetadataReference GetMetadataReference();
+        public abstract MetadataReference GetMetadataReference();
     }
 }
