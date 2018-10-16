@@ -5,8 +5,10 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection.Metadata;
+using CSharpE.Transform.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeGen;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Operations;
@@ -20,12 +22,135 @@ namespace CSharpE.Transform.VisualStudio
 {
     internal sealed class Compilation : RoslynCompilation
     {
-        private RoslynCompilation roslynCompilation;
+        private readonly CSharpCompilation roslynCompilation;
 
-        public Compilation(RoslynCompilation roslynCompilation)
+        public Compilation(CSharpCompilation roslynCompilation)
             : base(roslynCompilation.AssemblyName, roslynCompilation.References.ToImmutableArray(), new Dictionary<string, string>() /* TODO? */, roslynCompilation.IsSubmission, roslynCompilation.EventQueue)
             => this.roslynCompilation = roslynCompilation;
 
+        private ProjectTransformer CreateTransformer()
+        {
+            // PERF: caching of transformations and possibly ITransformation
+
+            var iTransformation = roslynCompilation.GetTypeByMetadataName(typeof(ITransformation).FullName);
+
+            if (iTransformation == null)
+                return null;
+
+            var transformations = new List<ITransformation>();
+
+            // TODO: handle other reference kinds
+            foreach (PortableExecutableReference reference in roslynCompilation.References)
+            {
+                var referenceSymbol = (IAssemblySymbol)roslynCompilation.GetAssemblyOrModuleSymbol(reference);
+                var transformationTypes = GetAllTypesVisitor.FindTypes(
+                    referenceSymbol.GlobalNamespace, type => type.TypeKind != TypeKind.Interface && type.AllInterfaces.Contains(iTransformation));
+
+                if (!transformationTypes.Any())
+                    continue;
+
+                var assembly = System.Reflection.Assembly.Load(reference.FilePath);
+
+                foreach (var symbol in transformationTypes)
+                {
+                    var type = assembly.GetType(symbol.MetadataName);
+                    var instance = (ITransformation)Activator.CreateInstance(type);
+
+                    transformations.Add(instance);
+                }
+            }
+
+            if (!transformations.Any())
+                return null;
+
+            return new ProjectTransformer(roslynCompilation, transformations);
+        }
+
+        // based on https://github.com/dotnet/roslyn/issues/6138#issuecomment-149216303
+        private class GetAllTypesVisitor : SymbolVisitor
+        {
+            public static List<INamedTypeSymbol> FindTypes(INamespaceSymbol ns, Func<INamedTypeSymbol, bool> condition)
+            {
+                var visitor = new GetAllTypesVisitor(condition);
+
+                ns.Accept(visitor);
+
+                return visitor.types;
+            }
+
+            private readonly Func<INamedTypeSymbol, bool> condition;
+            private readonly List<INamedTypeSymbol> types = new List<INamedTypeSymbol>();
+
+            private GetAllTypesVisitor(Func<INamedTypeSymbol, bool> condition) => this.condition = condition;
+
+            public override void VisitNamespace(INamespaceSymbol symbol)
+            {
+                foreach (var s in symbol.GetMembers())
+                {
+                    s.Accept(this);
+                }
+            }
+
+            public override void VisitNamedType(INamedTypeSymbol symbol)
+            {
+                if (condition(symbol))
+                    types.Add(symbol);
+            }
+        }
+
+        private bool hasTransformer;
+        private ProjectTransformer transformer;
+        internal ProjectTransformer Transformer
+        {
+            get
+            {
+                if (!hasTransformer)
+                {
+                    transformer = CreateTransformer();
+                    hasTransformer = true;
+                }
+                return transformer;
+            }
+        }
+
+        private CSharpCompilation designTimeCompilation;
+        internal CSharpCompilation DesignTimeCompilation
+        {
+            get
+            {
+                if (designTimeCompilation == null)
+                {
+                    if (Transformer == null)
+                    {
+                        designTimeCompilation = roslynCompilation;
+                    }
+                    else
+                    {
+                        var transformed = Transformer.Transform(designTime: true);
+
+                        designTimeCompilation = CSharpCompilation.Create(
+                            roslynCompilation.AssemblyName, transformed.SourceFiles.Select(file => file.Tree),
+                            transformed.AdditionalReferences.Select(reference => reference.GetMetadataReference()),
+                            roslynCompilation.Options);
+                    }
+                }
+                return designTimeCompilation;
+            }
+        }
+
+        private CompilationDiff diff;
+        internal CompilationDiff Diff
+        {
+            get
+            {
+                if (diff == null)
+                    diff = new CompilationDiff(roslynCompilation, DesignTimeCompilation);
+
+                return diff;
+            }
+        }
+
+        #region overrides
         protected override RoslynCompilation CommonClone()
         {
             return Wrap(roslynCompilation.Clone());
@@ -33,8 +158,8 @@ namespace CSharpE.Transform.VisualStudio
 
         protected override RoslynSemanticModel CommonGetSemanticModel(RoslynSyntaxTree syntaxTree, bool ignoreAccessibility)
         {
-            var roslynModel = roslynCompilation.GetSemanticModel(Unwrap(syntaxTree), ignoreAccessibility);
-            return new SemanticModel(roslynModel);
+            var roslynModel = DesignTimeCompilation.GetSemanticModel(Unwrap(syntaxTree), ignoreAccessibility);
+            return new SemanticModel(this, roslynModel);
         }
 
         protected override INamedTypeSymbol CommonCreateErrorTypeSymbol(INamespaceOrTypeSymbol container, string name, int arity)
@@ -344,7 +469,7 @@ namespace CSharpE.Transform.VisualStudio
 
         protected override INamedTypeSymbol CommonScriptClass => roslynCompilation.ScriptClass;
 
-        public override ScriptCompilationInfo CommonScriptCompilationInfo => throw new NotImplementedException();
+        public override ScriptCompilationInfo CommonScriptCompilationInfo => roslynCompilation.ScriptCompilationInfo;
 
         public override IEnumerable<ReferenceDirective> ReferenceDirectives => throw new NotImplementedException();
 
@@ -361,5 +486,6 @@ namespace CSharpE.Transform.VisualStudio
         public override StrongNameKeys StrongNameKeys => throw new NotImplementedException();
 
         public override Guid DebugSourceDocumentLanguageId => throw new NotImplementedException();
+        #endregion
     }
 }

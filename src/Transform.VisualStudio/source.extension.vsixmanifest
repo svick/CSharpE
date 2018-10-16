@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="CSharoE.Transform.VisualStudio.6fc693f6-faed-402c-b1bb-cef06c200716" Version="1.0" Language="en-US" Publisher="Petr Onderka" />
+        <Identity Id="CSharpE.Transform.VisualStudio.6fc693f6-faed-402c-b1bb-cef06c200716" Version="1.0" Language="en-US" Publisher="Petr Onderka" />
         <DisplayName>CSharpE.Transform.VisualStudio</DisplayName>
         <Description>Empty VSIX Project.</Description>
     </Metadata>

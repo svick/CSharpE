@@ -5,6 +5,7 @@ using CSharpE.Syntax;
 using CSharpE.Transform.Execution;
 using CSharpE.Transform.Internals;
 using CSharpE.Transform.Transformers;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CSharpE.Transform
 {
@@ -15,14 +16,14 @@ namespace CSharpE.Transform
         public TransformProject(
             IEnumerable<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
             Action<LogAction> onLog = null)
-            : this(sourceFiles.ToList(), additionalReferences)
+            : this(sourceFiles.ToList(), additionalReferences, null, onLog) { }
+
+        internal TransformProject(
+            IEnumerable<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
+            CSharpCompilation compilation, Action < LogAction> onLog = null)
+            : base(sourceFiles.ToList(), additionalReferences, compilation)
         {
             this.onLog = onLog;
-        }
-
-        private TransformProject(List<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
-            : base(sourceFiles, additionalReferences)
-        {
         }
 
         public TransformProject(IEnumerable<Syntax.SourceFile> sourceFiles) : this(sourceFiles, Array.Empty<LibraryReference>()) { }

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using CSharpE.Syntax;
 using CSharpE.Syntax.Internals;
 using CSharpE.Transform.Transformers;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CSharpE.Transform.Execution
 {
@@ -12,6 +14,8 @@ namespace CSharpE.Transform.Execution
     {
         public IList<SourceFile> SourceFiles { get; }
         public IList<LibraryReference> AdditionalReferences { get; }
+
+        private readonly CSharpCompilation compilation;
 
         private readonly List<TransformationTransformer> transformers;
 
@@ -37,12 +41,22 @@ namespace CSharpE.Transform.Execution
             }
         }
 
+        public ProjectTransformer(CSharpCompilation compilation, IEnumerable<ITransformation> transformations)
+            : this(
+                compilation.SyntaxTrees.Select(tree => new SourceFile(tree)).ToList(),
+                // TODO: handle other reference kinds
+                compilation.References
+                    .Select(reference => new AssemblyReference(((PortableExecutableReference)reference).FilePath))
+                    .ToList<LibraryReference>(),
+                transformations)
+            => this.compilation = compilation;
+
         public event Action<LogAction> Log;
 
         public ProjectTransformer Transform(bool designTime = false)
         {
             var transformProject = new TransformProject(
-                SourceFiles.Select(f => f.ToSyntaxSourceFile()), AdditionalReferences, Log);
+                SourceFiles.Select(f => f.ToSyntaxSourceFile()), AdditionalReferences, compilation, Log);
 
             foreach (var transformer in transformers)
             {

@@ -46,10 +46,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Compilation.cs" />
+    <Compile Include="CompilationDiff.cs" />
     <Compile Include="CompletionService.cs" />
     <Compile Include="SemanticModel.cs" />
     <Compile Include="SyntaxTree.cs" />
     <Compile Include="CompilationFactoryService.cs" />
+    <Compile Include="SyntaxTreeDiff.cs" />
     <Compile Include="SyntaxTreeFactoryService.cs" />
     <Compile Include="LanguageServices.cs" />
     <Compile Include="Metadata.cs" />
@@ -62,7 +64,8 @@
     </None>
   </ItemGroup>
   <PropertyGroup>
-    <InternalsAssemblyNames>Microsoft.CodeAnalysis;Microsoft.CodeAnalysis.Workspaces</InternalsAssemblyNames>
+    <InternalsAssemblyNames>Microsoft.CodeAnalysis;Microsoft.CodeAnalysis.Workspaces;Microsoft.CodeAnalysis.CSharp</InternalsAssemblyNames>
+    <VSSDKTargetPlatformRegRootSuffix>Exp</VSSDKTargetPlatformRegRootSuffix>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="IgnoresAccessChecksToGenerator">
@@ -74,6 +77,18 @@
     <PackageReference Include="Microsoft.VisualStudio.Composition">
       <Version>15.8.98</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Syntax\Syntax.csproj">
+      <Project>{1b8b6800-7718-4bd4-9cf2-c37af6ec69ed}</Project>
+      <Name>Syntax</Name>
+      <AdditionalProperties>TargetFramework=net46</AdditionalProperties>
+    </ProjectReference>
+    <ProjectReference Include="..\Transform\Transform.csproj">
+      <Project>{44252356-0dd1-4369-a817-559eddf5b5b5}</Project>
+      <Name>Transform</Name>
+      <AdditionalProperties>TargetFramework=net46</AdditionalProperties>
+    </ProjectReference>
   </ItemGroup>
   <!-- based on code from https://github.com/NuGet/Home/issues/4989#issuecomment-310565840 -->
   <Target Name="SetAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">

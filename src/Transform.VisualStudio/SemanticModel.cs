@@ -1,52 +1,39 @@
 ﻿extern alias msca;
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Symbols;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using RoslynSemanticModel = Microsoft.CodeAnalysis.SemanticModel;
+using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
 using Roslyn = msca.Microsoft.CodeAnalysis;
 
 namespace CSharpE.Transform.VisualStudio
 {
-    internal class SemanticModel : RoslynSemanticModel
+    internal class SemanticModel : CSharpSemanticModel
     {
+        private readonly Compilation compilation;
         private readonly RoslynSemanticModel roslynModel;
 
-        public SemanticModel(RoslynSemanticModel roslynModel) => this.roslynModel = roslynModel;
+        public SemanticModel(Compilation compilation, RoslynSemanticModel roslynModel)
+        {
+            this.compilation = compilation;
+            this.roslynModel = roslynModel;
+        }
+
+        private SyntaxTreeDiff GetTreeDiff() => compilation.Diff.ForTree(roslynModel.SyntaxTree.FilePath);
+
+        private SyntaxTreeDiff GetReverseTreeDiff() => compilation.Diff.ForTreeReverse(roslynModel.SyntaxTree.FilePath);
+
+        private TNode Adjust<TNode>(TNode node) where TNode : SyntaxNode => GetTreeDiff().Adjust(node);
+
         protected override IOperation GetOperationCore(SyntaxNode node, CancellationToken cancellationToken)
         {
             return roslynModel.GetOperation(node, cancellationToken);
-        }
-
-        protected override SymbolInfo GetSymbolInfoCore(SyntaxNode node, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return roslynModel.GetSymbolInfo(node, cancellationToken);
-        }
-
-        protected override SymbolInfo GetSpeculativeSymbolInfoCore(int position, SyntaxNode expression, SpeculativeBindingOption bindingOption)
-        {
-            return roslynModel.GetSpeculativeSymbolInfo(position, expression, bindingOption);
-        }
-
-        protected override TypeInfo GetSpeculativeTypeInfoCore(int position, SyntaxNode expression, SpeculativeBindingOption bindingOption)
-        {
-            return roslynModel.GetSpeculativeTypeInfo(position, expression, bindingOption);
-        }
-
-        protected override TypeInfo GetTypeInfoCore(SyntaxNode node, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return roslynModel.GetTypeInfo(node, cancellationToken);
-        }
-
-        protected override IAliasSymbol GetAliasInfoCore(SyntaxNode nameSyntax, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return roslynModel.GetAliasInfo(nameSyntax, cancellationToken);
-        }
-
-        protected override IAliasSymbol GetSpeculativeAliasInfoCore(int position, SyntaxNode nameSyntax, SpeculativeBindingOption bindingOption)
-        {
-            return roslynModel.GetSpeculativeAliasInfo(position, nameSyntax, bindingOption);
         }
 
         public override ImmutableArray<Diagnostic> GetSyntaxDiagnostics(
@@ -58,7 +45,12 @@ namespace CSharpE.Transform.VisualStudio
         public override ImmutableArray<Diagnostic> GetDeclarationDiagnostics(
             TextSpan? span = null, CancellationToken cancellationToken = new CancellationToken())
         {
-            return roslynModel.GetDeclarationDiagnostics(span, cancellationToken);
+            var diagnostics = roslynModel.GetDeclarationDiagnostics(span == null ? null : GetTreeDiff().Adjust(span.Value), cancellationToken);
+
+            if (!diagnostics.Any())
+                return diagnostics;
+
+            return Roslyn::ImmutableArrayExtensions.SelectAsArray(diagnostics, d => GetReverseTreeDiff().Adjust(d));
         }
 
         public override ImmutableArray<Diagnostic> GetMethodBodyDiagnostics(
@@ -72,93 +64,6 @@ namespace CSharpE.Transform.VisualStudio
             return roslynModel.GetDiagnostics(span, cancellationToken);
         }
 
-        protected override ISymbol GetDeclaredSymbolCore(SyntaxNode declaration, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return roslynModel.GetDeclaredSymbol(declaration, cancellationToken);
-        }
-
-        protected override ImmutableArray<ISymbol> GetDeclaredSymbolsCore(
-            SyntaxNode declaration, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return roslynModel.GetDeclaredSymbolsForNode(declaration, cancellationToken);
-        }
-
-        protected override ImmutableArray<ISymbol> LookupSymbolsCore(
-            int position, INamespaceOrTypeSymbol container, string name, bool includeReducedExtensionMethods)
-        {
-            return roslynModel.LookupSymbols(position, container, name, includeReducedExtensionMethods);
-        }
-
-        protected override ImmutableArray<ISymbol> LookupBaseMembersCore(int position, string name)
-        {
-            return roslynModel.LookupBaseMembers(position, name);
-        }
-
-        protected override ImmutableArray<ISymbol> LookupStaticMembersCore(int position, INamespaceOrTypeSymbol container, string name)
-        {
-            return roslynModel.LookupStaticMembers(position, container, name);
-        }
-
-        protected override ImmutableArray<ISymbol> LookupNamespacesAndTypesCore(int position, INamespaceOrTypeSymbol container, string name)
-        {
-            return roslynModel.LookupNamespacesAndTypes(position, container, name);
-        }
-
-        protected override ImmutableArray<ISymbol> LookupLabelsCore(int position, string name)
-        {
-            return roslynModel.LookupLabels(position, name);
-        }
-
-        protected override ControlFlowAnalysis AnalyzeControlFlowCore(SyntaxNode firstStatement, SyntaxNode lastStatement)
-        {
-            return roslynModel.AnalyzeControlFlow(firstStatement, lastStatement);
-        }
-
-        protected override ControlFlowAnalysis AnalyzeControlFlowCore(SyntaxNode statement)
-        {
-            return roslynModel.AnalyzeControlFlow(statement);
-        }
-
-        protected override DataFlowAnalysis AnalyzeDataFlowCore(SyntaxNode firstStatement, SyntaxNode lastStatement)
-        {
-            return roslynModel.AnalyzeDataFlow(firstStatement, lastStatement);
-        }
-
-        protected override DataFlowAnalysis AnalyzeDataFlowCore(SyntaxNode statementOrExpression)
-        {
-            return roslynModel.AnalyzeDataFlow(statementOrExpression);
-        }
-
-        protected override Optional<object> GetConstantValueCore(SyntaxNode node, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return roslynModel.GetConstantValue(node, cancellationToken);
-        }
-
-        protected override ImmutableArray<ISymbol> GetMemberGroupCore(SyntaxNode node, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return roslynModel.GetMemberGroup(node, cancellationToken);
-        }
-
-        protected override ISymbol GetEnclosingSymbolCore(int position, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return roslynModel.GetEnclosingSymbol(position, cancellationToken);
-        }
-
-        protected override bool IsAccessibleCore(int position, ISymbol symbol)
-        {
-            return roslynModel.IsAccessible(position, symbol);
-        }
-
-        protected override bool IsEventUsableAsFieldCore(int position, IEventSymbol eventSymbol)
-        {
-            return roslynModel.IsEventUsableAsField(position, eventSymbol);
-        }
-
-        protected override PreprocessingSymbolInfo GetPreprocessingSymbolInfoCore(SyntaxNode nameSyntax)
-        {
-            return roslynModel.GetPreprocessingSymbolInfo(nameSyntax);
-        }
-
         public override void ComputeDeclarationsInSpan(TextSpan span, bool getSymbol, Roslyn::PooledObjects.ArrayBuilder<DeclarationInfo> builder, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -169,20 +74,278 @@ namespace CSharpE.Transform.VisualStudio
             roslynModel.ComputeDeclarationsInNode(node, getSymbol, builder, cancellationToken, levelsToCompute);
         }
 
-        public override string Language => roslynModel.Language;
+        public override SymbolInfo GetSymbolInfoWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
 
-        protected override Microsoft.CodeAnalysis.Compilation CompilationCore => roslynModel.Compilation;
+        public override SymbolInfo GetCollectionInitializerSymbolInfoWorker(InitializerExpressionSyntax collectionInitializer, ExpressionSyntax node, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
 
-        protected override Microsoft.CodeAnalysis.SyntaxTree SyntaxTreeCore => roslynModel.SyntaxTree;
+        public override CSharpTypeInfo GetTypeInfoWorker(CSharpSyntaxNode node, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ImmutableArray<Symbol> GetMemberGroupWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ImmutableArray<PropertySymbol> GetIndexerGroupWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Optional<object> GetConstantValueWorker(CSharpSyntaxNode node, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override SymbolInfo GetSymbolInfo(OrderingSyntax node, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override SymbolInfo GetSymbolInfo(SelectOrGroupClauseSyntax node, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override TypeInfo GetTypeInfo(SelectOrGroupClauseSyntax node, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override QueryClauseInfo GetQueryClauseInfo(QueryClauseSyntax node, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Binder GetEnclosingBinderInternal(int position)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override MemberSemanticModel GetMemberModel(SyntaxNode node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryGetSpeculativeSemanticModelForMethodBodyCore(SyntaxTreeSemanticModel parentModel, int position, BaseMethodDeclarationSyntax method, out RoslynSemanticModel speculativeModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryGetSpeculativeSemanticModelForMethodBodyCore(SyntaxTreeSemanticModel parentModel, int position, AccessorDeclarationSyntax accessor, out RoslynSemanticModel speculativeModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, TypeSyntax type, SpeculativeBindingOption bindingOption, out RoslynSemanticModel speculativeModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, StatementSyntax statement, out RoslynSemanticModel speculativeModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, EqualsValueClauseSyntax initializer, out RoslynSemanticModel speculativeModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, ArrowExpressionClauseSyntax expressionBody, out RoslynSemanticModel speculativeModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, ConstructorInitializerSyntax constructorInitializer, out RoslynSemanticModel speculativeModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, CrefSyntax crefSyntax, out RoslynSemanticModel speculativeModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Conversion ClassifyConversion(ExpressionSyntax expression, ITypeSymbol destination, bool isExplicitInSource = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Conversion ClassifyConversionForCast(ExpressionSyntax expression, TypeSymbol destination)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ISymbol GetDeclaredSymbol(MemberDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+
+        public override ISymbol GetDeclaredSymbol(LocalFunctionStatementSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+
+        public override INamespaceSymbol GetDeclaredSymbol(NamespaceDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+
+        public override INamedTypeSymbol GetDeclaredSymbol(BaseTypeDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+
+        public override INamedTypeSymbol GetDeclaredSymbol(DelegateDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IFieldSymbol GetDeclaredSymbol(EnumMemberDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+
+        public override IMethodSymbol GetDeclaredSymbol(BaseMethodDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+
+        public override ISymbol GetDeclaredSymbol(BasePropertyDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+
+        public override IPropertySymbol GetDeclaredSymbol(PropertyDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+
+        public override IPropertySymbol GetDeclaredSymbol(IndexerDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+
+        public override IEventSymbol GetDeclaredSymbol(EventDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+
+        public override IPropertySymbol GetDeclaredSymbol(AnonymousObjectMemberDeclaratorSyntax declaratorSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override INamedTypeSymbol GetDeclaredSymbol(AnonymousObjectCreationExpressionSyntax declaratorSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override INamedTypeSymbol GetDeclaredSymbol(TupleExpressionSyntax declaratorSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ISymbol GetDeclaredSymbol(ArgumentSyntax declaratorSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IMethodSymbol GetDeclaredSymbol(AccessorDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IMethodSymbol GetDeclaredSymbol(ArrowExpressionClauseSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ISymbol GetDeclaredSymbol(VariableDeclaratorSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ISymbol GetDeclaredSymbol(SingleVariableDesignationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ILabelSymbol GetDeclaredSymbol(LabeledStatementSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ILabelSymbol GetDeclaredSymbol(SwitchLabelSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IAliasSymbol GetDeclaredSymbol(UsingDirectiveSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IAliasSymbol GetDeclaredSymbol(ExternAliasDirectiveSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IParameterSymbol GetDeclaredSymbol(ParameterSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ImmutableArray<ISymbol> GetDeclaredSymbols(BaseFieldDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ITypeParameterSymbol GetDeclaredSymbol(TypeParameterSyntax typeParameter, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IRangeVariableSymbol GetDeclaredSymbol(QueryClauseSyntax queryClause, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IRangeVariableSymbol GetDeclaredSymbol(JoinIntoClauseSyntax node, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IRangeVariableSymbol GetDeclaredSymbol(QueryContinuationSyntax node, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ForEachStatementInfo GetForEachStatementInfo(ForEachStatementSyntax node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ForEachStatementInfo GetForEachStatementInfo(CommonForEachStatementSyntax node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override DeconstructionInfo GetDeconstructionInfo(AssignmentExpressionSyntax node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override DeconstructionInfo GetDeconstructionInfo(ForEachVariableStatementSyntax node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override AwaitExpressionInfo GetAwaitExpressionInfo(AwaitExpressionSyntax node)
+        {
+            throw new NotImplementedException();
+        }
 
         public override bool IsSpeculativeSemanticModel => roslynModel.IsSpeculativeSemanticModel;
 
         public override int OriginalPositionForSpeculation => roslynModel.OriginalPositionForSpeculation;
 
-        protected override RoslynSemanticModel ParentModelCore => roslynModel.ParentModel;
-
-        protected override SyntaxNode RootCore => roslynModel.Root;
-
         public override RoslynSemanticModel ContainingModelOrSelf => throw new NotImplementedException();
+
+        public override CSharpCompilation Compilation => throw new NotImplementedException();
+
+        public override CSharpSyntaxNode Root => throw new NotImplementedException();
+
+        public override CSharpSemanticModel ParentModel => throw new NotImplementedException();
+
+        public override RoslynSyntaxTree SyntaxTree => roslynModel.SyntaxTree;
     }
 }

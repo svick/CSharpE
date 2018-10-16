@@ -1,4 +1,5 @@
-﻿using RoslynCompilation = Microsoft.CodeAnalysis.Compilation;
+﻿using Microsoft.CodeAnalysis.CSharp;
+using RoslynCompilation = Microsoft.CodeAnalysis.Compilation;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
 
 namespace CSharpE.Transform.VisualStudio
@@ -8,6 +9,6 @@ namespace CSharpE.Transform.VisualStudio
         public static RoslynSyntaxTree Wrap(RoslynSyntaxTree roslynTree) => roslynTree;// new SyntaxTree(roslynTree);
         public static RoslynSyntaxTree Unwrap(RoslynSyntaxTree tree) => tree;// ((SyntaxTree)tree).RoslynTree;
 
-        public static Compilation Wrap(RoslynCompilation roslynCompilation) => new Compilation(roslynCompilation);
+        public static Compilation Wrap(RoslynCompilation roslynCompilation) => new Compilation((CSharpCompilation)roslynCompilation);
     }
 }
