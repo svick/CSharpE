@@ -50,6 +50,7 @@
     <Compile Include="CompletionService.cs" />
     <Compile Include="RoslynExtensions.cs" />
     <Compile Include="SemanticModel.cs" />
+    <Compile Include="SyntaxDiffer.cs" />
     <Compile Include="SyntaxTree.cs" />
     <Compile Include="CompilationFactoryService.cs" />
     <Compile Include="SyntaxTreeDiff.cs" />

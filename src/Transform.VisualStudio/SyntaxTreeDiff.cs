@@ -18,7 +18,7 @@ namespace CSharpE.Transform.VisualStudio
             this.oldTree = oldTree;
             this.newTree = newTree;
 
-            changes = newTree.GetChanges(oldTree);
+            changes = SyntaxDiffer.GetTextChanges(oldTree, newTree);
         }
 
         public Diagnostic Adjust(Diagnostic diagnostic) => diagnostic.WithLocation(Adjust(diagnostic.Location));
