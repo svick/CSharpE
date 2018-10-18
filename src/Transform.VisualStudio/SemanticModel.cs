@@ -17,11 +17,15 @@ namespace CSharpE.Transform.VisualStudio
     internal class SemanticModel : CSharpSemanticModel
     {
         private readonly Compilation compilation;
-        private readonly RoslynSemanticModel roslynModel;
+        private readonly RoslynSyntaxTree oldTree;
+        private readonly RoslynSyntaxTree newTree;
+        private readonly CSharpSemanticModel roslynModel;
 
-        public SemanticModel(Compilation compilation, RoslynSemanticModel roslynModel)
+        public SemanticModel(Compilation compilation, RoslynSyntaxTree oldTree, RoslynSyntaxTree newTree, CSharpSemanticModel roslynModel)
         {
             this.compilation = compilation;
+            this.oldTree = oldTree;
+            this.newTree = newTree;
             this.roslynModel = roslynModel;
         }
 
@@ -71,13 +75,11 @@ namespace CSharpE.Transform.VisualStudio
 
         public override void ComputeDeclarationsInNode(SyntaxNode node, bool getSymbol, Roslyn::PooledObjects.ArrayBuilder<DeclarationInfo> builder, CancellationToken cancellationToken, int? levelsToCompute = null)
         {
-            roslynModel.ComputeDeclarationsInNode(node, getSymbol, builder, cancellationToken, levelsToCompute);
+            roslynModel.ComputeDeclarationsInNode(Adjust(node), getSymbol, builder, cancellationToken, levelsToCompute);
         }
 
         public override SymbolInfo GetSymbolInfoWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetSymbolInfoWorker(Adjust(node), options, cancellationToken);
 
         public override SymbolInfo GetCollectionInitializerSymbolInfoWorker(InitializerExpressionSyntax collectionInitializer, ExpressionSyntax node, CancellationToken cancellationToken = default)
         {
@@ -85,9 +87,7 @@ namespace CSharpE.Transform.VisualStudio
         }
 
         public override CSharpTypeInfo GetTypeInfoWorker(CSharpSyntaxNode node, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetTypeInfoWorker(Adjust(node), cancellationToken);
 
         public override ImmutableArray<Symbol> GetMemberGroupWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
         {
@@ -125,9 +125,7 @@ namespace CSharpE.Transform.VisualStudio
         }
 
         public override Binder GetEnclosingBinderInternal(int position)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetEnclosingBinderInternal(GetTreeDiff().Adjust(position) ?? throw new NotImplementedException());
 
         public override MemberSemanticModel GetMemberModel(SyntaxNode node)
         {
@@ -220,74 +218,46 @@ namespace CSharpE.Transform.VisualStudio
             => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override IPropertySymbol GetDeclaredSymbol(AnonymousObjectMemberDeclaratorSyntax declaratorSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declaratorSyntax), cancellationToken);
 
         public override INamedTypeSymbol GetDeclaredSymbol(AnonymousObjectCreationExpressionSyntax declaratorSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declaratorSyntax), cancellationToken);
 
         public override INamedTypeSymbol GetDeclaredSymbol(TupleExpressionSyntax declaratorSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declaratorSyntax), cancellationToken);
 
         public override ISymbol GetDeclaredSymbol(ArgumentSyntax declaratorSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declaratorSyntax), cancellationToken);
 
         public override IMethodSymbol GetDeclaredSymbol(AccessorDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override IMethodSymbol GetDeclaredSymbol(ArrowExpressionClauseSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override ISymbol GetDeclaredSymbol(VariableDeclaratorSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override ISymbol GetDeclaredSymbol(SingleVariableDesignationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override ILabelSymbol GetDeclaredSymbol(LabeledStatementSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override ILabelSymbol GetDeclaredSymbol(SwitchLabelSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override IAliasSymbol GetDeclaredSymbol(UsingDirectiveSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override IAliasSymbol GetDeclaredSymbol(ExternAliasDirectiveSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override IParameterSymbol GetDeclaredSymbol(ParameterSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override ImmutableArray<ISymbol> GetDeclaredSymbols(BaseFieldDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetDeclaredSymbols(Adjust(declarationSyntax), cancellationToken);
 
         public override ITypeParameterSymbol GetDeclaredSymbol(TypeParameterSyntax typeParameter, CancellationToken cancellationToken = default)
         {
@@ -340,12 +310,12 @@ namespace CSharpE.Transform.VisualStudio
 
         public override RoslynSemanticModel ContainingModelOrSelf => throw new NotImplementedException();
 
-        public override CSharpCompilation Compilation => throw new NotImplementedException();
+        public override CSharpCompilation Compilation => compilation.RoslynCompilation;
 
-        public override CSharpSyntaxNode Root => throw new NotImplementedException();
+        public override CSharpSyntaxNode Root => (CSharpSyntaxNode)newTree.GetRoot();
 
         public override CSharpSemanticModel ParentModel => throw new NotImplementedException();
 
-        public override RoslynSyntaxTree SyntaxTree => roslynModel.SyntaxTree;
+        public override RoslynSyntaxTree SyntaxTree => oldTree;
     }
 }

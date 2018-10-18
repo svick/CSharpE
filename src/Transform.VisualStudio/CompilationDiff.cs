@@ -1,7 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
-using System.Collections.Generic;
-using System.Linq;
-using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
+using System.Collections.Concurrent;
 
 namespace CSharpE.Transform.VisualStudio
 {
@@ -10,8 +8,8 @@ namespace CSharpE.Transform.VisualStudio
         private readonly CSharpCompilation oldCompilation;
         private readonly CSharpCompilation newCompilation;
 
-        private readonly Dictionary<string, SyntaxTreeDiff> cachedDiffs = new Dictionary<string, SyntaxTreeDiff>();
-        private readonly Dictionary<string, SyntaxTreeDiff> cachedReverseDiffs = new Dictionary<string, SyntaxTreeDiff>();
+        private readonly ConcurrentDictionary<string, SyntaxTreeDiff> cachedDiffs = new ConcurrentDictionary<string, SyntaxTreeDiff>();
+        private readonly ConcurrentDictionary<string, SyntaxTreeDiff> cachedReverseDiffs = new ConcurrentDictionary<string, SyntaxTreeDiff>();
 
         public CompilationDiff(CSharpCompilation oldCompilation, CSharpCompilation newCompilation)
         {
@@ -21,19 +19,11 @@ namespace CSharpE.Transform.VisualStudio
 
         private SyntaxTreeDiff BuildTreeDiff(string filePath, bool reverse)
         {
-            RoslynSyntaxTree GetTree(CSharpCompilation compilation)
-            {
-                var trees = compilation.SyntaxTrees.Where(tree => tree.FilePath == filePath).ToList();
-                if (trees.Count != 1)
-                    return null;
-                return trees[0];
-            }
-
-            var oldTree = GetTree(oldCompilation);
+            var oldTree = oldCompilation.GetTreeOrDefault(filePath);
             if (oldTree == null)
                 return null;
 
-            var newTree = GetTree(newCompilation);
+            var newTree = newCompilation.GetTreeOrDefault(filePath);
             if (newTree == null)
                 return null;
 
@@ -44,12 +34,7 @@ namespace CSharpE.Transform.VisualStudio
         {
             var cache = reverse ? cachedReverseDiffs : cachedDiffs;
 
-            if (!cache.TryGetValue(filePath, out var diff))
-            {
-                diff = BuildTreeDiff(filePath, reverse);
-                cache[filePath] = diff;
-            }
-            return diff;
+            return cache.GetOrAdd(filePath, path => BuildTreeDiff(path, reverse));
         }
 
         internal SyntaxTreeDiff ForTree(string filePath) => ForTree(filePath, reverse: false);

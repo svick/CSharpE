@@ -48,6 +48,7 @@
     <Compile Include="Compilation.cs" />
     <Compile Include="CompilationDiff.cs" />
     <Compile Include="CompletionService.cs" />
+    <Compile Include="RoslynExtensions.cs" />
     <Compile Include="SemanticModel.cs" />
     <Compile Include="SyntaxTree.cs" />
     <Compile Include="CompilationFactoryService.cs" />

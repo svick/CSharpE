@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Reflection;
 using System.Reflection.Metadata;
 using CSharpE.Transform.Execution;
 using Microsoft.CodeAnalysis;
@@ -20,19 +21,24 @@ using static CSharpE.Transform.VisualStudio.Wrapping;
 
 namespace CSharpE.Transform.VisualStudio
 {
+    // TODO: Ensure thread-safety
     internal sealed class Compilation : RoslynCompilation
     {
-        private readonly CSharpCompilation roslynCompilation;
+        public CSharpCompilation RoslynCompilation { get; }
 
         public Compilation(CSharpCompilation roslynCompilation)
             : base(roslynCompilation.AssemblyName, roslynCompilation.References.ToImmutableArray(), new Dictionary<string, string>() /* TODO? */, roslynCompilation.IsSubmission, roslynCompilation.EventQueue)
-            => this.roslynCompilation = roslynCompilation;
+        {
+            RoslynCompilation = roslynCompilation;
+
+            designTimeCompilation = new Lazy<CSharpCompilation>(CreateDesignTimeCompilation);
+        }
 
         private ProjectTransformer CreateTransformer()
         {
             // PERF: caching of transformations and possibly ITransformation
 
-            var iTransformation = roslynCompilation.GetTypeByMetadataName(typeof(ITransformation).FullName);
+            var iTransformation = RoslynCompilation.GetTypeByMetadataName(typeof(ITransformation).FullName);
 
             if (iTransformation == null)
                 return null;
@@ -40,20 +46,31 @@ namespace CSharpE.Transform.VisualStudio
             var transformations = new List<ITransformation>();
 
             // TODO: handle other reference kinds
-            foreach (PortableExecutableReference reference in roslynCompilation.References)
+            foreach (PortableExecutableReference reference in RoslynCompilation.References)
             {
-                var referenceSymbol = (IAssemblySymbol)roslynCompilation.GetAssemblyOrModuleSymbol(reference);
+                var referenceSymbol = (IAssemblySymbol)RoslynCompilation.GetAssemblyOrModuleSymbol(reference);
                 var transformationTypes = GetAllTypesVisitor.FindTypes(
-                    referenceSymbol.GlobalNamespace, type => type.TypeKind != TypeKind.Interface && type.AllInterfaces.Contains(iTransformation));
+                    referenceSymbol.GlobalNamespace, type => type.TypeKind != TypeKind.Interface && !type.IsAbstract && type.AllInterfaces.Contains(iTransformation));
 
                 if (!transformationTypes.Any())
                     continue;
 
-                var assembly = System.Reflection.Assembly.Load(reference.FilePath);
+                Assembly assembly;
+
+                try
+                {
+                    assembly = System.Reflection.Assembly.LoadFrom(reference.FilePath);
+                }
+                catch (Exception ex)
+                {
+                    // TODO: produce error
+                    return null;
+                }
+
 
                 foreach (var symbol in transformationTypes)
                 {
-                    var type = assembly.GetType(symbol.MetadataName);
+                    var type = assembly.GetType(symbol.GetFullMetadataName());
                     var instance = (ITransformation)Activator.CreateInstance(type);
 
                     transformations.Add(instance);
@@ -63,7 +80,7 @@ namespace CSharpE.Transform.VisualStudio
             if (!transformations.Any())
                 return null;
 
-            return new ProjectTransformer(roslynCompilation, transformations);
+            return new ProjectTransformer(RoslynCompilation, transformations);
         }
 
         // based on https://github.com/dotnet/roslyn/issues/6138#issuecomment-149216303
@@ -113,30 +130,21 @@ namespace CSharpE.Transform.VisualStudio
             }
         }
 
-        private CSharpCompilation designTimeCompilation;
-        internal CSharpCompilation DesignTimeCompilation
+        private CSharpCompilation CreateDesignTimeCompilation()
         {
-            get
-            {
-                if (designTimeCompilation == null)
-                {
-                    if (Transformer == null)
-                    {
-                        designTimeCompilation = roslynCompilation;
-                    }
-                    else
-                    {
-                        var transformed = Transformer.Transform(designTime: true);
+            if (Transformer == null)
+                return RoslynCompilation;
 
-                        designTimeCompilation = CSharpCompilation.Create(
-                            roslynCompilation.AssemblyName, transformed.SourceFiles.Select(file => file.Tree),
-                            transformed.AdditionalReferences.Select(reference => reference.GetMetadataReference()),
-                            roslynCompilation.Options);
-                    }
-                }
-                return designTimeCompilation;
-            }
+            var transformed = Transformer.Transform(designTime: true);
+
+            return CSharpCompilation.Create(
+                RoslynCompilation.AssemblyName, transformed.SourceFiles.Select(file => file.Tree),
+                transformed.AdditionalReferences.Select(reference => reference.GetMetadataReference()),
+                RoslynCompilation.Options);
         }
+
+        private readonly Lazy<CSharpCompilation> designTimeCompilation;
+        internal CSharpCompilation DesignTimeCompilation => designTimeCompilation.Value;
 
         private CompilationDiff diff;
         internal CompilationDiff Diff
@@ -144,7 +152,7 @@ namespace CSharpE.Transform.VisualStudio
             get
             {
                 if (diff == null)
-                    diff = new CompilationDiff(roslynCompilation, DesignTimeCompilation);
+                    diff = new CompilationDiff(RoslynCompilation, DesignTimeCompilation);
 
                 return diff;
             }
@@ -153,152 +161,153 @@ namespace CSharpE.Transform.VisualStudio
         #region overrides
         protected override RoslynCompilation CommonClone()
         {
-            return Wrap(roslynCompilation.Clone());
+            return Wrap(RoslynCompilation.Clone());
         }
 
         protected override RoslynSemanticModel CommonGetSemanticModel(RoslynSyntaxTree syntaxTree, bool ignoreAccessibility)
         {
-            var roslynModel = DesignTimeCompilation.GetSemanticModel(Unwrap(syntaxTree), ignoreAccessibility);
-            return new SemanticModel(this, roslynModel);
+            var newTree = DesignTimeCompilation.GetTree(syntaxTree.FilePath);
+            var roslynModel = (CSharpSemanticModel)DesignTimeCompilation.GetSemanticModel(newTree, ignoreAccessibility);
+            return new SemanticModel(this, syntaxTree, newTree, roslynModel);
         }
 
         protected override INamedTypeSymbol CommonCreateErrorTypeSymbol(INamespaceOrTypeSymbol container, string name, int arity)
         {
-            return roslynCompilation.CreateErrorTypeSymbol(container, name, arity);
+            return RoslynCompilation.CreateErrorTypeSymbol(container, name, arity);
         }
 
         protected override INamespaceSymbol CommonCreateErrorNamespaceSymbol(INamespaceSymbol container, string name)
         {
-            return roslynCompilation.CreateErrorNamespaceSymbol(container, name);
+            return RoslynCompilation.CreateErrorNamespaceSymbol(container, name);
         }
 
         protected override RoslynCompilation CommonWithAssemblyName(string outputName)
         {
-            return Wrap(roslynCompilation.WithAssemblyName(outputName));
+            return Wrap(RoslynCompilation.WithAssemblyName(outputName));
         }
 
         protected override RoslynCompilation CommonWithOptions(CompilationOptions options)
         {
-            return Wrap(roslynCompilation.WithOptions(options));
+            return Wrap(RoslynCompilation.WithOptions(options));
         }
 
         protected override RoslynCompilation CommonWithScriptCompilationInfo(ScriptCompilationInfo info)
         {
-            return Wrap(roslynCompilation.WithScriptCompilationInfo(info));
+            return Wrap(RoslynCompilation.WithScriptCompilationInfo(info));
         }
 
         protected override RoslynCompilation CommonAddSyntaxTrees(IEnumerable<RoslynSyntaxTree> trees)
         {
-            return Wrap(roslynCompilation.AddSyntaxTrees(trees.Select(Unwrap)));
+            return Wrap(RoslynCompilation.AddSyntaxTrees(trees.Select(Unwrap)));
         }
 
         protected override RoslynCompilation CommonRemoveSyntaxTrees(IEnumerable<RoslynSyntaxTree> trees)
         {
-            return Wrap(roslynCompilation.RemoveSyntaxTrees(trees.Select(Unwrap)));
+            return Wrap(RoslynCompilation.RemoveSyntaxTrees(trees.Select(Unwrap)));
         }
 
         protected override RoslynCompilation CommonRemoveAllSyntaxTrees()
         {
-            return Wrap(roslynCompilation.RemoveAllSyntaxTrees());
+            return Wrap(RoslynCompilation.RemoveAllSyntaxTrees());
         }
 
         protected override RoslynCompilation CommonReplaceSyntaxTree(RoslynSyntaxTree oldTree, RoslynSyntaxTree newTree)
         {
-            return Wrap(roslynCompilation.ReplaceSyntaxTree(Unwrap(oldTree), Unwrap(newTree)));
+            return Wrap(RoslynCompilation.ReplaceSyntaxTree(Unwrap(oldTree), Unwrap(newTree)));
         }
 
         protected override bool CommonContainsSyntaxTree(RoslynSyntaxTree syntaxTree)
         {
-            return roslynCompilation.ContainsSyntaxTree(Unwrap(syntaxTree));
+            return RoslynCompilation.ContainsSyntaxTree(Unwrap(syntaxTree));
         }
 
         public override CompilationReference ToMetadataReference(ImmutableArray<string> aliases = new ImmutableArray<string>(), bool embedInteropTypes = false)
         {
-            return roslynCompilation.ToMetadataReference(aliases, embedInteropTypes);
+            return RoslynCompilation.ToMetadataReference(aliases, embedInteropTypes);
         }
 
         protected override RoslynCompilation CommonWithReferences(IEnumerable<MetadataReference> newReferences)
         {
-            return Wrap(roslynCompilation.WithReferences(newReferences));
+            return Wrap(RoslynCompilation.WithReferences(newReferences));
         }
 
         protected override ISymbol CommonGetAssemblyOrModuleSymbol(MetadataReference reference)
         {
-            return roslynCompilation.GetAssemblyOrModuleSymbol(reference);
+            return RoslynCompilation.GetAssemblyOrModuleSymbol(reference);
         }
 
         protected override INamespaceSymbol CommonGetCompilationNamespace(INamespaceSymbol namespaceSymbol)
         {
-            return roslynCompilation.GetCompilationNamespace(namespaceSymbol);
+            return RoslynCompilation.GetCompilationNamespace(namespaceSymbol);
         }
 
         protected override IMethodSymbol CommonGetEntryPoint(CancellationToken cancellationToken)
         {
-            return roslynCompilation.GetEntryPoint(cancellationToken);
+            return RoslynCompilation.GetEntryPoint(cancellationToken);
         }
 
         protected override INamedTypeSymbol CommonGetSpecialType(SpecialType specialType)
         {
-            return roslynCompilation.GetSpecialType(specialType);
+            return RoslynCompilation.GetSpecialType(specialType);
         }
 
         protected override IArrayTypeSymbol CommonCreateArrayTypeSymbol(ITypeSymbol elementType, int rank)
         {
-            return roslynCompilation.CreateArrayTypeSymbol(elementType, rank);
+            return RoslynCompilation.CreateArrayTypeSymbol(elementType, rank);
         }
 
         protected override IPointerTypeSymbol CommonCreatePointerTypeSymbol(ITypeSymbol elementType)
         {
-            return roslynCompilation.CreatePointerTypeSymbol(elementType);
+            return RoslynCompilation.CreatePointerTypeSymbol(elementType);
         }
 
         protected override INamedTypeSymbol CommonGetTypeByMetadataName(string metadataName)
         {
-            return roslynCompilation.GetTypeByMetadataName(metadataName);
+            return RoslynCompilation.GetTypeByMetadataName(metadataName);
         }
 
         protected override INamedTypeSymbol CommonCreateTupleTypeSymbol(
             ImmutableArray<ITypeSymbol> elementTypes, ImmutableArray<string> elementNames, ImmutableArray<Location> elementLocations)
         {
-            return roslynCompilation.CreateTupleTypeSymbol(elementTypes, elementNames, elementLocations);
+            return RoslynCompilation.CreateTupleTypeSymbol(elementTypes, elementNames, elementLocations);
         }
 
         protected override INamedTypeSymbol CommonCreateTupleTypeSymbol(
             INamedTypeSymbol underlyingType, ImmutableArray<string> elementNames, ImmutableArray<Location> elementLocations)
         {
-            return roslynCompilation.CreateTupleTypeSymbol(underlyingType, elementNames, elementLocations);
+            return RoslynCompilation.CreateTupleTypeSymbol(underlyingType, elementNames, elementLocations);
         }
 
         protected override INamedTypeSymbol CommonCreateAnonymousTypeSymbol(
             ImmutableArray<ITypeSymbol> memberTypes, ImmutableArray<string> memberNames, ImmutableArray<Location> memberLocations,
             ImmutableArray<bool> memberIsReadOnly)
         {
-            return roslynCompilation.CreateAnonymousTypeSymbol(memberTypes, memberNames, memberIsReadOnly, memberLocations);
+            return RoslynCompilation.CreateAnonymousTypeSymbol(memberTypes, memberNames, memberIsReadOnly, memberLocations);
         }
 
         public override CommonConversion ClassifyCommonConversion(ITypeSymbol source, ITypeSymbol destination)
         {
-            return roslynCompilation.ClassifyCommonConversion(source, destination);
+            return RoslynCompilation.ClassifyCommonConversion(source, destination);
         }
 
         public override ImmutableArray<Diagnostic> GetParseDiagnostics(CancellationToken cancellationToken = new CancellationToken())
         {
-            return roslynCompilation.GetParseDiagnostics(cancellationToken);
+            return RoslynCompilation.GetParseDiagnostics(cancellationToken);
         }
 
         public override ImmutableArray<Diagnostic> GetDeclarationDiagnostics(CancellationToken cancellationToken = new CancellationToken())
         {
-            return roslynCompilation.GetDeclarationDiagnostics(cancellationToken);
+            return RoslynCompilation.GetDeclarationDiagnostics(cancellationToken);
         }
 
         public override ImmutableArray<Diagnostic> GetMethodBodyDiagnostics(CancellationToken cancellationToken = new CancellationToken())
         {
-            return roslynCompilation.GetMethodBodyDiagnostics(cancellationToken);
+            return RoslynCompilation.GetMethodBodyDiagnostics(cancellationToken);
         }
 
         public override ImmutableArray<Diagnostic> GetDiagnostics(CancellationToken cancellationToken = new CancellationToken())
         {
-            return roslynCompilation.GetDiagnostics(cancellationToken);
+            return RoslynCompilation.GetDiagnostics(cancellationToken);
         }
 
         protected override void AppendDefaultVersionResource(Stream resourceStream)
@@ -309,35 +318,35 @@ namespace CSharpE.Transform.VisualStudio
         public override bool ContainsSymbolsWithName(
             Func<string, bool> predicate, SymbolFilter filter = SymbolFilter.TypeAndMember, CancellationToken cancellationToken = new CancellationToken())
         {
-            return roslynCompilation.ContainsSymbolsWithName(predicate, filter, cancellationToken);
+            return RoslynCompilation.ContainsSymbolsWithName(predicate, filter, cancellationToken);
         }
 
         public override IEnumerable<ISymbol> GetSymbolsWithName(
             Func<string, bool> predicate, SymbolFilter filter = SymbolFilter.TypeAndMember, CancellationToken cancellationToken = new CancellationToken())
         {
-            return roslynCompilation.GetSymbolsWithName(predicate, filter, cancellationToken);
+            return RoslynCompilation.GetSymbolsWithName(predicate, filter, cancellationToken);
         }
 
         public override bool ContainsSymbolsWithName(
             string name, SymbolFilter filter = SymbolFilter.TypeAndMember, CancellationToken cancellationToken = new CancellationToken())
         {
-            return roslynCompilation.ContainsSymbolsWithName(name, filter, cancellationToken);
+            return RoslynCompilation.ContainsSymbolsWithName(name, filter, cancellationToken);
         }
 
         public override IEnumerable<ISymbol> GetSymbolsWithName(
             string name, SymbolFilter filter = SymbolFilter.TypeAndMember, CancellationToken cancellationToken = new CancellationToken())
         {
-            return roslynCompilation.GetSymbolsWithName(name, filter, cancellationToken);
+            return RoslynCompilation.GetSymbolsWithName(name, filter, cancellationToken);
         }
 
         public override AnalyzerDriver AnalyzerForLanguage(ImmutableArray<DiagnosticAnalyzer> analyzers, AnalyzerManager analyzerManager)
         {
-            return roslynCompilation.AnalyzerForLanguage(analyzers, analyzerManager);
+            return RoslynCompilation.AnalyzerForLanguage(analyzers, analyzerManager);
         }
 
         public override RoslynCompilation WithEventQueue(AsyncQueue<CompilationEvent> eventQueue)
         {
-            return Wrap(roslynCompilation.WithEventQueue(eventQueue));
+            return Wrap(RoslynCompilation.WithEventQueue(eventQueue));
         }
 
         public override bool HasSubmissionResult()
@@ -345,10 +354,7 @@ namespace CSharpE.Transform.VisualStudio
             throw new NotImplementedException();
         }
 
-        public override CommonReferenceManager CommonGetBoundReferenceManager()
-        {
-            throw new NotImplementedException();
-        }
+        public override CommonReferenceManager CommonGetBoundReferenceManager() => RoslynCompilation.CommonGetBoundReferenceManager();
 
         public override ISymbol CommonGetSpecialTypeMember(SpecialMember specialMember)
         {
@@ -445,31 +451,31 @@ namespace CSharpE.Transform.VisualStudio
             throw new NotImplementedException();
         }
 
-        public override bool IsCaseSensitive => roslynCompilation.IsCaseSensitive;
+        public override bool IsCaseSensitive => RoslynCompilation.IsCaseSensitive;
 
-        public override string Language => roslynCompilation.Language;
+        public override string Language => RoslynCompilation.Language;
 
-        protected override CompilationOptions CommonOptions => roslynCompilation.Options;
+        protected override CompilationOptions CommonOptions => RoslynCompilation.Options;
 
-        protected override IEnumerable<RoslynSyntaxTree> CommonSyntaxTrees => roslynCompilation.SyntaxTrees;
+        protected override IEnumerable<RoslynSyntaxTree> CommonSyntaxTrees => RoslynCompilation.SyntaxTrees;
 
-        public override ImmutableArray<MetadataReference> DirectiveReferences => roslynCompilation.DirectiveReferences;
+        public override ImmutableArray<MetadataReference> DirectiveReferences => RoslynCompilation.DirectiveReferences;
 
-        public override IEnumerable<AssemblyIdentity> ReferencedAssemblyNames => roslynCompilation.ReferencedAssemblyNames;
+        public override IEnumerable<AssemblyIdentity> ReferencedAssemblyNames => RoslynCompilation.ReferencedAssemblyNames;
 
-        protected override IAssemblySymbol CommonAssembly => roslynCompilation.Assembly;
+        protected override IAssemblySymbol CommonAssembly => RoslynCompilation.Assembly;
 
-        protected override IModuleSymbol CommonSourceModule => roslynCompilation.SourceModule;
+        protected override IModuleSymbol CommonSourceModule => RoslynCompilation.SourceModule;
 
-        protected override INamespaceSymbol CommonGlobalNamespace => roslynCompilation.GlobalNamespace;
+        protected override INamespaceSymbol CommonGlobalNamespace => RoslynCompilation.GlobalNamespace;
 
-        protected override INamedTypeSymbol CommonObjectType => roslynCompilation.ObjectType;
+        protected override INamedTypeSymbol CommonObjectType => RoslynCompilation.ObjectType;
 
-        protected override ITypeSymbol CommonDynamicType => roslynCompilation.DynamicType;
+        protected override ITypeSymbol CommonDynamicType => RoslynCompilation.DynamicType;
 
-        protected override INamedTypeSymbol CommonScriptClass => roslynCompilation.ScriptClass;
+        protected override INamedTypeSymbol CommonScriptClass => RoslynCompilation.ScriptClass;
 
-        public override ScriptCompilationInfo CommonScriptCompilationInfo => roslynCompilation.ScriptCompilationInfo;
+        public override ScriptCompilationInfo CommonScriptCompilationInfo => RoslynCompilation.ScriptCompilationInfo;
 
         public override IEnumerable<ReferenceDirective> ReferenceDirectives => throw new NotImplementedException();
 

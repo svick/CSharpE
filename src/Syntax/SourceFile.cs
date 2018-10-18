@@ -182,7 +182,8 @@ namespace CSharpE.Syntax
                 }
 
                 syntax = CSharpSyntaxFactory.SyntaxTree(
-                    CSharpSyntaxFactory.CompilationUnit(default, newUsings, default, newMembers).NormalizeWhitespace());
+                    CSharpSyntaxFactory.CompilationUnit(default, newUsings, default, newMembers).NormalizeWhitespace(),
+                    path: Path);
 
                 additionalNamespaces.Clear();
 
