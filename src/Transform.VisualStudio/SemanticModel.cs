@@ -3,6 +3,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Symbols;
@@ -33,7 +34,13 @@ namespace CSharpE.Transform.VisualStudio
 
         private SyntaxTreeDiff GetReverseTreeDiff() => compilation.Diff.ForTreeReverse(roslynModel.SyntaxTree.FilePath);
 
-        private TNode Adjust<TNode>(TNode node) where TNode : SyntaxNode => GetTreeDiff().Adjust(node);
+        private TNode Adjust<TNode>(TNode node) where TNode : SyntaxNode
+        {
+            if (node is CompilationUnitSyntax)
+                return (TNode)newTree.GetRoot();
+
+            return newTree.GetRoot().GetAnnotatedNodes(Annotation.Get(node)).Cast<TNode>().FirstOrDefault();
+        }
 
         protected override IOperation GetOperationCore(SyntaxNode node, CancellationToken cancellationToken)
         {

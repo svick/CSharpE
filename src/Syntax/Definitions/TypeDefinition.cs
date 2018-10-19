@@ -41,6 +41,7 @@ namespace CSharpE.Syntax
         private TypeDeclarationSyntax syntax;
         
         internal TypeDefinition(TypeDeclarationSyntax typeDeclarationSyntax, SyntaxNode parent)
+            : base(typeDeclarationSyntax)
         {
             Init(typeDeclarationSyntax);
 

@@ -6,6 +6,11 @@ namespace CSharpE.Syntax
 {
     public abstract class BaseMethodDefinition : MemberDefinition, ISyntaxWrapper<BaseMethodDeclarationSyntax>
     {
+        internal BaseMethodDefinition() { }
+
+        internal BaseMethodDefinition(BaseMethodDeclarationSyntax syntax)
+            : base(syntax) { }
+
         private protected abstract BaseMethodDeclarationSyntax BaseMethodSyntax { get; }
 
         private protected sealed override MemberDeclarationSyntax MemberSyntax => BaseMethodSyntax;
@@ -40,6 +45,7 @@ namespace CSharpE.Syntax
 
         private protected bool bodySet;
         private protected BlockStatement body;
+
         public BlockStatement Body
         {
             get

@@ -1,5 +1,6 @@
 ﻿using System;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
@@ -14,6 +15,12 @@ namespace CSharpE.Syntax
         }
 
         private SyntaxNode parent;
+
+        internal BaseTypeDefinition() { }
+
+        internal BaseTypeDefinition(MemberDeclarationSyntax memberDeclarationSyntax)
+            : base(memberDeclarationSyntax) { }
+
         internal override SyntaxNode Parent
         {
             get => parent;

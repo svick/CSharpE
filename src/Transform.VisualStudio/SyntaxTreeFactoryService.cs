@@ -1,18 +1,21 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Host;
-using Microsoft.CodeAnalysis.Host.Mef;
-using System.Composition;
-using Microsoft.VisualStudio.Composition;
-using Microsoft.CodeAnalysis.Text;
-using Roslyn.Utilities;
+﻿using System.Composition;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
+using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Host;
+using Microsoft.CodeAnalysis.Host.Mef;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
+using Microsoft.VisualStudio.Composition;
+using Roslyn.Utilities;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
 
 namespace CSharpE.Transform.VisualStudio
 {
-    //[ExportLanguageServiceFactory(typeof(ISyntaxTreeFactoryService), LanguageNames.CSharp, ServiceLayer.Host), Shared]
+    [ExportLanguageServiceFactory(typeof(ISyntaxTreeFactoryService), LanguageNames.CSharp, ServiceLayer.Host), Shared]
     internal sealed class SyntaxTreeFactoryServiceFactory : ILanguageServiceFactory
     {
         private readonly ExportProvider exportProvider;
@@ -32,7 +35,32 @@ namespace CSharpE.Transform.VisualStudio
             roslynSyntaxTreeFactoryService =
                 LanguageServices.GetCSharpService<ISyntaxTreeFactoryService>(exportProvider, languageServices);
 
-        private static SyntaxTree Wrap(RoslynSyntaxTree roslynSyntaxTree) => new SyntaxTree(roslynSyntaxTree);
+        private static SyntaxNode Annotate(SyntaxNode node)
+        {
+            bool NeedsAnnotation(SyntaxNode n)
+            {
+                switch (n.Kind())
+                {
+                    // TODO: list all relevant node kinds
+                    case SyntaxKind.ClassDeclaration:
+                    case SyntaxKind.StructDeclaration:
+                    case SyntaxKind.InterfaceDeclaration:
+                    case SyntaxKind.EnumDeclaration:
+                    case SyntaxKind.MethodDeclaration:
+                        return Annotation.Get(node) == null;
+
+                    default:
+                        return false;
+                }
+            }
+
+            return node.ReplaceNodes(
+                node.DescendantNodes().Where(NeedsAnnotation),
+                (_, n) => n.WithAdditionalAnnotations(Annotation.Create()));
+        }
+
+        private static RoslynSyntaxTree Annotate(RoslynSyntaxTree roslynSyntaxTree) =>
+            roslynSyntaxTree.WithRootAndOptions(Annotate(roslynSyntaxTree.GetRoot()), roslynSyntaxTree.Options);
 
         public bool CanCreateRecoverableTree(SyntaxNode root)
         {
@@ -48,7 +76,7 @@ namespace CSharpE.Transform.VisualStudio
         }
 
         public RoslynSyntaxTree CreateSyntaxTree(string filePath, ParseOptions options, Encoding encoding, SyntaxNode root) =>
-            Wrap(roslynSyntaxTreeFactoryService.CreateSyntaxTree(filePath, options, encoding, root));
+            Annotate(roslynSyntaxTreeFactoryService.CreateSyntaxTree(filePath, options, encoding, root));
 
         public SyntaxNode DeserializeNodeFrom(Stream stream, CancellationToken cancellationToken)
         {
@@ -67,6 +95,6 @@ namespace CSharpE.Transform.VisualStudio
 
         public RoslynSyntaxTree ParseSyntaxTree(
             string filePath, ParseOptions options, SourceText text, CancellationToken cancellationToken) =>
-            Wrap(roslynSyntaxTreeFactoryService.ParseSyntaxTree(filePath, options, text, cancellationToken));
+            Annotate(roslynSyntaxTreeFactoryService.ParseSyntaxTree(filePath, options, text, cancellationToken));
     }
 }

@@ -11,6 +11,8 @@ namespace CSharpE.Syntax
     {
         internal SyntaxNode() { }
 
+        internal SyntaxNode(Roslyn::SyntaxNode node) => markerAnnotation = Annotation.Get(node);
+
         internal abstract SyntaxNode Parent { get; set; }
 
         internal SourceFile SourceFile => this is SourceFile sourceFile ? sourceFile : Parent?.SourceFile;
@@ -34,7 +36,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (markerAnnotation == null)
-                    markerAnnotation = new SyntaxAnnotation();
+                    markerAnnotation = Annotation.Create();
 
                 return markerAnnotation;
             }

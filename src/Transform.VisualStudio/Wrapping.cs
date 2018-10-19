@@ -6,6 +6,7 @@ namespace CSharpE.Transform.VisualStudio
 {
     internal static class Wrapping
     {
+        // TODO: delete
         public static RoslynSyntaxTree Wrap(RoslynSyntaxTree roslynTree) => roslynTree;// new SyntaxTree(roslynTree);
         public static RoslynSyntaxTree Unwrap(RoslynSyntaxTree tree) => tree;// ((SyntaxTree)tree).RoslynTree;
 

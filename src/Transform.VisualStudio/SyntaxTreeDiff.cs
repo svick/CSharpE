@@ -81,15 +81,5 @@ namespace CSharpE.Transform.VisualStudio
             // TODO?
             return null;
         }
-
-        internal TNode Adjust<TNode>(TNode syntaxNode) where TNode : SyntaxNode
-        {
-            var newSpan = Adjust(syntaxNode.Span);
-
-            if (newSpan == null)
-                return null;
-
-            return newTree.GetRoot().FindNode(newSpan.Value) as TNode;
-        }
     }
 }

@@ -12,6 +12,11 @@ namespace CSharpE.Syntax
 {
     public abstract class MemberDefinition : SyntaxNode, ISyntaxWrapper<MemberDeclarationSyntax>
     {
+        internal MemberDefinition() { }
+
+        internal MemberDefinition(MemberDeclarationSyntax memberDeclarationSyntax)
+            : base(memberDeclarationSyntax) { }
+
         private protected abstract MemberDeclarationSyntax MemberSyntax { get; }
 
         private List<Attribute> attributes;
@@ -129,6 +134,7 @@ namespace CSharpE.Syntax
         public bool IsPrivateProtected => Accessibility == PrivateProtected;
 
         private TypeDefinition parent;
+
         internal override SyntaxNode Parent
         {
             get => parent;
