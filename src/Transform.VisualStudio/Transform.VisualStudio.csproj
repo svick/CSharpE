@@ -52,6 +52,7 @@
     <Compile Include="SemanticModel.cs" />
     <Compile Include="SyntaxDiffer.cs" />
     <Compile Include="CompilationFactoryService.cs" />
+    <Compile Include="SyntaxTree.cs" />
     <Compile Include="SyntaxTreeDiff.cs" />
     <Compile Include="SyntaxTreeFactoryService.cs" />
     <Compile Include="LanguageServices.cs" />

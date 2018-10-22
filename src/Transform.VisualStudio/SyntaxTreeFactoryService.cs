@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Composition;
 using Roslyn.Utilities;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
+using static CSharpE.Transform.VisualStudio.SyntaxTree;
 
 namespace CSharpE.Transform.VisualStudio
 {
@@ -35,32 +36,7 @@ namespace CSharpE.Transform.VisualStudio
             roslynSyntaxTreeFactoryService =
                 LanguageServices.GetCSharpService<ISyntaxTreeFactoryService>(exportProvider, languageServices);
 
-        private static SyntaxNode Annotate(SyntaxNode node)
-        {
-            bool NeedsAnnotation(SyntaxNode n)
-            {
-                switch (n.Kind())
-                {
-                    // TODO: list all relevant node kinds
-                    case SyntaxKind.ClassDeclaration:
-                    case SyntaxKind.StructDeclaration:
-                    case SyntaxKind.InterfaceDeclaration:
-                    case SyntaxKind.EnumDeclaration:
-                    case SyntaxKind.MethodDeclaration:
-                        return Annotation.Get(node) == null;
-
-                    default:
-                        return false;
-                }
-            }
-
-            return node.ReplaceNodes(
-                node.DescendantNodes().Where(NeedsAnnotation),
-                (_, n) => n.WithAdditionalAnnotations(Annotation.Create()));
-        }
-
-        private static RoslynSyntaxTree Annotate(RoslynSyntaxTree roslynSyntaxTree) =>
-            roslynSyntaxTree.WithRootAndOptions(Annotate(roslynSyntaxTree.GetRoot()), roslynSyntaxTree.Options);
+        private static SyntaxTree Wrap(RoslynSyntaxTree tree) => new SyntaxTree((CSharpSyntaxTree)tree);
 
         public bool CanCreateRecoverableTree(SyntaxNode root)
         {
@@ -71,16 +47,16 @@ namespace CSharpE.Transform.VisualStudio
             ProjectId cacheKey, string filePath, ParseOptions options, ValueSource<TextAndVersion> text,
             Encoding encoding, SyntaxNode root)
         {
-            return roslynSyntaxTreeFactoryService.CreateRecoverableTree(
-                cacheKey, filePath, options, text, encoding, root);
+            return Wrap(roslynSyntaxTreeFactoryService.CreateRecoverableTree(
+                cacheKey, filePath, options, text, encoding, root));
         }
 
         public RoslynSyntaxTree CreateSyntaxTree(string filePath, ParseOptions options, Encoding encoding, SyntaxNode root) =>
-            Annotate(roslynSyntaxTreeFactoryService.CreateSyntaxTree(filePath, options, encoding, root));
+            Wrap(roslynSyntaxTreeFactoryService.CreateSyntaxTree(filePath, options, encoding, root));
 
         public SyntaxNode DeserializeNodeFrom(Stream stream, CancellationToken cancellationToken)
         {
-            return roslynSyntaxTreeFactoryService.DeserializeNodeFrom(stream, cancellationToken);
+            return Annotate(roslynSyntaxTreeFactoryService.DeserializeNodeFrom(stream, cancellationToken));
         }
 
         public ParseOptions GetDefaultParseOptions()
@@ -95,6 +71,6 @@ namespace CSharpE.Transform.VisualStudio
 
         public RoslynSyntaxTree ParseSyntaxTree(
             string filePath, ParseOptions options, SourceText text, CancellationToken cancellationToken) =>
-            Annotate(roslynSyntaxTreeFactoryService.ParseSyntaxTree(filePath, options, text, cancellationToken));
+            Wrap(roslynSyntaxTreeFactoryService.ParseSyntaxTree(filePath, options, text, cancellationToken));
     }
 }

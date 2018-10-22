@@ -217,9 +217,8 @@ namespace CSharpE.Transform.VisualStudio
         }
 
         protected override bool CommonContainsSyntaxTree(RoslynSyntaxTree syntaxTree)
-        {
-            return RoslynCompilation.ContainsSyntaxTree(Unwrap(syntaxTree));
-        }
+            => RoslynCompilation.ContainsSyntaxTree(syntaxTree) ||
+                (designTimeCompilation.IsValueCreated && DesignTimeCompilation.ContainsSyntaxTree(syntaxTree));
 
         public override CompilationReference ToMetadataReference(ImmutableArray<string> aliases = new ImmutableArray<string>(), bool embedInteropTypes = false)
         {
@@ -459,23 +458,23 @@ namespace CSharpE.Transform.VisualStudio
 
         protected override IEnumerable<RoslynSyntaxTree> CommonSyntaxTrees => RoslynCompilation.SyntaxTrees;
 
-        public override ImmutableArray<MetadataReference> DirectiveReferences => RoslynCompilation.DirectiveReferences;
+        public override ImmutableArray<MetadataReference> DirectiveReferences => DesignTimeCompilation.DirectiveReferences;
 
-        public override IEnumerable<AssemblyIdentity> ReferencedAssemblyNames => RoslynCompilation.ReferencedAssemblyNames;
+        public override IEnumerable<AssemblyIdentity> ReferencedAssemblyNames => DesignTimeCompilation.ReferencedAssemblyNames;
 
-        protected override IAssemblySymbol CommonAssembly => RoslynCompilation.Assembly;
+        protected override IAssemblySymbol CommonAssembly => DesignTimeCompilation.Assembly;
 
-        protected override IModuleSymbol CommonSourceModule => RoslynCompilation.SourceModule;
+        protected override IModuleSymbol CommonSourceModule => DesignTimeCompilation.SourceModule;
 
-        protected override INamespaceSymbol CommonGlobalNamespace => RoslynCompilation.GlobalNamespace;
+        protected override INamespaceSymbol CommonGlobalNamespace => DesignTimeCompilation.GlobalNamespace;
 
-        protected override INamedTypeSymbol CommonObjectType => RoslynCompilation.ObjectType;
+        protected override INamedTypeSymbol CommonObjectType => DesignTimeCompilation.ObjectType;
 
-        protected override ITypeSymbol CommonDynamicType => RoslynCompilation.DynamicType;
+        protected override ITypeSymbol CommonDynamicType => DesignTimeCompilation.DynamicType;
 
-        protected override INamedTypeSymbol CommonScriptClass => RoslynCompilation.ScriptClass;
+        protected override INamedTypeSymbol CommonScriptClass => DesignTimeCompilation.ScriptClass;
 
-        public override ScriptCompilationInfo CommonScriptCompilationInfo => RoslynCompilation.ScriptCompilationInfo;
+        public override ScriptCompilationInfo CommonScriptCompilationInfo => DesignTimeCompilation.ScriptCompilationInfo;
 
         public override IEnumerable<ReferenceDirective> ReferenceDirectives => throw new NotImplementedException();
 
