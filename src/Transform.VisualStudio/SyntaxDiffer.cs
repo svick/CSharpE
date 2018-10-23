@@ -67,56 +67,6 @@ namespace CSharpE.Transform.VisualStudio
             return reducedChanges.Select(c => new TextChange(c.Range.Span, c.NewText)).ToList();
         }
 
-        internal static IList<TextSpan> GetPossiblyDifferentTextSpans(SyntaxTree before, SyntaxTree after)
-        {
-            if (before == after)
-            {
-                // They're the same, so nothing changed.
-                return Array.Empty<TextSpan>();
-            }
-            else if (before == null)
-            {
-                // The tree is completely new, everything has changed.
-                return new[] { new TextSpan(0, after.GetText().Length) };
-            }
-            else if (after == null)
-            {
-                throw new ArgumentNullException(nameof(after));
-            }
-            else
-            {
-                return GetPossiblyDifferentTextSpans(before.GetRoot(), after.GetRoot());
-            }
-        }
-
-        // return which spans of text in the new document are possibly different than text in the old document
-        internal static IList<TextSpan> GetPossiblyDifferentTextSpans(SyntaxNode oldNode, SyntaxNode newNode)
-        {
-            return new SyntaxDiffer(oldNode, newNode, computeNewText: false).ComputeSpansInNew();
-        }
-
-        private IList<TextSpan> ComputeSpansInNew()
-        {
-            this.ComputeChangeRecords();
-            var reducedChanges = ReduceChanges(_changes);
-
-            // this algorithm assumes changes are in non-overlapping document order
-            var newSpans = new List<TextSpan>();
-            int delta = 0; // difference between old & new start positions
-            foreach (var change in reducedChanges)
-            {
-                if (change.Range.NewLength > 0) // delete-only ranges cannot be expressed as part of new text
-                {
-                    int start = change.Range.Span.Start + delta;
-                    newSpans.Add(new TextSpan(start, change.Range.NewLength));
-                }
-
-                delta += change.Range.NewLength - change.Range.Span.Length;
-            }
-
-            return newSpans;
-        }
-
         private void ComputeChangeRecords()
         {
             while (true)
@@ -706,23 +656,6 @@ namespace CSharpE.Transform.VisualStudio
             }
 
             return queue;
-        }
-
-        private static SyntaxNodeOrToken[] ToArray(Stack<SyntaxNodeOrToken> stack, int n)
-        {
-            var nodes = new SyntaxNodeOrToken[n];
-            int i = n - 1;
-            foreach (var node in stack)
-            {
-                nodes[i] = node;
-                i--;
-
-                if (i < 0)
-                {
-                    break;
-                }
-            }
-            return nodes;
         }
 
         private static void RemoveFirst(Stack<SyntaxNodeOrToken> stack, int count)

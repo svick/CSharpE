@@ -47,33 +47,30 @@ namespace CSharpE.Transform.VisualStudio
             return roslynModel.GetOperation(node, cancellationToken);
         }
 
-        public override ImmutableArray<Diagnostic> GetSyntaxDiagnostics(
-            TextSpan? span = null, CancellationToken cancellationToken = new CancellationToken())
+        private ImmutableArray<Diagnostic> GetDiagnosticsTemplate(
+            Func<TextSpan?, CancellationToken, ImmutableArray<Diagnostic>> templateFunction,
+            TextSpan? span, CancellationToken cancellationToken)
         {
-            return roslynModel.GetSyntaxDiagnostics(span, cancellationToken);
+            var diagnostics = templateFunction(span == null ? null : GetTreeDiff().Adjust(span.Value), cancellationToken);
+
+            // PERF: cache result of GetReverseTreeDiff()
+            return ImmutableArray.CreateRange(diagnostics, d => GetReverseTreeDiff().Adjust(d));
         }
+
+        public override ImmutableArray<Diagnostic> GetSyntaxDiagnostics(
+            TextSpan? span = null, CancellationToken cancellationToken = default)
+            => GetDiagnosticsTemplate(roslynModel.GetSyntaxDiagnostics, span, cancellationToken);
 
         public override ImmutableArray<Diagnostic> GetDeclarationDiagnostics(
-            TextSpan? span = null, CancellationToken cancellationToken = new CancellationToken())
-        {
-            var diagnostics = roslynModel.GetDeclarationDiagnostics(span == null ? null : GetTreeDiff().Adjust(span.Value), cancellationToken);
-
-            if (!diagnostics.Any())
-                return diagnostics;
-
-            return Roslyn::ImmutableArrayExtensions.SelectAsArray(diagnostics, d => GetReverseTreeDiff().Adjust(d));
-        }
+            TextSpan? span = null, CancellationToken cancellationToken = default)
+            => GetDiagnosticsTemplate(roslynModel.GetDeclarationDiagnostics, span, cancellationToken);
 
         public override ImmutableArray<Diagnostic> GetMethodBodyDiagnostics(
-            TextSpan? span = null, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return roslynModel.GetMethodBodyDiagnostics(span, cancellationToken);
-        }
+            TextSpan? span = null, CancellationToken cancellationToken = default)
+            => GetDiagnosticsTemplate(roslynModel.GetMethodBodyDiagnostics, span, cancellationToken);
 
-        public override ImmutableArray<Diagnostic> GetDiagnostics(TextSpan? span = null, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return roslynModel.GetDiagnostics(span, cancellationToken);
-        }
+        public override ImmutableArray<Diagnostic> GetDiagnostics(TextSpan? span = null, CancellationToken cancellationToken = default)
+            => GetDiagnosticsTemplate(roslynModel.GetDiagnostics, span, cancellationToken);
 
         public override void ComputeDeclarationsInSpan(TextSpan span, bool getSymbol, Roslyn::PooledObjects.ArrayBuilder<DeclarationInfo> builder, CancellationToken cancellationToken)
         {
@@ -89,22 +86,16 @@ namespace CSharpE.Transform.VisualStudio
             => roslynModel.GetSymbolInfoWorker(Adjust(node), options, cancellationToken);
 
         public override SymbolInfo GetCollectionInitializerSymbolInfoWorker(InitializerExpressionSyntax collectionInitializer, ExpressionSyntax node, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetCollectionInitializerSymbolInfoWorker(Adjust(collectionInitializer), Adjust(node), cancellationToken);
 
         public override CSharpTypeInfo GetTypeInfoWorker(CSharpSyntaxNode node, CancellationToken cancellationToken = default)
             => roslynModel.GetTypeInfoWorker(Adjust(node), cancellationToken);
 
         public override ImmutableArray<Symbol> GetMemberGroupWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetMemberGroupWorker(Adjust(node), options, cancellationToken);
 
         public override ImmutableArray<PropertySymbol> GetIndexerGroupWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => roslynModel.GetIndexerGroupWorker(Adjust(node), options, cancellationToken);
 
         public override Optional<object> GetConstantValueWorker(CSharpSyntaxNode node, CancellationToken cancellationToken = default)
         {

@@ -26,8 +26,8 @@ namespace CSharpE.Transform.VisualStudio
     {
         public CSharpCompilation RoslynCompilation { get; }
 
-        public Compilation(CSharpCompilation roslynCompilation)
-            : base(roslynCompilation.AssemblyName, roslynCompilation.References.ToImmutableArray(), new Dictionary<string, string>() /* TODO? */, roslynCompilation.IsSubmission, roslynCompilation.EventQueue)
+        public Compilation(CSharpCompilation roslynCompilation, AsyncQueue<CompilationEvent> eventQueue = null)
+            : base(roslynCompilation.AssemblyName, roslynCompilation.References.ToImmutableArray(), new Dictionary<string, string>() /* TODO? */, roslynCompilation.IsSubmission, eventQueue)
         {
             RoslynCompilation = roslynCompilation;
 
@@ -137,10 +137,10 @@ namespace CSharpE.Transform.VisualStudio
 
             var transformed = Transformer.Transform(designTime: true);
 
-            return CSharpCompilation.Create(
+            return (CSharpCompilation)CSharpCompilation.Create(
                 RoslynCompilation.AssemblyName, transformed.SourceFiles.Select(file => file.Tree),
                 transformed.AdditionalReferences.Select(reference => reference.GetMetadataReference()),
-                RoslynCompilation.Options);
+                RoslynCompilation.Options).WithEventQueue(EventQueue);
         }
 
         private readonly Lazy<CSharpCompilation> designTimeCompilation;
@@ -173,12 +173,12 @@ namespace CSharpE.Transform.VisualStudio
 
         protected override INamedTypeSymbol CommonCreateErrorTypeSymbol(INamespaceOrTypeSymbol container, string name, int arity)
         {
-            return RoslynCompilation.CreateErrorTypeSymbol(container, name, arity);
+            return DesignTimeCompilation.CreateErrorTypeSymbol(container, name, arity);
         }
 
         protected override INamespaceSymbol CommonCreateErrorNamespaceSymbol(INamespaceSymbol container, string name)
         {
-            return RoslynCompilation.CreateErrorNamespaceSymbol(container, name);
+            return DesignTimeCompilation.CreateErrorNamespaceSymbol(container, name);
         }
 
         protected override RoslynCompilation CommonWithAssemblyName(string outputName)
@@ -220,7 +220,7 @@ namespace CSharpE.Transform.VisualStudio
             => RoslynCompilation.ContainsSyntaxTree(syntaxTree) ||
                 (designTimeCompilation.IsValueCreated && DesignTimeCompilation.ContainsSyntaxTree(syntaxTree));
 
-        public override CompilationReference ToMetadataReference(ImmutableArray<string> aliases = new ImmutableArray<string>(), bool embedInteropTypes = false)
+        public override CompilationReference ToMetadataReference(ImmutableArray<string> aliases = default, bool embedInteropTypes = false)
         {
             return RoslynCompilation.ToMetadataReference(aliases, embedInteropTypes);
         }
@@ -232,81 +232,82 @@ namespace CSharpE.Transform.VisualStudio
 
         protected override ISymbol CommonGetAssemblyOrModuleSymbol(MetadataReference reference)
         {
-            return RoslynCompilation.GetAssemblyOrModuleSymbol(reference);
+            return DesignTimeCompilation.GetAssemblyOrModuleSymbol(reference);
         }
 
         protected override INamespaceSymbol CommonGetCompilationNamespace(INamespaceSymbol namespaceSymbol)
         {
-            return RoslynCompilation.GetCompilationNamespace(namespaceSymbol);
+            return DesignTimeCompilation.GetCompilationNamespace(namespaceSymbol);
         }
 
         protected override IMethodSymbol CommonGetEntryPoint(CancellationToken cancellationToken)
         {
-            return RoslynCompilation.GetEntryPoint(cancellationToken);
+            return DesignTimeCompilation.GetEntryPoint(cancellationToken);
         }
 
         protected override INamedTypeSymbol CommonGetSpecialType(SpecialType specialType)
         {
-            return RoslynCompilation.GetSpecialType(specialType);
+            return DesignTimeCompilation.GetSpecialType(specialType);
         }
 
         protected override IArrayTypeSymbol CommonCreateArrayTypeSymbol(ITypeSymbol elementType, int rank)
         {
-            return RoslynCompilation.CreateArrayTypeSymbol(elementType, rank);
+            return DesignTimeCompilation.CreateArrayTypeSymbol(elementType, rank);
         }
 
         protected override IPointerTypeSymbol CommonCreatePointerTypeSymbol(ITypeSymbol elementType)
         {
-            return RoslynCompilation.CreatePointerTypeSymbol(elementType);
+            return DesignTimeCompilation.CreatePointerTypeSymbol(elementType);
         }
 
         protected override INamedTypeSymbol CommonGetTypeByMetadataName(string metadataName)
         {
-            return RoslynCompilation.GetTypeByMetadataName(metadataName);
+            return DesignTimeCompilation.GetTypeByMetadataName(metadataName);
         }
 
         protected override INamedTypeSymbol CommonCreateTupleTypeSymbol(
             ImmutableArray<ITypeSymbol> elementTypes, ImmutableArray<string> elementNames, ImmutableArray<Location> elementLocations)
         {
-            return RoslynCompilation.CreateTupleTypeSymbol(elementTypes, elementNames, elementLocations);
+            return DesignTimeCompilation.CreateTupleTypeSymbol(elementTypes, elementNames, elementLocations);
         }
 
         protected override INamedTypeSymbol CommonCreateTupleTypeSymbol(
             INamedTypeSymbol underlyingType, ImmutableArray<string> elementNames, ImmutableArray<Location> elementLocations)
         {
-            return RoslynCompilation.CreateTupleTypeSymbol(underlyingType, elementNames, elementLocations);
+            return DesignTimeCompilation.CreateTupleTypeSymbol(underlyingType, elementNames, elementLocations);
         }
 
         protected override INamedTypeSymbol CommonCreateAnonymousTypeSymbol(
             ImmutableArray<ITypeSymbol> memberTypes, ImmutableArray<string> memberNames, ImmutableArray<Location> memberLocations,
             ImmutableArray<bool> memberIsReadOnly)
         {
-            return RoslynCompilation.CreateAnonymousTypeSymbol(memberTypes, memberNames, memberIsReadOnly, memberLocations);
+            return DesignTimeCompilation.CreateAnonymousTypeSymbol(memberTypes, memberNames, memberIsReadOnly, memberLocations);
         }
 
         public override CommonConversion ClassifyCommonConversion(ITypeSymbol source, ITypeSymbol destination)
         {
-            return RoslynCompilation.ClassifyCommonConversion(source, destination);
+            return DesignTimeCompilation.ClassifyCommonConversion(source, destination);
         }
 
+        // TODO: Adjust diagnostics
         public override ImmutableArray<Diagnostic> GetParseDiagnostics(CancellationToken cancellationToken = new CancellationToken())
         {
-            return RoslynCompilation.GetParseDiagnostics(cancellationToken);
+            return DesignTimeCompilation.GetParseDiagnostics(cancellationToken);
         }
 
         public override ImmutableArray<Diagnostic> GetDeclarationDiagnostics(CancellationToken cancellationToken = new CancellationToken())
         {
-            return RoslynCompilation.GetDeclarationDiagnostics(cancellationToken);
+            return DesignTimeCompilation.GetDeclarationDiagnostics(cancellationToken);
         }
 
         public override ImmutableArray<Diagnostic> GetMethodBodyDiagnostics(CancellationToken cancellationToken = new CancellationToken())
         {
-            return RoslynCompilation.GetMethodBodyDiagnostics(cancellationToken);
+            return DesignTimeCompilation.GetMethodBodyDiagnostics(cancellationToken);
         }
 
         public override ImmutableArray<Diagnostic> GetDiagnostics(CancellationToken cancellationToken = new CancellationToken())
         {
-            return RoslynCompilation.GetDiagnostics(cancellationToken);
+            return DesignTimeCompilation.GetDiagnostics(cancellationToken);
         }
 
         protected override void AppendDefaultVersionResource(Stream resourceStream)
@@ -317,35 +318,37 @@ namespace CSharpE.Transform.VisualStudio
         public override bool ContainsSymbolsWithName(
             Func<string, bool> predicate, SymbolFilter filter = SymbolFilter.TypeAndMember, CancellationToken cancellationToken = new CancellationToken())
         {
-            return RoslynCompilation.ContainsSymbolsWithName(predicate, filter, cancellationToken);
+            return DesignTimeCompilation.ContainsSymbolsWithName(predicate, filter, cancellationToken);
         }
 
         public override IEnumerable<ISymbol> GetSymbolsWithName(
             Func<string, bool> predicate, SymbolFilter filter = SymbolFilter.TypeAndMember, CancellationToken cancellationToken = new CancellationToken())
         {
-            return RoslynCompilation.GetSymbolsWithName(predicate, filter, cancellationToken);
+            return DesignTimeCompilation.GetSymbolsWithName(predicate, filter, cancellationToken);
         }
 
         public override bool ContainsSymbolsWithName(
             string name, SymbolFilter filter = SymbolFilter.TypeAndMember, CancellationToken cancellationToken = new CancellationToken())
         {
-            return RoslynCompilation.ContainsSymbolsWithName(name, filter, cancellationToken);
+            return DesignTimeCompilation.ContainsSymbolsWithName(name, filter, cancellationToken);
         }
 
         public override IEnumerable<ISymbol> GetSymbolsWithName(
             string name, SymbolFilter filter = SymbolFilter.TypeAndMember, CancellationToken cancellationToken = new CancellationToken())
         {
-            return RoslynCompilation.GetSymbolsWithName(name, filter, cancellationToken);
+            return DesignTimeCompilation.GetSymbolsWithName(name, filter, cancellationToken);
         }
 
         public override AnalyzerDriver AnalyzerForLanguage(ImmutableArray<DiagnosticAnalyzer> analyzers, AnalyzerManager analyzerManager)
         {
-            return RoslynCompilation.AnalyzerForLanguage(analyzers, analyzerManager);
+            return DesignTimeCompilation.AnalyzerForLanguage(analyzers, analyzerManager);
         }
 
         public override RoslynCompilation WithEventQueue(AsyncQueue<CompilationEvent> eventQueue)
         {
-            return Wrap(RoslynCompilation.WithEventQueue(eventQueue));
+            // because most methods delegate to DesignTimeCompilation, eventQueue should be set there
+            // but since it might not exist yet, save the eventQueue for now
+            return new Compilation(RoslynCompilation, eventQueue);
         }
 
         public override bool HasSubmissionResult()
@@ -491,6 +494,7 @@ namespace CSharpE.Transform.VisualStudio
         public override StrongNameKeys StrongNameKeys => throw new NotImplementedException();
 
         public override Guid DebugSourceDocumentLanguageId => throw new NotImplementedException();
+
         #endregion
     }
 }

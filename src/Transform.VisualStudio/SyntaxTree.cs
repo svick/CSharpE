@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -7,93 +9,145 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
+using InternalSyntax = Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax;
 
 namespace CSharpE.Transform.VisualStudio
 {
-    internal sealed class SyntaxTree : CSharpSyntaxTree
+    internal class SyntaxTree : CSharpSyntaxTree
     {
-        private readonly CSharpSyntaxTree roslynTree;
+        private readonly CSharpParseOptions _options;
+        private readonly string _path;
+        private readonly CSharpSyntaxNode _root;
+        private readonly bool _hasCompilationUnitRoot;
+        private readonly Encoding _encodingOpt;
+        private readonly SourceHashAlgorithm _checksumAlgorithm;
+        private SourceText _lazyText;
+        private InternalSyntax.DirectiveStack _directives;
 
-        public SyntaxTree(CSharpSyntaxTree roslynTree) => this.roslynTree = Annotate(roslynTree);
+        // TODO: can text be lazy?
+        // TODO: directives?
+        public SyntaxTree(CSharpSyntaxTree roslynTree)
+            : this(roslynTree.GetText(), roslynTree.Encoding, roslynTree.GetText().ChecksumAlgorithm, roslynTree.FilePath, roslynTree.Options, roslynTree.GetRoot(), default) { }
 
-        internal static SyntaxNode Annotate(SyntaxNode node)
+        internal SyntaxTree(SourceText textOpt, Encoding encodingOpt, SourceHashAlgorithm checksumAlgorithm, string path, CSharpParseOptions options, CSharpSyntaxNode root, InternalSyntax.DirectiveStack directives)
         {
-            bool NeedsAnnotation(SyntaxNode n)
-            {
-                switch (n.Kind())
-                {
-                    // TODO: list all relevant node kinds
-                    case SyntaxKind.ClassDeclaration:
-                    case SyntaxKind.StructDeclaration:
-                    case SyntaxKind.InterfaceDeclaration:
-                    case SyntaxKind.EnumDeclaration:
-                    case SyntaxKind.MethodDeclaration:
-                        return Annotation.Get(node) == null;
+            Debug.Assert(root != null);
+            Debug.Assert(options != null);
+            Debug.Assert(textOpt == null || textOpt.Encoding == encodingOpt && textOpt.ChecksumAlgorithm == checksumAlgorithm);
 
-                    default:
-                        return false;
-                }
-            }
-
-            return node.ReplaceNodes(
-                node.DescendantNodes().Where(NeedsAnnotation),
-                (_, n) => n.WithAdditionalAnnotations(Annotation.Create()));
+            _lazyText = textOpt;
+            _encodingOpt = encodingOpt ?? textOpt?.Encoding;
+            _checksumAlgorithm = checksumAlgorithm;
+            _options = options;
+            _path = path ?? string.Empty;
+            _root = this.CloneNodeAsRoot(Annotate(root));
+            _hasCompilationUnitRoot = root.Kind() == SyntaxKind.CompilationUnit;
+            _directives = directives;
+            this.SetDirectiveStack(directives);
         }
 
-        private static TTree Annotate<TTree>(TTree roslynSyntaxTree) where TTree : RoslynSyntaxTree =>
-            (TTree)roslynSyntaxTree.WithRootAndOptions(Annotate(roslynSyntaxTree.GetRoot()), roslynSyntaxTree.Options);
+        internal static TNode Annotate<TNode>(TNode node) where TNode : SyntaxNode
+            => node.ReplaceNodes(
+                node.DescendantNodes().Where(n => Annotation.Get(n) == null),
+                (_, n) => n.WithAdditionalAnnotations(Annotation.Create()));
+
+        public override string FilePath
+        {
+            get { return _path; }
+        }
+
+        public override SourceText GetText(CancellationToken cancellationToken)
+        {
+            if (_lazyText == null)
+            {
+                Interlocked.CompareExchange(ref _lazyText, this.GetRoot(cancellationToken).GetText(_encodingOpt, _checksumAlgorithm), null);
+            }
+
+            return _lazyText;
+        }
 
         public override bool TryGetText(out SourceText text)
         {
-            return roslynTree.TryGetText(out text);
+            text = _lazyText;
+            return text != null;
         }
 
-        public override SourceText GetText(CancellationToken cancellationToken = new CancellationToken())
+        public override Encoding Encoding
         {
-            return roslynTree.GetText(cancellationToken);
+            get { return _encodingOpt; }
         }
 
-        public override bool TryGetRoot(out CSharpSyntaxNode root)
+        public override int Length
         {
-            return roslynTree.TryGetRoot(out root);
+            get { return _root.FullSpan.Length; }
         }
 
         public override CSharpSyntaxNode GetRoot(CancellationToken cancellationToken)
         {
-            return roslynTree.GetRoot(cancellationToken);
+            return _root;
         }
 
-        /*
-        public override RoslynSyntaxTree WithChangedText(SourceText newText)
+        public override bool TryGetRoot(out CSharpSyntaxNode root)
         {
-            return Wrap(RoslynTree.WithChangedText(newText));
+            root = _root;
+            return true;
         }
-        */
+
+        public override bool HasCompilationUnitRoot
+        {
+            get
+            {
+                return _hasCompilationUnitRoot;
+            }
+        }
+
+        public override CSharpParseOptions Options
+        {
+            get
+            {
+                return _options;
+            }
+        }
 
         public override SyntaxReference GetReference(SyntaxNode node)
         {
-            return roslynTree.GetReference(node);
+            return new SimpleSyntaxReference(node);
         }
 
         public override RoslynSyntaxTree WithRootAndOptions(SyntaxNode root, ParseOptions options)
         {
-            throw new NotImplementedException();
-            return roslynTree.WithRootAndOptions(root, options);
+            if (ReferenceEquals(_root, root) && ReferenceEquals(_options, options))
+            {
+                return this;
+            }
+
+            return new SyntaxTree(
+                null,
+                _encodingOpt,
+                _checksumAlgorithm,
+                _path,
+                (CSharpParseOptions)options,
+                (CSharpSyntaxNode)root,
+                _directives);
         }
 
         public override RoslynSyntaxTree WithFilePath(string path)
         {
-            return roslynTree.WithFilePath(path);
+            if (_path == path)
+            {
+                return this;
+            }
+
+            return new SyntaxTree(
+                _lazyText,
+                _encodingOpt,
+                _checksumAlgorithm,
+                path,
+                _options,
+                _root,
+                _directives);
         }
 
-        public override string FilePath => roslynTree.FilePath;
-
-        public override bool HasCompilationUnitRoot => roslynTree.HasCompilationUnitRoot;
-
-        public override CSharpParseOptions Options => roslynTree.Options;
-
-        public override int Length => roslynTree.Length;
-
-        public override Encoding Encoding => roslynTree.Encoding;
+        public override RoslynSyntaxTree WithChangedText(SourceText newText) => new SyntaxTree((CSharpSyntaxTree)base.WithChangedText(newText));
     }
 }

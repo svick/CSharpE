@@ -25,7 +25,9 @@
     <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
     <StartAction>Program</StartAction>
     <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
-    <StartArguments>/rootsuffix Exp</StartArguments>
+    <VSSDKTargetPlatformRegRootSuffix>Exp</VSSDKTargetPlatformRegRootSuffix>
+    <StartArguments>/rootsuffix $(VSSDKTargetPlatformRegRootSuffix)</StartArguments>
+    <InternalsAssemblyNames>Microsoft.CodeAnalysis;Microsoft.CodeAnalysis.Workspaces;Microsoft.CodeAnalysis.CSharp</InternalsAssemblyNames>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -65,10 +67,6 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <PropertyGroup>
-    <InternalsAssemblyNames>Microsoft.CodeAnalysis;Microsoft.CodeAnalysis.Workspaces;Microsoft.CodeAnalysis.CSharp</InternalsAssemblyNames>
-    <VSSDKTargetPlatformRegRootSuffix>Exp</VSSDKTargetPlatformRegRootSuffix>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="IgnoresAccessChecksToGenerator">
       <Version>0.4.0</Version>

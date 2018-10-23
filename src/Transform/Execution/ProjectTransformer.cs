@@ -65,7 +65,7 @@ namespace CSharpE.Transform.Execution
 
             return new ProjectTransformer(
                 transformProject.SourceFiles.Select(SourceFile.FromSyntaxSourceFile),
-                Enumerable.Empty<LibraryReference>(), Enumerable.Empty<ITransformation>());
+                transformProject.References, Enumerable.Empty<ITransformation>());
         }
 
         public async Task ReloadSourceFilesAsync()
