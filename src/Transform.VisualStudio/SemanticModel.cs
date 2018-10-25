@@ -15,7 +15,7 @@ using Roslyn = msca.Microsoft.CodeAnalysis;
 
 namespace CSharpE.Transform.VisualStudio
 {
-    internal class SemanticModel : CSharpSemanticModel
+    internal class SemanticModel : SyntaxTreeSemanticModel
     {
         private readonly Compilation compilation;
         private readonly RoslynSyntaxTree oldTree;
@@ -23,8 +23,9 @@ namespace CSharpE.Transform.VisualStudio
         private readonly CSharpSemanticModel roslynModel;
 
         public SemanticModel(Compilation compilation, RoslynSyntaxTree oldTree, RoslynSyntaxTree newTree, CSharpSemanticModel roslynModel)
+            : base(compilation.DesignTimeCompilation, newTree)
         {
-            this.compilation = compilation;
+            this.compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
             this.oldTree = oldTree;
             this.newTree = newTree;
             this.roslynModel = roslynModel;
@@ -159,37 +160,7 @@ namespace CSharpE.Transform.VisualStudio
             throw new NotImplementedException();
         }
 
-        public override bool TryGetSpeculativeSemanticModelForMethodBodyCore(SyntaxTreeSemanticModel parentModel, int position, BaseMethodDeclarationSyntax method, out RoslynSemanticModel speculativeModel)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool TryGetSpeculativeSemanticModelForMethodBodyCore(SyntaxTreeSemanticModel parentModel, int position, AccessorDeclarationSyntax accessor, out RoslynSemanticModel speculativeModel)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, TypeSyntax type, SpeculativeBindingOption bindingOption, out RoslynSemanticModel speculativeModel)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, StatementSyntax statement, out RoslynSemanticModel speculativeModel)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, EqualsValueClauseSyntax initializer, out RoslynSemanticModel speculativeModel)
-        {
-            throw new NotImplementedException();
-        }
-
         public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, ArrowExpressionClauseSyntax expressionBody, out RoslynSemanticModel speculativeModel)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, ConstructorInitializerSyntax constructorInitializer, out RoslynSemanticModel speculativeModel)
         {
             throw new NotImplementedException();
         }
@@ -358,12 +329,33 @@ namespace CSharpE.Transform.VisualStudio
 
         public override RoslynSemanticModel ContainingModelOrSelf => throw new NotImplementedException();
 
-        public override CSharpCompilation Compilation => compilation.RoslynCompilation;
+        public override CSharpCompilation Compilation
+        {
+            get
+            {
+                // Compilation is accessed from the base constructor, before compilation is assigned
+                // delegate to base version of that property in that case
+                if (compilation == null)
+                    return base.Compilation;
+
+                return compilation.RoslynCompilation;
+            }
+        }
 
         public override CSharpSyntaxNode Root => (CSharpSyntaxNode)newTree.GetRoot();
 
         public override CSharpSemanticModel ParentModel => throw new NotImplementedException();
 
-        public override RoslynSyntaxTree SyntaxTree => oldTree;
+        public override RoslynSyntaxTree SyntaxTree
+        {
+            get
+            {
+                // the same situation as Compilation
+                if (oldTree == null)
+                    return base.SyntaxTree;
+
+                return oldTree;
+            }
+        }
     }
 }
