@@ -99,6 +99,7 @@ namespace CSharpE.Syntax.Internals
                     return TypeDefinition(baseTypeDeclaration, parent);
                 case IncompleteMemberSyntax _:
                 case FieldDeclarationSyntax _:
+                case MethodDeclarationSyntax _:
                     return new InvalidTypeDefinition(memberDeclarationSyntax, parent);
             }
             throw new InvalidOperationException();

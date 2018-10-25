@@ -23,12 +23,9 @@ namespace CSharpE.Syntax
 
         public NamedTypeReference(string ns, NamedTypeReference container, string name, IEnumerable<TypeReference> typeParameters = null)
         {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentException("Value cannot be null or empty.", nameof(name));
-
             this.ns = ns;
             this.container = container;
-            this.name = name;
+            this.name = name ?? throw new ArgumentNullException("Name cannot be null.", nameof(name));
             this.typeParameters =
                 new TypeList(typeParameters ?? Array.Empty<TypeReference>(), this);
             isKnownType = true;
