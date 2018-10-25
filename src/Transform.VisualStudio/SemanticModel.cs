@@ -82,17 +82,39 @@ namespace CSharpE.Transform.VisualStudio
             roslynModel.ComputeDeclarationsInNode(Adjust(node), getSymbol, builder, cancellationToken, levelsToCompute);
         }
 
+        private TInfo GetInfo<TInfo>(CSharpSyntaxNode node, Func<CSharpSyntaxNode, TInfo> getInfo, Func<int, CSharpSyntaxNode, TInfo> getSpeculativeInfo)
+        {
+            var adjustedNode = Adjust(node);
+
+            if (adjustedNode != null)
+                return getInfo(adjustedNode);
+
+            int adjustedPosition = GetTreeDiff().AdjustLoose(node.Position);
+
+            return getSpeculativeInfo(adjustedPosition, node);
+        }
+
         public override SymbolInfo GetSymbolInfoWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
-            => roslynModel.GetSymbolInfoWorker(Adjust(node), options, cancellationToken);
+            => GetInfo(node, n => roslynModel.GetSymbolInfoWorker(n, options, cancellationToken),
+                (p, n) => roslynModel.GetSpeculativeSymbolInfo(p, n, SpeculativeBindingOption.BindAsExpression));
 
         public override SymbolInfo GetCollectionInitializerSymbolInfoWorker(InitializerExpressionSyntax collectionInitializer, ExpressionSyntax node, CancellationToken cancellationToken = default)
             => roslynModel.GetCollectionInitializerSymbolInfoWorker(Adjust(collectionInitializer), Adjust(node), cancellationToken);
 
         public override CSharpTypeInfo GetTypeInfoWorker(CSharpSyntaxNode node, CancellationToken cancellationToken = default)
-            => roslynModel.GetTypeInfoWorker(Adjust(node), cancellationToken);
+            => GetInfo(node, n => roslynModel.GetTypeInfoWorker(n, cancellationToken),
+                (p, n) => roslynModel.GetSpeculativeTypeInfoWorker(
+                    p, n as ExpressionSyntax ?? throw new NotImplementedException(), SpeculativeBindingOption.BindAsExpression));
 
         public override ImmutableArray<Symbol> GetMemberGroupWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
-            => roslynModel.GetMemberGroupWorker(Adjust(node), options, cancellationToken);
+        {
+            var adjusted = Adjust(node);
+
+            if (adjusted == null)
+                return ImmutableArray<Symbol>.Empty;
+
+            return roslynModel.GetMemberGroupWorker(adjusted, options, cancellationToken);
+        }
 
         public override ImmutableArray<PropertySymbol> GetIndexerGroupWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
             => roslynModel.GetIndexerGroupWorker(Adjust(node), options, cancellationToken);
@@ -123,7 +145,14 @@ namespace CSharpE.Transform.VisualStudio
         }
 
         public override Binder GetEnclosingBinderInternal(int position)
-            => roslynModel.GetEnclosingBinderInternal(GetTreeDiff().Adjust(position) ?? throw new NotImplementedException());
+        {
+            int? adjusted = GetTreeDiff().Adjust(position);
+
+            if (adjusted == null)
+                return null;
+
+            return roslynModel.GetEnclosingBinderInternal(adjusted.Value);
+        }
 
         public override MemberSemanticModel GetMemberModel(SyntaxNode node)
         {
@@ -181,7 +210,14 @@ namespace CSharpE.Transform.VisualStudio
         }
 
         public override ISymbol GetDeclaredSymbol(MemberDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        {
+            var adjusted = Adjust(declarationSyntax);
+
+            if (adjusted == null)
+                return null;
+
+            return roslynModel.GetDeclaredSymbol(adjusted, cancellationToken);
+        }
 
         public override ISymbol GetDeclaredSymbol(LocalFunctionStatementSyntax declarationSyntax, CancellationToken cancellationToken = default)
             => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
@@ -234,7 +270,14 @@ namespace CSharpE.Transform.VisualStudio
             => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override ISymbol GetDeclaredSymbol(VariableDeclaratorSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        {
+            var adjusted = Adjust(declarationSyntax);
+
+            if (adjusted == null)
+                return null;
+
+            return roslynModel.GetDeclaredSymbol(adjusted, cancellationToken);
+        }
 
         public override ISymbol GetDeclaredSymbol(SingleVariableDesignationSyntax declarationSyntax, CancellationToken cancellationToken = default)
             => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
@@ -255,7 +298,14 @@ namespace CSharpE.Transform.VisualStudio
             => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
 
         public override ImmutableArray<ISymbol> GetDeclaredSymbols(BaseFieldDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbols(Adjust(declarationSyntax), cancellationToken);
+        {
+            var adjusted = Adjust(declarationSyntax);
+
+            if (adjusted == null)
+                return ImmutableArray<ISymbol>.Empty;
+
+            return roslynModel.GetDeclaredSymbols(adjusted, cancellationToken);
+        }
 
         public override ITypeParameterSymbol GetDeclaredSymbol(TypeParameterSyntax typeParameter, CancellationToken cancellationToken = default)
         {

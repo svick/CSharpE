@@ -6,7 +6,7 @@ using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
 
 namespace CSharpE.Transform.VisualStudio
 {
-    internal class SyntaxTreeDiff
+    public class SyntaxTreeDiff
     {
         private readonly RoslynSyntaxTree oldTree;
         private readonly RoslynSyntaxTree newTree;
@@ -57,13 +57,13 @@ namespace CSharpE.Transform.VisualStudio
 
             foreach (var change in changes)
             {
-                result = Adjust(result, change);
+                result = Adjust(position, result, change);
             }
 
             return result;
         }
 
-        private static int? Adjust(int? position, TextChangeRange change)
+        private static int? Adjust(int originalPosition, int? position, TextChangeRange change, bool loose = false)
         {
             if (position == null)
                 return null;
@@ -72,14 +72,28 @@ namespace CSharpE.Transform.VisualStudio
 
             int diff = change.NewLength - change.Span.Length;
 
-            if (change.Span.End < pos)
+            if (change.Span.End <= originalPosition)
                 return pos + diff;
 
-            if (change.Span.Start > pos)
+            if (change.Span.Start > originalPosition)
                 return pos;
 
-            // TODO?
+            if (loose)
+                return pos + (originalPosition - change.Span.Start);
+
             return null;
+        }
+
+        public int AdjustLoose(int position)
+        {
+            int? result = position;
+
+            foreach (var change in changes)
+            {
+                result = Adjust(position, result, change, loose: true);
+            }
+
+            return result.Value;
         }
     }
 }

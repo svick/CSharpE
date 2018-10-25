@@ -16,4 +16,10 @@
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="CSharpE.Transform.VisualStudio">
+      <HintPath>..\..\src\Transform.VisualStudio\obj\$(Configuration)\CSharpE.Transform.VisualStudio.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

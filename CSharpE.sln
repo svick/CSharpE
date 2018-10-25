@@ -27,6 +27,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transform.Tests", "test\Transform.Tests\Transform.Tests.csproj", "{C3849BA5-F511-4083-B7AD-068502BDFA47}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F5AC9ADB-1EBB-4916-95D5-547997BCDC35} = {F5AC9ADB-1EBB-4916-95D5-547997BCDC35}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestUtilities", "test\TestUtilities\TestUtilities.csproj", "{F5E0644E-D7F0-40FB-BE70-DEFA3AC2E94E}"
 EndProject

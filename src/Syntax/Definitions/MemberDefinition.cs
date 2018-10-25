@@ -86,7 +86,7 @@ namespace CSharpE.Syntax
             return false;
         }
 
-        private static Roslyn::SyntaxList<AttributeListSyntax> GetAttributeLists(MemberDeclarationSyntax syntax)
+        private static SyntaxList<AttributeListSyntax> GetAttributeLists(MemberDeclarationSyntax syntax)
         {
             switch (syntax)
             {
@@ -94,14 +94,16 @@ namespace CSharpE.Syntax
                     return default;
                 case BaseFieldDeclarationSyntax fieldDeclaration:
                     return fieldDeclaration.AttributeLists;
-								case BasePropertyDeclarationSyntax propertyDeclaration:
-										return propertyDeclaration.AttributeLists;
+                case BasePropertyDeclarationSyntax propertyDeclaration:
+                    return propertyDeclaration.AttributeLists;
                 case BaseMethodDeclarationSyntax methodDeclaration:
                     return methodDeclaration.AttributeLists;
                 case BaseTypeDeclarationSyntax typeDeclaration:
                     return typeDeclaration.AttributeLists;
                 case DelegateDeclarationSyntax delegateDeclaration:
                     return delegateDeclaration.AttributeLists;
+                case IncompleteMemberSyntax incompleteMember:
+                    return incompleteMember.AttributeLists;
             }
 
             throw new NotImplementedException(syntax.GetType().Name);

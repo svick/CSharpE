@@ -82,6 +82,8 @@ namespace CSharpE.Syntax.Internals
                     return TypeDefinition(baseTypeDeclaration, containingType);
                 case DelegateDeclarationSyntax delegateDeclaration:
                     return new DelegateDefinition(delegateDeclaration, containingType);
+                case IncompleteMemberSyntax incompleteMember:
+                    return new IncompleteMemberDefinition(incompleteMember, containingType);
                 default:
                     throw new NotImplementedException(memberDeclarationSyntax.GetType().Name);
             }
@@ -95,6 +97,9 @@ namespace CSharpE.Syntax.Internals
                     return new DelegateDefinition(delegateDeclaration, parent);
                 case BaseTypeDeclarationSyntax baseTypeDeclaration:
                     return TypeDefinition(baseTypeDeclaration, parent);
+                case IncompleteMemberSyntax _:
+                case FieldDeclarationSyntax _:
+                    return new InvalidTypeDefinition(memberDeclarationSyntax, parent);
             }
             throw new InvalidOperationException();
         }
