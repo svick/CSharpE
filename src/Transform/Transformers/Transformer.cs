@@ -25,6 +25,8 @@ namespace CSharpE.Transform.Transformers
             }
             else
             {
+                // TODO: check that designTime hasn't changed
+
                 innerTransformer.Transform(project, project);
             }
         }

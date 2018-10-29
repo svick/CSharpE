@@ -12,7 +12,5 @@ namespace CSharpE.Transform.VisualStudio
     {
         public static SyntaxTree Wrap(RoslynSyntaxTree roslynTree) => new SyntaxTree(roslynTree);
         public static RoslynSyntaxTree Unwrap(RoslynSyntaxTree tree) => ((SyntaxTree)tree).RoslynTree;
-
-        public static Compilation Wrap(RoslynCompilation roslynCompilation) => new Compilation(roslynCompilation);
     }
 }

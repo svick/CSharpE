@@ -26,6 +26,7 @@
     <StartAction>Program</StartAction>
     <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
+    <VSSDKTargetPlatformRegRootSuffix>Exp</VSSDKTargetPlatformRegRootSuffix>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,11 +46,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Compilation.cs" />
+    <Compile Include="CompilationDiff.cs" />
     <Compile Include="CompletionService.cs" />
+    <Compile Include="ProjectInfo.cs" />
+    <Compile Include="RoslynExtensions.cs" />
+    <Compile Include="SyntaxDiffer.cs" />
     <Compile Include="SyntaxTree.cs" />
-    <Compile Include="CompilationFactoryService.cs" />
-    <Compile Include="SyntaxTreeFactoryService.cs" />
+    <Compile Include="SyntaxTreeDiff.cs" />
     <Compile Include="LanguageServices.cs" />
     <Compile Include="Metadata.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -73,6 +76,13 @@
     <PackageReference Include="Microsoft.VisualStudio.Composition">
       <Version>15.8.98</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Transform\Transform.csproj">
+      <Project>{44252356-0DD1-4369-A817-559EDDF5B5B5}</Project>
+      <Name>Transform</Name>
+      <AdditionalProperties>TargetFramework=net46</AdditionalProperties>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

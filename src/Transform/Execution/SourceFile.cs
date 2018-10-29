@@ -21,6 +21,9 @@ namespace CSharpE.Transform.Execution
             Tree = tree;
         }
 
+        public SourceFile(SyntaxTree tree)
+            : this(tree.FilePath, tree) { }
+
         internal Syntax.SourceFile ToSyntaxSourceFile() => new Syntax.SourceFile(Path, Tree);
 
         public static SourceFile FromSyntaxSourceFile(Syntax.SourceFile syntaxSourceFile) =>

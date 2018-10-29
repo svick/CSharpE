@@ -5,34 +5,30 @@ using CSharpE.Syntax;
 using CSharpE.Transform.Execution;
 using CSharpE.Transform.Internals;
 using CSharpE.Transform.Transformers;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CSharpE.Transform
 {
-    internal class TransformProject : Syntax.Project
+    internal sealed class TransformProject : Project
     {
         private readonly Action<LogAction> onLog;
-
-        private readonly List<Syntax.SourceFile> additionalSourceFiles;
-
-        protected override IEnumerable<Syntax.SourceFile> ActualSourceFiles => SourceFiles.Concat(additionalSourceFiles);
 
         public TransformProject(
             IEnumerable<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
             Action<LogAction> onLog = null)
-            : this(sourceFiles.ToList(), additionalReferences)
+            : this(sourceFiles.ToList(), additionalReferences, null, onLog) { }
+
+        internal TransformProject(
+            IEnumerable<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
+            CSharpCompilation compilation, Action<LogAction> onLog = null)
+            : base(sourceFiles.ToList(), additionalReferences, compilation)
         {
             this.onLog = onLog;
         }
 
-        private TransformProject(List<Syntax.SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
-            : base(sourceFiles, additionalReferences)
-        {
-            additionalSourceFiles = sourceFiles.Except(SourceFiles).ToList();
-        }
-
         public TransformProject(IEnumerable<Syntax.SourceFile> sourceFiles) : this(sourceFiles, Array.Empty<LibraryReference>()) { }
 
-        public TransformProject(Syntax.Project project) : this(project.SourceFiles, project.References) { }
+        public TransformProject(Project project) : this(project.SourceFiles, project.References) { }
 
         internal TransformerBuilder TransformerBuilder { get; set; }
 

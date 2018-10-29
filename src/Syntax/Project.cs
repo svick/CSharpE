@@ -13,8 +13,6 @@ namespace CSharpE.Syntax
         
         public IList<SourceFile> SourceFiles { get; }
 
-        protected virtual IEnumerable<SourceFile> ActualSourceFiles => SourceFiles;
-        
         public IList<LibraryReference> References { get; }
 
         private CSharpCompilation compilation;
@@ -24,7 +22,7 @@ namespace CSharpE.Syntax
             {
                 // TODO: if References changed, alter the compilation
 
-                var trees = ActualSourceFiles.Select(file => file.GetSyntaxTree()).ToList();
+                var trees = SourceFiles.Select(file => file.GetSyntaxTree()).ToList();
 
                 if (compilation == null)
                 {
@@ -41,12 +39,10 @@ namespace CSharpE.Syntax
             }
         }
 
-        public Project(CSharpCompilation compilation)
-        {
-            throw new NotImplementedException();
-        }
-
         public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
+            : this(sourceFiles, additionalReferences, null) { }
+
+        internal Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences, CSharpCompilation compilation)
         {
             SourceFiles = sourceFiles.ToList();
 
@@ -56,6 +52,8 @@ namespace CSharpE.Syntax
             }
 
             References = DefaultReferences.Union(additionalReferences).ToList();
+
+            this.compilation = compilation;
         }
 
         public Project(IEnumerable<SourceFile> sourceFiles)
