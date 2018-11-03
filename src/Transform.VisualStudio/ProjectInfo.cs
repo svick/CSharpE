@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CSharpE.Transform.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.VisualStudio.Threading;
 
 namespace CSharpE.Transform.VisualStudio
 {
@@ -16,6 +17,8 @@ namespace CSharpE.Transform.VisualStudio
         private static ConcurrentDictionary<ProjectId, ProjectInfo> cache = new ConcurrentDictionary<ProjectId, ProjectInfo>();
 
         public static ProjectInfo Get(Project project) => cache.GetOrAdd(project.Id, _ => new ProjectInfo());
+
+        private AsyncSemaphore semaphore = new AsyncSemaphore(1);
 
         private Project oldProject;
         private Project transformedProject;
@@ -40,68 +43,84 @@ namespace CSharpE.Transform.VisualStudio
             return (adjustedDocument, adjustedPosition);
         }
 
-        private async Task<Project> Adjust(Project project)
+        public async Task<Document> Adjust(Document document)
         {
-            if (oldProject == project)
-                return transformedProject;
+            var project = document.Project;
 
-            var compilation = (CSharpCompilation)await project.GetCompilationAsync();
+            var adjustedProject = await Adjust(project);
 
-            // PERF: don't recreate transfomer when references change
+            if (adjustedProject == null)
+                return document;
 
-            if (transformer == null ||
-                !oldProject.MetadataReferences.SequenceEqual(project.MetadataReferences) ||
-                !oldProject.ProjectReferences.SequenceEqual(project.ProjectReferences))
+            return adjustedProject.GetDocument(document.Id);
+        }
+
+        public async Task<Project> Adjust(Project project)
+        {
+            using (await semaphore.EnterAsync())
             {
-                transformer = CreateTransformer(compilation);
+                if (oldProject == project)
+                    return transformedProject;
+
+                var compilation = (CSharpCompilation)await project.GetCompilationAsync();
+
+                // PERF: don't recreate transfomer when references change
+
+                if (transformer == null ||
+                    !oldProject.MetadataReferences.SequenceEqual(project.MetadataReferences) ||
+                    !oldProject.ProjectReferences.SequenceEqual(project.ProjectReferences))
+                {
+                    transformer = CreateTransformer(compilation);
+                }
+                else
+                {
+                    // TODO: what if transformations were added or removed?
+                    // (because a reference changed even though it compared equal above)
+
+                    transformer.ReloadFromCompilation(compilation);
+                }
+
+                if (transformer == null)
+                    return null;
+
+                var result = transformer.Transform(designTime: true);
+
+                var resultProject = oldProject ?? project;
+
+                // TODO: references
+
+                // PERF: use Dictionary?
+                var toUpdate = (from document in resultProject.Documents
+                                let sourceFile = result.SourceFiles.SingleOrDefault(sf => sf.Path == document.FilePath)
+                                where sourceFile != null
+                                select (documentId: document.Id, sourceFile)).ToList();
+
+                // update
+                foreach (var (documentId, sourceFile) in toUpdate)
+                {
+                    resultProject = resultProject.GetDocument(documentId).WithSyntaxRoot(await sourceFile.Tree.GetRootAsync()).Project;
+                }
+
+                // remove
+                foreach (var documentId in resultProject.DocumentIds.Where(id => !toUpdate.Any(pair => pair.documentId == id)))
+                {
+                    resultProject = resultProject.RemoveDocument(documentId);
+                }
+
+                // add
+                foreach (var sourceFile in result.SourceFiles.Where(sf => !toUpdate.Any(pair => pair.sourceFile == sf)))
+                {
+                    resultProject = resultProject.AddDocument(
+                        Path.GetFileName(sourceFile.Path), await sourceFile.Tree.GetRootAsync(), filePath: sourceFile.Path).Project;
+                }
+
+                oldProject = project;
+                transformedProject = resultProject;
+                // PERF: lazy?
+                diff = new CompilationDiff(await project.GetCompilationAsync(), await resultProject.GetCompilationAsync());
+
+                return resultProject;
             }
-            else
-            {
-                // TODO: what if transformations were added or removed?
-                // (because a reference changed even though it compared equal above)
-
-                transformer.ReloadFromCompilation(compilation);
-            }
-
-            if (transformer == null)
-                return null;
-
-            var result = transformer.Transform(designTime: true);
-
-            var resultProject = oldProject ?? project;
-
-            // TODO: references
-
-            // PERF: use Dictionary?
-            var toUpdate = (from document in resultProject.Documents
-                           let sourceFile = result.SourceFiles.SingleOrDefault(sf => sf.Path == document.FilePath)
-                           where sourceFile != null
-                           select (documentId: document.Id, sourceFile)).ToList();
-
-            // update
-            foreach (var (documentId, sourceFile) in toUpdate)
-            {
-                resultProject = resultProject.GetDocument(documentId).WithSyntaxRoot(sourceFile.Tree.GetRoot()).Project;
-            }
-
-            // remove
-            foreach (var documentId in resultProject.DocumentIds.Where(id => !toUpdate.Any(pair => pair.documentId == id)))
-            {
-                resultProject = resultProject.RemoveDocument(documentId);
-            }
-
-            // add
-            foreach (var sourceFile in result.SourceFiles.Where(sf => !toUpdate.Any(pair => pair.sourceFile == sf)))
-            {
-                resultProject = resultProject.AddDocument(Path.GetFileName(sourceFile.Path), sourceFile.Tree.GetRoot(), filePath: sourceFile.Path).Project;
-            }
-
-            oldProject = project;
-            transformedProject = resultProject;
-            // PERF: lazy?
-            diff = new CompilationDiff(await project.GetCompilationAsync(), await resultProject.GetCompilationAsync());
-
-            return resultProject;
         }
 
         private ProjectTransformer CreateTransformer(CSharpCompilation compilation)

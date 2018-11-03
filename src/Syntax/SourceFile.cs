@@ -141,7 +141,43 @@ namespace CSharpE.Syntax
             }
         }
 
-        internal void EnsureUsingNamespace(string ns) => additionalNamespaces.Add(ns);
+        private readonly List<UsingNamespaceRecorder> usingNamespaceRecorders = new List<UsingNamespaceRecorder>();
+
+        internal void EnsureUsingNamespace(string ns)
+        {
+            foreach (var recorder in usingNamespaceRecorders)
+            {
+                recorder.Record(ns);
+            }
+
+            additionalNamespaces.Add(ns);
+        }
+
+        internal UsingNamespaceRecorder RecordUsingNamespaces()
+        {
+            var recorder = new UsingNamespaceRecorder(this);
+
+            usingNamespaceRecorders.Add(recorder);
+
+            return recorder;
+        }
+
+        internal class UsingNamespaceRecorder
+        {
+            private readonly SourceFile sourceFile;
+            private readonly HashSet<string> namespaces = new HashSet<string>();
+
+            public UsingNamespaceRecorder(SourceFile sourceFile) => this.sourceFile = sourceFile;
+
+            internal void Record(string ns) => namespaces.Add(ns);
+
+            internal IEnumerable<string> StopAndGetResult()
+            {
+                sourceFile.usingNamespaceRecorders.Remove(this);
+
+                return namespaces;
+            }
+        }
 
         private SyntaxTree GetWrapped(ref bool? changed)
         {

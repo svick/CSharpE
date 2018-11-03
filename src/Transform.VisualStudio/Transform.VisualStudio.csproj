@@ -27,6 +27,7 @@
     <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
     <VSSDKTargetPlatformRegRootSuffix>Exp</VSSDKTargetPlatformRegRootSuffix>
+    <InternalsAssemblyNames>Microsoft.CodeAnalysis;Microsoft.CodeAnalysis.Workspaces;Microsoft.CodeAnalysis.CSharp;Microsoft.CodeAnalysis.Features</InternalsAssemblyNames>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,6 +49,7 @@
   <ItemGroup>
     <Compile Include="CompilationDiff.cs" />
     <Compile Include="CompletionService.cs" />
+    <Compile Include="DiagnosticAnalyzerService.cs" />
     <Compile Include="ProjectInfo.cs" />
     <Compile Include="RoslynExtensions.cs" />
     <Compile Include="SyntaxDiffer.cs" />
@@ -63,9 +65,6 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <PropertyGroup>
-    <InternalsAssemblyNames>Microsoft.CodeAnalysis;Microsoft.CodeAnalysis.Workspaces</InternalsAssemblyNames>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="IgnoresAccessChecksToGenerator">
       <Version>0.4.0</Version>
@@ -76,8 +75,16 @@
     <PackageReference Include="Microsoft.VisualStudio.Composition">
       <Version>15.8.98</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Threading">
+      <Version>15.8.168</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Syntax\Syntax.csproj">
+      <Project>{1b8b6800-7718-4bd4-9cf2-c37af6ec69ed}</Project>
+      <Name>Syntax</Name>
+      <AdditionalProperties>TargetFramework=net46</AdditionalProperties>
+    </ProjectReference>
     <ProjectReference Include="..\Transform\Transform.csproj">
       <Project>{44252356-0DD1-4369-A817-559EDDF5B5B5}</Project>
       <Name>Transform</Name>
