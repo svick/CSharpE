@@ -1,9 +1,4 @@
-﻿1. try changing the language of *.cs files in VS to `CSharpE` by using `IContentTypeRegistryService`
-2. if that doesn't work, use the hack of setting `ServiceLayer` to `Host`
-
----
-
-- remove the "persistent" term from the codebase (and maybe also "cloneable"?)
+﻿- remove the "persistent" term from the codebase (and maybe also "cloneable"?)
 
 ---
 
@@ -15,6 +10,7 @@
   - optional: make it more efficient using copy on write 
 - add tests ensuring mutating smart inputs (incl. syntax nodes) throws
 - make most classes `sealed`
+- look into how InvocationReasons.SemanticChanged works and if it could be used to decide when to rerun the whole transformation
 
 ---
 

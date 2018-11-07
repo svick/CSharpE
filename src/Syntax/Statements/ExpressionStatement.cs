@@ -6,9 +6,12 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class ExpressionStatement : Statement, ISyntaxWrapper<ExpressionStatementSyntax>
+    // Roslyn doesn't allow ThrowExpression inside an ExpressionStatement, instead it uses ThrowStatement
+    // CSharpE always uses ThrowExpression and doesn't have ThrowStatement
+    // so this class has to translate between the two
+    public sealed class ExpressionStatement : Statement
     {
-        private ExpressionStatementSyntax syntax;
+        private StatementSyntax syntax;
 
         internal ExpressionStatement(ExpressionStatementSyntax syntax, SyntaxNode parent)
         {
@@ -25,24 +28,47 @@ namespace CSharpE.Syntax
             get
             {
                 if (expression == null)
-                    expression = FromRoslyn.Expression(syntax.Expression, this);
+                    expression = syntax is ThrowStatementSyntax throwStatement
+                        ? SyntaxFactory.Throw(FromRoslyn.Expression(throwStatement.Expression, this))
+                        : FromRoslyn.Expression(((ExpressionStatementSyntax)syntax).Expression, this);
 
                 return expression;
             }
             set => SetNotNull(ref expression, value);
         }
 
-        ExpressionStatementSyntax ISyntaxWrapper<ExpressionStatementSyntax>.GetWrapped(ref bool? changed)
+        private protected override StatementSyntax GetWrappedStatement(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
             bool? thisChanged = false;
 
-            var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
+            ExpressionSyntax newExpression;
+            bool newIsThrow = false;
 
-            if (syntax == null || thisChanged == true)
+            if (expression is ThrowExpression throwExpression)
             {
-                syntax = CSharpSyntaxFactory.ExpressionStatement(newExpression);
+                newExpression = throwExpression.Operand.GetWrapped(ref thisChanged);
+                newIsThrow = true;
+            }
+            else if (expression == null && syntax is ThrowStatementSyntax throwStatement)
+            {
+                newExpression = throwStatement.Expression;
+                newIsThrow = true;
+            }
+            else
+            {
+                newExpression = expression?.GetWrapped(ref thisChanged) ?? ((ExpressionStatementSyntax)syntax).Expression;
+            }
+
+            bool oldIsThrow = syntax is ThrowStatementSyntax;
+
+            if (syntax == null || newIsThrow != oldIsThrow || thisChanged == true)
+            {
+                if (newIsThrow)
+                    syntax = CSharpSyntaxFactory.ThrowStatement(newExpression);
+                else
+                    syntax = CSharpSyntaxFactory.ExpressionStatement(newExpression);
 
                 SetChanged(ref changed);
             }
@@ -50,12 +76,9 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        private protected override StatementSyntax GetWrappedStatement(ref bool? changed) =>
-            this.GetWrapped<ExpressionStatementSyntax>(ref changed);
-
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            syntax = (ExpressionStatementSyntax)newSyntax;
+            syntax = (StatementSyntax)newSyntax;
 
             Set(ref expression, null);
         }
