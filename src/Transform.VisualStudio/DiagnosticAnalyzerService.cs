@@ -1,29 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Options;
+using Microsoft.CodeAnalysis.Shared.TestHooks;
 using Microsoft.CodeAnalysis.SolutionCrawler;
 using Microsoft.VisualStudio.Composition;
 
 namespace CSharpE.Transform.VisualStudio
 {
-    // "CSharpE" is a sentinel value so that it's possible to identify this type from metadata
-    [ExportIncrementalAnalyzerProvider(true, WellKnownSolutionCrawlerAnalyzers.Diagnostic, workspaceKinds: new[] { WorkspaceKind.Host, nameof(CSharpE) })]
-    internal class DefaultDiagnosticAnalyzerService : IIncrementalAnalyzerProvider//, IDiagnosticUpdateSource
+    [ExportIncrementalAnalyzerProvider(true, WellKnownSolutionCrawlerAnalyzers.Diagnostic, workspaceKinds: new[] { WorkspaceKind.Host })]
+    internal class DiagnosticAnalyzerService : IIncrementalAnalyzerProvider//, IDiagnosticUpdateSource
     {
-        private readonly Lazy<IIncrementalAnalyzerProvider> lazyRoslynAnalyzerProvider;
+        private readonly DiagnosticAnalyzerService2 diagnosticAnalyzerService;
 
         [ImportingConstructor]
-        public DefaultDiagnosticAnalyzerService(ExportProvider exportProvider) =>
-            lazyRoslynAnalyzerProvider = exportProvider.GetExports<IIncrementalAnalyzerProvider, IncrementalAnalyzerProviderMetadata>()
-                .Single(lazy => lazy.Metadata.Name == WellKnownSolutionCrawlerAnalyzers.Diagnostic && lazy.Metadata.WorkspaceKinds != null &&
-                    lazy.Metadata.WorkspaceKinds.Contains(WorkspaceKind.Host) && !lazy.Metadata.WorkspaceKinds.Contains(nameof(CSharpE)));
+        public DiagnosticAnalyzerService(DiagnosticAnalyzerService2 diagnosticAnalyzerService) => 
+            this.diagnosticAnalyzerService = diagnosticAnalyzerService;
 
-        public IIncrementalAnalyzer CreateIncrementalAnalyzer(Workspace workspace) => new IncrementalAnalyzer(lazyRoslynAnalyzerProvider.Value.CreateIncrementalAnalyzer(workspace));
+        public IIncrementalAnalyzer CreateIncrementalAnalyzer(Workspace workspace) =>
+            new IncrementalAnalyzer(diagnosticAnalyzerService.CreateIncrementalAnalyzer(workspace));
 
         class IncrementalAnalyzer : IIncrementalAnalyzer
         {
@@ -69,6 +69,38 @@ namespace CSharpE.Transform.VisualStudio
             {
                 throw new NotImplementedException();
             }
+        }
+    }
+
+    [Export(typeof(DiagnosticAnalyzerService2))]
+    internal class DiagnosticAnalyzerService2 : Microsoft.CodeAnalysis.Diagnostics.DiagnosticAnalyzerService, IDiagnosticUpdateSource
+    {
+        [ImportingConstructor]
+        public DiagnosticAnalyzerService2(
+            IDiagnosticUpdateSourceRegistrationService registrationService,
+            IAsynchronousOperationListenerProvider listenerProvider,
+            PrimaryWorkspace primaryWorkspace,
+            [Import(AllowDefault = true)]IWorkspaceDiagnosticAnalyzerProviderService diagnosticAnalyzerProviderService,
+            [Import(AllowDefault = true)]AbstractHostDiagnosticUpdateSource hostDiagnosticUpdateSource)
+            : base(registrationService, listenerProvider, primaryWorkspace, diagnosticAnalyzerProviderService, hostDiagnosticUpdateSource)
+        { }
+
+        private DiagnosticData Adjust(DiagnosticData data) => throw new NotImplementedException();
+
+        private DiagnosticsUpdatedArgs Adjust(DiagnosticsUpdatedArgs args)
+        {
+            if (args.Diagnostics.IsEmpty)
+                return args;
+
+            return DiagnosticsUpdatedArgs.DiagnosticsCreated(
+                args.Id, args.Workspace, args.Solution, args.ProjectId, args.DocumentId,
+                ImmutableArray.CreateRange(args.Diagnostics.Select(Adjust)));
+        }
+
+        public new event EventHandler<DiagnosticsUpdatedArgs> DiagnosticsUpdated
+        {
+            add => base.DiagnosticsUpdated += (s, e) => value(s, Adjust(e));
+            remove => throw new NotImplementedException();
         }
     }
 }
