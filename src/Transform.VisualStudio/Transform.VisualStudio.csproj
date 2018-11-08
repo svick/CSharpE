@@ -49,7 +49,6 @@
   <ItemGroup>
     <Compile Include="Compilation.cs" />
     <Compile Include="CompilationDiff.cs" />
-    <Compile Include="CompletionService.cs" />
     <Compile Include="RoslynExtensions.cs" />
     <Compile Include="SemanticModel.cs" />
     <Compile Include="SyntaxDiffer.cs" />
