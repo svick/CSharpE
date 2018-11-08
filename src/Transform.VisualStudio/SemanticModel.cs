@@ -120,10 +120,8 @@ namespace CSharpE.Transform.VisualStudio
         public override ImmutableArray<PropertySymbol> GetIndexerGroupWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
             => roslynModel.GetIndexerGroupWorker(Adjust(node), options, cancellationToken);
 
-        public override Optional<object> GetConstantValueWorker(CSharpSyntaxNode node, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+        public override Optional<object> GetConstantValueWorker(CSharpSyntaxNode node, CancellationToken cancellationToken = default) =>
+            roslynModel.GetConstantValueWorker(Adjust(node), cancellationToken);
 
         public override SymbolInfo GetSymbolInfo(OrderingSyntax node, CancellationToken cancellationToken = default)
         {
