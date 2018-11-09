@@ -153,10 +153,7 @@ namespace CSharpE.Transform.VisualStudio
             return roslynModel.GetEnclosingBinderInternal(adjusted.Value);
         }
 
-        public override MemberSemanticModel GetMemberModel(SyntaxNode node)
-        {
-            throw new NotImplementedException();
-        }
+        public override MemberSemanticModel GetMemberModel(SyntaxNode node) => roslynModel.GetMemberModel(Adjust(node));
 
         public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, ArrowExpressionClauseSyntax expressionBody, out RoslynSemanticModel speculativeModel)
         {

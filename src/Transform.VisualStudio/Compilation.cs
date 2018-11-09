@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Reflection;
 using System.Reflection.Metadata;
 using CSharpE.Transform.Execution;
@@ -130,6 +131,54 @@ namespace CSharpE.Transform.VisualStudio
             }
         }
 
+        private AsyncQueue<CompilationEvent> Adjust(AsyncQueue<CompilationEvent> eventQueue)
+        {
+            if (eventQueue == null)
+                return null;
+
+            var oldQueue = eventQueue;
+            var newQueue = new AsyncQueue<CompilationEvent>();
+
+            // if this method throws an exception, there is no good way to handle it
+            // so use async void, which will raise the exception on the synchronization context
+            async void PropagateEvents()
+            {
+                try
+                {
+                    while (true)
+                    {
+                        var e = await newQueue.DequeueAsync();
+
+                        CompilationEvent newEvent;
+
+                        switch (e)
+                        {
+                            case SymbolDeclaredCompilationEvent symbolDeclared:
+                                newEvent = new SymbolDeclaredCompilationEvent(this, symbolDeclared.Symbol);
+                                break;
+                            case CompilationUnitCompletedEvent compilationUnitCompleted:
+                                newEvent = new CompilationUnitCompletedEvent(this, AdjustReverse(compilationUnitCompleted.CompilationUnit));
+                                break;
+                            case CompilationStartedEvent compilationStarted:
+                                newEvent = new CompilationStartedEvent(this);
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
+
+                        oldQueue.Enqueue(newEvent);
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                }
+            }
+
+            PropagateEvents();
+
+            return newQueue;
+        }
+
         private CSharpCompilation CreateDesignTimeCompilation()
         {
             if (Transformer == null)
@@ -140,7 +189,7 @@ namespace CSharpE.Transform.VisualStudio
             return (CSharpCompilation)CSharpCompilation.Create(
                 RoslynCompilation.AssemblyName, transformed.SourceFiles.Select(file => file.Tree),
                 transformed.AdditionalReferences.Select(reference => reference.GetMetadataReference()),
-                RoslynCompilation.Options).WithEventQueue(EventQueue);
+                RoslynCompilation.Options).WithEventQueue(Adjust(EventQueue));
         }
 
         private readonly Lazy<CSharpCompilation> designTimeCompilation;
@@ -158,6 +207,10 @@ namespace CSharpE.Transform.VisualStudio
             }
         }
 
+        private RoslynSyntaxTree AdjustReverse(RoslynSyntaxTree syntaxTree) => this.GetTree(syntaxTree.FilePath);
+
+        private RoslynSyntaxTree Adjust(RoslynSyntaxTree syntaxTree) => DesignTimeCompilation.GetTree(syntaxTree.FilePath);
+
         #region overrides
         protected override RoslynCompilation CommonClone()
         {
@@ -166,7 +219,7 @@ namespace CSharpE.Transform.VisualStudio
 
         protected override RoslynSemanticModel CommonGetSemanticModel(RoslynSyntaxTree syntaxTree, bool ignoreAccessibility)
         {
-            var newTree = DesignTimeCompilation.GetTree(syntaxTree.FilePath);
+            var newTree = Adjust(syntaxTree);
             var roslynModel = (CSharpSemanticModel)DesignTimeCompilation.GetSemanticModel(newTree, ignoreAccessibility);
             return new SemanticModel(this, syntaxTree, newTree, roslynModel);
         }

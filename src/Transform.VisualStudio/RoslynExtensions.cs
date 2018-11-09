@@ -1,17 +1,17 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
+using RoslynCompilation = Microsoft.CodeAnalysis.Compilation;
 
 namespace CSharpE.Transform.VisualStudio
 {
     internal static class RoslynExtensions
     {
-        public static RoslynSyntaxTree GetTree(this CSharpCompilation compilation, string filePath)
+        public static RoslynSyntaxTree GetTree(this RoslynCompilation compilation, string filePath)
             => compilation.SyntaxTrees.Single(tree => tree.FilePath == filePath);
 
-        public static RoslynSyntaxTree GetTreeOrDefault(this CSharpCompilation compilation, string filePath)
+        public static RoslynSyntaxTree GetTreeOrDefault(this RoslynCompilation compilation, string filePath)
         {
             // PERF: unnecessary List allocation
             var trees = compilation.SyntaxTrees.Where(tree => tree.FilePath == filePath).ToList();
