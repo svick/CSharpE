@@ -40,7 +40,7 @@ namespace CSharpE.Transform.VisualStudio
             _checksumAlgorithm = checksumAlgorithm;
             _options = options;
             _path = path ?? string.Empty;
-            _root = this.CloneNodeAsRoot(Annotate(root));
+            _root = this.CloneNodeAsRoot(Annotate(SyntaxNode.CloneNodeAsRoot(root, null)));
             _hasCompilationUnitRoot = root.Kind() == SyntaxKind.CompilationUnit;
             _directives = directives;
             this.SetDirectiveStack(directives);
