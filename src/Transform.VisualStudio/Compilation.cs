@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -131,6 +132,22 @@ namespace CSharpE.Transform.VisualStudio
             }
         }
 
+
+        private static int nextId;
+        private static readonly ConcurrentDictionary<Compilation, int> ids = new ConcurrentDictionary<Compilation, int>();
+        internal void Log(string message)
+        {
+            int id = ids.GetOrAdd(this, _ => Interlocked.Increment(ref nextId));
+
+            lock (ids)
+                File.AppendAllLines(@"C:\temp\log.txt", new[] { $"Compilation #{id}: {message}" });
+        }
+
+        internal object eventQueueProcessingLock = new object();
+        internal readonly HashSet<RoslynSyntaxTree> completedCompilationUnits = new HashSet<RoslynSyntaxTree>();
+        internal int eventQueueProcessingSemaphoreCounter = 0;
+        internal readonly SemaphoreSlim eventQueueProcessingSemaphore = new SemaphoreSlim(0);
+
         private AsyncQueue<CompilationEvent> Adjust(AsyncQueue<CompilationEvent> eventQueue)
         {
             if (eventQueue == null)
@@ -147,6 +164,8 @@ namespace CSharpE.Transform.VisualStudio
                 {
                     while (true)
                     {
+                        Log("Before dequeue.");
+
                         var e = await newQueue.DequeueAsync();
 
                         CompilationEvent newEvent;
@@ -158,6 +177,12 @@ namespace CSharpE.Transform.VisualStudio
                                 break;
                             case CompilationUnitCompletedEvent compilationUnitCompleted:
                                 newEvent = new CompilationUnitCompletedEvent(this, AdjustReverse(compilationUnitCompleted.CompilationUnit));
+
+                                lock (eventQueueProcessingLock)
+                                {
+                                    completedCompilationUnits.Add(compilationUnitCompleted.CompilationUnit);
+                                }
+
                                 break;
                             case CompilationStartedEvent compilationStarted:
                                 newEvent = new CompilationStartedEvent(this);
@@ -167,10 +192,31 @@ namespace CSharpE.Transform.VisualStudio
                         }
 
                         oldQueue.Enqueue(newEvent);
+
+                        if (e is CompilationUnitCompletedEvent)
+                        {
+                            while (true)
+                            {
+                                lock (eventQueueProcessingLock)
+                                {
+                                    if (eventQueueProcessingSemaphoreCounter == 0)
+                                        break;
+
+                                    int decremented = --eventQueueProcessingSemaphoreCounter;
+
+                                    Log($"Decremented to {decremented}.");
+                                }
+
+                                eventQueueProcessingSemaphore.Release();
+                            }
+
+                            Log("Finished decrementing.");
+                        }
                     }
                 }
                 catch (TaskCanceledException)
                 {
+                    Log("Finished propagating.");
                 }
             }
 

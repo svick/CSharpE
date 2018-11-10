@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis.Text;
 using RoslynSemanticModel = Microsoft.CodeAnalysis.SemanticModel;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
 using Roslyn = msca.Microsoft.CodeAnalysis;
+using System.Diagnostics;
 
 namespace CSharpE.Transform.VisualStudio
 {
@@ -71,7 +72,72 @@ namespace CSharpE.Transform.VisualStudio
             => GetDiagnosticsTemplate(roslynModel.GetMethodBodyDiagnostics, span, cancellationToken);
 
         public override ImmutableArray<Diagnostic> GetDiagnostics(TextSpan? span = null, CancellationToken cancellationToken = default)
-            => GetDiagnosticsTemplate(roslynModel.GetDiagnostics, span, cancellationToken);
+        {
+            // HACK: Roslyn's CompilationWithAnalyzers.GenerateCompilationEventsAndPopulateEventsCacheAsync
+            // assumes that after this method returns, the compilation's EventQueue will not be empty.
+            // The following code should ensure that at least one event propagated from DesignTimeCompilation to the main compilation.
+
+            ImmutableArray<Diagnostic> Core() => GetDiagnosticsTemplate(roslynModel.GetDiagnostics, span, cancellationToken);
+
+            // In these cases, waiting for events is not necessary.
+            if (span != null || compilation.EventQueue == null)
+                return Core();
+
+            bool firstTime;
+
+            lock (compilation.eventQueueProcessingLock)
+            {
+                firstTime = !compilation.completedCompilationUnits.Contains(newTree);
+
+                if (firstTime)
+                {
+                    int incremented = ++compilation.eventQueueProcessingSemaphoreCounter;
+
+                    compilation.Log($"Incremented to {incremented}.");
+                }
+            }
+
+            if (!firstTime)
+                return Core();
+
+            bool finishedWaiting = false;
+
+            try
+            {
+                var result = Core();
+
+                compilation.Log("Before wait.");
+
+                compilation.eventQueueProcessingSemaphore.Wait();
+
+                finishedWaiting = true;
+
+                compilation.Log("After wait.");
+
+                return result;
+            }
+            finally
+            {
+                if (!finishedWaiting)
+                {
+                    bool decremented = false;
+
+                    // PERF: Use CompleteExchange instead of a lock
+                    lock (compilation.eventQueueProcessingLock)
+                    {
+                        if (compilation.eventQueueProcessingSemaphoreCounter > 0)
+                        {
+                            compilation.eventQueueProcessingSemaphoreCounter--;
+                            decremented = true;
+                        }
+                    }
+
+                    // somebody decremented the counter to zero, so there should be a free semaphore Wait
+                    if (!decremented)
+                        compilation.eventQueueProcessingSemaphore.Wait();
+                }
+            }
+        }
 
         public override void ComputeDeclarationsInSpan(TextSpan span, bool getSymbol, Roslyn::PooledObjects.ArrayBuilder<DeclarationInfo> builder, CancellationToken cancellationToken)
         {
@@ -337,7 +403,7 @@ namespace CSharpE.Transform.VisualStudio
             }
         }
 
-        public override CSharpSyntaxNode Root => (CSharpSyntaxNode)newTree.GetRoot();
+        public override CSharpSyntaxNode Root => (CSharpSyntaxNode)oldTree.GetRoot();
 
         public override CSharpSemanticModel ParentModel => throw new NotImplementedException();
 
