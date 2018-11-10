@@ -132,17 +132,6 @@ namespace CSharpE.Transform.VisualStudio
             }
         }
 
-
-        private static int nextId;
-        private static readonly ConcurrentDictionary<Compilation, int> ids = new ConcurrentDictionary<Compilation, int>();
-        internal void Log(string message)
-        {
-            int id = ids.GetOrAdd(this, _ => Interlocked.Increment(ref nextId));
-
-            lock (ids)
-                File.AppendAllLines(@"C:\temp\log.txt", new[] { $"Compilation #{id}: {message}" });
-        }
-
         internal object eventQueueProcessingLock = new object();
         internal readonly HashSet<RoslynSyntaxTree> completedCompilationUnits = new HashSet<RoslynSyntaxTree>();
         internal int eventQueueProcessingSemaphoreCounter = 0;
@@ -164,8 +153,6 @@ namespace CSharpE.Transform.VisualStudio
                 {
                     while (true)
                     {
-                        Log("Before dequeue.");
-
                         var e = await newQueue.DequeueAsync();
 
                         CompilationEvent newEvent;
@@ -202,22 +189,15 @@ namespace CSharpE.Transform.VisualStudio
                                     if (eventQueueProcessingSemaphoreCounter == 0)
                                         break;
 
-                                    int decremented = --eventQueueProcessingSemaphoreCounter;
-
-                                    Log($"Decremented to {decremented}.");
+                                    eventQueueProcessingSemaphoreCounter--;
                                 }
 
                                 eventQueueProcessingSemaphore.Release();
                             }
-
-                            Log("Finished decrementing.");
                         }
                     }
                 }
-                catch (TaskCanceledException)
-                {
-                    Log("Finished propagating.");
-                }
+                catch (TaskCanceledException) { }
             }
 
             PropagateEvents();

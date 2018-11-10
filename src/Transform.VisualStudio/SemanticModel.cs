@@ -12,7 +12,6 @@ using Microsoft.CodeAnalysis.Text;
 using RoslynSemanticModel = Microsoft.CodeAnalysis.SemanticModel;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
 using Roslyn = msca.Microsoft.CodeAnalysis;
-using System.Diagnostics;
 
 namespace CSharpE.Transform.VisualStudio
 {
@@ -90,11 +89,7 @@ namespace CSharpE.Transform.VisualStudio
                 firstTime = !compilation.completedCompilationUnits.Contains(newTree);
 
                 if (firstTime)
-                {
-                    int incremented = ++compilation.eventQueueProcessingSemaphoreCounter;
-
-                    compilation.Log($"Incremented to {incremented}.");
-                }
+                    compilation.eventQueueProcessingSemaphoreCounter++;
             }
 
             if (!firstTime)
@@ -106,13 +101,9 @@ namespace CSharpE.Transform.VisualStudio
             {
                 var result = Core();
 
-                compilation.Log("Before wait.");
-
                 compilation.eventQueueProcessingSemaphore.Wait();
 
                 finishedWaiting = true;
-
-                compilation.Log("After wait.");
 
                 return result;
             }
