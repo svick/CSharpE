@@ -1,9 +1,21 @@
-## Roslyn comparison
+## Visual Studio support
 
-[ActorTests.cs](https://github.com/svick/CSharpE/blob/roslyn-comparison/test/Actor.Tests/ActorTests.cs)  
-[ActorTransformation.cs](https://github.com/svick/CSharpE/blob/roslyn-comparison/src/Extensions/Actor/ActorTransformation.cs)  
-[RoslynActorTransformation.cs](https://github.com/svick/CSharpE/blob/roslyn-comparison/src/Extensions/Actor/RoslynActorTransformation.cs)
+Basic features work:
 
-## "Smart" transformation
+![](doc/images/basic.png)
 
-[ActorTransformation.cs](https://github.com/svick/CSharpE/blob/master/src/Extensions/Actor.Lazy/ActorTransformation.cs)
+Error reporting works (especially notice that the errors would be different in regular C#):
+
+![](doc/images/errors.png)
+
+IntelliSense works (including filter buttons at the bottom):
+
+![](doc/images/intellisense.png)
+
+Parameter info works:
+
+![](doc/images/parameterinfo.png)
+
+Quick info works when hovering over a member:
+
+![](doc/images/quickinfo.png)
