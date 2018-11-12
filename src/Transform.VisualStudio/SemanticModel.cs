@@ -396,7 +396,7 @@ namespace CSharpE.Transform.VisualStudio
 
         public override CSharpSyntaxNode Root => (CSharpSyntaxNode)oldTree.GetRoot();
 
-        public override CSharpSemanticModel ParentModel => throw new NotImplementedException();
+        public override CSharpSemanticModel ParentModel => null;
 
         public override RoslynSyntaxTree SyntaxTree
         {
