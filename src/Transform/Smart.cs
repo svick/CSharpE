@@ -127,7 +127,7 @@ namespace CSharpE.Transform
             if (!(nodes is ISyntaxCollection<TNode> syntaxCollection))
                 throw new ArgumentException("Collection has to be provided by CSharpE.");
             ClosureChecker.ThrowIfHasClosure(action);
-            GeneralHandler.ThrowIfNotPersistent(arg1);
+            GeneralHandler.ThrowIfNotTrackable(arg1);
 
             syntaxCollection.Visit(new Visitor<TNode, T1>(arg1, action));
         }
@@ -149,7 +149,7 @@ namespace CSharpE.Transform
             if (!(nodes is ISyntaxCollection<TNode> syntaxCollection))
                 throw new ArgumentException("Collection has to be provided by CSharpE.");
             ClosureChecker.ThrowIfHasClosure(action);
-            GeneralHandler.ThrowIfNotPersistent(arg);
+            GeneralHandler.ThrowIfNotTrackable(arg);
 
             var visitor = new Visitor<TNode, TArg, TIntermediate, TResult>(arg, action, simpleCombine, complexCombine);
             syntaxCollection.Visit(visitor);
@@ -176,7 +176,7 @@ namespace CSharpE.Transform
             TypeDefinition node, T1 arg1, Action<T1, ILimitedTypeDefinition> action)
         {
             ClosureChecker.ThrowIfHasClosure(action);
-            GeneralHandler.ThrowIfNotPersistent(arg1);
+            GeneralHandler.ThrowIfNotTrackable(arg1);
 
             if (node.SourceFile?.Project is TransformProject transformProject)
             {

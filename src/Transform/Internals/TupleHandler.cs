@@ -30,11 +30,11 @@ namespace CSharpE.Transform.Internals
             }
         }
 
-        public static void ThrowIfNotPersistent<T>(T arg)
+        public static void ThrowIfNotTrackable<T>(T arg)
         {
             foreach (var item in GetItems(arg))
             {
-                GeneralHandler.ThrowIfNotPersistent(item);
+                GeneralHandler.ThrowIfNotTrackable(item);
             }
         }
 

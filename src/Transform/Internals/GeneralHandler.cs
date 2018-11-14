@@ -6,7 +6,7 @@ namespace CSharpE.Transform.Internals
 {
     internal static class GeneralHandler
     {
-        public static void ThrowIfNotPersistent<T>(T arg)
+        public static void ThrowIfNotTrackable<T>(T arg)
         {
             if (IsImmutable(arg))
                 return;
@@ -16,19 +16,19 @@ namespace CSharpE.Transform.Internals
 
             if (CollectionHandler.IsCollection(arg))
             {
-                CollectionHandler.ThrowIfNotPersistent(arg);
+                CollectionHandler.ThrowIfNotTrackable(arg);
                 
                 return;
             }
 
             if (TupleHandler.IsTuple(arg))
             {
-                TupleHandler.ThrowIfNotPersistent(arg);
+                TupleHandler.ThrowIfNotTrackable(arg);
 
                 return;
             }
 
-            throw new ArgumentNotPersistentException($"The given {arg.GetType()} is not persistent.");
+            throw new ArgumentNotPersistentException($"The given {arg.GetType()} cannot be tracked.");
         }
 
         public static bool IsImmutable<T>(T arg)
@@ -65,7 +65,7 @@ namespace CSharpE.Transform.Internals
             if (CollectionHandler.IsCollection(input))
                 return CollectionHandler.DeepClone(input);
 
-            throw new InvalidOperationException($"The object {input} has to be cloneable.");
+            throw new InvalidOperationException($"The object {input} cannot be cloned.");
         }
 
         public static bool Equals<T>(T arg1, T arg2)

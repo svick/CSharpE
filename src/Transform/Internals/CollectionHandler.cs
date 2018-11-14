@@ -20,13 +20,13 @@ namespace CSharpE.Transform.Internals
             return IsArrayType(type) || IsListType(type);
         }
 
-        public static void ThrowIfNotPersistent<T>(T arg)
+        public static void ThrowIfNotTrackable<T>(T arg)
         {
             var collection = (IEnumerable)arg;
 
             foreach (var item in collection)
             {
-                GeneralHandler.ThrowIfNotPersistent(item);
+                GeneralHandler.ThrowIfNotTrackable(item);
             }
         }
 
