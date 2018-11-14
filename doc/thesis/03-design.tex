@@ -300,7 +300,7 @@ This does not mean non-determinism or side-effects are completely forbidden in t
 
 Because nondeterminism and unrecognized side-effects can sometimes be desirable, and because .NET does not have a good way of recognizing them, the system does not have any mechanism of preventing them.
 
-Also note that non-determinism might be undesirable in a transformation, even when ignoring its effects on smart loops. This is because a transformation can decide what code is valid and how the code behaves when executed. So, code that compiles and works correctly now could stop compiling or it could change its behavior in the future, which is generally undesirable.
+Also note that nondeterminism might be undesirable in a transformation, even when ignoring its effects on smart loops. This is because a transformation can decide what code is valid and how the code behaves when executed. So, code that compiles and works correctly now could stop compiling or it could change its behavior in the future, which is generally undesirable.
 
 \item Access to syntax nodes has to be controlled.
 
