@@ -21,21 +21,18 @@ namespace CSharpE.Transform.VisualStudio
             changes = SyntaxDiffer.GetTextChanges(oldTree, newTree);
         }
 
-        public Diagnostic Adjust(Diagnostic diagnostic) => diagnostic.WithLocation(Adjust(diagnostic.Location));
+        public Diagnostic Adjust(Diagnostic diagnostic) => diagnostic.WithLocation(AdjustLoose(diagnostic.Location));
 
-        public Location Adjust(Location location)
+        private Location AdjustLoose(Location location)
         {
             if (location.Kind != LocationKind.SourceFile)
                 return location;
 
             Debug.Assert(location.SourceTree == oldTree);
 
-            var adjusted = Adjust(location.SourceSpan);
+            var adjusted = AdjustLoose(location.SourceSpan);
 
-            if (adjusted == null)
-                return Location.None;
-
-            return Location.Create(newTree, adjusted.Value);
+            return Location.Create(newTree, adjusted);
         }
 
         public TextSpan? Adjust(TextSpan span)
@@ -49,6 +46,15 @@ namespace CSharpE.Transform.VisualStudio
                 return null;
 
             return TextSpan.FromBounds(start.Value, end.Value);
+        }
+
+        private TextSpan AdjustLoose(TextSpan span)
+        {
+            int start = AdjustLoose(span.Start);
+
+            int end = AdjustLoose(span.End);
+
+            return TextSpan.FromBounds(start, end);
         }
 
         public int? Adjust(int position)
