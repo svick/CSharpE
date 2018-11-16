@@ -69,7 +69,6 @@ namespace CSharpE.Transform.VisualStudio
                     return null;
                 }
 
-
                 foreach (var symbol in transformationTypes)
                 {
                     var type = assembly.GetType(symbol.GetFullMetadataName());
