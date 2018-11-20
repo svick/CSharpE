@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using CSharpE.Syntax;
 using CSharpE.Transform.Execution;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Nerdbank.MSBuildExtension;
 using SourceFile = CSharpE.Transform.Execution.SourceFile;
 
 namespace CSharpE.Transform.MSBuild
 {
-    public class TransformTask : Task
+    public class TransformTask : ContextIsolatedTask
     {
         private const int CorELoadingReferenceAssembly = unchecked((int)0x80131058);
 
@@ -26,10 +25,8 @@ namespace CSharpE.Transform.MSBuild
         [Output]
         public ITaskItem[] OutputSourceFiles { get; set; }
 
-        public override bool Execute()
+        protected override bool ExecuteIsolated()
         {
-            Debugger.Launch();
-
             OutputSourceFiles = InputSourceFiles;
 
             var assemblyPaths = 
@@ -47,7 +44,7 @@ namespace CSharpE.Transform.MSBuild
                 Assembly assembly;
                 try
                 {
-                    assembly = Assembly.LoadFrom(assemblyPath);
+                    assembly = LoadAssemblyByPath(assemblyPath);
                 }
                 catch (BadImageFormatException ex) when (ex.HResult == CorELoadingReferenceAssembly)
                 {

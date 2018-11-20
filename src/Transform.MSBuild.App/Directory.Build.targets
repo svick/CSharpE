@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\Transform.MSBuild\bin\Debug\netstandard2.0\CSharpE.Transform.MSBuild.dll" TaskName="CSharpE.Transform.MSBuild.TransformTask" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\Transform.MSBuild\bin\Debug\net46\CSharpE.Transform.MSBuild.dll" TaskName="CSharpE.Transform.MSBuild.TransformTask" />
 
   <Target Name="TransformTask" AfterTargets="BeforeCompile">
     <TransformTask InputSourceFiles="@(Compile)" InputReferences="@(ReferencePath)">

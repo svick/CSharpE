@@ -8,6 +8,7 @@
 - make most classes `sealed`
 - look into how InvocationReasons.SemanticChanged works and if it could be used to decide when to rerun the whole transformation
 - consider using limited Roslyn formatting instead of `NormalizeWhitespace`
+- remove ITransformation.AdditionalReferences: it doesn't seem to be useful
 
 ---
 
