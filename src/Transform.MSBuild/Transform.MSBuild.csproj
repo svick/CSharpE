@@ -1,15 +1,59 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net46</TargetFrameworks>
+
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.MSBuildExtension" Version="0.1.20-beta" />
+    <Compile Remove="*.net.cs" Condition="'$(TargetFramework)' != 'net46'" />
+    <Compile Remove="*.netcoreapp.cs" Condition="'$(TargetFramework)' != 'netcoreapp2.0'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" Condition="'$(TargetFramework)' != 'net46'" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Transform\Transform.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <!-- We're going to include it by virtue of sending the whole bin dir to the build folder. -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Package up the build folder's contents. -->
+    <None Include="build\**">
+      <Pack>true</Pack>
+      <PackagePath>build\%(RecursiveDir)%(FileName)%(Extension)</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
+  <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <Content Include="
+            $(OutputPath)**\*.dll;
+            $(OutputPath)**\*.exe;
+            $(OutputPath)**\*.dll.config;
+            $(OutputPath)**\*.json;
+            "
+            Exclude="
+            $(OutputPath)**\Microsoft.Build.Framework.dll;
+            $(OutputPath)**\Microsoft.Build.Tasks.Core.dll;
+            $(OutputPath)**\Microsoft.Build.Utilities.Core.dll;
+            ">
+        <Pack>true</Pack>
+        <PackagePath>build\</PackagePath>
+      </Content>
+    </ItemGroup>
+  </Target>
+  
 </Project>

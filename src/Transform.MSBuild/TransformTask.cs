@@ -14,6 +14,7 @@ namespace CSharpE.Transform.MSBuild
 {
     public class TransformTask : ContextIsolatedTask
     {
+        // https://github.com/dotnet/corefx/blob/778fea7/src/Common/src/System/HResults.cs#L74
         private const int CorELoadingReferenceAssembly = unchecked((int)0x80131058);
 
         [Required]
@@ -31,11 +32,6 @@ namespace CSharpE.Transform.MSBuild
 
             var assemblyPaths = 
                 (InputReferences ?? string.Empty).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-
-            var transformAssemblyPath = assemblyPaths.FirstOrDefault(n => Path.GetFileName(n) == "CSharpE.Transform.dll");
-
-            if (transformAssemblyPath == null)
-                return true;
 
             var transformations = new List<ITransformation>();
 

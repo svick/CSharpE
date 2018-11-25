@@ -1,0 +1,7 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <CSharpEToolsRootPath Condition=" '$(CSharpEToolsRootPath)' == '' ">$(MSBuildThisFileDirectory)</CSharpEToolsRootPath>
+    <CSharpEToolsSubPath Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netcoreapp2.0\</CSharpEToolsSubPath>
+    <CSharpEToolsSubPath Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net46\</CSharpEToolsSubPath>
+  </PropertyGroup>
+</Project>

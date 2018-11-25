@@ -1,6 +1,9 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <CSharpEToolsPath Condition=" '$(CSharpEToolsPath)' == '' ">$(CSharpEToolsRootPath)$(CSharpEToolsSubPath)</CSharpEToolsPath>
+  </PropertyGroup>
 
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\Transform.MSBuild\bin\Debug\net46\CSharpE.Transform.MSBuild.dll" TaskName="CSharpE.Transform.MSBuild.TransformTask" />
+  <UsingTask TaskName="CSharpE.Transform.MSBuild.TransformTask" AssemblyFile="$(CSharpEToolsPath)CSharpE.Transform.MSBuild.dll" />
 
   <Target Name="TransformTask" AfterTargets="BeforeCompile">
     <TransformTask InputSourceFiles="@(Compile)" InputReferences="@(ReferencePath)">
@@ -12,5 +15,4 @@
       <_CSharpE_Compile Remove="@(_CSharpE_Compile)" />
     </ItemGroup>
   </Target>
-
 </Project>

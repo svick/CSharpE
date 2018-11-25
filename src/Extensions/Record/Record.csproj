@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-      <TargetFramework>netstandard2.0</TargetFramework>
+      <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Syntax\Syntax.csproj" />
-      <ProjectReference Include="..\..\Transform\Transform.csproj" />
+      <ProjectReference Include="..\..\Syntax\Syntax.csproj" PrivateAssets="All" />
+      <ProjectReference Include="..\..\Transform\Transform.csproj" PrivateAssets="All" />
+      <ProjectReference Include="..\..\Transform.MSBuild\Transform.MSBuild.csproj" />
     </ItemGroup>
 
 </Project>
