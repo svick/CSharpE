@@ -7,7 +7,6 @@
     <ItemGroup>
       <ProjectReference Include="..\..\Syntax\Syntax.csproj" PrivateAssets="All" />
       <ProjectReference Include="..\..\Transform\Transform.csproj" PrivateAssets="All" />
-      <ProjectReference Include="..\..\Transform.MSBuild\Transform.MSBuild.csproj" />
     </ItemGroup>
 
 </Project>

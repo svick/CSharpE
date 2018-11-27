@@ -47,15 +47,30 @@ namespace CSharpE.Transform.MSBuild
                     // Reference assemblies can't contain transformer implementations
                     continue;
                 }
+                catch (FileLoadException) when (Path.GetFileName(assemblyPath).StartsWith("CSharpE."))
+                {
+                    // On .Net Core, we're getting "Assembly with same name is already loaded"
+                    continue;
+                }
                 catch (Exception ex)
                 {
-                    Log.LogWarning($"Could not load assembly '{assemblyPath}': {ex.Message}");
+                    Log.LogWarning($"Could not load assembly '{assemblyPath}': {ex.GetType()}: {ex.Message}");
                     continue;
                 }
 
-                var assemblyTransformations = assembly.ExportedTypes
-                    .Where(t => typeof(ITransformation).IsAssignableFrom(t) && !t.IsAbstract)
-                    .Select(type => (ITransformation)Activator.CreateInstance(type));
+                IEnumerable<ITransformation> assemblyTransformations;
+
+                try
+                {
+                    assemblyTransformations = assembly.ExportedTypes
+                        .Where(t => typeof(ITransformation).IsAssignableFrom(t) && !t.IsAbstract)
+                        .Select(type => (ITransformation)Activator.CreateInstance(type));
+                }
+                catch when (assembly.GetName().Name == "Microsoft.Build.Tasks.Core")
+                {
+                    // TODO: this assembly shouldn't be referenced in the first place
+                    continue;
+                }
 
                 transformations.AddRange(assemblyTransformations);
             }

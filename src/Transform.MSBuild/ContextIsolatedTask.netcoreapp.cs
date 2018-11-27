@@ -59,6 +59,9 @@ namespace Nerdbank.MSBuildExtension
                 innerTaskBaseType = innerTaskBaseType.GetTypeInfo().BaseType;
             }
 
+            var contextField = innerTaskBaseType.GetField(nameof(ctxt), BindingFlags.NonPublic | BindingFlags.Instance);
+            contextField.SetValue(innerTask, ctxt);
+
             var outerProperties = this.GetType().GetRuntimeProperties().ToDictionary(i => i.Name);
             var innerProperties = innerTaskType.GetRuntimeProperties().ToDictionary(i => i.Name);
             var propertiesDiscovery = from outerProperty in outerProperties.Values

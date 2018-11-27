@@ -1,4 +1,9 @@
-﻿- fix moving `NamedTypeReference`s between files (doesn't update `using`s)
+﻿- to avoid assembly loading issues, MSBuild task runs itself in a separate process
+- CSharpE.MSBuild should run (in a design-time mode?) during a design-time build, if the VS extension is not installed it should also produce a warning
+
+---
+
+- fix moving `NamedTypeReference`s between files (doesn't update `using`s)
 - detect reading of References/Symbols, then rerun when those symbols change
 - when `Clear()`ing a list of members, or more generally resetting `Parent` to `null`, make sure semantics of detached nodes still work by storing cached versions of necessary Roslyn types
 - allow `Where` in smart loops; check there are no sideefects on the node same as `ForEach`
