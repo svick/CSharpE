@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>CSharpE.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>CSharpE.$(MSBuildProjectName)</RootNamespace>
-    <Version>0.1.54</Version>
+    <Version>0.1.67</Version>
     <PackageOutputPath>$(MSBuildThisFileDirectory)pkg</PackageOutputPath>
     <LangVersion>7.3</LangVersion>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CSharpE.ruleset</CodeAnalysisRuleSet>

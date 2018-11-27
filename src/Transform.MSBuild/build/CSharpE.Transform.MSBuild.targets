@@ -3,7 +3,7 @@
     <CSharpEToolsPath Condition=" '$(CSharpEToolsPath)' == '' ">$(CSharpEToolsRootPath)$(CSharpEToolsSubPath)</CSharpEToolsPath>
   </PropertyGroup>
 
-  <UsingTask TaskName="CSharpE.Transform.MSBuild.TransformTask" AssemblyFile="$(CSharpEToolsPath)CSharpE.Transform.MSBuild.dll" />
+  <UsingTask TaskName="CSharpE.Transform.MSBuild.TransformTask" AssemblyFile="$(CSharpEToolsPath)CSharpE.Transform.MSBuild.$(CSharpEAssemblyExtension)" />
 
   <Target Name="TransformTask" AfterTargets="BeforeCompile">
     <TransformTask InputSourceFiles="@(Compile)" InputReferences="@(ReferencePath)">

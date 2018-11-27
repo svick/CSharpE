@@ -1,1 +1,0 @@
-Note: The ContextIsolatedTask and some parts of Transform.MSBuild.csproj were copied from https://github.com/AArnott/Nerdbank.MSBuildExtension/.

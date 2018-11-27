@@ -1,5 +1,4 @@
-﻿- to avoid assembly loading issues, MSBuild task runs itself in a separate process
-- CSharpE.MSBuild should run (in a design-time mode?) during a design-time build, if the VS extension is not installed it should also produce a warning
+﻿- CSharpE.MSBuild should run (in a design-time mode?) during a design-time build, if the VS extension is not installed it should also produce a warning
 
 ---
 

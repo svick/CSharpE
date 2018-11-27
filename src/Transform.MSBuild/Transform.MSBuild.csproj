@@ -2,17 +2,13 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;net46</TargetFrameworks>
+    <OutputType>Exe</OutputType>
 
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="*.net.cs" Condition="'$(TargetFramework)' != 'net46'" />
-    <Compile Remove="*.netcoreapp.cs" Condition="'$(TargetFramework)' != 'netcoreapp2.0'" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" />

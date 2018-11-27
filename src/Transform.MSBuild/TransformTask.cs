@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using CSharpE.Syntax;
-using CSharpE.Transform.Execution;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using Nerdbank.MSBuildExtension;
-using SourceFile = CSharpE.Transform.Execution.SourceFile;
 
 namespace CSharpE.Transform.MSBuild
 {
-    public class TransformTask : ContextIsolatedTask
+    public class TransformTask : Task
     {
-        // https://github.com/dotnet/corefx/blob/778fea7/src/Common/src/System/HResults.cs#L74
-        private const int CorELoadingReferenceAssembly = unchecked((int)0x80131058);
-
         [Required]
         public ITaskItem[] InputSourceFiles { get; set; }
 
@@ -26,102 +16,63 @@ namespace CSharpE.Transform.MSBuild
         [Output]
         public ITaskItem[] OutputSourceFiles { get; set; }
 
-        protected override bool ExecuteIsolated()
+        public override bool Execute()
         {
             OutputSourceFiles = InputSourceFiles;
 
-            var assemblyPaths = 
-                (InputReferences ?? string.Empty).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var assemblyLocation = typeof(Program).Assembly.Location;
 
-            var transformations = new List<ITransformation>();
-
-            foreach (var assemblyPath in assemblyPaths)
+            var psi = new ProcessStartInfo
             {
-                Assembly assembly;
-                try
-                {
-                    assembly = LoadAssemblyByPath(assemblyPath);
-                }
-                catch (BadImageFormatException ex) when (ex.HResult == CorELoadingReferenceAssembly)
-                {
-                    // Reference assemblies can't contain transformer implementations
-                    continue;
-                }
-                catch (FileLoadException) when (Path.GetFileName(assemblyPath).StartsWith("CSharpE."))
-                {
-                    // On .Net Core, we're getting "Assembly with same name is already loaded"
-                    continue;
-                }
-                catch (Exception ex)
-                {
-                    Log.LogWarning($"Could not load assembly '{assemblyPath}': {ex.GetType()}: {ex.Message}");
-                    continue;
-                }
+#if NET46
+                FileName = assemblyLocation,
+#else
+                FileName = "dotnet",
+                Arguments = assemblyLocation,
+#endif
+                UseShellExecute = false,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+            };
 
-                IEnumerable<ITransformation> assemblyTransformations;
+            var process = Process.Start(psi);
 
-                try
-                {
-                    assemblyTransformations = assembly.ExportedTypes
-                        .Where(t => typeof(ITransformation).IsAssignableFrom(t) && !t.IsAbstract)
-                        .Select(type => (ITransformation)Activator.CreateInstance(type));
-                }
-                catch when (assembly.GetName().Name == "Microsoft.Build.Tasks.Core")
-                {
-                    // TODO: this assembly shouldn't be referenced in the first place
-                    continue;
-                }
+            var processInput = process.StandardInput;
 
-                transformations.AddRange(assemblyTransformations);
+            processInput.WriteLine(InputReferences);
+
+            foreach (var item in InputSourceFiles)
+            {
+                processInput.WriteLine(item.ItemSpec);
             }
 
-            if (!transformations.Any())
-                return true;
+            processInput.Close();
 
-            var sourceFiles =
-                InputSourceFiles.Select(item => SourceFile.OpenAsync(item.ItemSpec).GetAwaiter().GetResult());
+            var processOutput = process.StandardOutput;
 
-            var references = assemblyPaths.Select(path => new AssemblyReference(path));
+            string line;
 
-            var transformer = new ProjectTransformer(sourceFiles, references, transformations);
-
-            var result = transformer.Transform(designTime: false);
-
-            var tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "obj", "CSharpE");
-            Directory.CreateDirectory(tmpDirectory);
-
-            var fileNameTracker = new Dictionary<string, int>();
-
-            string GetUniqueFilePath(string path)
-            {
-                var fileName = Path.GetFileName(path);
-
-                var uniqueFileName = fileName;
-
-                if (fileNameTracker.TryGetValue(fileName, out int n))
-                {
-                    n++;
-                    uniqueFileName = Path.GetFileNameWithoutExtension(fileName) + n + Path.GetExtension(fileName);
-                }
-                else
-                {
-                    n = 2;
-                }
-
-                fileNameTracker[fileName] = n;
-
-                return Path.Combine(tmpDirectory, uniqueFileName);
-            }
+            bool readingOutput = false;
 
             var outputFiles = new List<ITaskItem>();
 
-            foreach (var file in result.SourceFiles)
+            while ((line = processOutput.ReadLine()) != null)
             {
-                var outputFilePath = GetUniqueFilePath(file.Path);
-
-                File.WriteAllText(outputFilePath, file.Text);
-
-                outputFiles.Add(new TaskItem(outputFilePath));
+                switch (line)
+                {
+                    case "error":
+                        Log.LogError(processOutput.ReadToEnd());
+                        return false;
+                    case "output":
+                        readingOutput = true;
+                        break;
+                    default:
+                        if (readingOutput)
+                            outputFiles.Add(new TaskItem(line));
+                        else
+                            Log.LogWarning(line);
+                        break;
+                }
             }
 
             OutputSourceFiles = outputFiles.ToArray();
