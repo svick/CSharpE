@@ -5,7 +5,7 @@
 
   <UsingTask TaskName="CSharpE.Transform.MSBuild.TransformTask" AssemblyFile="$(CSharpEToolsPath)CSharpE.Transform.MSBuild.$(CSharpEAssemblyExtension)" />
 
-  <Target Name="TransformTask" AfterTargets="BeforeCompile">
+  <Target Name="TransformTask" AfterTargets="BeforeCompile" Condition="$(DesignTimeBuild) != true AND $(BuildingProject) == true">
     <TransformTask InputSourceFiles="@(Compile)" InputReferences="@(ReferencePath)">
       <Output ItemName="_CSharpE_Compile" TaskParameter="OutputSourceFiles" />
     </TransformTask>

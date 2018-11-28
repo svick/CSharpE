@@ -202,12 +202,9 @@ namespace CSharpE.Transform.VisualStudio
 
         public override Binder GetEnclosingBinderInternal(int position)
         {
-            int? adjusted = GetTreeDiff().Adjust(position);
+            int adjusted = GetTreeDiff().AdjustLoose(position);
 
-            if (adjusted == null)
-                return null;
-
-            return roslynModel.GetEnclosingBinderInternal(adjusted.Value);
+            return roslynModel.GetEnclosingBinderInternal(adjusted);
         }
 
         public override MemberSemanticModel GetMemberModel(SyntaxNode node) => roslynModel.GetMemberModel(Adjust(node));
