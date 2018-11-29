@@ -189,13 +189,11 @@ Another set of decisions to make are about the inheritance hierarchy of member d
 
 \section{CSharpE.Transform}
 
-\todo{subsections}
-
 Now that the \ac{API} for representing and modifying code has been designed, it is time to decide how is the system going to transform a project for some extension. Per Section~\ref{extensions-are-dotnet-libraries}, extensions are distributed as .NET libraries. This means the system will need some way to recognize what transformations an extension wants to perform and then execute them.
 
 A reasonable way to do this is to have an interface that is implemented by each transformation. The system would then create an instance of the type (or types) that implements this interface and call a method on it whenever the transformation needs to be performed.
 
-As has been explained before, the transformations that need to be performed can be different at design time and at build time, so the interface should account for that. Also, different extensions will have different relationships between the two transformations, so the \ac{API} should account for that. The solutions to these two requirements are that the interface will include a parameter that specifies which transformation should be performed and there will also be abstract classes that hide this parameter for transformations that do not need it. This way, full flexibility of using an interface is maintained, while recommended patterns are communicated using the abstract classes.
+As has been explained before, the transformations that need to be performed can be different at design time and at build time. Also, different extensions will have different relationships between the two transformations. To fulfill these two requirements, the interface will include a parameter that specifies which transformation should be performed and there will also be abstract classes that hide this parameter for transformations that do not need it. This way, full flexibility of using an interface is maintained, while recommended patterns are communicated using the abstract classes.
 
 Listing~\ref{csharpetransform-simple-example} shows how the running example from Section~\ref{running-example} could be implemented as a transformation. Notice that it uses one of the aforementioned abstract classes and that the body of the method is the same as the main part of Listing~\ref{csharpesyntax-example}.
 
@@ -205,9 +203,9 @@ Listing~\ref{csharpetransform-simple-example} shows how the running example from
 \label{csharpetransform-simple-example}
 \end{listing}
 
-\medskip
+\subsection{Making transformations efficient}
 
-A much more complicated question is: how to make design-time transformations efficient, by regenerating only code that depends on modified code? As can be seen from the previous example, transformations are often structured around \cs{foreach} loops over syntax nodes: the transformation applies for each class, or for each type with an attribute, or for each method. And this includes \cs{foreach} loops that are hidden by convenience methods from \cs{CSharpE.Syntax}. For example, consider the following code iterating over all methods in a project:
+A much more complicated question is: how to make design-time transformations efficient, by regenerating only code that depends on code modified by the user? As can be seen from the previous example, transformations are often structured around \cs{foreach} loops over syntax nodes: the transformation applies for each class, or for each type with an attribute, or for each method. And this includes \cs{foreach} loops that are hidden by convenience methods from \cs{CSharpE.Syntax}. For example, consider the following code iterating over all methods in a project:
 
 \begin{minted}{csharp}
 foreach (var method in project.Methods())
@@ -231,7 +229,7 @@ foreach (var file in project.SourceFiles)
 }
 \end{minted}
 
-This, combined with the fact that a programmer editing their code usually focuses at a single higher-level syntax node (like a method or a class) at a time, makes \cs{foreach} loops the ideal point where to decide whether transformation code should be executed again: the system could make this decision for each iteration of a \cs{foreach} loop, based primarily on whether the syntax node that is being processed by that iteration changed.
+This, combined with the fact that a programmer editing their code usually focuses at a single higher-level syntax node (like a method or a class) at a time, makes \cs{foreach} loops ideal to decide whether transformation code should be executed again: the system could make this decision for each iteration of a \cs{foreach} loop, based primarily on whether the syntax node that is being processed by that iteration changed.
 
 But the regular \cs{foreach} loop does not offer sufficient flexibility for the kind of operations that will be required to implement this "smart" \cs{foreach} loop. Instead, a method with a lambda parameter will be used, similar to the \cs{Parallel.ForEach} method in .NET. \cite{parallel-foreach}
 
@@ -249,7 +247,7 @@ To make this more concrete, Listing~\ref{csharpetransform-smart-example} shows h
 
 In general, how this works is that each loop iteration has its own inputs and outputs. Inputs are the syntax nodes and other data that the iteration has access to. Outputs are any changes made to those syntax nodes and also any data it returns (while a regular \cs{foreach} loop cannot return anything, a \cs{foreach}-like method can).
 
-When the loop is executed for the first time, its body is invoked as if it was a regular \cs{foreach} loop, but at the same time, its inputs and outputs are recorded. When it is executed again, the new inputs are compared with the recorded one. If the new inputs match the recorded ones, instead of invoking the loop body, the recorded outputs are used. This way, if only a small part of the input changes, there is a good chance that only small part of the transformation will have to be executed again.
+When an iteration of the loop is executed for the first time, its body is invoked as if it was a regular \cs{foreach} loop, but at the same time, its inputs and outputs are recorded. When it is executed again, the new inputs are compared with the recorded ones. If they match, instead of invoking the loop body, the recorded outputs are used. This way, if only a small part of the input changes, there is a good chance that only small part of the transformation will have to be executed again.
 
 \medskip
 
@@ -279,9 +277,9 @@ Listing~\ref{csharpetransform-log} shows the output of internal logging for this
 \label{csharpetransform-log}
 \end{listing}
 
-\bigskip
+\subsection{Smart loop details}
 
-When it comes to designing how exactly the "smart" \cs{foreach} loop should look like, there are several considerations:
+When it comes to designing how exactly the smart \cs{foreach} loop should look like, there are several considerations:
 
 \begin{itemize}
 \item The system assumes that code in a loop iteration body is deterministic and free of unrecognized side-effects.
@@ -295,7 +293,7 @@ This does not mean non-determinism or side-effects are completely forbidden in t
 \item If an iteration logs what it does to a file, it might be acceptable that the log file is only updated when the inputs change.
 \item If an iteration updates some global cache, then that is technically a side-effect. But if that cache is only used to make the code more efficient and no code relies on it for correctness, then this side-effect does not cause any issues.
 \item If an iteration uses a randomized algorithm, the fact that the output of the algorithm could change with each execution is generally not a positive feature. In this case, skipping re-execution should be acceptable.
-\item Mutating the syntax node that is being processed by the iteration is explicitly allowed. This is because any changes to that node are recognized by the system and are re-applied even if execution of the iteration is skipped.
+\item Mutating the syntax node that is being processed by the iteration, including its child nodes, is explicitly allowed. This is because any changes to that node are recognized by the system and are re-applied even if execution of the iteration is skipped.
 \end{itemize}
 
 Because nondeterminism and unrecognized side-effects can sometimes be desirable, and because .NET does not have a good way of recognizing them, the system does not have any mechanism of preventing them.
@@ -306,7 +304,7 @@ Also note that nondeterminism might be undesirable in a transformation, even whe
 
 \nopagebreak
 
-When some part of some syntax node is accessed by a loop iteration, and this part of the syntax node is changed between two executions of that iteration, the iteration has to be re-executed, because that change could alter its output. While it would be possible to track which parts of which syntax nodes are accessed by an iteration, the system described in this work does not attempt to do so, on the assumption that it is not necessary to achieve sufficient performance for design-time transformations.
+When some syntax node is accessed by a loop iteration, and this syntax node is changed between two executions of that iteration, the iteration has to be re-executed, because that change could alter its output. While it would be possible to track which syntax nodes are accessed by an iteration, the system described in this work does not attempt to do so, on the assumption that it is not necessary to achieve sufficient performance for design-time transformations.
 
 \label{no-parent-transform}
 Instead, whenever any syntax node accessible by a loop iteration changes, that iteration is re-executed. As a consequence of this, syntax node objects do not have parent references, as has been pointed out in Section~\ref{no-parent-syntax}. If such references did exist, the whole file or even the whole project would be accessible from any syntax node, which means even a small change would cause re-execution of large amounts of code.
@@ -370,11 +368,31 @@ Instead, additional data is passed as arguments to the \cs{Smart.ForEach} method
 
 \item All data that is passed out has to be tracked.
 
-Regular loops in C\# do not return values, instead, they usually mutate some object from the outer scope (for example, an iteration could call \cs{Add} on a \cs{List<T>} that is declared outside the loop). Since this is not allowed according to the rules described in the previous point, an alternative approach that can be more easily controlled by the system would be very useful.
+Regular loops in C\# do not return values, instead, they often mutate some object from the outer scope (for example, an iteration could call \cs{Add} on a \cs{List<T>} that is declared outside the loop). Since this is not allowed according to the rules described in the previous point, an alternative approach that can be more easily controlled by the system would be very useful.
 
 The approach used by the system is to allow the lambda that represents the body of the loop to return a value. The whole loop then returns a list of these values (specifically, \cs{IReadOnlyList<T>}), one for each iteration. When an iteration is not re-executed, the previously returned value is used again. To make sure further changes to returned values do not affect following executions, the values returned from loop iterations are deep cloned. For this reason, they also have the same limitation on allowed types as input values.
 
-\item understanding MLM (and the combinatorial explosion), incl. which collections are accepted as inputs
+\item The system has to understand the collection that is being iterated.
+
+To efficiently re-execute a smart loop, the system has to have a good understanding of what changed in the collection since the last execution. And because smart loops are often nested, either explicitly, or implicitly by using convenience methods that bypass one or more levels of syntax nodes (such as the previously mentioned \cs{project.Methods()}), it is not enough to determine when an item in a current version of the collection is exactly the same as an item in the previous version: it is also important to recognize when a current item is similar to an item from the previous version, so that results can be reused for the parts of the item that did not change.
+
+Because computing these kind of differences for arbitrary collections is not trivial and generally should not be necessary in transformations, the system only allows performing smart loops on collections provided by the system. Since these collections satisfy some specific conditions (for example, a collection that only contains syntax nodes from the same file in source code order), computing their differences is fairly easy and the results should be quite accurate.
+
+Also, collections that bypass levels of syntax nodes, which are returned by convenience methods, have to be understood by the system, so that a smart loop over one of them behaves the same as multiple nested smart loops, one for each level of syntax nodes. This way, determining which code does not have to be re-executed can happen at larger granularities.
+
+An alternative design, which would avoid the need for recognizing these special collections, would be to have a smart loop method for each collection on each type of syntax node. For example, consider the following code:
+
+\begin{minted}{csharp}
+Smart.ForEach(project.GetClasses(), lambda);
+\end{minted}
+
+With this alternative design, it would be instead:
+
+\begin{minted}{csharp}
+project.ForEachClass(lambda);
+\end{minted}
+
+While this syntax might look appealing at first, the problem with it is that it would significantly increase the \ac{API} surface: the \cs{Smart.ForEach} method has several overloads (for varying number of arguments passed to the lambda and for returning a result collection) and this design would require adding those overloads for every collection on every type of syntax node. For this reason, the alternative design was rejected.
 
 \item The smart loop methods should not be extension methods.
 

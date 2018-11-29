@@ -20,7 +20,7 @@ namespace CSharpE.Transform
             }
 
             public void Visit<TParent, TChild>(
-                Syntax.Project project, TParent parent, IEnumerable<TChild> children,
+                Project project, TParent parent, IEnumerable<TChild> children,
                 Func<TChild, IEnumerable<TNode>> itemFunction)
                 where TParent : class
                 where TChild : SyntaxNode =>
@@ -28,12 +28,12 @@ namespace CSharpE.Transform
                     project, parent, children, (arg, action, itemFunction),
                     (t, child) => ForEach(t.itemFunction(child), t.arg, t.action));
 
-            public void Visit<TParent>(Syntax.Project project, TParent parent, IEnumerable<TNode> items)
+            public void Visit<TParent>(Project project, TParent parent, IEnumerable<TNode> items)
                 where TParent : class =>
                 Visit(project, parent, items, arg, action);
 
             private static void Visit<TParent, TChild, TVisitArg>(
-                Syntax.Project project, TParent parent, IEnumerable<TChild> children, TVisitArg visitArg,
+                Project project, TParent parent, IEnumerable<TChild> children, TVisitArg visitArg,
                 Action<TVisitArg, TChild> childAction)
                 where TParent : class
                 where TChild : SyntaxNode
@@ -74,7 +74,7 @@ namespace CSharpE.Transform
             }
 
             public void Visit<TParent, TChild>(
-                Syntax.Project project, TParent parent, IEnumerable<TChild> children,
+                Project project, TParent parent, IEnumerable<TChild> children,
                 Func<TChild, IEnumerable<TNode>> itemFunction)
                 where TParent : class
                 where TChild : SyntaxNode =>
@@ -83,12 +83,12 @@ namespace CSharpE.Transform
                     (t, child) => ForEach(t.itemFunction(child), t.arg, t.action, simpleCombine, complexCombine),
                     complexCombine);
 
-            public void Visit<TParent>(Syntax.Project project, TParent parent, IEnumerable<TNode> items)
+            public void Visit<TParent>(Project project, TParent parent, IEnumerable<TNode> items)
                 where TParent : class =>
                 Visit(project, parent, items, arg, action, simpleCombine);
 
             private void Visit<TParent, TChild, TVisitArg, TValue>(
-                Syntax.Project project, TParent parent, IEnumerable<TChild> children, TVisitArg visitArg,
+                Project project, TParent parent, IEnumerable<TChild> children, TVisitArg visitArg,
                 Func<TVisitArg, TChild, TValue> childAction, Func<TResult, TValue, TResult> combine)
                 where TParent : class
                 where TChild : SyntaxNode
