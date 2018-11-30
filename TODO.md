@@ -26,3 +26,5 @@
   - and/or maybe some kind of cache/factory?
  - CSharpE.MSBuild should run (in a design-time mode?) during a design-time build, if the VS extension is not installed it should also produce a warning
  - design-time transformations shouldn't add `using`s, because those are observable
+ - add `Smart.ForEachWithSegment` (but with better name), which allows adding members to a type based on a collection of other members
+     - might require adding an abstraction for dependencies? (node/limited node/data)

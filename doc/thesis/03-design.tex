@@ -231,11 +231,15 @@ foreach (var file in project.SourceFiles)
 
 This, combined with the fact that a programmer editing their code usually focuses at a single higher-level syntax node (like a method or a class) at a time, makes \cs{foreach} loops ideal to decide whether transformation code should be executed again: the system could make this decision for each iteration of a \cs{foreach} loop, based primarily on whether the syntax node that is being processed by that iteration changed.
 
-But the regular \cs{foreach} loop does not offer sufficient flexibility for the kind of operations that will be required to implement this "smart" \cs{foreach} loop. Instead, a method with a lambda parameter will be used, similar to the \cs{Parallel.ForEach} method in .NET. \cite{parallel-foreach}
+Bu the regular \cs{foreach} loop does not offer sufficient flexibility for the kind of operations that will be required to implement this "smart" \cs{foreach} loop, so an alternative has to be considered.
+
+One option would be to create a transformation for writing transformations: the author of a transformation writes a regular \cs{foreach} loop, which is then translated into a smart loop. The problem with this approach is that it hides what should be explicit: as explained in detail below, there are significant differences between the behavior of a regular \cs{foreach} loop and a smart loop, which should not be hidden from the transformation author.
+
+Instead, a method with a lambda parameter will be used, similar to the \cs{Parallel.ForEach} method in .NET. \cite{parallel-foreach}
 
 \medskip
 
-To make this more concrete, Listing~\ref{csharpetransform-smart-example} shows how the "smart" \cs{foreach} loop could be used in the running example. Notice that the outer \cs{foreach} loop from Listing~\ref{csharpetransform-simple-example} was replaced with a call to the \cs{Smart.ForEach} method, with a lambda serving as the loop body. Why the inner loop was not similarly changed will be explained at a later point.
+To make this more concrete, Listing~\ref{csharpetransform-smart-example} shows how the smart \cs{foreach} loop could be used in the running example. Notice that the outer \cs{foreach} loop from Listing~\ref{csharpetransform-simple-example} was replaced with a call to the \cs{Smart.ForEach} method, with a lambda serving as the loop body. Why the inner loop was not similarly changed will be explained at a later point.
 
 \begin{listing}
 \inputminted[firstline=9,lastline=27]{csharp}{samples/CSharpETransform.Smart/EntityTransformation.cs}
@@ -402,5 +406,22 @@ According to Framework Design Guidelines, extension methods should only be used 
 
 \end{itemize}
 
-\todo{mention that I considered transformation transformation}
-\todo{Not just API!}
+\subsection{Smart segment}
+
+Now that we understand the limitations of smart loops, it should be clear why the second \cs{foreach} loop in Listing~\ref{csharpetransform-smart-example} cannot be a smart loop: it iterates over fields of a class, which means an iteration of a smart loop would only be allowed to mutate the field it is processing, when it needs to mutate the class itself by adding a property to it.
+
+Because code like this, where a member is generated based on another existing member, is expected to be common, CSharpE.Transform contains a special method just for this purpose: It is called \cs{Smart.Segment} and it creates a segment of code that can add members to a type, but is strictly limited when it comes to interacting with the type in any other way. Specifically, this means that the code in such a segment does not depend on members of the type, which means it does not have to be re-executed when an unrelated member changes.
+
+Listing~\ref{csharpetransform-smart-example2} shows how \cs{Smart.Segment} can be used in the running example. Notice that the original \cs{foreach} loop has been changed into a smart loop that reads relevant data from fields and a regular \cs{foreach} loop that adds properties through \cs{Smart.Segment}.
+
+\begin{listing}
+\inputminted[firstline=9,lastline=30]{csharp}{samples/CSharpETransform.Smart2/EntityTransformation.cs}
+\caption{Example of CSharpE.Transform smart segment}
+\label{csharpetransform-smart-example2}
+\end{listing}
+
+\subsection{Conclusion?}
+
+\section{Conclusion???}
+
+\todo{Not just API?}
