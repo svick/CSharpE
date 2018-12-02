@@ -420,8 +420,16 @@ Listing~\ref{csharpetransform-smart-example2} shows how \cs{Smart.Segment} can b
 \label{csharpetransform-smart-example2}
 \end{listing}
 
-\subsection{Conclusion?}
+\section{User experience}
 
-\section{Conclusion???}
+Another aspect of the system that should be considered is the experience of both creating an extension and using one or more extensions when writing code.
+
+Because a CSharpE extension is a regular .NET library that references the CSharpE.Transform library and implements the transformation interface, it is created using the same tools as any other .NET library. And just like most .NET libraries, extensions are distributed as NuGet packages and can use any supported distribution channel, including NuGet.org.
+
+The situation is more complicated for code that wants use an extension. \dots
+
+\bigskip
+
+\todo{conclusion}
 
 \todo{Not just API?}
