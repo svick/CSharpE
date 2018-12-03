@@ -195,6 +195,44 @@ A reasonable way to do this is to have an interface that is implemented by each 
 
 As has been explained before, the transformations that need to be performed can be different at design time and at build time. Also, different extensions will have different relationships between the two transformations. To fulfill these two requirements, the interface will include a parameter that specifies which transformation should be performed and there will also be abstract classes that hide this parameter for transformations that do not need it. This way, full flexibility of using an interface is maintained, while recommended patterns are communicated using the abstract classes.
 
+\medskip
+
+Listing~\ref{itransformation-api} shows the \ac{API} of this interface (\cs{ITransformation}) and the related abstract classes: 
+
+\begin{itemize}
+\item The base class \cs{Transformation}, which is a convenient location for helper members that are going to be useful in many transformations. Specifically, the \cs{NotImplementedStatement} property should be useful in most transformations that have a design-time component, as the body of generated members.
+\item The \cs{SimpleTransformation} class, which can be used for transformations that behave the same at design-time and at build-time.
+\item The \cs{BuildTimeTransformation} class, which can be used for transformations that do not do anything at design-time, for example, aspects.
+\end{itemize}
+
+\begin{listing}
+\begin{minted}{csharp}
+public interface ITransformation
+{
+    void Process(Project project, bool designTime);
+}
+
+public abstract class Transformation : ITransformation
+{
+    public abstract void Process(Project project, bool designTime);
+
+    protected static Statement NotImplementedStatement { get; }
+}
+
+public abstract class SimpleTransformation : Transformation
+{
+    protected abstract void Process(Project project);
+}
+
+public abstract class BuildTimeTransformation : Transformation
+{
+    protected abstract void Process(Project project);
+}
+\end{minted}
+\caption{Simplified \ac{API} of types used to implement transformations}
+\label{itransformation-api}
+\end{listing}
+
 Listing~\ref{csharpetransform-simple-example} shows how the running example from Section~\ref{running-example} could be implemented as a transformation. Notice that it uses one of the aforementioned abstract classes and that the body of the method is the same as the main part of Listing~\ref{csharpesyntax-example}.
 
 \begin{listing}
