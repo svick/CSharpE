@@ -6,7 +6,6 @@ namespace CSharpE.Syntax.Tests
 {
     public class TypeDeclarationTests
     {
-        // TODO: add asserts for constructor and finalizer when those work
         [Fact]
         public void InterfaceCanHaveInvalidMembers()
         {
@@ -41,6 +40,15 @@ interface I
             Assert.Equal("M", method.Name);
             Assert.Equal(MemberModifiers.Static, method.Modifiers);
             Assert.Equal("System.Void", method.ReturnType.ToString());
+
+            var ctor = Assert.IsType<ConstructorDefinition>(interfaceDefinition.Members[2]);
+
+            Assert.False(ctor.IsStatic);
+            Assert.Equal(MemberModifiers.None, ctor.Modifiers);
+
+            var finalizer = Assert.IsType<FinalizerDefinition>(interfaceDefinition.Members[3]);
+
+            Assert.Equal(MemberModifiers.None, finalizer.Modifiers);
         }
     }
 }

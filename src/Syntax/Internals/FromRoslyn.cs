@@ -74,6 +74,8 @@ namespace CSharpE.Syntax.Internals
                     return new MethodDefinition(methodDeclaration, containingType);
                 case ConstructorDeclarationSyntax constructorDeclaration:
                     return new ConstructorDefinition(constructorDeclaration, containingType);
+                case DestructorDeclarationSyntax destructorDeclaration:
+                    return new FinalizerDefinition(destructorDeclaration, containingType);
                 case OperatorDeclarationSyntax operatorDeclaration:
                     return new OperatorDefinition(operatorDeclaration, containingType);
                 case ConversionOperatorDeclarationSyntax conversionOperatorDeclaration:

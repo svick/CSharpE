@@ -73,7 +73,7 @@ Listing~\ref{syntax-types} shows inheritance hierarchy of the \cs{CSharpE.Syntax
 .4 BaseMethodDefinition.
 .5 MethodDefinition.
 .5 ConstructorDefinition.
-.5 DestructorDefinition.
+.5 FinalizerDefinition.
 .5 OperatorDefinition.
 .4 BasePropertyDefinition.
 .5 PropertyDefinition.
@@ -145,7 +145,7 @@ var field = type.AddField(...);
 
 \subsection{Members}
 
-Class, struct and interface definitions can contain various kinds of members, namely fields, methods, properties, events, indexers, operators, constructors, destructors (also known as finalizers) and nested type definitions. Not all kinds of members are valid for all three kinds of types, but since invalid members might be useful to some extensions, the \ac{API} still allows them.
+Class, struct and interface definitions can contain various kinds of members, namely fields, methods, properties, events, indexers, operators, constructors, finalizers (also known as destructors) and nested type definitions. Not all kinds of members are valid for all three kinds of types, but since invalid members might be useful to some extensions, the \ac{API} still allows them.
 
 All kinds of members can have modifiers. While in source, member modifiers can be defined in different order (for example, both \cs{public static} and \cs{static public} are valid modifiers for a method), this order does not make a difference. For this reason, this \ac{API} represents all modifiers using a single flags enum, \cs{MemberModifiers}. 
 
@@ -167,6 +167,8 @@ This is made easier by splitting a single declaration with multiple definitions 
 \item The specification lists three syntactic forms of operators: unary operators, binary operators and conversion operators. It would be possible to have a separate type for each form, but a simpler solution is to have just one type, \cs{OperatorDefinition}, which represents all three forms. An \cs{OperatorDefinition} then has a kind, which is \cs{Implicit} or \cs{Explicit} for conversion operators, or the name of one of the overloadable unary or binary operators (for example, \cs{Addition} or \cs{Xor}).
 
 \item The specification lists instance constructors and static constructors separately. But since \cs{Static} already exists as a member modifier for other kinds of members, it could be confusing if it did not work for constructors. For this reason, both instance and static constructors are represented as \cs{ConstructorDefinition}.
+
+\item The specification calls the member that is invoked when an instance is garbage collected "destructor". But the official documentation \cite{finalizer} and the \ac{CLI} specification call this member "finalizer", so that is the name used here.
 \end{itemize}
 
 \medskip
