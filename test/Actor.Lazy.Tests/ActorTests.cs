@@ -94,11 +94,11 @@ class C
             var sourceFile = new SourceFile("source.cse", input);
 
             var project = new ProjectTransformer(
-                new[] { sourceFile }, new[] { typeof(ActorAttribute) },
+                new[] { sourceFile }, CreateReferences(typeof(ActorAttribute)),
                 new ITransformation[] { new ActorTransformation() });
 
-            var tranformedProject = project.Transform();
-            AssertEx.LinesEqual(expectedOutput, tranformedProject.SourceFiles.Single().Text);
+            var transformedProject = project.Transform();
+            AssertEx.LinesEqual(expectedOutput, transformedProject.SourceFiles.Single().Text);
         }
 
         [Fact]
@@ -156,7 +156,7 @@ class C
 
             var sourceFile = new SourceFile("source.cse", input);
             var project = new ProjectTransformer(
-                new[] { sourceFile }, new[] { typeof(ActorAttribute) },
+                new[] { sourceFile }, CreateReferences(typeof(ActorAttribute)),
                 new ITransformation[] { new ActorTransformation() });
 
             var recorder = new LogRecorder<LogAction>();
@@ -183,7 +183,7 @@ class C
 
             sourceFile.Tree = sourceFile.Tree.WithInsertBefore($"    }}{nl}}}", $"        return 42;{nl}");
             tranformedProject = project.Transform();
-            AssertEx.LinesEqual(Includeptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
+            AssertEx.LinesEqual(IncludeOptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
             Assert.Equal(
                 new LogAction[]
                 {
@@ -193,7 +193,7 @@ class C
                 }, recorder.Read());
 
             tranformedProject = project.Transform();
-            AssertEx.LinesEqual(Includeptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
+            AssertEx.LinesEqual(IncludeOptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
             Assert.Equal(
                 new LogAction[] { ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "cached") },
                 recorder.Read());

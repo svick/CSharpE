@@ -34,8 +34,5 @@ namespace CSharpE.Extensions.Actor
                 });
             });
         }
-
-        public override IEnumerable<LibraryReference> AdditionalReferences =>
-            new[] { new AssemblyReference(typeof(ActorAttribute)) };
     }
 }

@@ -77,8 +77,6 @@ namespace CSharpE.Transform.MSBuild
 
             OutputSourceFiles = outputFiles.ToArray();
 
-            // TODO: handle added references?
-
             return true;
         }
     }

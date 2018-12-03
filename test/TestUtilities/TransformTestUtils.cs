@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using CSharpE.Syntax;
 using CSharpE.Transform;
 using static System.Text.RegularExpressions.RegexOptions;
 
@@ -27,6 +29,9 @@ namespace CSharpE.TestUtilities
         private static readonly Regex Optional = new Regex(@"\[\|(.*?)\|\]", Singleline);
 
         public static string IgnoreOptional(string input) => Optional.Replace(input, string.Empty);
-        public static string Includeptional(string input) => Optional.Replace(input, "$1");
+        public static string IncludeOptional(string input) => Optional.Replace(input, "$1");
+
+        public static IEnumerable<LibraryReference> CreateReferences(params Type[] representatives) =>
+            representatives.Select(t => new AssemblyReference(t));
     }
 }

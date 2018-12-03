@@ -99,8 +99,5 @@ namespace CSharpE.Extensions.Record
                 }
             });
         }
-
-        public override IEnumerable<LibraryReference> AdditionalReferences =>
-            new[] { new AssemblyReference(typeof(RecordAttribute)) };
     }
 }

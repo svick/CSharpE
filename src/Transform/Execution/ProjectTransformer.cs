@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpE.Syntax;
-using CSharpE.Syntax.Internals;
 using CSharpE.Transform.Transformers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -13,18 +12,12 @@ namespace CSharpE.Transform.Execution
     public class ProjectTransformer
     {
         public IList<SourceFile> SourceFiles { get; }
+
         public IList<LibraryReference> AdditionalReferences { get; }
 
         private readonly CSharpCompilation compilation;
 
         private readonly List<TransformationTransformer> transformers;
-
-        public ProjectTransformer(
-            IEnumerable<SourceFile> sourceFiles, IEnumerable<Type> additionalReferencesRepresentatives,
-            IEnumerable<ITransformation> transformations)
-            : this(
-                sourceFiles, additionalReferencesRepresentatives.Select(t => new AssemblyReference(t)),
-                transformations) { }
 
         public ProjectTransformer(
             IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
@@ -36,7 +29,6 @@ namespace CSharpE.Transform.Execution
             
             foreach (var transformation in transformations)
             {
-                AdditionalReferences.AddRange(transformation.AdditionalReferences);
                 transformers.Add(new TransformationTransformer(transformation));
             }
         }
