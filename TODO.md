@@ -28,3 +28,4 @@
  - design-time transformations shouldn't add `using`s, because those are observable
  - add `Smart.ForEachWithSegment` (but with better name), which allows adding members to a type based on a collection of other members
      - might require adding an abstraction for dependencies? (node/limited node/data)
+- improve debugging of extensions by using launchSettings.json
