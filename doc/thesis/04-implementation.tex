@@ -17,6 +17,39 @@ The implementation of the system is composed of four main projects:
 
 \section{CSharpE.Syntax}
 
+The most complicated part of the job of \cs{CSharpE.Syntax} is to convert from C\# source code to CSharpE code representation and vice versa. To help with this, we can use Roslyn. With that, it is only necessary to convert between the Roslyn representation and the CSharpE representation, which is much easier. Also, by using Roslyn, we use the same code as the C\# compiler, which means there is no chance of introducing parsing bugs.
+
+\medskip
+
+Because CSharpE syntax nodes and Roslyn syntax nodes often have very close correspondence and because transformations often access only some parts of the syntax tree, a CSharpE syntax tree that is created from a Roslyn syntax tree acts as a lazy wrapper over it: CSharpE nodes are created from the corresponding Roslyn nodes only as necessary. In other words, when a CSharpE node is created from a Roslyn node, it stores the Roslyn node. When one of its child nodes is then accessed for the first time, it is created from the corresponding child of the Roslyn node.
+
+\todo{how a node is actually created}
+
+Syntax nodes can also have properties that are not child syntax nodes and are not lazy. For example, the property \cs{string Name} of \cs{TypeDefinition} is one.
+
+\medskip
+
+A created CSharpE syntax node can then be modified by the user. Eventually, it will need to be converted back to C\# source code, which is once more done through Roslyn nodes: CSharpE nodes implement the internal interface \cs{ISyntaxWrapper<TSyntax>}, which can be seen in Listing~\ref{isyntaxwrapper}. The single method of this interface, \cs{GetWrapped}, is used to retrieve an up-to-date version of the Roslyn node (\cs{TSyntax}) for a CSharpE node. The \cs{changed} parameter is used by the \cs{GetWrapped} method of the parent to detect whether the current node changed since the parent called the \cs{GetWrapped} method of the child node last. Any other caller is required to pass a reference to \cs{null} for the parameter.
+
+\begin{listing}
+\begin{minted}{csharp}
+internal interface ISyntaxWrapper<out TSyntax>
+{
+    TSyntax GetWrapped(ref bool? changed);
+}
+\end{minted}
+\caption{Declaration of the ISyntaxWrapper interface}
+\label{isyntaxwrapper}
+\end{listing}
+
+\todo{simplified source code of some very simple node type with a lazy and non-lazy property?}
+
+A typical implementation of \cs{GetWrapped} will work like this:
+
+\begin{enumerate}
+\item 
+\end{enumerate}
+
 \section{CSharpE.Transform}
 
 \section{CSharpE.Transform.VisualStudio}
