@@ -1,14 +1,31 @@
 \chapter{Implementation}
 
-\section{Syntax trees}
+As has been explained before, the implementation should be a .NET library usable from C\#. While it would be possible to write such a library in another .NET language, C\#, as a general-purpose programming language, is suitable for this task, so it is the language used in the implementation.
 
-\section{Transformations}
+One of the principles of the design of the system has been a focus on performance, especially when it comes to limiting executing the code of transformations. The implementation also sometimes considers performance, but generally speaking, maintainability and readability of code take precedence, especially at the method level. Because some of the code written this way might be performance-critical, the intention is to use profiling and optimize the found bottlenecks, but this has not been done in the current version.
 
-\section{IDE integration}
+\medskip
+
+The implementation of the system is composed of four main projects:
+
+\begin{itemize}
+\item \cs{CSharpE.Syntax}, for representing code,
+\item \cs{CSharpE.Transform}, for transforming code,
+\item \cs{CSharpE.Transform.VisualStudio}, which supports using extensions at design-time in Visual Studio,
+\item \cs{CSharpE.Transform.MSBuild}, which supports using extensions at build-time in MSBuild.
+\end{itemize}
+
+\section{CSharpE.Syntax}
+
+\section{CSharpE.Transform}
+
+\section{CSharpE.Transform.VisualStudio}
 
 \begin{itemize}
 \item tried creating custom language that "derives" from \cs{CSharp}; VS didn't like that
 \item mention how I had to use the extern alias trick, which is not easy with NuGet
 \end{itemize}
+
+\section{CSharpE.Transform.MSBuild}
 
 \section{Example extensions}
