@@ -76,7 +76,7 @@ namespace CSharpE.Transform.Transformers
             }
         }
 
-        Func<TypeDefinition, Func<TypeDefinition, Action<TypeDefinition>>> CreateLimitedDiffer()
+        private static Func<TypeDefinition, Func<TypeDefinition, Action<TypeDefinition>>> CreateLimitedDiffer()
         {
             return inputBefore =>
             {
@@ -103,7 +103,7 @@ namespace CSharpE.Transform.Transformers
             };
         }
 
-        Func<TInput, Func<TInput, Action<TInput>>> CreateDiffer()
+        private Func<TInput, Func<TInput, Action<TInput>>> CreateDiffer()
         {
             if (limited)
                 return AddNamespacesToDiffer((Func<TInput, Func<TInput, Action<TInput>>>)CreateLimitedDiffer());
@@ -115,7 +115,7 @@ namespace CSharpE.Transform.Transformers
             });
         }
 
-        Func<TInput, Func<TInput, Action<TInput>>> AddNamespacesToDiffer(Func<TInput, Func<TInput, Action<TInput>>> differ)
+        private static Func<TInput, Func<TInput, Action<TInput>>> AddNamespacesToDiffer(Func<TInput, Func<TInput, Action<TInput>>> differ)
         {
             return inputBefore =>
             {

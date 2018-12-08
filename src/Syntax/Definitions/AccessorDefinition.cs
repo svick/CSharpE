@@ -65,10 +65,7 @@ namespace CSharpE.Syntax
             return syntax;
         }
         
-        private protected override void SetSyntaxImpl(Microsoft.CodeAnalysis.SyntaxNode newSyntax)
-        {
-            throw new System.NotImplementedException();
-        }
+        private protected override void SetSyntaxImpl(Microsoft.CodeAnalysis.SyntaxNode newSyntax) => throw new NotImplementedException();
 
         internal override SyntaxNode Clone() => new AccessorDefinition();
     }
