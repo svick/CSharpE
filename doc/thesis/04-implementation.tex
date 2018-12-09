@@ -23,8 +23,6 @@ The most complicated part of the job of \cs{CSharpE.Syntax} is to convert from C
 
 Because CSharpE syntax nodes and Roslyn syntax nodes often have very close correspondence and because transformations often access only some parts of the syntax tree, a CSharpE syntax tree that is created from a Roslyn syntax tree acts as a lazy wrapper over it: CSharpE nodes are created from the corresponding Roslyn nodes only as necessary. In other words, when a CSharpE node is created from a Roslyn node, it stores the Roslyn node. When one of its child nodes is then accessed for the first time, it is created from the corresponding child of the Roslyn node.
 
-\todo{how a node is actually created}
-
 Syntax nodes can also have properties that are not child syntax nodes and are not lazy. For example, the property \cs{string Name} of \cs{TypeDefinition} is one.
 
 \medskip
@@ -41,6 +39,10 @@ internal interface ISyntaxWrapper<out TSyntax>
 \caption{Declaration of the ISyntaxWrapper interface}
 \label{isyntaxwrapper}
 \end{listing}
+
+Another option would be to notify ancestor nodes when a node is modified. This way, a node that was not changed would not have to recompute the wrapped Roslyn node, which should be more efficient. Though this approach is more complicated and so it has not been implemented.
+
+\medskip
 
 \todo{simplified source code of some very simple node type with a lazy and non-lazy property?}
 
