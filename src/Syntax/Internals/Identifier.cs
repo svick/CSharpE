@@ -8,26 +8,35 @@ namespace CSharpE.Syntax.Internals
     {
         private SyntaxToken syntax;
 
-        internal Identifier(SyntaxToken syntax) : this() => this.syntax = syntax;
+        private bool canBeNull;
 
-        public Identifier(string text) : this()
+        public Identifier(SyntaxToken syntax, bool canBeNull = false) : this()
         {
-            if (string.IsNullOrEmpty(text))
-                throw new ArgumentException(nameof(text));
-
-            this.text = text;
+            this.syntax = syntax;
+            this.canBeNull = canBeNull;
         }
 
+        public Identifier(string text, bool canBeNull = false) : this()
+        {
+            this.canBeNull = canBeNull;
+            this.Text = text;
+        }
+
+        private bool textSet;
         private string text;
         public string Text
         {
-            get => text ?? syntax.ValueText;
+            get => textSet ? text : syntax.ValueText;
             set
             {
-                if (string.IsNullOrEmpty(value))
+                if (!canBeNull && value == null)
+                    throw new ArgumentNullException(nameof(value));
+
+                if (value == string.Empty)
                     throw new ArgumentException(nameof(value));
 
                 text = value;
+                textSet = true;
             }
         }
 
@@ -35,11 +44,9 @@ namespace CSharpE.Syntax.Internals
         // which would mean that the change in syntax would not be remembered by the original instance
         internal SyntaxToken GetWrapped(ref bool? changed)
         {
-            var newText = text ?? syntax.ValueText;
-
-            if (newText != syntax.ValueText)
+            if (Text != syntax.ValueText)
             {
-                syntax = CSharpSyntaxFactory.Identifier(text);
+                syntax = text == null ? default : CSharpSyntaxFactory.Identifier(text);
 
                 changed = true;
             }

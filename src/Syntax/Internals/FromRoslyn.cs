@@ -17,7 +17,10 @@ namespace CSharpE.Syntax.Internals
         {
             switch (syntax)
             {
-                case LiteralExpressionSyntax literalSyntax: return LiteralExpression(literalSyntax, parent);
+                case LiteralExpressionSyntax literalSyntax:
+                    return LiteralExpression(literalSyntax, parent);
+                case InvocationExpressionSyntax invocationSyntax:
+                    return new InvocationExpression(invocationSyntax, parent);
                 case null: return null;
             }
 
@@ -28,6 +31,8 @@ namespace CSharpE.Syntax.Internals
         {
             switch (syntax.Kind())
             {
+                case SyntaxKind.NullLiteralExpression:
+                    return new NullExpression(syntax, parent);
                 case SyntaxKind.NumericLiteralExpression:
                     if (syntax.Token.Value is int)
                         return new IntLiteralExpression(syntax, parent);

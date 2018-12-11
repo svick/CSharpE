@@ -125,7 +125,6 @@ namespace CSharpE.Syntax
             set => name.Text = value;
         }
 
-
         MethodDeclarationSyntax ISyntaxWrapper<MethodDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);

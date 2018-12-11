@@ -128,5 +128,12 @@ namespace CSharpE.Syntax
             // if nodes are equivalent, their strings should be equal
             return StringComparer.Ordinal.GetHashCode(thisWrapper.GetWrapped().ToString());
         }
+
+        public override string ToString()
+        {
+            var thisWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)this;
+
+            return thisWrapper.GetWrapped().NormalizeWhitespace().ToString();
+        }
     }
 }

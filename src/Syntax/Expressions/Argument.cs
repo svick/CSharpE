@@ -6,7 +6,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    // TODO: named arguments; ref and out
+    // TODO: ref, out and in
     public sealed class Argument : SyntaxNode, ISyntaxWrapper<ArgumentSyntax>
     {
         private ArgumentSyntax syntax;
@@ -14,10 +14,22 @@ namespace CSharpE.Syntax
         internal Argument(ArgumentSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+            name = new Identifier(syntax.NameColon?.Name.Identifier ?? default, canBeNull: true);
             Parent = parent;
         }
 
-        public Argument(Expression expression) => Expression = expression;
+        public Argument(Expression expression, string name = null)
+        {
+            Expression = expression;
+            this.name = new Identifier(name, canBeNull: true);
+        }
+
+        private Identifier name;
+        public string Name
+        {
+            get => name.Text;
+            set => name.Text = value;
+        }
 
         private Expression expression;
         public Expression Expression
@@ -38,11 +50,14 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
+            var newName = name.GetWrapped(ref thisChanged);
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
 
             if (syntax == null || thisChanged == true)
             {
-                syntax = CSharpSyntaxFactory.Argument(newExpression);
+                syntax = CSharpSyntaxFactory.Argument(
+                    newName == default ? null : CSharpSyntaxFactory.NameColon(CSharpSyntaxFactory.IdentifierName(newName)),
+                    default, newExpression);
 
                 SetChanged(ref changed);
             }
