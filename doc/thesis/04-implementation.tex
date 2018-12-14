@@ -44,13 +44,99 @@ Another option would be to notify ancestor nodes when a node is modified. This w
 
 \medskip
 
-\todo{simplified source code of some very simple node type with a lazy and non-lazy property?}
+\begin{listing}
+\begin{minted}{csharp}
+public sealed class Argument : SyntaxNode, ISyntaxWrapper<ArgumentSyntax>
+{
+    private ArgumentSyntax syntax;
 
-A typical implementation of \cs{GetWrapped} will work like this:
+    internal Argument(ArgumentSyntax syntax, SyntaxNode parent)
+    {
+        this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+        Name = syntax.NameColon?.Name.Identifier.ValueText;
+        Parent = parent;
+    }
+
+    public Argument(Expression expression, string name = null)
+    {
+        Expression = expression;
+        Name = name;
+    }
+
+    public string Name { get; set; }
+
+    private Expression expression;
+    public Expression Expression
+    {
+        get => expression ??
+            (expression = FromRoslyn.Expression(syntax.Expression, this));
+        set => SetNotNull(ref expression, value);
+    }
+
+    ArgumentSyntax ISyntaxWrapper<ArgumentSyntax>.GetWrapped(ref bool? changed)
+    {
+        GetAndResetChanged(ref changed);
+        
+        bool? thisChanged = false;
+        var newExpression =
+            expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
+
+        if (syntax == null || thisChanged == true ||
+            syntax.NameColon?.Name.Identifier.ValueText != Name)
+        {
+            syntax = RoslynSyntaxFactory.Argument(
+                Name == null ? null : CSharpSyntaxFactory.NameColon(Name),
+                default, newExpression);
+
+            SetChanged(ref changed);
+        }
+
+        return syntax;
+    }
+
+    public static implicit operator Argument(Expression expression)
+        => new Argument(expression);
+}
+\end{minted}
+\caption{Simplified implementation of the Argument class}
+\label{argument-source}
+\end{listing}
+
+Listing~\ref{argument-source} shows how a typical implementation of a \cs{SyntaxNode} looks like. Specifically, it shows simplified code of the \cs{Argument} class, which is used to represent an argument to a call. For example, the statement \cs{F(42, foo: null);} contains two arguments: \cs{42} and \cs{foo: null}. An argument is composed of an expression, an optional name and an optional ref kind (\cs{ref}, \cs{out} or \cs{in}). For brevity, the shown version of \cs{Argument} does not support arguments that have a ref kind. This means the class has two properties: the lazy \cs{Expression} and non-lazy \cs{Name}.
+
+The implementation is composed of the following parts:
+
+\begin{itemize}
+\item Specification that the class directly inherits from the \cs{SyntaxNode} base class and that it implements the \cs{ISyntaxWrapper<TSyntax>} interface for Roslyn's \cs{ArgumentSyntax} type.
+
+\item A field holding the most recent Roslyn syntax node, if any.
+
+\item An internal constructor that creates an instance of the class from a Roslyn syntax node. Notice that the lazy property \cs{Expression} is not initialized here, while the non-lazy property \cs{Name} is. Another interesting point is how complicated the expression used to initialize \cs{Name} is, which shows that the CSharpE design is much simpler than the Roslyn design.
+
+This constructor is used when a member of the \cs{Arguments} collection of \cs{InvocationExpression} is accessed for the first time.
+
+\item A public constructor that can be used by the user to create a new instance of this class.
+
+\item The \cs{Name} property. Because it is not lazy, it does not require any special behavior and so it can be an auto-property.
+
+\item The \cs{Expression} property. Since it is lazy, when its value is read for the first time, it creates the \cs{Expression} node based on the expression of the Roslyn node. The \cs{FromRoslyn} class contains helper methods for converting Roslyn nodes to CSharpE nodes. In this case, it is used to create the correct type that derives from \cs{Expression} based on the Roslyn node.
+
+The setter uses the helper method \cs{SetNotNull}, which checks that the passed in value is not \cs{null} and also ensures that the \cs{Parent} property of the expression node is correctly set.
+
+\item The \cs{GetWrapped} method. It is an explicit interface implementation, because C\# does not allow implicit interface implementations through internal methods, only public ones, and this method should not be accessible by the user.
+
+The method does the following:
 
 \begin{enumerate}
-\item 
+\item Make sure that the value of the \cs{changed} parameter is set correctly when this method is called by the parent node by invoking the helper methods \cs{GetAndResetChanged} and \cs{SetChanged} at the appropriate places.
+\item Call \cs{GetWrapped} on its lazy properties if they are initialized, otherwise use the corresponding child of the saved Roslyn node. While doing this, keep track of whether any lazy properties reported changes in the \cs{thisChanged} variable.
+\item Check if a new Roslyn node needs to be created. This happens either because no Roslyn node has been created yet, or because changes occurred since the saved Roslyn node was created. Changes are detected by checking the \cs{thisChanged} variable for lazy properties and by comparing with the latest Roslyn node for non-lazy properties.
+\item Create a new Roslyn node by using a factory method from the Roslyn \cs{SyntaxFactory} class (aliased as \cs{RoslynSyntaxFactory} because of a conflict with CSharpE \cs{SyntaxFactory}) and save it.
+\item Finally, return the Roslyn node, which is now guaranteed to be up to date.
 \end{enumerate}
+
+\item An implicit conversion operator from \cs{Expression} to \cs{Argument}. This way, the common case where an argument to a call has only an expression, without a name or a ref kind, can be created more easily.
+\end{itemize}
 
 \section{CSharpE.Transform}
 
