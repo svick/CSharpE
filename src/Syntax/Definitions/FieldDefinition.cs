@@ -4,7 +4,7 @@ using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 // TODO: field declarations with more than one field
@@ -115,12 +115,12 @@ namespace CSharpE.Syntax
                 !IsAnnotated(syntax))
             {
                 var equalsValueClause =
-                    newInitializer == null ? null : CSharpSyntaxFactory.EqualsValueClause(newInitializer);
+                    newInitializer == null ? null : RoslynSyntaxFactory.EqualsValueClause(newInitializer);
 
-                var newSyntax = CSharpSyntaxFactory.FieldDeclaration(
-                    GetNewAttributes(), newModifiers.GetWrapped(), CSharpSyntaxFactory.VariableDeclaration(
-                        newType, CSharpSyntaxFactory.SingletonSeparatedList(
-                            CSharpSyntaxFactory.VariableDeclarator(newName, null, equalsValueClause))));
+                var newSyntax = RoslynSyntaxFactory.FieldDeclaration(
+                    GetNewAttributes(), newModifiers.GetWrapped(), RoslynSyntaxFactory.VariableDeclaration(
+                        newType, RoslynSyntaxFactory.SingletonSeparatedList(
+                            RoslynSyntaxFactory.VariableDeclarator(newName, null, equalsValueClause))));
 
                 syntax = Annotate(newSyntax);
 

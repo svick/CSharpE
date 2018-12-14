@@ -1,7 +1,7 @@
 ﻿using System;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -14,22 +14,17 @@ namespace CSharpE.Syntax
         internal Argument(ArgumentSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
-            name = new Identifier(syntax.NameColon?.Name.Identifier ?? default, canBeNull: true);
+            Name = syntax.NameColon?.Name.Identifier.ValueText;
             Parent = parent;
         }
 
         public Argument(Expression expression, string name = null)
         {
             Expression = expression;
-            this.name = new Identifier(name, canBeNull: true);
+            Name = name;
         }
 
-        private Identifier name;
-        public string Name
-        {
-            get => name.Text;
-            set => name.Text = value;
-        }
+        public string Name { get; set; }
 
         private Expression expression;
         public Expression Expression
@@ -50,13 +45,12 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
-            var newName = name.GetWrapped(ref thisChanged);
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || syntax.NameColon?.Name.Identifier.ValueText != Name)
             {
-                syntax = CSharpSyntaxFactory.Argument(
-                    newName == default ? null : CSharpSyntaxFactory.NameColon(CSharpSyntaxFactory.IdentifierName(newName)),
+                syntax = RoslynSyntaxFactory.Argument(
+                    Name == null ? null : RoslynSyntaxFactory.NameColon(Name),
                     default, newExpression);
 
                 SetChanged(ref changed);

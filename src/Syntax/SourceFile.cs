@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -201,7 +201,7 @@ namespace CSharpE.Syntax
             additionalNamespaces.RemoveWhere(
                 ns =>
                 {
-                    var nameSyntax = CSharpSyntaxFactory.ParseName(ns);
+                    var nameSyntax = RoslynSyntaxFactory.ParseName(ns);
                     return oldUsingNamespaces.Any(ons => nameSyntax.IsEquivalentTo(ons));
                 });
 
@@ -214,11 +214,11 @@ namespace CSharpE.Syntax
                     // TODO: sort usings?
                     newUsings = newUsings.AddRange(
                         additionalNamespaces.OrderBy(x => x).Select(
-                            ns => CSharpSyntaxFactory.UsingDirective(CSharpSyntaxFactory.ParseName(ns))));
+                            ns => RoslynSyntaxFactory.UsingDirective(RoslynSyntaxFactory.ParseName(ns))));
                 }
 
-                syntax = CSharpSyntaxFactory.SyntaxTree(
-                    CSharpSyntaxFactory.CompilationUnit(default, newUsings, default, newMembers).NormalizeWhitespace(),
+                syntax = RoslynSyntaxFactory.SyntaxTree(
+                    RoslynSyntaxFactory.CompilationUnit(default, newUsings, default, newMembers).NormalizeWhitespace(),
                     path: Path);
 
                 additionalNamespaces.Clear();

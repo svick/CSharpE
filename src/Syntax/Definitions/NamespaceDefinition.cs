@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -50,8 +50,8 @@ namespace CSharpE.Syntax
 
             if (syntax == null || thisChanged == true || Name != syntax.Name.ToString())
             {
-                syntax = CSharpSyntaxFactory.NamespaceDeclaration(
-                    CSharpSyntaxFactory.ParseName(Name), default, default, newMembers);
+                syntax = RoslynSyntaxFactory.NamespaceDeclaration(
+                    RoslynSyntaxFactory.ParseName(Name), default, default, newMembers);
 
                 SetChanged(ref changed);
             }

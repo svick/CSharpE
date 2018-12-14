@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static CSharpE.Syntax.MemberModifiers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
@@ -92,9 +92,9 @@ namespace CSharpE.Syntax
         {
             var tokens = ModifiersMapping
                 .Where((modifier, _) => modifiers.Contains(modifier))
-                .Select((_, syntaxKind) => CSharpSyntaxFactory.Token(syntaxKind));
+                .Select((_, syntaxKind) => RoslynSyntaxFactory.Token(syntaxKind));
 
-            return CSharpSyntaxFactory.TokenList(tokens);
+            return RoslynSyntaxFactory.TokenList(tokens);
         }
     }
 }

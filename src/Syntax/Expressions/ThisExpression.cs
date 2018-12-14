@@ -1,7 +1,7 @@
 ﻿using System;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -24,7 +24,7 @@ namespace CSharpE.Syntax
 
             if (syntax == null)
             {
-                syntax = CSharpSyntaxFactory.ThisExpression();
+                syntax = RoslynSyntaxFactory.ThisExpression();
 
                 SetChanged(ref changed);
             }

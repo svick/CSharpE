@@ -4,7 +4,7 @@ using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -74,9 +74,9 @@ namespace CSharpE.Syntax
                 if (Parent == null)
                     throw new InvalidOperationException("Can't create syntax node for constructor with no parent type.");
 
-                var newSyntax = CSharpSyntaxFactory.ConstructorDeclaration(
-                    GetNewAttributes(), newModifiers.GetWrapped(), CSharpSyntaxFactory.Identifier(ParentType.Name),
-                    CSharpSyntaxFactory.ParameterList(newParameters), default, newBody);
+                var newSyntax = RoslynSyntaxFactory.ConstructorDeclaration(
+                    GetNewAttributes(), newModifiers.GetWrapped(), RoslynSyntaxFactory.Identifier(ParentType.Name),
+                    RoslynSyntaxFactory.ParameterList(newParameters), default, newBody);
 
                 syntax = Annotate(newSyntax);
 

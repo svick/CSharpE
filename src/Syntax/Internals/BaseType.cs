@@ -1,6 +1,6 @@
 using System;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax.Internals
@@ -58,7 +58,7 @@ namespace CSharpE.Syntax.Internals
 
             if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
             {
-                var newSyntax = CSharpSyntaxFactory.SimpleBaseType(newType);
+                var newSyntax = RoslynSyntaxFactory.SimpleBaseType(newType);
 
                 syntax = Annotate(newSyntax);
                 

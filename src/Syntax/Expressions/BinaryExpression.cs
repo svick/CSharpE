@@ -2,7 +2,7 @@ using System;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -87,8 +87,8 @@ namespace CSharpE.Syntax
             if (Syntax == null || thisChanged == true)
             {
                 Syntax = IsAssignment 
-                    ? (ExpressionSyntax)CSharpSyntaxFactory.AssignmentExpression(Kind, newLeft, newRight)
-                    : CSharpSyntaxFactory.BinaryExpression(Kind, newLeft, newRight);
+                    ? (ExpressionSyntax)RoslynSyntaxFactory.AssignmentExpression(Kind, newLeft, newRight)
+                    : RoslynSyntaxFactory.BinaryExpression(Kind, newLeft, newRight);
 
                 SetChanged(ref changed);
             }

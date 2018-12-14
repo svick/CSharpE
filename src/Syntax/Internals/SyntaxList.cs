@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Roslyn = Microsoft.CodeAnalysis;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
 {
@@ -191,7 +191,7 @@ namespace CSharpE.Syntax.Internals
             Roslyn::SyntaxList<TRoslynSyntax> syntaxList, SyntaxNode parent) : base(syntaxList, parent) { }
 
         protected sealed override Roslyn::SyntaxList<TRoslynSyntax> CreateList(List<TRoslynSyntax> nodes) =>
-            CSharpSyntaxFactory.List(nodes);
+            RoslynSyntaxFactory.List(nodes);
     }
 
     internal class SeparatedSyntaxList<TSyntax, TRoslynSyntax>
@@ -207,6 +207,6 @@ namespace CSharpE.Syntax.Internals
             Roslyn::SeparatedSyntaxList<TRoslynSyntax> syntaxList, SyntaxNode parent) : base(syntaxList, parent) { }
 
         protected sealed override Roslyn::SeparatedSyntaxList<TRoslynSyntax> CreateList(List<TRoslynSyntax> nodes) =>
-            CSharpSyntaxFactory.SeparatedList(nodes);
+            RoslynSyntaxFactory.SeparatedList(nodes);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -33,7 +33,7 @@ namespace CSharpE.Syntax
 
             if (Syntax == null || Value != (bool)Syntax.Token.Value)
             {
-                Syntax = CSharpSyntaxFactory.LiteralExpression(Value ? TrueLiteralExpression : FalseLiteralExpression);
+                Syntax = RoslynSyntaxFactory.LiteralExpression(Value ? TrueLiteralExpression : FalseLiteralExpression);
 
                 SetChanged(ref changed);
             }

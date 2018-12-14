@@ -5,7 +5,7 @@ using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -52,10 +52,10 @@ namespace CSharpE.Syntax
             if (attributes == null)
                 return GetAttributeLists(MemberSyntax);
 
-            return CSharpSyntaxFactory.List(
+            return RoslynSyntaxFactory.List(
                 attributes.Select(
-                    a => CSharpSyntaxFactory.AttributeList(
-                        CSharpSyntaxFactory.SingletonSeparatedList(a.GetWrapped()))));
+                    a => RoslynSyntaxFactory.AttributeList(
+                        RoslynSyntaxFactory.SingletonSeparatedList(a.GetWrapped()))));
         }
 
         private protected void ResetAttributes() => attributes = null;

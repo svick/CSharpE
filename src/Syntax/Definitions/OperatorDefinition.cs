@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 using static CSharpE.Syntax.OperatorKind;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -156,19 +156,19 @@ namespace CSharpE.Syntax
             {
                 BaseMethodDeclarationSyntax newSyntax;
 
-                var token = CSharpSyntaxFactory.Token(GetTokenKind(Kind));
+                var token = RoslynSyntaxFactory.Token(GetTokenKind(Kind));
 
                 if (Kind == Implicit || Kind == Explicit)
                 {
-                    newSyntax = CSharpSyntaxFactory.ConversionOperatorDeclaration(
+                    newSyntax = RoslynSyntaxFactory.ConversionOperatorDeclaration(
                         GetNewAttributes(), newModifiers.GetWrapped(), token, newReturnType,
-                        CSharpSyntaxFactory.ParameterList(newParameters), newBody, null);
+                        RoslynSyntaxFactory.ParameterList(newParameters), newBody, null);
                 }
                 else
                 {
-                    newSyntax = CSharpSyntaxFactory.OperatorDeclaration(
+                    newSyntax = RoslynSyntaxFactory.OperatorDeclaration(
                         GetNewAttributes(), newModifiers.GetWrapped(), newReturnType, token,
-                        CSharpSyntaxFactory.ParameterList(newParameters), newBody, null);
+                        RoslynSyntaxFactory.ParameterList(newParameters), newBody, null);
                 }
 
                 syntax = Annotate(newSyntax);

@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.CodeAnalysis;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
 {
@@ -46,7 +46,7 @@ namespace CSharpE.Syntax.Internals
         {
             if (Text != syntax.ValueText)
             {
-                syntax = text == null ? default : CSharpSyntaxFactory.Identifier(text);
+                syntax = text == null ? default : RoslynSyntaxFactory.Identifier(text);
 
                 changed = true;
             }

@@ -4,7 +4,7 @@ using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -140,9 +140,9 @@ namespace CSharpE.Syntax
             if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || !IsAnnotated(syntax))
             {
-                var newSyntax = CSharpSyntaxFactory.MethodDeclaration(
+                var newSyntax = RoslynSyntaxFactory.MethodDeclaration(
                     GetNewAttributes(), newModifiers.GetWrapped(), newReturnType, null, newName, null,
-                    CSharpSyntaxFactory.ParameterList(newParameters), default, newBody, null);
+                    RoslynSyntaxFactory.ParameterList(newParameters), default, newBody, null);
 
                 syntax = Annotate(newSyntax);
 

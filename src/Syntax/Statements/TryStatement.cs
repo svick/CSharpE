@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -86,11 +86,11 @@ namespace CSharpE.Syntax
             if (syntax == null || thisChanged == true)
             {
                 var newFinallyClause = newFinallyStatements.Any()
-                    ? CSharpSyntaxFactory.FinallyClause(CSharpSyntaxFactory.Block(newFinallyStatements))
+                    ? RoslynSyntaxFactory.FinallyClause(RoslynSyntaxFactory.Block(newFinallyStatements))
                     : null;
 
-                syntax = CSharpSyntaxFactory.TryStatement(
-                    CSharpSyntaxFactory.Block(newTryStatements), newCatchClauses, newFinallyClause);
+                syntax = RoslynSyntaxFactory.TryStatement(
+                    RoslynSyntaxFactory.Block(newTryStatements), newCatchClauses, newFinallyClause);
 
                 SetChanged(ref changed);
             }

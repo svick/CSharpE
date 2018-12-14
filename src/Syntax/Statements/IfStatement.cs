@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -39,7 +39,7 @@ namespace CSharpE.Syntax
         private static Roslyn::SyntaxList<StatementSyntax> GetStatementList(StatementSyntax statement) =>
             statement is BlockSyntax blockSyntax
                 ? blockSyntax.Statements
-                : CSharpSyntaxFactory.SingletonList(statement);
+                : RoslynSyntaxFactory.SingletonList(statement);
 
         private StatementList thenStatements;
         public IList<Statement> ThenStatements
@@ -67,7 +67,7 @@ namespace CSharpE.Syntax
 
             if (syntax == null || thisChanged == true)
             {
-                syntax = CSharpSyntaxFactory.IfStatement(newCondition, CSharpSyntaxFactory.Block(newThenStatements));
+                syntax = RoslynSyntaxFactory.IfStatement(newCondition, RoslynSyntaxFactory.Block(newThenStatements));
 
                 SetChanged(ref changed);
             }

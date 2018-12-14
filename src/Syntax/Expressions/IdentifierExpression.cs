@@ -1,6 +1,6 @@
 ﻿using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -43,7 +43,7 @@ namespace CSharpE.Syntax
 
             if (syntax == null || thisChanged == true)
             {
-                syntax = CSharpSyntaxFactory.IdentifierName(newIdentifier);
+                syntax = RoslynSyntaxFactory.IdentifierName(newIdentifier);
 
                 SetChanged(ref changed);
             }

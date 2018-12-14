@@ -1,7 +1,7 @@
 using System;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -66,9 +66,9 @@ namespace CSharpE.Syntax
             if (syntax == null || newIsThrow != oldIsThrow || thisChanged == true)
             {
                 if (newIsThrow)
-                    syntax = CSharpSyntaxFactory.ThrowStatement(newExpression);
+                    syntax = RoslynSyntaxFactory.ThrowStatement(newExpression);
                 else
-                    syntax = CSharpSyntaxFactory.ExpressionStatement(newExpression);
+                    syntax = RoslynSyntaxFactory.ExpressionStatement(newExpression);
 
                 SetChanged(ref changed);
             }

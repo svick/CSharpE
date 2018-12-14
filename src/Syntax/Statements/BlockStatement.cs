@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -45,7 +45,7 @@ namespace CSharpE.Syntax
 
             if (syntax == null || thisChanged == true)
             {
-                syntax = CSharpSyntaxFactory.Block(newStatements);
+                syntax = RoslynSyntaxFactory.Block(newStatements);
 
                 SetChanged(ref changed);
             }

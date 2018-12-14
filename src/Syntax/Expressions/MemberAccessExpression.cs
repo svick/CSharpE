@@ -1,7 +1,7 @@
 ﻿using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -65,9 +65,9 @@ namespace CSharpE.Syntax
 
             if (syntax == null || thisChanged == true)
             {
-                syntax = CSharpSyntaxFactory.MemberAccessExpression(
+                syntax = RoslynSyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression, newExpression,
-                    CSharpSyntaxFactory.IdentifierName(newMemberName));
+                    RoslynSyntaxFactory.IdentifierName(newMemberName));
 
                 SetChanged(ref changed);
             }

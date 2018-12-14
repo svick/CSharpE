@@ -6,7 +6,7 @@ using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -267,19 +267,19 @@ namespace CSharpE.Syntax
                     SimpleNameSyntax simpleName;
                     if (newTypeParameters.Any())
                     {
-                        simpleName = CSharpSyntaxFactory.GenericName(
-                            CSharpSyntaxFactory.Identifier(Name),
-                            CSharpSyntaxFactory.TypeArgumentList(newTypeParameters));
+                        simpleName = RoslynSyntaxFactory.GenericName(
+                            RoslynSyntaxFactory.Identifier(Name),
+                            RoslynSyntaxFactory.TypeArgumentList(newTypeParameters));
                     }
                     else
                     {
-                        simpleName = CSharpSyntaxFactory.IdentifierName(Name);
+                        simpleName = RoslynSyntaxFactory.IdentifierName(Name);
                     }
 
                     if (newContainer == null)
                         syntax = simpleName;
                     else
-                        syntax = CSharpSyntaxFactory.QualifiedName((NameSyntax)newContainer, simpleName);
+                        syntax = RoslynSyntaxFactory.QualifiedName((NameSyntax)newContainer, simpleName);
                 }
 
                 syntax = Annotate(syntax);
@@ -309,7 +309,7 @@ namespace CSharpE.Syntax
             if (kind == SyntaxKind.None)
                 return null;
 
-            return CSharpSyntaxFactory.PredefinedType(CSharpSyntaxFactory.Token(kind));
+            return RoslynSyntaxFactory.PredefinedType(RoslynSyntaxFactory.Token(kind));
         }
 
         private SyntaxKind GetPredefinedSyntaxKind()
