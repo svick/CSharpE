@@ -17,7 +17,7 @@ The implementation of the system is composed of four main projects:
 
 \section{CSharpE.Syntax}
 
-The most complicated part of the job of \cs{CSharpE.Syntax} is to convert from C\# source code to CSharpE code representation and vice versa. To help with this, we can use Roslyn. With that, it is only necessary to convert between the Roslyn representation and the CSharpE representation, which is much easier. Also, by using Roslyn, we use the same code as the C\# compiler, which means there is no chance of introducing parsing bugs.
+The most complicated part of the job of \cs{CSharpE.Syntax} is to convert from C\# source code to CSharpE code representation and vice versa. To help with this, we can use Roslyn. Thanks to Roslyn, it is only necessary to write code that converts between the Roslyn representation and the CSharpE representation, which is much easier. Also, by using Roslyn, we use the same code as the C\# compiler, which means there is no chance of introducing parsing bugs.
 
 \medskip
 
@@ -27,7 +27,7 @@ Syntax nodes can also have properties that are not child syntax nodes and are no
 
 \medskip
 
-A created CSharpE syntax node can then be modified by the user. Eventually, it will need to be converted back to C\# source code, which is once more done through Roslyn nodes: CSharpE nodes implement the internal interface \cs{ISyntaxWrapper<TSyntax>}, which can be seen in Listing~\ref{isyntaxwrapper}. The single method of this interface, \cs{GetWrapped}, is used to retrieve an up-to-date version of the Roslyn node (\cs{TSyntax}) for a CSharpE node. The \cs{changed} parameter is used by the \cs{GetWrapped} method of the parent to detect whether the current node changed since the parent called the \cs{GetWrapped} method of the child node last. Any other caller is required to pass a reference to \cs{null} for the parameter.
+After a CSharpE syntax node is created, it can then be modified by the user. Eventually, it will need to be converted back to C\# source code, which is once more done through Roslyn nodes: CSharpE nodes implement the internal interface \cs{ISyntaxWrapper<TSyntax>}, which can be seen in Listing~\ref{isyntaxwrapper}. The single method of this interface, \cs{GetWrapped}, is used to retrieve an up-to-date version of the Roslyn node (\cs{TSyntax}) for a CSharpE node. The \cs{changed} parameter is used by the \cs{GetWrapped} method of the parent node to detect whether the current node changed since the parent called the \cs{GetWrapped} method of the child node last. Any other caller is required to pass a reference to \cs{null} for the parameter.
 
 \begin{listing}
 \begin{minted}{csharp}
@@ -40,7 +40,7 @@ internal interface ISyntaxWrapper<out TSyntax>
 \label{isyntaxwrapper}
 \end{listing}
 
-Another option would be to notify ancestor nodes when a node is modified. This way, a node that was not changed would not have to recompute the wrapped Roslyn node, which should be more efficient. Though this approach is more complicated and so it has not been implemented.
+Another option would be to notify ancestor nodes whenever a node is modified. This way, a node that has not changed would not have to be inspected for changes, which could be more efficient. Though this approach is more complicated and so it has not been implemented.
 
 \medskip
 
@@ -102,7 +102,7 @@ public sealed class Argument : SyntaxNode, ISyntaxWrapper<ArgumentSyntax>
 \label{argument-source}
 \end{listing}
 
-Listing~\ref{argument-source} shows how a typical implementation of a \cs{SyntaxNode} looks like. Specifically, it shows simplified code of the \cs{Argument} class, which is used to represent an argument to a call. For example, the statement \cs{F(42, foo: null);} contains two arguments: \cs{42} and \cs{foo: null}. An argument is composed of an expression, an optional name and an optional ref kind (\cs{ref}, \cs{out} or \cs{in}). For brevity, the shown version of \cs{Argument} does not support arguments that have a ref kind. This means the class has two properties: the lazy \cs{Expression} and non-lazy \cs{Name}.
+Listing~\ref{argument-source} shows how a typical implementation of a \cs{SyntaxNode} looks like. Specifically, it shows simplified code of the \cs{Argument} class, which is used to represent an argument to a call. For example, the statement \cs{F(42, foo: null);} contains two arguments: \cs{42} and \cs{foo: null}. An argument is composed of an expression, an optional name and an optional ref kind (\cs{ref}, \cs{out} or \cs{in}). For brevity, the version of \cs{Argument} shown here does not support arguments that have a ref kind. This means that the class has two properties: the lazy \cs{Expression} and the non-lazy \cs{Name}.
 
 The implementation is composed of the following parts:
 
@@ -111,19 +111,27 @@ The implementation is composed of the following parts:
 
 \item A field holding the most recent Roslyn syntax node, if any.
 
-\item An internal constructor that creates an instance of the class from a Roslyn syntax node. Notice that the lazy property \cs{Expression} is not initialized here, while the non-lazy property \cs{Name} is. Another interesting point is how complicated the expression used to initialize \cs{Name} is, which shows that the CSharpE design is much simpler than the Roslyn design.
+\item An internal constructor that creates an instance of the class from a Roslyn syntax node.
 
-This constructor is used when a member of the \cs{Arguments} collection of \cs{InvocationExpression} is accessed for the first time.
+Notice that the lazy property \cs{Expression} is not initialized here, while the non-lazy property \cs{Name} is. Another interesting point is how complicated the expression used to initialize \cs{Name} is, which shows that the CSharpE design is much simpler than the Roslyn design in this case.
+
+This constructor is used when a member of the \cs{Arguments} collection of \cs{InvocationExpression} or a similar kind of expression is accessed for the first time.
 
 \item A public constructor that can be used by the user to create a new instance of this class.
 
-\item The \cs{Name} property. Because it is not lazy, it does not require any special behavior and so it can be an auto-property.
+\item The \cs{Name} property.
 
-\item The \cs{Expression} property. Since it is lazy, when its value is read for the first time, it creates the \cs{Expression} node based on the expression of the Roslyn node. The \cs{FromRoslyn} class contains helper methods for converting Roslyn nodes to CSharpE nodes. In this case, it is used to create the correct type that derives from \cs{Expression} based on the Roslyn node.
+Because it is not lazy, it does not require any special behavior and so it can be an auto-property.
 
-The setter uses the helper method \cs{SetNotNull}, which checks that the passed in value is not \cs{null} and also ensures that the \cs{Parent} property of the expression node is correctly set.
+\item The \cs{Expression} property.
 
-\item The \cs{GetWrapped} method. It is an explicit interface implementation, because C\# does not allow implicit interface implementations through internal methods, only public ones, and this method should not be accessible by the user.
+Since it is lazy, when its value is read for the first time, the \cs{Expression} node is created based on the expression of the Roslyn node. The \cs{FromRoslyn} class contains helper methods for converting Roslyn nodes to CSharpE nodes. In this case, it is used to create the correct type that derives from \cs{Expression} based on the Roslyn node.
+
+The setter uses the helper method \cs{SetNotNull}, which checks that the passed in value is not \cs{null} and also ensures that the \cs{Parent} property of the expression node is correctly set. (The \cs{Parent} property is explained in more detail later.)
+
+\item The \cs{GetWrapped} method.
+
+It is an explicit interface implementation, because C\# does not allow implicit interface implementations through internal methods, only public ones, and this method should not be accessible by the user.
 
 The method does the following:
 
@@ -135,7 +143,46 @@ The method does the following:
 \item Finally, return the Roslyn node, which is now guaranteed to be up to date.
 \end{enumerate}
 
-\item An implicit conversion operator from \cs{Expression} to \cs{Argument}. This way, the common case where an argument to a call has only an expression, without a name or a ref kind, can be created more easily.
+Note that the returned Roslyn node will have no parent. When the caller is the CSharpE parent node, it will incorporate that Roslyn node into its own Roslyn node, but with parent set to that node. This happens automatically when any Roslyn node with child nodes is created.
+
+To make this efficient, Roslyn uses a data structure called "red-green tree" (unrelated to the well-known red-black tree), where the regular nodes (which have parent references, and so cannot be reused) are a layer on top of hidden nodes with no parent references, which are reused. \cite{red-green-trees}
+
+\item An implicit conversion operator from \cs{Expression} to \cs{Argument}.
+
+\nopagebreak
+
+This way, the common case where an argument has only an expression, without a name or a ref kind, can be created more easily.
+\end{itemize}
+
+Other syntax nodes generally follow this pattern, with some exceptions:
+
+\begin{itemize}
+\item Accessing any semantic information is more complicated.
+
+As explained in Section~\ref{roslyn}, Roslyn provides semantic information though the \cs{Compilation} and \cs{SemanticModel} classes. For example, to get the full name of a \cs{NamedTypeReference}, such as the type reference \cs{Task} in the field declaration \cs{Task t;}, the following happens:
+
+\begin{enumerate}
+\item The \cs{Compilation} for the project is created.
+
+To do that, information from the whole project is necessary, which means that every node that exposes semantic information has to have access to the \cs{Project} object. The way this is done is by making every node have a reference to its parent node. With that, the \cs{SourceFile} that contains a node can be found by recursively walking parent references, and \cs{SourceFile} contains a reference to its \cs{Project}.
+
+\item The \cs{SemanticModel} for the source file is created.
+
+\item A symbol corresponding to the node in question is retrieved from the \cs{SemanticModel}.
+
+This requires using exactly the node that is part of the Roslyn syntax tree that was used to create the \cs{Compilation}. As explained above, the node created by \cs{GetWrapped} is not that: it has no parent node, and so it couldn't possibly be part of the syntax tree.
+
+To find the corresponding node that is part of the syntax tree, we use Roslyn Syntax Annotations. \cite{roslyn-annotations} The Roslyn node returned from \cs{GetWrapped} is annotated with an annotation unique for the current CSharpE node. Then, a node with the same annotation is found in the syntax tree. Finally, that node is used to find the symbol through \cs{SemanticModel}. This works, because incorporating Roslyn node into a parent preserves annotations.
+
+\item The symbol is used to find the desired information.
+
+In this example, that is the full name of a type.
+
+\end{enumerate}
+
+\item syntax list
+\item other collections
+\item whitespace
 \end{itemize}
 
 \section{CSharpE.Transform}

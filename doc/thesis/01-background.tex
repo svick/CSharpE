@@ -115,6 +115,7 @@ As can be seen from the example, generating code using \ac{CodeDOM} requires fir
 Especially notice that the code has to manually generate backing fields for properties, because CodeDOM does not support auto-implemented properties.
 
 \subsection{Roslyn}
+\label{roslyn}
 
 Roslyn \cite{roslyn} is the C\# (and Visual Basic .NET) compiler, which can also be used as a library for manipulating C\# code, including parsing, transformation and generation. Its object model was primarily designed to be used in the Visual Studio \ac{IDE}, which is why it is very detailed (so it can accurately represent any source code, including erroneous or incomplete code) and also immutable (so that multiple \ac{IDE} services can operate on the same model).
 

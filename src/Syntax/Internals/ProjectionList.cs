@@ -22,7 +22,7 @@ namespace CSharpE.Syntax.Internals
         }
     }
 
-    // Note: this type is currently mostly not optimized for perf.
+    // PERF: this type is currently mostly not optimized.
     internal class ProjectionList<TSource, TTarget> : IList<TTarget>
     {
         private readonly IList<TSource> sourceList;

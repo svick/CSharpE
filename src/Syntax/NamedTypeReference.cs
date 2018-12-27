@@ -25,7 +25,7 @@ namespace CSharpE.Syntax
         {
             this.ns = ns;
             this.container = container;
-            this.name = name ?? throw new ArgumentNullException("Name cannot be null.", nameof(name));
+            this.name = name ?? throw new ArgumentNullException(nameof(name), "Name cannot be null.");
             this.typeParameters =
                 new TypeList(typeParameters ?? Array.Empty<TypeReference>(), this);
             isKnownType = true;
@@ -59,7 +59,7 @@ namespace CSharpE.Syntax
             if (isKnownType != null)
                 return;
 
-            // PERF: don't need semantics for PredefinedTypeSyntax 
+            // PERF: don't need semantics for PredefinedTypeSyntax
 
             if (SourceFile == null)
                 throw new InvalidOperationException("Can't get this information for node without ancestor SourceFile.");
