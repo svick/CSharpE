@@ -422,7 +422,7 @@ Regular loops in C\# do not return values, instead, they often mutate some objec
 
 The approach used by the system is to allow the lambda that represents the body of the loop to return a value. The whole loop then returns a list of these values (specifically, \cs{IReadOnlyList<T>}), one for each iteration. When an iteration is not re-executed, the previously returned value is used again. To make sure further changes to returned values do not affect following executions, the values returned from loop iterations are deep cloned. For this reason, they also have the same limitation on allowed types as input values.
 
-\item The system has to understand the collection that is being iterated.
+\item \label{smart-loop-collection} The system has to understand the collection that is being iterated.
 
 To efficiently re-execute a smart loop, the system has to have a good understanding of what changed in the collection since the last execution. And because smart loops are often nested, either explicitly, or implicitly by using convenience methods that bypass one or more levels of syntax nodes (such as the previously mentioned \cs{project.Methods()}), it is not enough to determine when an item in a current version of the collection is exactly the same as an item in the previous version: it is also important to recognize when a current item is similar to an item from the previous version, so that results can be reused for the parts of the item that did not change.
 

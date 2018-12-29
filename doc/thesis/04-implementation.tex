@@ -176,13 +176,25 @@ To find the corresponding node that is part of the syntax tree, we use Roslyn Sy
 
 \item The symbol is used to find the desired information.
 
-In this example, that is the full name of a type.
+In this case, that is the full name of the type of the field declaration, which could be (depending on references in the compilation and using directives in the file) for example \cs{System.Threading.Tasks.Task}, \cs{Microsoft.Build.Utilities.Task} or even a type with a name other than \cs{Task} (if the file contains a using alias directive).
 
 \end{enumerate}
 
-\item syntax list
-\item other collections
-\item whitespace
+\item Lists of syntax nodes have their own set of types.
+
+In the CSharpE \ac{API}, lists of syntax nodes are represented as \cs{IList<T>}. In Roslyn, such lists are either a \cs{SyntaxList<T>} (for lists with no separator, such as members of a class) or a \cs{SeparatedSyntaxList<T>} (for lists that use comma as a separator, such as arguments of a method call).
+
+To bridge this, CSharpE contains a set of internal list types, that also help with maintaining laziness. Such a list contains a collection, where each item can be either a Roslyn node or a CSharpE node. When an item in the list is accessed, it is converted to a CSharpE node, if it is not one already. When \cs{GetWrapped} is called on the list, the result will include Roslyn nodes from the collection directly, while CSharpE nodes have to be converted by invoking their own \cs{GetWrapped}.
+
+\item Exposed collections implement an interface for use in CSharpE.Transform smart loops.
+
+As explained in Section~\ref{smart-loop-collection}, CSharpE.Transform smart loops need to understand the collections they are iterating. For this reason, CSharpE.Syntax collections implement the \cs{ISyntaxCollection<T>} interface. This interface implements the visitor patterns, so that a smart loop can correctly decide how to process the collection.
+
+\item Whitespace from user code is not preserved.
+
+When a syntax node is created using the Roslyn \cs{SyntaxFactory}, it contains so called "elastic trivia", which is meant to be later replaced with actual trivia based on some formatting conventions. But if this step is not performed and the node is converted to a string, the result is invalid code. For example, \cs{SyntaxFactory.ClassDeclaration("Foo").ToString()} returns \cs{classFoo{}}, which is not valid C\# code.
+
+The easiest way to fix this is to call \cs{NormalizeWhitespace()}, though using that has a side-effect of reformatting all code, including code written by the user. But because the user is only ever going to see the reformatted code when debugging, this was considered an acceptable solution.
 \end{itemize}
 
 \section{CSharpE.Transform}

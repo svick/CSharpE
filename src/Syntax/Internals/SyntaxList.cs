@@ -111,9 +111,7 @@ namespace CSharpE.Syntax.Internals
 
                 var value = list[index];
                 if (value is TSyntax node)
-                {
                     return node;
-                }
 
                 node = CreateWrapper((TRoslynSyntax)value);
                 list[index] = node;

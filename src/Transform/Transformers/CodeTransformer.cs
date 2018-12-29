@@ -97,8 +97,8 @@ namespace CSharpE.Transform.Transformers
 
                     // finally add recorded nodes to a node
                     
-                    return newInput =>
-                        newInput.Members.AddRange(newMembers.Select(m => FromRoslyn.MemberDefinition(m, newInput)));
+                    return nextInput =>
+                        nextInput.Members.AddRange(newMembers.Select(m => FromRoslyn.MemberDefinition(m, nextInput)));
                 };
             };
         }
