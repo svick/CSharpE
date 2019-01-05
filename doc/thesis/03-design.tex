@@ -480,6 +480,8 @@ The situation is more complicated for code that wants to use extensions. First o
 
 Second, design-time versions of transformations have to be executed while the user is editing their code in an \ac{IDE} and the experience should be as close as possible to editing regular C\# code. Because every \ac{IDE} and code editor has their own mechanism for extending it, only Visual Studio will be supported.
 
+\label{debugging}
+
 Third, it should be possible to use debugging while developing extensions and code that is using extensions. Extension authors will want to debug extensions themselves and also user code after the build-time version of a transformation has been run. Extension users would likely prefer to see only the code they wrote, while code after build-time transformations is being debugged.
 
 Debugging extensions is complicated by the fact that they run inside MSBuild and Visual Studio. To debug them, advanced debugging techniques have to be used, such as manually specifying debug executable, attaching the debugger to a running process or using \cs{Debugger.Break();} \cite{debugger-break} to launch the debugger when the transformation is executed. This is not ideal, and even though one of the goals of this system is to make developing extensions as easy as possible, it is likely extensions will be mostly developed by more experienced developers, so these hurdles should be acceptable.

@@ -1,4 +1,6 @@
-﻿namespace CSharpE.Syntax.Internals
+﻿using CSharpE.Syntax;
+
+namespace CSharpE.Transform.Internals
 {
     internal static class LogInfo
     {

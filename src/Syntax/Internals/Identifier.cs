@@ -8,7 +8,7 @@ namespace CSharpE.Syntax.Internals
     {
         private SyntaxToken syntax;
 
-        private bool canBeNull;
+        private readonly bool canBeNull;
 
         public Identifier(SyntaxToken syntax, bool canBeNull = false) : this()
         {
