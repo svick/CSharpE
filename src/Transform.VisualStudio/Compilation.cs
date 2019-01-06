@@ -212,7 +212,7 @@ namespace CSharpE.Transform.VisualStudio
             var transformed = Transformer.Transform(designTime: true);
 
             return (CSharpCompilation)CSharpCompilation.Create(
-                RoslynCompilation.AssemblyName, transformed.SourceFiles.Select(file => file.Tree),
+                RoslynCompilation.AssemblyName, transformed.SourceFiles.Select(file => file.GetSyntaxTree()),
                 transformed.AdditionalReferences.Select(reference => reference.GetMetadataReference()),
                 RoslynCompilation.Options).WithEventQueue(Adjust(EventQueue));
         }

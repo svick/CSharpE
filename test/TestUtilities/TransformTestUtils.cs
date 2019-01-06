@@ -18,8 +18,8 @@ namespace CSharpE.TestUtilities
             string code, ITransformation transformation, bool designTime,
             params Type[] additionalReferencesRepresentatives)
         {
-            var project = new Syntax.Project(
-                new[] {new Syntax.SourceFile("source.cse", code)}, additionalReferencesRepresentatives);
+            var project = new Project(
+                new[] {new SourceFile("source.cse", code)}, additionalReferencesRepresentatives);
 
             transformation.Process(project, designTime);
 

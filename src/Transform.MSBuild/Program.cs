@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using CSharpE.Syntax;
 using CSharpE.Transform.Execution;
-using SourceFile = CSharpE.Transform.Execution.SourceFile;
 
 namespace CSharpE.Transform.MSBuild
 {
@@ -135,7 +134,7 @@ namespace CSharpE.Transform.MSBuild
             {
                 var outputFilePath = GetUniqueFilePath(file.Path);
 
-                File.WriteAllText(outputFilePath, file.Text);
+                File.WriteAllText(outputFilePath, file.GetText());
 
                 yield return outputFilePath;
             }

@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 using CSharpE.Extensions.Actor;
+using CSharpE.Syntax;
 using CSharpE.TestUtilities;
 using CSharpE.Transform;
 using CSharpE.Transform.Execution;
-using Microsoft.CodeAnalysis.CSharp.UnitTests;
 using Xunit;
 using static CSharpE.TestUtilities.TransformTestUtils;
 
@@ -98,7 +98,7 @@ class C
                 new ITransformation[] { new ActorTransformation() });
 
             var transformedProject = project.Transform();
-            AssertEx.LinesEqual(expectedOutput, transformedProject.SourceFiles.Single().Text);
+            AssertEx.LinesEqual(expectedOutput, transformedProject.SourceFiles.Single().GetText());
         }
 
         [Fact]
@@ -162,17 +162,25 @@ class C
             var recorder = new LogRecorder<LogAction>();
             project.Log += recorder.Record;
 
-            var tranformedProject = project.Transform();
-            AssertEx.LinesEqual(input, tranformedProject.SourceFiles.Single().Text);
+            var transformedProject = project.Transform();
+            AssertEx.LinesEqual(input, transformedProject.SourceFiles.Single().GetText());
             Assert.Equal(
                 new LogAction[] { ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "transform") },
                 recorder.Read());
 
             string nl = Environment.NewLine;
 
-            sourceFile.Tree = sourceFile.Tree.WithInsertBefore("class", $"[Actor]{nl}");
-            tranformedProject = project.Transform();
-            AssertEx.LinesEqual(IgnoreOptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
+            void SourceFileInsertBefore(string existingText, string newText)
+            {
+                var oldFile = project.SourceFiles[0];
+                int offset = oldFile.GetText().IndexOf(existingText, StringComparison.Ordinal);
+                var newFullText = oldFile.GetText().Insert(offset, newText);
+                project.SourceFiles[0] = new SourceFile(oldFile.Path, newFullText);
+            }
+
+            SourceFileInsertBefore("class", $"[Actor]{nl}");
+            transformedProject = project.Transform();
+            AssertEx.LinesEqual(IgnoreOptional(expectedOutput), transformedProject.SourceFiles.Single().GetText());
             Assert.Equal(
                 new LogAction[]
                 {
@@ -181,9 +189,9 @@ class C
                     ("MethodDefinition", "M2", "transform")
                 }, recorder.Read());
 
-            sourceFile.Tree = sourceFile.Tree.WithInsertBefore($"    }}{nl}}}", $"        return 42;{nl}");
-            tranformedProject = project.Transform();
-            AssertEx.LinesEqual(IncludeOptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
+            SourceFileInsertBefore($"    }}{nl}}}", $"        return 42;{nl}");
+            transformedProject = project.Transform();
+            AssertEx.LinesEqual(IncludeOptional(expectedOutput), transformedProject.SourceFiles.Single().GetText());
             Assert.Equal(
                 new LogAction[]
                 {
@@ -192,8 +200,8 @@ class C
                     ("MethodDefinition", "M2", "transform")
                 }, recorder.Read());
 
-            tranformedProject = project.Transform();
-            AssertEx.LinesEqual(IncludeOptional(expectedOutput), tranformedProject.SourceFiles.Single().Text);
+            transformedProject = project.Transform();
+            AssertEx.LinesEqual(IncludeOptional(expectedOutput), transformedProject.SourceFiles.Single().GetText());
             Assert.Equal(
                 new LogAction[] { ("TransformProject", null, "transform"), ("SourceFile", "source.cse", "cached") },
                 recorder.Read());

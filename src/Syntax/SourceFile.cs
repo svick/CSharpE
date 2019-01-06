@@ -25,6 +25,8 @@ namespace CSharpE.Syntax
             syntax = syntaxTree;
         }
 
+        internal SourceFile(SyntaxTree syntaxTree) : this(syntaxTree.FilePath, syntaxTree) { }
+
         public SourceFile(string path, string text)
             : this(path, CSharpSyntaxTree.ParseText(text)) { }
 

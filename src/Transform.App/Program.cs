@@ -9,7 +9,6 @@ using CSharpE.Transform.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
 using Roslyn = Microsoft.CodeAnalysis;
-using SourceFile = CSharpE.Transform.Execution.SourceFile;
 
 namespace CSharpE.Transform.App
 {
@@ -53,7 +52,7 @@ namespace CSharpE.Transform.App
 
             if (!interactive)
             {
-                var inputFiles = await Task.WhenAll(inputFilePaths.Select(Syntax.SourceFile.OpenAsync));
+                var inputFiles = await Task.WhenAll(inputFilePaths.Select(SourceFile.OpenAsync));
 
                 var project = new Syntax.Project(inputFiles);
 
@@ -92,7 +91,7 @@ namespace CSharpE.Transform.App
                 {
                     case "":
                     case "d":
-                        await designProject.ReloadSourceFilesAsync();
+                        await ReloadSourceFilesAsync(designProject);
                         
                         designTransformed = designProject.Transform(designTime: true);
 
@@ -104,12 +103,12 @@ namespace CSharpE.Transform.App
 
                             Directory.CreateDirectory(Path.GetDirectoryName(newPath));
 
-                            File.WriteAllText(newPath, sourceFile.Text);
+                            File.WriteAllText(newPath, sourceFile.GetText());
                         }
 
                         break;
                     case "b":
-                        await buildProject.ReloadSourceFilesAsync();
+                        await ReloadSourceFilesAsync(buildProject);
                         
                         var buildTransformed = buildProject.Transform(designTime: false);
 
@@ -120,7 +119,7 @@ namespace CSharpE.Transform.App
 
                             Directory.CreateDirectory(Path.GetDirectoryName(newPath));
 
-                            File.WriteAllText(newPath, sourceFile.Text);
+                            File.WriteAllText(newPath, sourceFile.GetText());
                         }
 
                         break;
@@ -167,6 +166,14 @@ namespace CSharpE.Transform.App
             }
         }
 
+        private static async Task ReloadSourceFilesAsync(ProjectTransformer projectTransformer)
+        {
+            for (int i = 0; i < projectTransformer.SourceFiles.Count; i++)
+            {
+                projectTransformer.SourceFiles[i] = await SourceFile.OpenAsync(projectTransformer.SourceFiles[i].Path);
+            }
+        }
+
         private static Roslyn::Project ToRoslynProject(ProjectTransformer projectTransformer)
         {
             var workspace = new AdhocWorkspace();
@@ -174,7 +181,7 @@ namespace CSharpE.Transform.App
             
             foreach (var sourceFile in projectTransformer.SourceFiles)
             {
-                roslynProject = roslynProject.AddDocument(sourceFile.Path, sourceFile.Text).Project;
+                roslynProject = roslynProject.AddDocument(sourceFile.Path, sourceFile.GetText()).Project;
             }
 
             return roslynProject;

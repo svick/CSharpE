@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using CSharpE.Syntax;
 using CSharpE.Transform.Transformers;
 using Microsoft.CodeAnalysis;
@@ -48,7 +47,8 @@ namespace CSharpE.Transform.Execution
         public ProjectTransformer Transform(bool designTime = false)
         {
             var transformProject = new TransformProject(
-                SourceFiles.Select(f => f.ToSyntaxSourceFile()), AdditionalReferences, compilation, Log);
+                SourceFiles.Select(sf => new SourceFile(sf.Path, sf.GetSyntaxTree())),
+                AdditionalReferences, compilation, Log);
 
             foreach (var transformer in transformers)
             {
@@ -56,16 +56,7 @@ namespace CSharpE.Transform.Execution
             }
 
             return new ProjectTransformer(
-                transformProject.SourceFiles.Select(SourceFile.FromSyntaxSourceFile),
-                transformProject.References, Enumerable.Empty<ITransformation>());
-        }
-
-        public async Task ReloadSourceFilesAsync()
-        {
-            foreach (var sourceFile in SourceFiles)
-            {
-                await sourceFile.ReopenAsync();
-            }
+                transformProject.SourceFiles, transformProject.References, Enumerable.Empty<ITransformation>());
         }
     }
 
