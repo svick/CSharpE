@@ -50,12 +50,12 @@ namespace CSharpE.Transform.App
             List<ITransformation> transformations =
                 transformationTypes.Select(tt => (ITransformation) Activator.CreateInstance(tt)).ToList();
 
+            var inputFiles = await Task.WhenAll(inputFilePaths.Select(SourceFile.OpenAsync));
+
+            var project = new Syntax.Project(inputFiles, new[] { new AssemblyReference(typeof(object)) });
+
             if (!interactive)
             {
-                var inputFiles = await Task.WhenAll(inputFilePaths.Select(SourceFile.OpenAsync));
-
-                var project = new Syntax.Project(inputFiles, new[] { new AssemblyReference(typeof(object)) });
-
                 foreach (var transformation in transformations)
                 {
                     transformation.Process(project, designTime: false);
@@ -69,17 +69,15 @@ namespace CSharpE.Transform.App
                 return;
             }
 
-            var transformInputFiles = await Task.WhenAll(inputFilePaths.Select(SourceFile.OpenAsync));
+            var designTransformer = new ProjectTransformer(transformations);
 
-            var designProject = new ProjectTransformer(transformInputFiles, new LibraryReference[0], transformations);
-
-            designProject.Log += Console.WriteLine;
+            designTransformer.Log += Console.WriteLine;
             
-            var buildProject = new ProjectTransformer(transformInputFiles, new LibraryReference[0], transformations);
+            var buildTransformer = new ProjectTransformer(transformations);
 
-            buildProject.Log += Console.WriteLine;
+            buildTransformer.Log += Console.WriteLine;
 
-            ProjectTransformer designTransformed = null;
+            Syntax.Project designTransformed = null;
             
             while (true)
             {
@@ -91,9 +89,9 @@ namespace CSharpE.Transform.App
                 {
                     case "":
                     case "d":
-                        await ReloadSourceFilesAsync(designProject);
+                        await ReloadSourceFilesAsync(project);
                         
-                        designTransformed = designProject.Transform(designTime: true);
+                        designTransformed = designTransformer.Transform(project, designTime: true);
 
                         foreach (var sourceFile in designTransformed.SourceFiles)
                         {
@@ -108,9 +106,9 @@ namespace CSharpE.Transform.App
 
                         break;
                     case "b":
-                        await ReloadSourceFilesAsync(buildProject);
+                        await ReloadSourceFilesAsync(project);
                         
-                        var buildTransformed = buildProject.Transform(designTime: false);
+                        var buildTransformed = buildTransformer.Transform(project, designTime: false);
 
                         foreach (var sourceFile in buildTransformed.SourceFiles)
                         {
@@ -166,15 +164,15 @@ namespace CSharpE.Transform.App
             }
         }
 
-        private static async Task ReloadSourceFilesAsync(ProjectTransformer projectTransformer)
+        private static async Task ReloadSourceFilesAsync(Syntax.Project project)
         {
-            for (int i = 0; i < projectTransformer.SourceFiles.Count; i++)
+            for (int i = 0; i < project.SourceFiles.Count; i++)
             {
-                projectTransformer.SourceFiles[i] = await SourceFile.OpenAsync(projectTransformer.SourceFiles[i].Path);
+                project.SourceFiles[i] = await SourceFile.OpenAsync(project.SourceFiles[i].Path);
             }
         }
 
-        private static Roslyn::Project ToRoslynProject(ProjectTransformer projectTransformer)
+        private static Roslyn::Project ToRoslynProject(Syntax.Project projectTransformer)
         {
             var workspace = new AdhocWorkspace();
             var roslynProject = workspace.AddProject("Project", LanguageNames.CSharp);

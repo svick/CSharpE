@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace CSharpE.Syntax
@@ -11,7 +12,7 @@ namespace CSharpE.Syntax
 
         public IList<LibraryReference> References { get; }
 
-        private CSharpCompilation compilation;
+        internal CSharpCompilation compilation;
         public CSharpCompilation Compilation
         {
             get
@@ -38,6 +39,14 @@ namespace CSharpE.Syntax
 
         public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references)
             : this(sourceFiles, references, null) { }
+
+        public Project(CSharpCompilation compilation)
+            : this(
+                compilation.SyntaxTrees.Select(tree => new SourceFile(tree)).ToList(),
+                // TODO: handle other reference kinds
+                compilation.References
+                    .Select(reference => new AssemblyReference(((PortableExecutableReference)reference).FilePath))
+                    .ToList<LibraryReference>()) { }
 
         internal Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references, CSharpCompilation compilation)
         {

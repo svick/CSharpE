@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -81,7 +80,7 @@ namespace CSharpE.Transform.VisualStudio
             if (!transformations.Any())
                 return null;
 
-            return new ProjectTransformer(RoslynCompilation, transformations);
+            return new ProjectTransformer(transformations);
         }
 
         // based on https://github.com/dotnet/roslyn/issues/6138#issuecomment-149216303
@@ -131,7 +130,7 @@ namespace CSharpE.Transform.VisualStudio
             }
         }
 
-        internal object eventQueueProcessingLock = new object();
+        internal readonly object eventQueueProcessingLock = new object();
         internal readonly HashSet<RoslynSyntaxTree> completedCompilationUnits = new HashSet<RoslynSyntaxTree>();
         internal int eventQueueProcessingSemaphoreCounter = 0;
         internal readonly SemaphoreSlim eventQueueProcessingSemaphore = new SemaphoreSlim(0);
@@ -209,7 +208,7 @@ namespace CSharpE.Transform.VisualStudio
             if (Transformer == null)
                 return RoslynCompilation;
 
-            var transformed = Transformer.Transform(designTime: true);
+            var transformed = Transformer.Transform(new Syntax.Project(RoslynCompilation), designTime: true);
 
             return (CSharpCompilation)CSharpCompilation.Create(
                 RoslynCompilation.AssemblyName, transformed.SourceFiles.Select(file => file.GetSyntaxTree()),

@@ -20,7 +20,7 @@ namespace CSharpE.Transform
 
         internal TransformProject(
             IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references,
-            CSharpCompilation compilation, Action < LogAction> onLog = null)
+            CSharpCompilation compilation, Action <LogAction> onLog = null)
             : base(sourceFiles.ToList(), references, compilation)
         {
             this.onLog = onLog;
@@ -28,7 +28,13 @@ namespace CSharpE.Transform
 
         public TransformProject(IEnumerable<SourceFile> sourceFiles) : this(sourceFiles, Array.Empty<LibraryReference>()) { }
 
-        public TransformProject(Project project) : this(project.SourceFiles, project.References) { }
+        public TransformProject(Project project, Action<LogAction> onLog = null)
+            : this(
+                project.SourceFiles.Select(sf => new SourceFile(sf.Path, sf.GetSyntaxTree())),
+                project.References, project.compilation)
+        {
+            this.onLog = onLog;
+        }
 
         internal TransformerBuilder TransformerBuilder { get; set; }
 

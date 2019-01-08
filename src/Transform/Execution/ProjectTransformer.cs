@@ -1,29 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using CSharpE.Syntax;
 using CSharpE.Transform.Transformers;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace CSharpE.Transform.Execution
 {
     public class ProjectTransformer
     {
-        public IList<SourceFile> SourceFiles { get; }
-
-        public IList<LibraryReference> References { get; }
-
-        private readonly CSharpCompilation compilation;
-
         private readonly List<TransformationTransformer> transformers;
 
-        public ProjectTransformer(
-            IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references,
-            IEnumerable<ITransformation> transformations)
+        public ProjectTransformer(IEnumerable<ITransformation> transformations)
         {
-            SourceFiles = sourceFiles.ToList();
-            References = references.ToList();
             transformers = new List<TransformationTransformer>();
             
             foreach (var transformation in transformations)
@@ -32,31 +19,18 @@ namespace CSharpE.Transform.Execution
             }
         }
 
-        public ProjectTransformer(CSharpCompilation compilation, IEnumerable<ITransformation> transformations)
-            : this(
-                compilation.SyntaxTrees.Select(tree => new SourceFile(tree)).ToList(),
-                // TODO: handle other reference kinds
-                compilation.References
-                    .Select(reference => new AssemblyReference(((PortableExecutableReference)reference).FilePath))
-                    .ToList<LibraryReference>(),
-                transformations)
-            => this.compilation = compilation;
-
         public event Action<LogAction> Log;
 
-        public ProjectTransformer Transform(bool designTime = false)
+        public Project Transform(Project project, bool designTime = false)
         {
-            var transformProject = new TransformProject(
-                SourceFiles.Select(sf => new SourceFile(sf.Path, sf.GetSyntaxTree())),
-                References, compilation, Log);
+            var transformProject = new TransformProject(project, Log);
 
             foreach (var transformer in transformers)
             {
                 transformer.Transform(transformProject, designTime);
             }
 
-            return new ProjectTransformer(
-                transformProject.SourceFiles, transformProject.References, Enumerable.Empty<ITransformation>());
+            return new Project(transformProject.SourceFiles, transformProject.References);
         }
     }
 
