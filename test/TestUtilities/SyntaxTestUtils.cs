@@ -9,7 +9,7 @@ namespace CSharpE.TestUtilities
         {
             var sourceFile = new SourceFile("source.cse", code);
 
-            var project = new Project(sourceFile);
+            var project = new Project(new [] { sourceFile }, new[] { new AssemblyReference(typeof(object)) });
 
             return project.SourceFiles.Single();
         }

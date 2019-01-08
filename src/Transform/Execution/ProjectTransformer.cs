@@ -12,18 +12,18 @@ namespace CSharpE.Transform.Execution
     {
         public IList<SourceFile> SourceFiles { get; }
 
-        public IList<LibraryReference> AdditionalReferences { get; }
+        public IList<LibraryReference> References { get; }
 
         private readonly CSharpCompilation compilation;
 
         private readonly List<TransformationTransformer> transformers;
 
         public ProjectTransformer(
-            IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
+            IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references,
             IEnumerable<ITransformation> transformations)
         {
             SourceFiles = sourceFiles.ToList();
-            AdditionalReferences = additionalReferences.ToList();
+            References = references.ToList();
             transformers = new List<TransformationTransformer>();
             
             foreach (var transformation in transformations)
@@ -48,7 +48,7 @@ namespace CSharpE.Transform.Execution
         {
             var transformProject = new TransformProject(
                 SourceFiles.Select(sf => new SourceFile(sf.Path, sf.GetSyntaxTree())),
-                AdditionalReferences, compilation, Log);
+                References, compilation, Log);
 
             foreach (var transformer in transformers)
             {

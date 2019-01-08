@@ -199,7 +199,7 @@ The easiest way to fix this is to call \cs{NormalizeWhitespace()}, though using 
 
 \section{CSharpE.Transform}
 
-Now that types necessary for representing and modifying code have been implemented, it is time to turn to code that will drive transformations. While Section~\ref{transform-design}
+Now that types necessary for representing and modifying code have been implemented, it is time to turn to code that will drive transformations. While Section~\ref{transform-design} described the user-facing \ac{API} of CSharpE.Transform, there is one more public type, \cs{ProjectTransformer}, which is used by the Visual Studio and MSBuild extensions to run transformations. To isolate this type from user-facing types, it is placed in a separate namespace: \cs{CSharpE.Transform.Execution}.
 
 \section{CSharpE.Transform.VisualStudio}
 

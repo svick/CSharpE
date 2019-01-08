@@ -54,7 +54,7 @@ namespace CSharpE.Transform.App
             {
                 var inputFiles = await Task.WhenAll(inputFilePaths.Select(SourceFile.OpenAsync));
 
-                var project = new Syntax.Project(inputFiles);
+                var project = new Syntax.Project(inputFiles, new[] { new AssemblyReference(typeof(object)) });
 
                 foreach (var transformation in transformations)
                 {

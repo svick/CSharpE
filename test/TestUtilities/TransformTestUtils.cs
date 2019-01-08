@@ -19,7 +19,7 @@ namespace CSharpE.TestUtilities
             params Type[] additionalReferencesRepresentatives)
         {
             var project = new Project(
-                new[] {new SourceFile("source.cse", code)}, additionalReferencesRepresentatives);
+                new[] {new SourceFile("source.cse", code)}, CreateReferences(additionalReferencesRepresentatives));
 
             transformation.Process(project, designTime);
 
@@ -32,6 +32,6 @@ namespace CSharpE.TestUtilities
         public static string IncludeOptional(string input) => Optional.Replace(input, "$1");
 
         public static IEnumerable<LibraryReference> CreateReferences(params Type[] representatives) =>
-            representatives.Select(t => new AssemblyReference(t));
+            representatives.Prepend(typeof(object)).Select(t => new AssemblyReference(t));
     }
 }

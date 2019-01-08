@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
@@ -8,9 +7,6 @@ namespace CSharpE.Syntax
 {
     public class Project
     {
-        // TODO
-        private static readonly LibraryReference[] DefaultReferences = { new AssemblyReference(typeof(object)) };
-        
         public IList<SourceFile> SourceFiles { get; }
 
         public IList<LibraryReference> References { get; }
@@ -40,10 +36,10 @@ namespace CSharpE.Syntax
         }
 
 
-        public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences)
-            : this(sourceFiles, additionalReferences, null) { }
+        public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references)
+            : this(sourceFiles, references, null) { }
 
-        internal Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences, CSharpCompilation compilation)
+        internal Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references, CSharpCompilation compilation)
         {
             SourceFiles = sourceFiles.ToList();
 
@@ -52,26 +48,10 @@ namespace CSharpE.Syntax
                 sourceFile.Project = this;
             }
 
-            References = DefaultReferences.Union(additionalReferences).ToList();
+            References = references.ToList();
 
             this.compilation = compilation;
         }
-
-        public Project(IEnumerable<SourceFile> sourceFiles)
-            : this(sourceFiles, Array.Empty<LibraryReference>())
-        { }
-
-        public Project()
-            : this(Array.Empty<SourceFile>())
-        { }
-
-        public Project(params SourceFile[] sourceFiles)
-            : this(sourceFiles.AsEnumerable())
-        { }
-
-        public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<Type> additionalReferencesRepresentatives)
-            : this(sourceFiles, additionalReferencesRepresentatives.Select(t => new AssemblyReference(t)))
-        { }
 
         // TODO: limit type kind and use in ActorTransformation
         public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>

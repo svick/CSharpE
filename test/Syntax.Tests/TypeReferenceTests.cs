@@ -39,7 +39,7 @@ namespace CSharpE.Syntax.Tests
         public void UnknownTypeFromSyntax()
         {
             var file = new SourceFile("C.cse", @"class C { Foo.Bar f; }");
-            new Project(file);
+            new Project(new [] { file }, new LibraryReference[0]);
             var field = file.GetTypes().OfType<TypeDefinition>().Single().Fields.Single();
             var type = (NamedTypeReference)field.Type;
 

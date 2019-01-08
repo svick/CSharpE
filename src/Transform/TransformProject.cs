@@ -14,14 +14,14 @@ namespace CSharpE.Transform
         private readonly Action<LogAction> onLog;
 
         public TransformProject(
-            IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
+            IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references,
             Action<LogAction> onLog = null)
-            : this(sourceFiles.ToList(), additionalReferences, null, onLog) { }
+            : this(sourceFiles.ToList(), references, null, onLog) { }
 
         internal TransformProject(
-            IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> additionalReferences,
+            IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references,
             CSharpCompilation compilation, Action < LogAction> onLog = null)
-            : base(sourceFiles.ToList(), additionalReferences, compilation)
+            : base(sourceFiles.ToList(), references, compilation)
         {
             this.onLog = onLog;
         }
