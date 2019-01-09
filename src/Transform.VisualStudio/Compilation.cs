@@ -80,7 +80,7 @@ namespace CSharpE.Transform.VisualStudio
             if (!transformations.Any())
                 return null;
 
-            return new ProjectTransformer(transformations);
+            return new ProjectTransformer(transformations, designTime: true);
         }
 
         // based on https://github.com/dotnet/roslyn/issues/6138#issuecomment-149216303
@@ -208,7 +208,7 @@ namespace CSharpE.Transform.VisualStudio
             if (Transformer == null)
                 return RoslynCompilation;
 
-            var transformed = Transformer.Transform(new Syntax.Project(RoslynCompilation), designTime: true);
+            var transformed = Transformer.Transform(new Syntax.Project(RoslynCompilation));
 
             return (CSharpCompilation)CSharpCompilation.Create(
                 RoslynCompilation.AssemblyName, transformed.SourceFiles.Select(file => file.GetSyntaxTree()),

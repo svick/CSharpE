@@ -69,11 +69,11 @@ namespace CSharpE.Transform.App
                 return;
             }
 
-            var designTransformer = new ProjectTransformer(transformations);
+            var designTransformer = new ProjectTransformer(transformations, designTime: true);
 
             designTransformer.Log += Console.WriteLine;
             
-            var buildTransformer = new ProjectTransformer(transformations);
+            var buildTransformer = new ProjectTransformer(transformations, designTime: false);
 
             buildTransformer.Log += Console.WriteLine;
 
@@ -91,7 +91,7 @@ namespace CSharpE.Transform.App
                     case "d":
                         await ReloadSourceFilesAsync(project);
                         
-                        designTransformed = designTransformer.Transform(project, designTime: true);
+                        designTransformed = designTransformer.Transform(project);
 
                         foreach (var sourceFile in designTransformed.SourceFiles)
                         {
@@ -108,7 +108,7 @@ namespace CSharpE.Transform.App
                     case "b":
                         await ReloadSourceFilesAsync(project);
                         
-                        var buildTransformed = buildTransformer.Transform(project, designTime: false);
+                        var buildTransformed = buildTransformer.Transform(project);
 
                         foreach (var sourceFile in buildTransformed.SourceFiles)
                         {

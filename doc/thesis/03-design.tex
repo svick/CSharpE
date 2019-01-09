@@ -168,7 +168,7 @@ This is made easier by splitting a single declaration with multiple definitions 
 
 \item The specification lists instance constructors and static constructors separately. But since \cs{Static} already exists as a member modifier for other kinds of members, it could be confusing if it did not work for constructors. For this reason, both instance and static constructors are represented as \cs{ConstructorDefinition}.
 
-\item The Microsoft C\# specification calls the member that is invoked after an instance is garbage collected "destructor". But the Ecma C\# specification\footnotemark{} and the official documentation~\cite{finalizer} both call this member "finalizer", so that is the name used here.
+\item The Microsoft C\# specification calls the member that is invoked before an instance is garbage collected "destructor". But the Ecma C\# specification\footnotemark{} and the official documentation~\cite{finalizer} both call this member "finalizer", so that is the name used here.
 
 \footnotetext{Quoting from \cite{ecma-334}:
 \begin{quote}

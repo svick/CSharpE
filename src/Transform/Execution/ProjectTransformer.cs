@@ -1,33 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using CSharpE.Syntax;
+using CSharpE.Transform.Internals;
 using CSharpE.Transform.Transformers;
 
 namespace CSharpE.Transform.Execution
 {
     public class ProjectTransformer
     {
-        private readonly List<TransformationTransformer> transformers;
+        private readonly List<Transformer<TransformProject, Unit>> transformers;
 
-        public ProjectTransformer(IEnumerable<ITransformation> transformations)
+        public ProjectTransformer(IEnumerable<ITransformation> transformations, bool designTime = false)
         {
-            transformers = new List<TransformationTransformer>();
+            transformers = new List<Transformer<TransformProject, Unit>>();
             
             foreach (var transformation in transformations)
             {
-                transformers.Add(new TransformationTransformer(transformation));
+                transformers.Add(CreateTransformer(transformation, designTime));
             }
         }
 
+        private static Transformer<TransformProject, Unit> CreateTransformer(ITransformation transformation, bool designTime) =>
+            CodeTransformer<TransformProject, Unit>.Create(project =>
+            {
+                transformation.Process(project, designTime);
+                return Unit.Value;
+            });
+
         public event Action<LogAction> Log;
 
-        public Project Transform(Project project, bool designTime = false)
+        public Project Transform(Project project)
         {
             var transformProject = new TransformProject(project, Log);
 
             foreach (var transformer in transformers)
             {
-                transformer.Transform(transformProject, designTime);
+                transformer.Transform(transformProject, transformProject);
             }
 
             return new Project(transformProject.SourceFiles, transformProject.References);

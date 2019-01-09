@@ -201,6 +201,32 @@ The easiest way to fix this is to call \cs{NormalizeWhitespace()}, though using 
 
 Now that types necessary for representing and modifying code have been implemented, it is time to turn to code that will drive transformations. While Section~\ref{transform-design} described the user-facing \ac{API} of CSharpE.Transform, there is one more public type, \cs{ProjectTransformer}, which is used by the Visual Studio and MSBuild extensions to run transformations. To isolate this type from user-facing types, it is placed in a separate namespace: \cs{CSharpE.Transform.Execution}.
 
+\begin{listing}
+\begin{minted}{csharp}
+public class ProjectTransformer
+{
+    public ProjectTransformer(
+        IEnumerable<ITransformation> transformations, bool designTime);
+
+    public event Action<LogAction> Log;
+
+    public Project Transform(Project project);
+}
+\end{minted}
+\caption{API of the ProjectTransformer class}
+\label{projecttransformer-source}
+\end{listing}
+
+Listing~\ref{projecttransformer-source} shows the \ac{API} of \cs{ProjectTransformer}. An instance of this class is created by specifying a collection of transformations and whether they should be executed in design-time or build-time mode. Next, we can subscribe to the \cs{Log} event to diagnose how transformations are executed, as we have seen in Listing~\ref{csharpetransform-log}. (Note that this event does not follow the recommended pattern of using the \cs{EventHandler<T>} delegate. \cite{fdg-events} The approach used here is simpler and is sufficient for the purpose of subscribing to diagnostic information.) Finally, the \cs{Transform} method is used to execute the transformations on the specified project.
+
+The \cs{Transform} method can be called repeatedly to keep executing the same transformations. If it is called for a project that contains code similar to previous project, results of transformations will be retrieved from caches, making the process more efficient.
+
+Even though \cs{Project} is mutable, the method does not modify its input and instead returns a new \cs{Project} instance. This is done so that the caller can keep modifying the original project after the transformation is performed.
+
+\medskip
+
+\todo{implementation of ProjectTransformer}
+
 \section{CSharpE.Transform.VisualStudio}
 
 \begin{itemize}

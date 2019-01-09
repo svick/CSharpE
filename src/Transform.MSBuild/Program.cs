@@ -100,9 +100,9 @@ namespace CSharpE.Transform.MSBuild
 
             var references = assemblyPaths.Select(path => new AssemblyReference(path));
 
-            var transformer = new ProjectTransformer(transformations);
+            var transformer = new ProjectTransformer(transformations, designTime: false);
 
-            var result = transformer.Transform(new Project(sourceFiles, references), designTime: false);
+            var result = transformer.Transform(new Project(sourceFiles, references));
 
             var tmpDirectory = Path.Combine(Directory.GetCurrentDirectory(), "obj", "CSharpE");
             Directory.CreateDirectory(tmpDirectory);
