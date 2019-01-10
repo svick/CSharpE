@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
     
     <ProjectReference Include="..\..\src\Syntax\Syntax.csproj" />
     <ProjectReference Include="..\..\src\Transform\Transform.csproj" />
