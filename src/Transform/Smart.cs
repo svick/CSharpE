@@ -40,7 +40,7 @@ namespace CSharpE.Transform
             {
                 if (project is TransformProject transformProject)
                 {
-                    transformProject.TransformerBuilder.Collection(
+                    transformProject.TransformerCollector.Collection(
                         parent, children, ActionInvoker.Create(childAction), visitArg);
                 }
                 else
@@ -95,7 +95,7 @@ namespace CSharpE.Transform
             {
                 if (project is TransformProject transformProject)
                 {
-                    Result = transformProject.TransformerBuilder.Collection(
+                    Result = transformProject.TransformerCollector.Collection(
                         parent, children, ActionInvoker.Create(childAction, combine), visitArg);
                 }
                 else
@@ -180,7 +180,7 @@ namespace CSharpE.Transform
 
             if (node.SourceFile?.Project is TransformProject transformProject)
             {
-                transformProject.TransformerBuilder.LimitedSegment(
+                transformProject.TransformerCollector.LimitedSegment(
                     node, ActionInvoker.Create<T1, TypeDefinition>((a1, n) => action(a1, node)), arg1);
             }
             else

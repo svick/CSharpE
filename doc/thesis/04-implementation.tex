@@ -225,7 +225,35 @@ Even though \cs{Project} is mutable, the method does not modify its input and in
 
 \medskip
 
-When a \cs{ProjectTransformer} is created, it 
+When a \cs{ProjectTransformer} is created, it creates a \cs{CodeTransformer} for each transformation. \cs{CodeTransformer} handles efficiently executing that transformation. When the \cs{Transform} method is called, a \cs{TransformProject} is created for the input project, then each \cs{CodeTransformer} is applied to it.
+
+\cs{TransformProject} is a type that inherits from \cs{Project}, with some additions in support of executing transformations.
+
+\medskip
+
+\cs{CodeTransformer<TInput, TOutput>} is used to execute a piece of user code, which mutates its input and optionally also returns output. While the user code is executing, smart loops and segments have access to information from their previous execution within this \cs{CodeTransformer}, which means they can take advantage of caching. This is done by attaching information about the previous executions to \cs{TransformProject}. Since smart loops and segments always have access to a \cs{Project}, they can detect whether it is a \cs{TransformProject} and act accordingly.
+
+If the piece of code executed within a \cs{CodeTransformer} has no output, unit type (i.e.\ type with no data and only one value) is used for the \cs{TOutput} type parameter. But because .NET does not have a built-in unit type, and because this unit type does not have to be visible in the \ac{API} of the library, a custom type called \cs{Unit} is used.\footnotemark{}
+
+\footnotetext{The \cs{ValueTuple} family of types, which were added to .NET to support C\# tuples, includes the non-generic \cs{ValueTuple} type, representing a tuple with zero elements, even though there is currently no support for zero-element tuples in C\#. This type could be used as a unit type, but a custom type with the name \cs{Unit} makes the intention clearer.}
+
+If the input of a \cs{CodeTransformer} is a syntax node, it, or rather, its derived class, \cs{SyntaxNodeCodeTransformer<TInput, TOutput>}, employs caching of its own: When it is detected that the current input is equivalent to the previous input, changes from the previous input are directly applied to the current one, without recomputing them. Because there are variations to this process, it is represented as a delegate of the type \cs{Func<T, Func<T, Action<T>>>}, which resembles the curried form of a function in functional programming. This delegate shape is used here, because each of the three inputs is provided at a different point in the process of executing the user code: the first one is provided before the code is executed, the second one after, and the third one can be repeatedly provided for next equivalent inputs.
+
+Specifically, the variations of this delegate are:
+
+\begin{itemize}
+\item Regular.
+
+For most user code, the "before" input is ignored, syntax is retrieved from the "after" input (by calling \cs{GetWrapped} on it) and the "next" input is mutated by forcing this syntax into it.
+
+\item Smart segment.
+
+User code that executes within a smart segment requires special handling, because it only handles newly added members to a type. To do this, the number of members is recorded from the "before" input, then members above this count are saved from the "after" input, and finally, these members are added to the "next" input.
+
+\item Using directives.
+
+The code that executes within a \cs{SyntaxNodeCodeTransformer} is not allowed to modify syntax outside of its input, with one exception: \cs{using} directives. When newly added syntax nodes reference a type from a name\-space that does not have a \cs{using} directive in the file yet, CSharpE adds it automatically. But this has to be replicated also when those syntax nodes are being added from a cache. To do this, \cs{SourceFile} includes functionality to record requests to ensure a \cs{using} directive exists. For the "before" input, this recording is started, for the "after" input, recording is stopped and its results retrieved and for the "next" input, the recorded namespaces are requested again. This happens on top of one of the two delegates described above.
+\end{itemize}
 
 \section{CSharpE.Transform.VisualStudio}
 

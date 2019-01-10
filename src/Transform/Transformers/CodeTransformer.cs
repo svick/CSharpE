@@ -18,9 +18,9 @@ namespace CSharpE.Transform.Transformers
         public static CodeTransformer<TInput, TOutput> Create(Func<TInput, TOutput> codeAction, bool limitedComparison = false)
         {
             if (typeof(SyntaxNode).IsAssignableFrom(typeof(TInput)))
-                return (CodeTransformer<TInput, TOutput>) Activator.CreateInstance(
-                    typeof(SyntaxNodeCodeTransformer<,>).MakeGenericType(typeof(TInput), typeof(TOutput)), codeAction,
-                    limitedComparison);
+                return (CodeTransformer<TInput, TOutput>)Activator.CreateInstance(
+                    typeof(SyntaxNodeCodeTransformer<,>).MakeGenericType(typeof(TInput), typeof(TOutput)),
+                    codeAction, limitedComparison);
 
             return new CodeTransformer<TInput, TOutput>(codeAction);
         }
@@ -31,18 +31,18 @@ namespace CSharpE.Transform.Transformers
 
         public virtual TOutput Transform(TransformProject project, TInput input)
         {
-            var transformerBuilder = new TransformerBuilder(project, transformers);
+            var transformerCollector = new TransformerCollector(project, transformers);
 
-            var oldTransformerBuilder = project.TransformerBuilder;
-            project.TransformerBuilder = transformerBuilder;
+            var oldTransformerCollector = project.TransformerCollector;
+            project.TransformerCollector = transformerCollector;
 
             project.Log(GetTargetKind(input), LogInfo.GetName(input), "transform");
 
             var result = codeAction(input);
 
-            project.TransformerBuilder = oldTransformerBuilder;
+            project.TransformerCollector = oldTransformerCollector;
 
-            transformers = transformerBuilder.Transformers;
+            transformers = transformerCollector.Transformers;
 
             return result;
         }
@@ -87,13 +87,8 @@ namespace CSharpE.Transform.Transformers
                 return inputAfter =>
                 {
                     // then record Roslyn syntax for nodes added by limited transformation 
-                    
-                    var newMembers = new List<MemberDeclarationSyntax>();
 
-                    for (int i = oldMembersCount; i < inputAfter.Members.Count; i++)
-                    {
-                        newMembers.Add(inputAfter.Members[i].GetWrapped());
-                    }
+                    var newMembers = inputAfter.Members.Skip(oldMembersCount).Select(m => m.GetWrapped()).ToList();
 
                     // finally add recorded nodes to a node
                     

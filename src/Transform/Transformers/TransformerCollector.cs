@@ -5,13 +5,13 @@ using CSharpE.Transform.Internals;
 
 namespace CSharpE.Transform.Transformers
 {
-    internal class TransformerBuilder
+    internal class TransformerCollector
     {
         private readonly TransformProject project;
         private readonly IReadOnlyList<CollectionTransformer> oldTransformers;
         private int oldTransformersIndex = 0;
 
-        public TransformerBuilder(
+        public TransformerCollector(
             TransformProject project, IReadOnlyList<CollectionTransformer> transformers)
         {
             this.project = project;
