@@ -8,11 +8,11 @@ namespace CSharpE.Transform.Execution
 {
     public class ProjectTransformer
     {
-        private readonly List<Transformer<TransformProject, Unit>> transformers;
+        private readonly List<CodeTransformer<TransformProject, Unit>> transformers;
 
         public ProjectTransformer(IEnumerable<ITransformation> transformations, bool designTime = false)
         {
-            transformers = new List<Transformer<TransformProject, Unit>>();
+            transformers = new List<CodeTransformer<TransformProject, Unit>>();
             
             foreach (var transformation in transformations)
             {
@@ -20,7 +20,7 @@ namespace CSharpE.Transform.Execution
             }
         }
 
-        private static Transformer<TransformProject, Unit> CreateTransformer(ITransformation transformation, bool designTime) =>
+        private static CodeTransformer<TransformProject, Unit> CreateTransformer(ITransformation transformation, bool designTime) =>
             CodeTransformer<TransformProject, Unit>.Create(project =>
             {
                 transformation.Process(project, designTime);

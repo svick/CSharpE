@@ -6,7 +6,7 @@ using CSharpE.Transform.Internals;
 namespace CSharpE.Transform.Transformers
 {
     internal abstract class CollectionTransformer<TParent, TItem, TData, TIntermediate, TResult>
-        : Transformer<IEnumerable<TItem>, TResult>
+        : CollectionTransformer
         where TParent : class
         where TItem : SyntaxNode
     {
@@ -18,6 +18,8 @@ namespace CSharpE.Transform.Transformers
             Action = action;
             Data = GeneralHandler.DeepClone(data);
         }
+
+        public abstract TResult Transform(TransformProject project, IEnumerable<TItem> input);
 
         public abstract bool Matches(TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction,
             TData newData, bool newLimitedComparison);
@@ -38,7 +40,7 @@ namespace CSharpE.Transform.Transformers
         }
     }
 
-    internal static class CollectionTransformer
+    internal abstract class CollectionTransformer
     {
         public static CollectionTransformer<TParent, TItem, TData, TIntermediate, TOutput> Create<TParent, TItem, TData, TIntermediate, TOutput>(
             TParent parent, ActionInvoker<TData, TItem, TIntermediate, TOutput> action, TData data,

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax;
 using CSharpE.Transform.Internals;
@@ -9,17 +8,17 @@ namespace CSharpE.Transform.Transformers
     internal class TransformerBuilder
     {
         private readonly TransformProject project;
-        private readonly IReadOnlyList<Transformer> oldTransformers;
+        private readonly IReadOnlyList<CollectionTransformer> oldTransformers;
         private int oldTransformersIndex = 0;
 
         public TransformerBuilder(
-            TransformProject project, IReadOnlyList<Transformer> transformers)
+            TransformProject project, IReadOnlyList<CollectionTransformer> transformers)
         {
             this.project = project;
             oldTransformers = transformers;
         }
 
-        public List<Transformer> Transformers { get; } = new List<Transformer>();
+        public List<CollectionTransformer> Transformers { get; } = new List<CollectionTransformer>();
 
         public TResult Collection<TParent, TItem, TData, TIntermediate, TResult>(
             TParent parent, IEnumerable<TItem> collection,

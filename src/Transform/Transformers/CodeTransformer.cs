@@ -9,11 +9,11 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Transform.Transformers
 {
-    internal class CodeTransformer<TInput, TOutput> : Transformer<TInput, TOutput>
+    internal class CodeTransformer<TInput, TOutput>
     {
         private readonly Func<TInput, TOutput> codeAction;
 
-        private List<Transformer> transformers;
+        private List<CollectionTransformer> transformers;
 
         public static CodeTransformer<TInput, TOutput> Create(Func<TInput, TOutput> codeAction, bool limitedComparison = false)
         {
@@ -29,7 +29,7 @@ namespace CSharpE.Transform.Transformers
 
         private protected virtual string GetTargetKind(TInput input) => input.GetType().Name; 
 
-        public override TOutput Transform(TransformProject project, TInput input)
+        public virtual TOutput Transform(TransformProject project, TInput input)
         {
             var transformerBuilder = new TransformerBuilder(project, transformers);
 
