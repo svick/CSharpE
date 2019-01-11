@@ -76,19 +76,19 @@ namespace CSharpE.Transform.Transformers
             }
         }
 
-        private static Func<TypeDefinition, Func<TypeDefinition, Action<TypeDefinition>>> CreateLimitedDiffer()
+        private static Func<TypeDefinition, Func<Action<TypeDefinition>>> CreateLimitedDiffer()
         {
-            return inputBefore =>
+            return input =>
             {
                 // first record the count of members before transformation
                 
-                var oldMembersCount = inputBefore.Members.Count;
+                var oldMembersCount = input.Members.Count;
 
-                return inputAfter =>
+                return () =>
                 {
                     // then record Roslyn syntax for nodes added by limited transformation 
 
-                    var newMembers = inputAfter.Members.Skip(oldMembersCount).Select(m => m.GetWrapped()).ToList();
+                    var newMembers = input.Members.Skip(oldMembersCount).Select(m => m.GetWrapped()).ToList();
 
                     // finally add recorded nodes to a node
                     
@@ -98,31 +98,31 @@ namespace CSharpE.Transform.Transformers
             };
         }
 
-        private Func<TInput, Func<TInput, Action<TInput>>> CreateDiffer()
+        private Func<TInput, Func<Action<TInput>>> CreateDiffer()
         {
             if (limited)
-                return AddNamespacesToDiffer((Func<TInput, Func<TInput, Action<TInput>>>)CreateLimitedDiffer());
+                return AddNamespacesToDiffer((Func<TInput, Func<Action<TInput>>>)CreateLimitedDiffer());
 
-            return AddNamespacesToDiffer(_ => inputAfter =>
+            return AddNamespacesToDiffer(input => () =>
             {
-                var afterSyntax = inputAfter.GetWrapped();
+                var afterSyntax = input.GetWrapped();
                 return nextInput => nextInput.SetSyntax(afterSyntax);
             });
         }
 
-        private static Func<TInput, Func<TInput, Action<TInput>>> AddNamespacesToDiffer(Func<TInput, Func<TInput, Action<TInput>>> differ)
+        private static Func<TInput, Func<Action<TInput>>> AddNamespacesToDiffer(Func<TInput, Func<Action<TInput>>> differ)
         {
-            return inputBefore =>
+            return input =>
             {
-                var recorder = inputBefore.SourceFile.RecordUsingNamespaces();
+                var recorder = input.SourceFile.RecordUsingNamespaces();
 
-                var differWithBefore = differ(inputBefore);
+                var differBefore = differ(input);
 
-                return inputAfter =>
+                return () =>
                 {
                     var namespaces = recorder.StopAndGetResult();
 
-                    var differWithAfter = differWithBefore(inputAfter);
+                    var differAfter = differBefore();
 
                     return nextInput =>
                     {
@@ -131,7 +131,7 @@ namespace CSharpE.Transform.Transformers
                             nextInput.SourceFile.EnsureUsingNamespace(ns);
                         }
 
-                        differWithAfter(nextInput);
+                        differAfter(nextInput);
                     };
                 };
             };
@@ -158,7 +158,7 @@ namespace CSharpE.Transform.Transformers
                 
                 beforeSyntax = newBeforeSyntax;
 
-                syntaxChangesApplier = differ(input);
+                syntaxChangesApplier = differ();
             }
 
             return GeneralHandler.DeepClone(cachedOutput);
