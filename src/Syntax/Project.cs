@@ -8,6 +8,11 @@ namespace CSharpE.Syntax
 {
     public class Project
     {
+        private static readonly LibraryReference[] DefaultReferences =
+        {
+            new AssemblyReference(typeof(object))
+        };
+
         public IList<SourceFile> SourceFiles { get; }
 
         public IList<LibraryReference> References { get; }
@@ -36,7 +41,6 @@ namespace CSharpE.Syntax
             }
         }
 
-
         public Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references)
             : this(sourceFiles, references, null) { }
 
@@ -61,6 +65,9 @@ namespace CSharpE.Syntax
 
             this.compilation = compilation;
         }
+
+        public Project(params SourceFile[] sourceFiles)
+            : this(sourceFiles, DefaultReferences) { }
 
         // TODO: limit type kind and use in ActorTransformation
         public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>
