@@ -85,7 +85,7 @@ namespace CSharpE.Transform.VisualStudio
                 return pos;
 
             if (loose)
-                return pos + (originalPosition - change.Span.Start);
+                return pos - (originalPosition - change.Span.Start);
 
             return null;
         }
