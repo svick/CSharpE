@@ -29,8 +29,7 @@ namespace CSharpE.Syntax.Internals
         public static IEnumerable<TItem> Create<TItem>(Project parent, IEnumerable<TItem> items) =>
             new SimpleCollection<Project, TItem>(parent, parent, items);
 
-        public static IEnumerable<TItem> Create<TParent, TItem>(TParent parent, IEnumerable<TItem> items)
-            where TParent : SyntaxNode =>
-            new SimpleCollection<TParent, TItem>(parent.SourceFile?.Project, parent, items);
+        public static IEnumerable<TItem> Create<TItem>(SyntaxNode parent, IEnumerable<TItem> items) =>
+            new SimpleCollection<SyntaxNode, TItem>(parent.SourceFile?.Project, parent, items);
     }
 }

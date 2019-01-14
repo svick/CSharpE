@@ -48,8 +48,6 @@ namespace CSharpE.Transform.Transformers
             where TParent : class
             where TItem : SyntaxNode
         {
-            // PERF: SyntaxNodeCollectionTransformer might profit from ExpressionTree-based cache
-
             object result;
 
             if (typeof(TParent) == typeof(Project) && typeof(TItem) == typeof(SourceFile))
@@ -58,11 +56,10 @@ namespace CSharpE.Transform.Transformers
                     (Project)(object)parent,
                     (ActionInvoker<TData, SourceFile, TIntermediate, TOutput>)(object)action, data);
             }
-            else if (typeof(SyntaxNode).IsAssignableFrom(typeof(TParent)))
+            else if (typeof(TParent) == typeof(SyntaxNode))
             {
-                var transformerType = typeof(SyntaxNodeCollectionTransformer<,,,,>).MakeGenericType(
-                    typeof(TParent), typeof(TItem), typeof(TData), typeof(TIntermediate), typeof(TOutput));
-                result = Activator.CreateInstance(transformerType, parent, action, data, limitedComparison);
+                result = new SyntaxNodeCollectionTransformer<TItem, TData, TIntermediate, TOutput>(
+                    (SyntaxNode)(object)parent, action, data, limitedComparison);
             }
             else
                 throw new InvalidOperationException();

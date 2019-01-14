@@ -13,9 +13,8 @@ using SyntaxNode = CSharpE.Syntax.SyntaxNode;
 namespace CSharpE.Transform.Transformers
 {
     // transformer for a collection of syntax nodes from the same file
-    internal class SyntaxNodeCollectionTransformer<TParent, TItem, TData, TIntermediate, TResult>
-        : CollectionTransformer<TParent, TItem, TData, TIntermediate, TResult>
-        where TParent : SyntaxNode
+    internal class SyntaxNodeCollectionTransformer<TItem, TData, TIntermediate, TResult>
+        : CollectionTransformer<SyntaxNode, TItem, TData, TIntermediate, TResult>
         where TItem : SyntaxNode
     {
         private readonly bool limitedComparison;
@@ -25,8 +24,9 @@ namespace CSharpE.Transform.Transformers
         private List<TextSpan> oldItemsSpans;
         private List<CodeTransformer<TItem, TIntermediate>> oldTransformers;
 
-        public SyntaxNodeCollectionTransformer(TParent parent,
-            ActionInvoker<TData, TItem, TIntermediate, TResult> action, TData data, bool limitedComparison)
+        public SyntaxNodeCollectionTransformer(
+            SyntaxNode parent, ActionInvoker<TData, TItem, TIntermediate, TResult> action, TData data,
+            bool limitedComparison)
             : base(action, data)
         {
             this.limitedComparison = limitedComparison;
@@ -96,7 +96,7 @@ namespace CSharpE.Transform.Transformers
         }
 
         public override bool Matches(
-            TParent newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction, TData newData,
+            SyntaxNode newParent, ActionInvoker<TData, TItem, TIntermediate, TResult> newAction, TData newData,
             bool newLimitedComparison)
         {
             var newParentFileSpan = newParent.FileSpan;
