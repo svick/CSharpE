@@ -13,7 +13,7 @@ using SyntaxNode = CSharpE.Syntax.SyntaxNode;
 namespace CSharpE.Transform.Transformers
 {
     // transformer for a collection of syntax nodes from the same file
-    internal class SyntaxNodeCollectionTransformer<TItem, TData, TIntermediate, TResult>
+    internal sealed class SyntaxNodeCollectionTransformer<TItem, TData, TIntermediate, TResult>
         : CollectionTransformer<SyntaxNode, TItem, TData, TIntermediate, TResult>
         where TItem : SyntaxNode
     {

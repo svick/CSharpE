@@ -8,7 +8,6 @@
 - make most classes `sealed`
 - look into how InvocationReasons.SemanticChanged works and if it could be used to decide when to rerun the whole transformation
 - consider using limited Roslyn formatting instead of `NormalizeWhitespace`
-- remove ITransformation.AdditionalReferences: it doesn't seem to be useful
 
 ---
 
@@ -17,15 +16,16 @@
 - consider creating code from "template" lambda or local function  
   - basically automatic code quoter
   - "lambda" parameters for inlining other code blocks
-- ensure no Roslyn types are exposed in the public interface
+- ensure no unwated Roslyn types are exposed in the public interface
 - consider rewriting existing Roslyn-based rewriter project into CSharpE, like LinqAF
 - think of how to handle segments that don't change in design time, but do change in build time (see `RecordTransformation`)
 - consider smart foreach for user data
   - probably using levenstein distance for diffing
     - no need to use levenstein, if you can be unordered and set-based?
   - and/or maybe some kind of cache/factory?
- - CSharpE.MSBuild should run (in a design-time mode?) during a design-time build, if the VS extension is not installed it should also produce a warning
- - design-time transformations shouldn't add `using`s, because those are observable
- - add `Smart.ForEachWithSegment` (but with better name), which allows adding members to a type based on a collection of other members
-     - might require adding an abstraction for dependencies? (node/limited node/data)
+- CSharpE.MSBuild should run (in a design-time mode?) during a design-time build, if the VS extension is not installed it should also produce a warning
+- design-time transformations shouldn't add `using`s, because those are observable
+- add `Smart.ForEachWithSegment` (but with better name), which allows adding members to a type based on a collection of other members
+  - might require adding an abstraction for dependencies? (node/limited node/data)
 - improve debugging of extensions by using launchSettings.json
+- improve `CollectionTransformer` reuse by allowing different `Data`

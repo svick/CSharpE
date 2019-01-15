@@ -5,7 +5,7 @@ using CSharpE.Transform.Internals;
 
 namespace CSharpE.Transform.Transformers
 {
-    internal class TransformerCollector
+    internal sealed class TransformerCollector
     {
         private readonly TransformProject project;
         private readonly IReadOnlyList<CollectionTransformer> oldTransformers;

@@ -5,7 +5,7 @@ using CSharpE.Transform.Internals;
 namespace CSharpE.Transform.Transformers
 {
     // transformer for a collection of source files
-    internal class SourceFileCollectionTransformer<TData, TIntermediate, TResult>
+    internal sealed class SourceFileCollectionTransformer<TData, TIntermediate, TResult>
         : CollectionTransformer<Project, SourceFile, TData, TIntermediate, TResult>
     {
         private Dictionary<string, CodeTransformer<SourceFile, TIntermediate>> oldTransformers;

@@ -188,7 +188,7 @@ To bridge this, CSharpE contains a set of internal list types, that also help wi
 
 \item Exposed collections implement an interface for use in CSharpE.Transform smart loops.
 
-As explained in Section~\ref{smart-loop-collection}, CSharpE.Transform smart loops need to understand the collections they are iterating. For this reason, CSharpE.Syntax collections implement the \cs{ISyntaxCollection<T>} interface. This interface implements the visitor patterns, so that a smart loop can correctly decide how to process the collection.
+As explained in Section~\ref{smart-loop-collection}, CSharpE.Transform smart loops need to understand the collections they are iterating. For this reason, CSharpE.Syntax collections implement the \cs{ISyntaxCollection<T>} interface. This interface implements the visitor pattern, so that a smart loop can correctly decide how to process the collection.
 
 \item Whitespace from user code is not preserved.
 
@@ -231,13 +231,13 @@ When a \cs{ProjectTransformer} is created, it creates a \cs{CodeTransformer} for
 
 \medskip
 
-\cs{CodeTransformer<TInput, TOutput>} is used to execute a piece of user code, which mutates its input and optionally also returns output. While the user code is executing, smart loops and segments have access to information from their previous execution within this \cs{CodeTransformer}, which means they can take advantage of caching. This is done by attaching information about the previous executions to \cs{TransformProject}. Since smart loops and segments always have access to a \cs{Project}, they can detect whether it is a \cs{TransformProject} and act accordingly.
-
-If the piece of code executed within a \cs{CodeTransformer} has no output, unit type (i.e.\ type with no data and only one value) is used for the \cs{TOutput} type parameter. But because .NET does not have a built-in unit type, and because this unit type does not have to be visible in the \ac{API} of the library, a custom type called \cs{Unit} is used.\footnotemark{}
+\cs{CodeTransformer<TInput, TOutput>} is used to execute a piece of user code, which mutates its input and optionally also returns output. If the piece of code executed within a \cs{CodeTransformer} has no output, unit type (i.e.\ type with no data and only one value) is used for the \cs{TOutput} type parameter. But because .NET does not have a built-in unit type, and because this unit type does not have to be visible in the \ac{API} of the library, a custom internal type called \cs{Unit} is used.\footnotemark{}
 
 \footnotetext{The \cs{ValueTuple} family of types, which were added to .NET to support C\# tuples, includes the non-generic \cs{ValueTuple} type, representing a tuple with zero elements, even though there is currently no support for zero-element tuples in C\#. This type could be used as a unit type, but a custom type with the name \cs{Unit} makes the intention clearer.}
 
-If the input of a \cs{CodeTransformer} is a syntax node, it, or rather, its derived class, \cs{SyntaxNodeCodeTransformer<TInput, TOutput>}, employs caching of its own: When it is detected that the current input is equivalent to the previous input, changes from the previous input are directly applied to the current one, without recomputing them. Because there are variations to this process, it is represented as a delegate of the type \cs{Func<T, Func<Action<T>>>}, which is somewhat similar to the curried form of a function in functional programming. This delegate shape is used here, because the delegate is invoked in three stages, each at a different point in the process of executing the user code: the first stage is invoked before the code is executed (and is provided with the input syntax node), the second stage is invoked after the code is executed (and does not have input of its own, because all it needs is the syntax node, which was already provided in the previous stage and has been mutated since then), and the third stage can be repeatedly invoked whenever there is a next equivalent input (and is provided with that input).
+% While the user code is executing, smart loops and segments have access to information from their previous execution within this \cs{CodeTransformer}, which means they can take advantage of caching. This is done by attaching information about the previous executions to \cs{TransformProject}. Since smart loops and segments always have access to a \cs{Project}, they can detect whether it is a \cs{TransformProject} and act accordingly.
+
+If the input of a \cs{CodeTransformer} is a syntax node, it, or rather, its derived class, \cs{SyntaxNodeCodeTransformer<TInput, TOutput>}, employs caching: When it is detected that the current input is equivalent to the previous input, changes from the previous input are directly applied to the current one, without recomputing them. Because there are variations to this process, it is represented as a delegate of the type \cs{Func<T, Func<Action<T>>>}, which is somewhat similar to the curried form of a function type in functional programming. This delegate shape is used here, because the delegate is invoked in three stages, each at a different point in the process of executing the user code: the first stage is invoked before the code is executed (and is provided with the input syntax node), the second stage is invoked after the code is executed (and does not have input of its own, because all it needs is the syntax node, which was already provided in the previous stage and has been mutated since then), and the third stage can be repeatedly invoked whenever there is a next equivalent input (and is provided with that input).
 
 Specifically, the variations of this delegate are:
 
@@ -258,6 +258,59 @@ The code that executes within a \cs{SyntaxNodeCodeTransformer} is not allowed to
 
 In the "before" stage, this recording is started on the input, in the "after" stage, recording is stopped and its results retrieved and for the input of the "next" stage, the recorded namespaces are requested again. This happens on top of one of the two delegates described above.
 \end{itemize}
+
+This caching is at the core of ensuring that user code is not executed unnecessarily in CSharpE.Transform and it is what each "cached" line in Listing~\ref{csharpetransform-log} represents. But to make this work, each \cs{CodeTransformer} also has to maintain information about the execution of smart loops and segments within it.
+
+\medskip
+
+This information is kept in a list of objects of type \cs{CollectionTransformer}. When a smart loop or segment is invoked within user code, information about it is matched against an object from the list. If the match is successful, the old object is reused, otherwise, new \cs{CollectionTransformer} is created.
+
+Since the user code in question is always the same, it is expected that it will usually invoke the same smart loops and segments when it is executed, which should result in high levels of reuse of \cs{CollectionTransformer} objects.
+
+Specifically, each object in the list is a \cs{CollectionTransformer<TParent, TItem, TData, TIntermediate, TResult>}. The meaning of the type parameters for a smart loop is:
+
+\begin{itemize}
+\item \cs{TParent} is the type that contains the collection.
+\item \cs{TItem} is the type of items in the collection.
+\item \cs{TData} is the type of data that is used as input for user code.
+\item \cs{TIntermediate} is the result type of each iteration of the smart loop.
+\item \cs{TResult} is the result type of the whole smart loop.
+\end{itemize}
+
+\pagebreak[2]
+
+A smart segment behaves in many respects like a smart loop over a collection with a single element. This means that for example both \cs{TParent} and \cs{TItem} are \cs{TypeDefinition} for them. Another case where some of the type parameters are effectively unused is for smart loops that do no return a value: in that case, both \cs{TIntermediate} and \cs{TResult} are \cs{Unit}.
+
+To further clarify the meaning of the type parameters, consider the following example code, modified from Listing~\ref{csharpetransform-smart-example2}:
+
+\begin{minted}{csharp}
+var fieldsList = Smart.ForEach(classDefinition.Fields, classDefinition.Name,
+    (className, field) => (className, field.Type, field.Name));
+\end{minted}
+
+The \cs{CollectionTransformer} used for this code has the following type parameters:
+
+\bigskip \noindent
+\begin{tabular}{ll}
+Type parameter     & Value \\
+\midrule
+\cs{TParent}       & \cs{SyntaxNode} (for \cs{classDefinition}) \\
+\cs{TItem}         & \cs{FieldDefinition} \\
+\cs{TData}         & \cs{string} (for \cs{classDefinition.Name}) \\
+\cs{TIntermediate} & \cs{(string, TypeReference, string)} \\
+\cs{TResult}       & \cs{List<(string, TypeReference, string)>}
+\end{tabular}
+
+\bigskip
+
+What the implementation of \cs{CollectionTransformer} actually does is that it maintains \cs{CodeTransformer} objects and whenever it processes a collection, it reuses one of these objects, if it matches the item that is currently being processed. There are two variants of \cs{CollectionTransformer} and each of them does this differently:
+
+\begin{itemize}
+\item \cs{SourceFileCollectionTransformer} is used when processing source files in a project. Files are considered to match when they have the same path (including file name).
+\item \cs{SyntaxNodeCollectionTransformer} is used when processing syntax nodes within a file. Syntax nodes are considered to match based on a diff of the parent node. This way, when some nodes are added to or removed from the collection, the remaining nodes (including those that were changed) should still have their \cs{CodeTransformer} reused.
+\end{itemize}
+
+In both cases, when \cs{CodeTransformer} objects are reused, it means that their matching comes into effect, which can lead to avoiding rerunning the relevant piece of user code, thanks to caching.
 
 \section{CSharpE.Transform.VisualStudio}
 
