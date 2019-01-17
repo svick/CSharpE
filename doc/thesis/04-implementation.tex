@@ -314,8 +314,44 @@ In both cases, when \cs{CodeTransformer} objects are reused, it means that their
 
 \section{CSharpE.Transform.VisualStudio}
 
+Now that CSharpE.Transform has been implemented, it is time to use it from the Visual Studio \ac{IDE}. Most of the support in Visual Studio for C\# comes from a Visual Studio extension that is open source and part of the Roslyn project, but this support is not useful for CSharpE on its own. This means that the possible approaches to make it work are:
+
+\begin{enumerate}
+\item Attempt to extend the extension, so that it also supports CSharpE.
+\item Improve the extension to make it more suitable for extending to support CSharpE.
+\item Modify the extension to support CSharpE, by creating a fork of Roslyn.
+\item Implement support for CSharpE from scratch, without using the existing support for C\#.
+\end{enumerate}
+
+Option 1 looks promising  at first: Visual Studio and the C\# extension use \ac{MEF} for their components, which means it could be possible to replace the C\# components with CSharpE components.
+
+Specifically, this can be accomplished thanks to the way the C\# extension uses \ac{MEF}. When the relevant components are resolved, only the one with the highest \cs{ServiceLayer} is selected. This means that the CSharpE components will be chosen, if they specify higher \cs{ServiceLayer} than the corresponding C\# components.
+
+Another question is: which components to replace? For example, the Roslyn \ac{API} contains the abstract class \cs{CompletionService}. Creating a class that derives from it allows specifying which items show in code completion. But there is no such component that would allow overriding which errors and warnings show in the Error List, which is necessary to make CSharpE work well in Visual Studio.
+
+Roslyn also contains more low-level services: \cs{ISyntaxTreeFactoryService} and \cs{ICompilationFactoryService}, that allow using custom \cs{SyntaxTree} and \cs{Compilation} objects. Overriding those should be enough; unfortunately, they are internal.
+
+Though all is not lost: .NET includes support for the undocumented attribute \cs{IgnoresAccessChecksToAttribute}. \cite{iacta} Using this attribute is enough to make this work at runtime, but because the C\# compiler does not understand the attribute, more work is necessary at compile-time. That work can be done by an MSBuild task, which rewrites referenced assemblies by changing internal members to public ones.\footnotemark \cite{iactg}
+
+\footnotetext{At first sight, this might look like a good opportunity to use CSharpE. But CSharpE is designed for rewriting source code written by the user, not rewriting referenced assemblies. Doing that requires manipulating metadata, not source code, which is why CSharpE is not useful for this purpose. The referenced project uses Mono.Cecil for its metadata manipulation.}
+
+The big issue with this approach is that it leads to code that is likely going to be extremely brittle: Whenever the code of the C\# extension changes (which usually happens with every minor version of Visual Studio), there is a high chance that it will break the CSharpE extension, because it relies on internal implementation details, which are subject to change.
+
+\medskip
+
+Option 2 is an attempt to make Option 1 less brittle: if the public extensibility points offered by the C\# extension were expanded to support the needs of CSharpE, the chance that an update to the C\# extension would break the CSharpE extension would be significantly diminished. The issue with this option is that it requires cooperation from the maintainers of the C\# extension, which is uncertain.
+
+\medskip
+
+Option 3 would be to create a version of the C\# extension with support for CSharpE, instead of building the CSharpE extension on top of the C\# extension. Doing this would require creating and maintaining a fork of the Roslyn repository. The advantage, compared with Option 1, is that there would be no need to use problematic techniques like \cs{IgnoresAccessChecksToAttribute}. The disadvantage is that this could make the CSharpE extension even more brittle with respect to changes in Roslyn: a change in Roslyn that would not affect Option 1 could still cause a merge conflict in this option.
+
+\medskip
+
+Option 4 is to create an extension for CSharpE that is largely independent of the C\# extension, though it could reuse some of its services. This approach avoids the brittleness issues of Options 1 and 3 and the dependency on maintainers of Roslyn of Option2. But it would likely require a significant amount of work to reimplement all the necessary services and the end result would probably still not be on a par with what is offered by the C\# extension.
+
+\medskip
+
 \begin{itemize}
-\item tried creating custom language that "derives" from \cs{CSharp}; VS didn't like that
 \item mention how I had to use the extern alias trick, which is not easy with NuGet
 \end{itemize}
 
