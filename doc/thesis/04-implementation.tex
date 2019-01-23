@@ -312,14 +312,18 @@ What the implementation of \cs{CollectionTransformer} actually does is that it m
 
 In both cases, when \cs{CodeTransformer} objects are reused, it means that their matching comes into effect, which can lead to avoiding rerunning the relevant piece of user code, thanks to caching.
 
+\section{CSharpE.Transform.MSBuild}
+
+\todo{}
+
 \section{CSharpE.Transform.VisualStudio}
 
 Now that CSharpE.Transform has been implemented, it is time to use it from the Visual Studio \ac{IDE}. Most of the support in Visual Studio for C\# comes from a Visual Studio extension that is open source and part of the Roslyn project, but this support is not useful for CSharpE on its own. This means that the possible approaches to make it work are:
 
 \begin{enumerate}
-\item Attempt to extend the extension, so that it also supports CSharpE.
-\item Improve the extension to make it more suitable for extending to support CSharpE.
-\item Modify the extension to support CSharpE, by creating a fork of Roslyn.
+\item Attempt to extend the C\# extension, so that it also supports CSharpE.
+\item Improve the C\# extension to make it more suitable for extending to support CSharpE.
+\item Modify the C\# extension to support CSharpE, by creating a fork of Roslyn.
 \item Implement support for CSharpE from scratch, without using the existing support for C\#.
 \end{enumerate}
 
@@ -351,10 +355,18 @@ Option 4 is to create an extension for CSharpE that is largely independent of th
 
 \medskip
 
+For the long-term health of the project, Option 2 would be ideal. If that proved infeasible, then Option 4 might become necessary. But because this is currently only a short-term project, Option 1 was chosen instead.
+
+What this means is that the Visual Studio extension for CSharpE implements \cs{ISyntaxTreeFactoryService} and \cs{ICompilationFactoryService} in such a way that they override their C\# versions. These services are used to provide custom implementations of \cs{SyntaxTree}, \cs{Compilation} and \cs{SemanticModel}. All of these generally delegate to their C\# versions, except that syntax nodes and file locations often have to be mapped back and forth between the original source code and source code after all design-time transformations have been run.
+
+For mapping between nodes, Roslyn Syntax Annotations are used: nodes in original trees are annotated before transformations are run. Then, if semantic information about a node is requested, a node with the same annotation in the corresponding transformed tree is located and its information is returned instead. Since a transformation can remove or replace nodes, this process can fail, with no information being returned.
+
+For mapping between source file locations, annotations are not fine-grained enough, so diffs are used instead. Roslyn contains the \cs{SyntaxDiffer} class for computing diffs between syntax trees, but this was insufficient. Because of that, an enhanced copy of this class is used.
+
 \begin{itemize}
+\item "incremental" transformations
+\item debugging
 \item mention how I had to use the extern alias trick, which is not easy with NuGet
 \end{itemize}
-
-\section{CSharpE.Transform.MSBuild}
 
 \section{Example extensions}
