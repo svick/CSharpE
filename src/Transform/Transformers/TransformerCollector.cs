@@ -52,18 +52,18 @@ namespace CSharpE.Transform.Transformers
         {
             // segment is implemented as a single-element collection, because CodeTransformer doesn't handle data
             
-            CollectionTransformer<TNode, TNode, TData, TResult, TResult> transformer = null;
+            CollectionTransformer<SyntaxNode, TNode, TData, TResult, TResult> transformer = null;
 
             var oldTransformer = oldTransformers?.ElementAtOrDefault(oldTransformersIndex++);
 
-            if (oldTransformer is CollectionTransformer<TNode, TNode, TData, TResult, TResult> oldCollectionTransformer)
+            if (oldTransformer is CollectionTransformer<SyntaxNode, TNode, TData, TResult, TResult> oldCollectionTransformer)
             {
                 if (oldCollectionTransformer.Matches(node, action, data, newLimitedComparison: true))
                     transformer = oldCollectionTransformer;
             }
 
             if (transformer == null)
-                transformer = CollectionTransformer.Create(node, action, data, limitedComparison: true);
+                transformer = CollectionTransformer.Create((SyntaxNode)node, action, data, limitedComparison: true);
 
             var result = transformer.Transform(project, new[] { node });
 
