@@ -28,12 +28,26 @@ namespace CSharpE.Transform.VisualStudio
         public CSharpCompilation RoslynCompilation { get; }
 
         public Compilation(CSharpCompilation roslynCompilation, AsyncQueue<CompilationEvent> eventQueue = null)
-            : base(roslynCompilation.AssemblyName, roslynCompilation.References.ToImmutableArray(), new Dictionary<string, string>() /* TODO? */, roslynCompilation.IsSubmission, eventQueue)
+            : this(roslynCompilation, previousCompilation: null, eventQueue) { }
+
+        private Compilation(
+            CSharpCompilation roslynCompilation, Compilation previousCompilation, AsyncQueue<CompilationEvent> eventQueue = null)
+            : base(
+                roslynCompilation.AssemblyName, roslynCompilation.References.ToImmutableArray(),
+                new Dictionary<string, string>() /* TODO? */, roslynCompilation.IsSubmission, eventQueue)
         {
             RoslynCompilation = roslynCompilation;
 
             designTimeCompilation = new Lazy<CSharpCompilation>(CreateDesignTimeCompilation);
+
+            if (previousCompilation?.hasTransformer == true && previousCompilation.References.SequenceEqual(References))
+            {
+                transformer = previousCompilation.transformer;
+                hasTransformer = true;
+            }
         }
+
+        private Compilation Wrap(RoslynCompilation roslynCompilation) => new Compilation((CSharpCompilation)roslynCompilation, this);
 
         private ProjectTransformer CreateTransformer()
         {
@@ -124,6 +138,7 @@ namespace CSharpE.Transform.VisualStudio
                 if (!hasTransformer)
                 {
                     transformer = CreateTransformer();
+
                     hasTransformer = true;
                 }
                 return transformer;
@@ -208,7 +223,11 @@ namespace CSharpE.Transform.VisualStudio
             if (Transformer == null)
                 return RoslynCompilation;
 
-            var transformed = Transformer.Transform(new Syntax.Project(RoslynCompilation));
+            Syntax.Project transformed;
+            lock (Transformer)
+            {
+                transformed = Transformer.Transform(new Syntax.Project(RoslynCompilation));
+            }
 
             return (CSharpCompilation)CSharpCompilation.Create(
                 RoslynCompilation.AssemblyName, transformed.SourceFiles.Select(file => file.GetSyntaxTree()),
@@ -425,7 +444,7 @@ namespace CSharpE.Transform.VisualStudio
         {
             // because most methods delegate to DesignTimeCompilation, eventQueue should be set there
             // but since it might not exist yet, save the eventQueue for now
-            return new Compilation(RoslynCompilation, eventQueue);
+            return new Compilation(RoslynCompilation, this, eventQueue);
         }
 
         public override bool HasSubmissionResult()
@@ -538,7 +557,7 @@ namespace CSharpE.Transform.VisualStudio
 
         protected override IEnumerable<RoslynSyntaxTree> CommonSyntaxTrees => RoslynCompilation.SyntaxTrees;
 
-        public override ImmutableArray<MetadataReference> DirectiveReferences => DesignTimeCompilation.DirectiveReferences;
+        public override ImmutableArray<MetadataReference> DirectiveReferences => RoslynCompilation.DirectiveReferences;
 
         public override IEnumerable<AssemblyIdentity> ReferencedAssemblyNames => DesignTimeCompilation.ReferencedAssemblyNames;
 

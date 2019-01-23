@@ -25,7 +25,7 @@ namespace CSharpE.Transform.VisualStudio
         public SemanticModel(Compilation compilation, RoslynSyntaxTree oldTree, RoslynSyntaxTree newTree, CSharpSemanticModel roslynModel)
             : base(compilation.DesignTimeCompilation, newTree)
         {
-            this.compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
+            this.compilation = compilation;
             this.oldTree = oldTree;
             this.newTree = newTree;
             this.roslynModel = roslynModel;
@@ -101,7 +101,7 @@ namespace CSharpE.Transform.VisualStudio
             {
                 var result = Core();
 
-                compilation.eventQueueProcessingSemaphore.Wait();
+                compilation.eventQueueProcessingSemaphore.Wait(cancellationToken);
 
                 finishedWaiting = true;
 
