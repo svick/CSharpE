@@ -99,23 +99,23 @@ namespace CSharpE.Syntax
 
         public IEnumerable<BaseTypeDefinition> GetAllTypes()
         {
-            IEnumerable<BaseTypeDefinition> GetAllTypes(BaseTypeDefinition type)
+            IEnumerable<BaseTypeDefinition> GetAllTypes(IEnumerable<BaseTypeDefinition> types)
             {
-                yield return type;
-
-                if (type is TypeDefinition typeDefinition)
+                foreach (var type in types)
                 {
-                    foreach (var directType in typeDefinition.Types)
+                    yield return type;
+
+                    if (type is TypeDefinition typeDefinition)
                     {
-                        foreach (var indirectType in GetAllTypes(directType))
+                        foreach (var descendantType in GetAllTypes(typeDefinition.Types))
                         {
-                            yield return indirectType;
+                            yield return descendantType;
                         }
                     }
                 }
             }
 
-            return SimpleCollection.Create(this, GetTypes().SelectMany(GetAllTypes));
+            return SimpleCollection.Create(this, GetAllTypes(GetTypes()));
         }
 
         public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>
@@ -254,4 +254,3 @@ namespace CSharpE.Syntax
         }
     }
 }
- 
