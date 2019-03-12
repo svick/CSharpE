@@ -314,11 +314,23 @@ In both cases, when \cs{CodeTransformer} objects are reused, it means that their
 
 \section{CSharpE.Transform.MSBuild}
 
-\todo{}
+Now that CSharpE.Transform has been implemented, it is time to use it. First, we create an MSBuild \cs{Task} to support executing build-time transformations from \acp{IDE} or from the command line. MSBuild has variants for both .NET Framework and .NET Core and both will need to be capable of running this \cs{Task}, because the .NET Framework variant is used by Visual Studio and the .NET Core variant is required by Linux build servers. This means that the \cs{Task} will have to be capable of running on both frameworks.
+
+The \cs{Task} will need to load referenced extension assemblies to execute the transformations contained within them. To avoid issues with assembly loading we could take advantage of assembly isolation (\cs{AppDomain} in .NET Framework and \cs{AssemblyLoadContext} in .NET Core) either directly or by using a library, \cite{nb-msbe} but this approach does not seem to be reliable. So, a separate process is used instead.
+
+The way it works is that the assembly with the \cs{Task} is loaded as a regular MSBuild extension library. It then relaunches itself as an application, which actually executes the transformations. The two processes communicate with each other using a rudimentary text-based protocol: the MSBuild extension writes paths of references (including references to CSharpE extensions) and input source files to the standard input of the second process and then reads warnings, errors and paths of transformed source files from its standard output.
+
+\medskip
+
+The MSBuild process is generally not reused between builds, which means this approach will always execute full transformations, with no caching. This is acceptable, because building is not particularly performance sensitive, certainly significantly less sensitive than \ac{IDE} operations like autocompletion.
+
+MSBuild \cs{Task}s are usually executed not just during regular build, but also during "design-time build". \cite{design-time-builds} Because such builds are used by \acp{IDE}, but CSharpE requires special handling for those, the \cs{Task} described in this section specifically does not execute during design-time builds.
 
 \section{CSharpE.Transform.VisualStudio}
 
-Now that CSharpE.Transform has been implemented, it is time to use it from the Visual Studio \ac{IDE}. Most of the support in Visual Studio for C\# comes from a Visual Studio extension that is open source and part of the Roslyn project, but this support is not useful for CSharpE on its own. This means that the possible approaches to make it work are:
+\todo{Rewrite intro after MSBuild}
+
+Now that CSharpE.Transform has been implemented, it is time to use it from the Visual Studio \ac{IDE}. Most of the support in Visual Studio for C\# comes from a Visual Studio extension that is open source and part of the Roslyn project, but this support is not useful for CSharpE on its own. The possible approaches to make it work are:
 
 \begin{enumerate}
 \item Attempt to extend the C\# extension, so that it also supports CSharpE.
