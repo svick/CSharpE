@@ -199,7 +199,7 @@ The easiest way to fix this is to call \cs{NormalizeWhitespace()}, though using 
 
 \section{CSharpE.Transform}
 
-Now that types necessary for representing and modifying code have been implemented, it is time to turn to code that will drive transformations. While Section~\ref{transform-design} described the user-facing \ac{API} of CSharpE.Transform, there is one more public type, \cs{ProjectTransformer}, which is used by the Visual Studio and MSBuild extensions to run transformations. To isolate this type from user-facing types, it is placed in a separate namespace: \cs{CSharpE.Transform.Execution}.
+Now that types necessary for representing and modifying code have been implemented, it is time to turn to code that will drive transformations. \label{ProjectTransformer} While Section~\ref{transform-design} described the user-facing \ac{API} of CSharpE.Transform, there is one more public type, \cs{ProjectTransformer}, which is used by the Visual Studio and MSBuild extensions to run transformations. To isolate this type from user-facing types, it is placed in a separate namespace: \cs{CSharpE.Transform.Execution}.
 
 \begin{listing}
 \begin{minted}{csharp}
@@ -328,9 +328,7 @@ MSBuild \cs{Task}s are usually executed not just during regular build, but also 
 
 \section{CSharpE.Transform.VisualStudio}
 
-\todo{Rewrite intro after MSBuild}
-
-Now that CSharpE.Transform has been implemented, it is time to use it from the Visual Studio \ac{IDE}. Most of the support in Visual Studio for C\# comes from a Visual Studio extension that is open source and part of the Roslyn project, but this support is not useful for CSharpE on its own. The possible approaches to make it work are:
+After support for MSBuild, the next step is to add support for the Visual Studio \ac{IDE}. Most of the support in Visual Studio for C\# comes from a Visual Studio extension that is open source and part of the Roslyn project, but this support is not useful for CSharpE on its own, because it has no knowledge of CSharpE transformations. Possible approaches to make this work are:
 
 \begin{enumerate}
 \item Attempt to extend the C\# extension, so that it also supports CSharpE.
@@ -341,17 +339,17 @@ Now that CSharpE.Transform has been implemented, it is time to use it from the V
 
 Option 1 looks promising  at first: Visual Studio and the C\# extension use \ac{MEF} for their components, which means it could be possible to replace the C\# components with CSharpE components.
 
-Specifically, this can be accomplished thanks to the way the C\# extension uses \ac{MEF}. When the relevant components are resolved, only the one with the highest \cs{ServiceLayer} is selected. This means that the CSharpE components will be chosen, if they specify higher \cs{ServiceLayer} than the corresponding C\# components.
+Specifically, this can be accomplished thanks to the way the C\# extension uses \ac{MEF}. When the relevant components are resolved, only the one with the highest \cs{ServiceLayer} is selected. This means that CSharpE components will be chosen, if they specify higher \cs{ServiceLayer} than the corresponding C\# components.
 
 Another question is: which components to replace? For example, the Roslyn \ac{API} contains the abstract class \cs{CompletionService}. Creating a class that derives from it allows specifying which items show in code completion. But there is no such component that would allow overriding which errors and warnings show in the Error List, which is necessary to make CSharpE work well in Visual Studio.
 
 Roslyn also contains more low-level services: \cs{ISyntaxTreeFactoryService} and \cs{ICompilationFactoryService}, that allow using custom \cs{SyntaxTree} and \cs{Compilation} objects. Overriding those should be enough; unfortunately, they are internal.
 
-Though all is not lost: .NET includes support for the undocumented attribute \cs{IgnoresAccessChecksToAttribute}. \cite{iacta} Using this attribute is enough to make this work at runtime, but because the C\# compiler does not understand the attribute, more work is necessary at compile-time. That work can be done by an MSBuild task, which rewrites referenced assemblies by changing internal members to public ones.\footnotemark \cite{iactg}
+Though all is not lost: .NET includes support for the undocumented attribute \cs{IgnoresAccessChecksToAttribute}. \cite{iacta} Applying this attribute is enough for run-time, but because the C\# compiler does not understand the attribute, more work is necessary at compile-time. That work can be done by an MSBuild task, which rewrites referenced assemblies by changing internal members to public ones.\footnotemark \cite{iactg}
 
 \footnotetext{At first sight, this might look like a good opportunity to use CSharpE. But CSharpE is designed for rewriting source code written by the user, not rewriting referenced assemblies. Doing that requires manipulating metadata, not source code, which is why CSharpE is not useful for this purpose. The referenced project uses Mono.Cecil for its metadata manipulation.}
 
-The big issue with this approach is that it leads to code that is likely going to be extremely brittle: Whenever the code of the C\# extension changes (which usually happens with every minor version of Visual Studio), there is a high chance that it will break the CSharpE extension, because it relies on internal implementation details, which are subject to change.
+The big issue with this approach is that it leads to code that is likely going to be extremely brittle: Whenever the C\# extension is updated (which usually happens with every minor version of Visual Studio), there is a high chance that it will break the CSharpE extension, because it relies on internal implementation details, which are subject to change.
 
 \medskip
 
@@ -359,15 +357,15 @@ Option 2 is an attempt to make Option 1 less brittle: if the public extensibilit
 
 \medskip
 
-Option 3 would be to create a version of the C\# extension with support for CSharpE, instead of building the CSharpE extension on top of the C\# extension. Doing this would require creating and maintaining a fork of the Roslyn repository. The advantage, compared with Option 1, is that there would be no need to use problematic techniques like \cs{IgnoresAccessChecksToAttribute}. The disadvantage is that this could make the CSharpE extension even more brittle with respect to changes in Roslyn: a change in Roslyn that would not affect Option 1 could still cause a merge conflict in this option.
+Option 3 would be to create a version of the C\# extension with support for CSharpE, instead of building the CSharpE extension on top of the C\# extension. Doing this would require creating and maintaining a fork of the Roslyn repository. The advantage, compared with Option 1, is that there would be no need to use problematic techniques like \cs{IgnoresAccessChecksToAttribute}. The disadvantage is that this could make the CSharpE extension even more brittle with respect to changes in Roslyn: a change in Roslyn that would not affect Option 1 could still cause a merge conflict with this approach.
 
 \medskip
 
-Option 4 is to create an extension for CSharpE that is largely independent of the C\# extension, though it could reuse some of its services. This approach avoids the brittleness issues of Options 1 and 3 and the dependency on maintainers of Roslyn of Option2. But it would likely require a significant amount of work to reimplement all the necessary services and the end result would probably still not be on a par with what is offered by the C\# extension.
+Option 4 is to create an extension for CSharpE that is largely independent of the C\# extension, though it could reuse some of its services. This approach avoids the brittleness issues of Options 1 and 3 and the dependency on maintainers of Roslyn of Option 2. But it would likely require a significant amount of work to reimplement all the necessary services and the end result would probably still not be on a par with what is offered by the C\# extension.
 
 \medskip
 
-For the long-term health of the project, Option 2 would be ideal. If that proved infeasible, then Option 4 might become necessary. But because this is currently only a short-term project, Option 1 was chosen instead.
+For the long-term health of the CSharpE project, Option 2 would be ideal. If that proved infeasible, then Option 4 might become necessary. But because this is currently only a short-term project, Option 1 was chosen instead.
 
 What this means is that the Visual Studio extension for CSharpE implements \cs{ISyntaxTreeFactoryService} and \cs{ICompilationFactoryService} in such a way that they override their C\# versions. These services are used to provide custom implementations of \cs{SyntaxTree}, \cs{Compilation} and \cs{SemanticModel}. All of these generally delegate to their C\# versions, except that syntax nodes and file locations often have to be mapped back and forth between the original source code and source code after all design-time transformations have been run.
 
@@ -375,8 +373,11 @@ For mapping between nodes, Roslyn Syntax Annotations are used: nodes in original
 
 For mapping between source file locations, annotations are not fine-grained enough, so diffs are used instead. Roslyn contains the \cs{SyntaxDiffer} class for computing diffs between syntax trees, but this was insufficient. Because of that, an enhanced copy of this class is used.
 
+\medskip
+
+The core of the CSharpE Visual Studio extension is in its implementation of \cs{Compilation}: it contains the original C\# \cs{Compilation} and also a lazily computed C\# \cs{Compilation} containing code with design-time transformations applied. These two \cs{Compilation}s are then used as appropriate to implement the required \cs{abstract} methods. \cs{ProjectTransformer}, described in Section~\ref{ProjectTransformer}, is used to compute the compilation with transformations applied. Because the \cs{Compilation} class is immutable and considered thread-safe, a single instance of \cs{ProjectTransfomer} is used under a mutex for successive modified instances of \cs{Compilation}, so that transformations of code that hasn't changed do not have to be recomputed. One exception is when these modifications include changes to references: a new instance of \cs{ProjectTransformer} is used in that situation, in case a modified reference included a transformation, because \cs{ProjectTransformer} operates on a fixed set of transformations.
+
 \begin{itemize}
-\item "incremental" transformations
 \item debugging
 \item mention how I had to use the extern alias trick, which is not easy with NuGet
 \end{itemize}
