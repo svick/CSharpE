@@ -377,9 +377,14 @@ For mapping between source file locations, annotations are not fine-grained enou
 
 The core of the CSharpE Visual Studio extension is in its implementation of \cs{Compilation}: it contains the original C\# \cs{Compilation} and also a lazily computed C\# \cs{Compilation} containing code with design-time transformations applied. These two \cs{Compilation}s are then used as appropriate to implement the required \cs{abstract} methods. \cs{ProjectTransformer}, described in Section~\ref{ProjectTransformer}, is used to compute the compilation with transformations applied. Because the \cs{Compilation} class is immutable and considered thread-safe, a single instance of \cs{ProjectTransfomer} is used under a mutex for successive modified instances of \cs{Compilation}, so that transformations of code that hasn't changed do not have to be recomputed. One exception is when these modifications include changes to references: a new instance of \cs{ProjectTransformer} is used in that situation, in case a modified reference included a transformation, because \cs{ProjectTransformer} operates on a fixed set of transformations.
 
-\begin{itemize}
-\item debugging
-\item mention how I had to use the extern alias trick, which is not easy with NuGet
-\end{itemize}
+\medskip
+
+When a project that uses CSharpE is executed within the Visual Studio Debugger, the code that is displayed to the user is the one produced by MSBuild, which means it is the user code, after performing build-time transformations. So, the code shown to the user is the code that is actually executing, which is especially useful when developing a transformation or when debugging an issue related to the used transformations.
+
+At the same time, a transformation can introduce a large amount of "boilerplate code" (which is one of the main reasons why transformations are useful in the first place), and this additional code can hamper understanding how the user code executes. While this means that some kind of simplified debugging view could be useful, it has not been implemented.
+
+\medskip
+
+\todo{Conclusion?}
 
 \section{Example extensions}
