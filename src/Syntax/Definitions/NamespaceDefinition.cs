@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -77,6 +78,8 @@ namespace CSharpE.Syntax
                 }
             }
         }
+
+        internal override IEnumerable<SyntaxNode> GetChildren() => Members.Select(m => m.Value);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

@@ -252,5 +252,7 @@ namespace CSharpE.Syntax
             get => null;
             set => throw new InvalidOperationException();
         }
+
+        internal override IEnumerable<SyntaxNode> GetChildren() => Members.Select(m => m.Value);
     }
 }

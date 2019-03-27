@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
@@ -95,9 +96,19 @@ namespace CSharpE.Syntax
 
         private protected void GetAndResetChanged(ref bool? changed) => changeTracker.GetAndResetChanged(ref changed);
 
-        private protected void SetChanged(ref bool? changed) => changeTracker.SetChanged(ref changed);
+        internal void SetChanged(ref bool? changed) => changeTracker.SetChanged(ref changed);
 
         internal abstract SyntaxNode Clone();
+
+        // used for testing
+        internal virtual IEnumerable<SyntaxNode> GetChildren()
+        {
+            // TODO: is this a reasonable default implementation?
+
+            return this.GetType().GetProperties()
+                .Where(p => typeof(SyntaxNode).IsAssignableFrom(p.PropertyType) && p.Name != nameof(Parent))
+                .Select(p => (SyntaxNode)p.GetValue(this));
+        }
 
         public bool Equals(SyntaxNode other)
         {

@@ -260,6 +260,8 @@ namespace CSharpE.Syntax
         {
             throw new NotImplementedException();
         }
+
+        internal override IEnumerable<SyntaxNode> GetChildren() => BaseTypes.AsEnumerable<SyntaxNode>().Concat(Members);
     }
 
     public sealed class ClassDefinition : TypeDefinition, ISyntaxWrapper<ClassDeclarationSyntax>
