@@ -8,7 +8,7 @@ namespace N.M
         N.M.C c2;
         C<int> c3;
         int i;
-        // C[] a;
+        C[][,] a;
 
         void M()
         {

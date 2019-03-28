@@ -12,9 +12,9 @@ namespace CSharpE.Syntax.Tests
 {
     public class AllSyntaxTests
     {
-        private HashSet<Type> encounteredNodes = new HashSet<Type>();
+        private readonly HashSet<Type> encounteredNodes = new HashSet<Type>();
 
-        private static Type[] excludedSyntaxNodeTypes =
+        private static readonly Type[] excludedSyntaxNodeTypes =
         {
             // won't be supported
             typeof(MakeRefExpressionSyntax),
@@ -32,7 +32,6 @@ namespace CSharpE.Syntax.Tests
             typeof(AliasQualifiedNameSyntax),
 
             // TODO: these have to be handled
-            typeof(ArrayTypeSyntax),
             typeof(PointerTypeSyntax),
             typeof(NullableTypeSyntax),
             typeof(TupleTypeSyntax),

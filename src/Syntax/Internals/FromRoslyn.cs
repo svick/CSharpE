@@ -147,7 +147,16 @@ namespace CSharpE.Syntax.Internals
 
         public static TypeReference TypeReference(TypeSyntax typeSyntax, SyntaxNode parent)
         {
-            return new NamedTypeReference(typeSyntax, parent);
+            switch (typeSyntax)
+            {
+                case ArrayTypeSyntax array:
+                    return new ArrayTypeReference(array, parent);
+                case NameSyntax _:
+                case PredefinedTypeSyntax _:
+                    return new NamedTypeReference(typeSyntax, parent);
+                default:
+                    throw new NotImplementedException(typeSyntax.GetType().Name);
+            }
         }
     }
 }
