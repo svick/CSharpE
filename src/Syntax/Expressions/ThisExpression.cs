@@ -12,7 +12,7 @@ namespace CSharpE.Syntax
 
         public ThisExpression() { }
 
-        private ThisExpression(ThisExpressionSyntax syntax, SyntaxNode parent)
+        internal ThisExpression(ThisExpressionSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
             Parent = parent;

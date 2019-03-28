@@ -1,7 +1,5 @@
-using System;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 
 namespace CSharpE.Syntax
 {

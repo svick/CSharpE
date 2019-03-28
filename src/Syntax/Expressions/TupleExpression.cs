@@ -12,7 +12,7 @@ namespace CSharpE.Syntax
     {
         private TupleExpressionSyntax syntax;
 
-        private TupleExpression(TupleExpressionSyntax syntax, SyntaxNode parent)
+        internal TupleExpression(TupleExpressionSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax;
             Parent = parent;

@@ -17,14 +17,29 @@ namespace CSharpE.Syntax.Internals
         {
             switch (syntax)
             {
-                case LiteralExpressionSyntax literalSyntax:
-                    return LiteralExpression(literalSyntax, parent);
-                case InvocationExpressionSyntax invocationSyntax:
-                    return new InvocationExpression(invocationSyntax, parent);
-                case null: return null;
+                case AssignmentExpressionSyntax assignment:
+                    return new AssignmentExpression(assignment, parent);
+                case AwaitExpressionSyntax await:
+                    return new AwaitExpression(await, parent);
+                case IdentifierNameSyntax identifierName:
+                    return new IdentifierExpression(identifierName, parent);
+                case InvocationExpressionSyntax invocation:
+                    return new InvocationExpression(invocation, parent);
+                case LiteralExpressionSyntax literal:
+                    return LiteralExpression(literal, parent);
+                case MemberAccessExpressionSyntax memberAccess:
+                    return new MemberAccessExpression(memberAccess, parent);
+                case ObjectCreationExpressionSyntax objectCreation:
+                    return new NewExpression(objectCreation, parent);
+                case ThisExpressionSyntax @this:
+                    return new ThisExpression(@this, parent);
+                case TupleExpressionSyntax tuple:
+                    return new TupleExpression(tuple, parent);
+                case null:
+                    return null;
             }
 
-            throw new NotImplementedException();
+            throw new NotImplementedException(syntax.GetType().Name);
         }
 
         public static LiteralExpression LiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
@@ -48,6 +63,8 @@ namespace CSharpE.Syntax.Internals
             {
                 case null:
                     return null;
+                case ExpressionStatementSyntax expressionStatement:
+                    return new ExpressionStatement(expressionStatement, parent);
                 case ReturnStatementSyntax returnStatement:
                     return new ReturnStatement(returnStatement, parent);
             }

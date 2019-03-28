@@ -76,5 +76,7 @@ namespace CSharpE.Syntax
         }
 
         internal override SyntaxNode Parent { get; set; }
+
+        internal override IEnumerable<SyntaxNode> GetChildren() => Statements;
     }
 }

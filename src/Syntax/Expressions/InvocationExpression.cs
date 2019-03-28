@@ -90,5 +90,7 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new InvocationExpression(Expression, Arguments);
 
         internal override SyntaxNode Parent { get; set; }
+
+        internal override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Expression }.Concat(Arguments);
     }
 }

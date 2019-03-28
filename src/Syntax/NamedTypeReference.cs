@@ -71,12 +71,22 @@ namespace CSharpE.Syntax
 
         private void Resolve(INamedTypeSymbol symbol)
         {
-            if (symbol.TypeKind == TypeKind.Error)
+            if (symbol == null || symbol.TypeKind == TypeKind.Error)
             {
-                container = syntax is QualifiedNameSyntax qualifiedName
-                    ? new NamedTypeReference(qualifiedName.Left, this)
-                    : null;
-                syntaxName = symbol.Name;
+                SimpleNameSyntax nameSyntax;
+
+                if (syntax is QualifiedNameSyntax qualifiedName)
+                {
+                    container = new NamedTypeReference(qualifiedName.Left, this);
+                    nameSyntax = qualifiedName.Right;
+                }
+                else
+                {
+                    container = null;
+                    nameSyntax = (SimpleNameSyntax)syntax;
+                }
+                syntaxName = symbol?.Name ?? nameSyntax.Identifier.ValueText;
+
                 isKnownType = false;
             }
             else
