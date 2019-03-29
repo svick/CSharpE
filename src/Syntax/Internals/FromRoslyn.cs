@@ -31,6 +31,10 @@ namespace CSharpE.Syntax.Internals
                     return new MemberAccessExpression(memberAccess, parent);
                 case ObjectCreationExpressionSyntax objectCreation:
                     return new NewExpression(objectCreation, parent);
+                case ParenthesizedExpressionSyntax parenthesized:
+                    return new ParenthesizedExpression(parenthesized, parent);
+                case RefExpressionSyntax @ref:
+                    return new RefExpression(@ref, parent);
                 case ThisExpressionSyntax @this:
                     return new ThisExpression(@this, parent);
                 case TupleExpressionSyntax tuple:

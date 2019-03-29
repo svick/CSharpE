@@ -32,7 +32,8 @@ namespace CSharpE.Syntax.Tests
             typeof(AliasQualifiedNameSyntax),
 
             // TODO: these have to be handled
-            typeof(ParenthesizedExpressionSyntax),
+            typeof(CheckedExpressionSyntax),
+            typeof(CheckedStatementSyntax),
             typeof(PrefixUnaryExpressionSyntax),
             typeof(PostfixUnaryExpressionSyntax),
             typeof(ConditionalAccessExpressionSyntax),
@@ -40,8 +41,6 @@ namespace CSharpE.Syntax.Tests
             typeof(BinaryExpressionSyntax),
             typeof(ConditionalExpressionSyntax),
             typeof(BaseExpressionSyntax),
-            typeof(CheckedExpressionSyntax),
-            typeof(CheckedStatementSyntax),
             typeof(DefaultExpressionSyntax),
             typeof(TypeOfExpressionSyntax),
             typeof(SizeOfExpressionSyntax),
@@ -51,7 +50,6 @@ namespace CSharpE.Syntax.Tests
             typeof(AnonymousMethodExpressionSyntax),
             typeof(SimpleLambdaExpressionSyntax),
             typeof(ParenthesizedLambdaExpressionSyntax),
-            typeof(RefExpressionSyntax),
             typeof(InitializerExpressionSyntax)
         };
 

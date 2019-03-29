@@ -9,13 +9,13 @@ namespace CSharpE.Syntax
 {
     public abstract class BinaryExpression : Expression
     {
-        private protected ExpressionSyntax Syntax;
+        private ExpressionSyntax syntax;
 
         internal override SyntaxNode Parent { get; set; }
 
         internal BinaryExpression(ExpressionSyntax syntax, SyntaxNode parent)
         {
-            Syntax = syntax;
+            this.syntax = syntax;
             Parent = parent;
         }
 
@@ -41,7 +41,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (left == null)
-                    left = FromRoslyn.Expression(GetLeft(Syntax), this);
+                    left = FromRoslyn.Expression(GetLeft(syntax), this);
 
                 return left;
             }
@@ -64,7 +64,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (right == null)
-                    right = FromRoslyn.Expression(GetRight(Syntax), this);
+                    right = FromRoslyn.Expression(GetRight(syntax), this);
 
                 return right;
             }
@@ -81,19 +81,19 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
-            var newLeft = left?.GetWrapped(ref thisChanged) ?? GetLeft(Syntax);
-            var newRight = right?.GetWrapped(ref thisChanged) ?? GetRight(Syntax);
+            var newLeft = left?.GetWrapped(ref thisChanged) ?? GetLeft(syntax);
+            var newRight = right?.GetWrapped(ref thisChanged) ?? GetRight(syntax);
 
-            if (Syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true)
             {
-                Syntax = IsAssignment 
+                syntax = IsAssignment 
                     ? (ExpressionSyntax)RoslynSyntaxFactory.AssignmentExpression(Kind, newLeft, newRight)
                     : RoslynSyntaxFactory.BinaryExpression(Kind, newLeft, newRight);
 
                 SetChanged(ref changed);
             }
 
-            return Syntax;
+            return syntax;
         }
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>

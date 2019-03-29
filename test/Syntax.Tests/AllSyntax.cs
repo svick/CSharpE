@@ -21,6 +21,8 @@ namespace N.M
             _ = this;
             M(42);
             new object();
+            
+            return ref this.i;
         }
     }
 }
