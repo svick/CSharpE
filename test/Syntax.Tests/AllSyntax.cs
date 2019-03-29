@@ -9,8 +9,10 @@ namespace N.M
         C<int> c3;
         int i;
         C[][,] a;
+        C* p;
+        C? n;
 
-        void M()
+        ref int M()
         {
             _ = (1, 2);
             await null;

@@ -149,11 +149,17 @@ namespace CSharpE.Syntax.Internals
         {
             switch (typeSyntax)
             {
-                case ArrayTypeSyntax array:
-                    return new ArrayTypeReference(array, parent);
                 case NameSyntax _:
                 case PredefinedTypeSyntax _:
                     return new NamedTypeReference(typeSyntax, parent);
+                case ArrayTypeSyntax array:
+                    return new ArrayTypeReference(array, parent);
+                case NullableTypeSyntax nullable:
+                    return new NullableTypeReference(nullable, parent);
+                case PointerTypeSyntax pointer:
+                    return new PointerTypeReference(pointer, parent);
+                case RefTypeSyntax @ref:
+                    return new RefTypeReference(@ref, parent);
                 default:
                     throw new NotImplementedException(typeSyntax.GetType().Name);
             }

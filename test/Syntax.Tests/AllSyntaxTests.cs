@@ -32,11 +32,8 @@ namespace CSharpE.Syntax.Tests
             typeof(AliasQualifiedNameSyntax),
 
             // TODO: these have to be handled
-            typeof(PointerTypeSyntax),
-            typeof(NullableTypeSyntax),
             typeof(TupleTypeSyntax),
             typeof(TupleElementSyntax),
-            typeof(RefTypeSyntax),
             typeof(ParenthesizedExpressionSyntax),
             typeof(PrefixUnaryExpressionSyntax),
             typeof(PostfixUnaryExpressionSyntax),
