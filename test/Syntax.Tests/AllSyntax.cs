@@ -11,6 +11,7 @@ namespace N.M
         C[][,] a;
         C* p;
         C? n;
+        (int i, string) t;
 
         ref int M()
         {

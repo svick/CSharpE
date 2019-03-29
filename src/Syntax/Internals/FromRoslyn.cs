@@ -160,6 +160,8 @@ namespace CSharpE.Syntax.Internals
                     return new PointerTypeReference(pointer, parent);
                 case RefTypeSyntax @ref:
                     return new RefTypeReference(@ref, parent);
+                case TupleTypeSyntax tuple:
+                    return new TupleTypeReference(tuple, parent);
                 default:
                     throw new NotImplementedException(typeSyntax.GetType().Name);
             }

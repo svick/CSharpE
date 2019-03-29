@@ -57,7 +57,7 @@ namespace CSharpE.Syntax
 
                 return catchClauses;
             }
-            set => SetList(ref catchClauses, new SyntaxList<CatchClause, CatchClauseSyntax>(this));
+            set => SetList(ref catchClauses, new SyntaxList<CatchClause, CatchClauseSyntax>(value, this));
         }
 
         private StatementList finallyStatements;
