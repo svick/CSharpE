@@ -7,7 +7,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class BlockStatement : Statement, ISyntaxWrapper<BlockSyntax>
+    public sealed class BlockStatement : Statement
     {
         private BlockSyntax syntax;
 
@@ -17,10 +17,8 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        public BlockStatement(IEnumerable<Statement> statements)
-        {
-            Statements = statements.ToList();
-        }
+        public BlockStatement(IEnumerable<Statement> statements) =>
+            this.statements = new StatementList(statements, this);
 
         private StatementList statements;
         public IList<Statement> Statements
@@ -35,7 +33,7 @@ namespace CSharpE.Syntax
             set => SetList(ref statements, new StatementList(value, this));
         }
 
-        BlockSyntax ISyntaxWrapper<BlockSyntax>.GetWrapped(ref bool? changed)
+        internal BlockSyntax GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -53,27 +51,15 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        private protected override StatementSyntax GetWrappedStatement(ref bool? changed) =>
-            this.GetWrapped<BlockSyntax>(ref changed);
-
-        internal BlockSyntax GetWrapped(ref bool? changed) => this.GetWrapped<BlockSyntax>(ref changed);
+        private protected override StatementSyntax GetWrappedStatement(ref bool? changed) => GetWrapped(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
+            SetList(ref statements, null);
             syntax = (BlockSyntax)newSyntax;
-
-            statements = null;
         }
 
-        internal override SyntaxNode Clone()
-        {
-            if (statements == null)
-            {
-                return new BlockStatement(syntax, null);
-            }
-
-            return new BlockStatement(Statements);
-        }
+        internal override SyntaxNode Clone() => new BlockStatement(Statements);
 
         internal override SyntaxNode Parent { get; set; }
 

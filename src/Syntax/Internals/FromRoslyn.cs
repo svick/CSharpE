@@ -21,6 +21,8 @@ namespace CSharpE.Syntax.Internals
                     return new AssignmentExpression(assignment, parent);
                 case AwaitExpressionSyntax await:
                     return new AwaitExpression(await, parent);
+                case CheckedExpressionSyntax @checked:
+                    return new CheckedExpression(@checked, parent);
                 case IdentifierNameSyntax identifierName:
                     return new IdentifierExpression(identifierName, parent);
                 case InvocationExpressionSyntax invocation:
@@ -67,10 +69,12 @@ namespace CSharpE.Syntax.Internals
             {
                 case null:
                     return null;
-                case ExpressionStatementSyntax expressionStatement:
-                    return new ExpressionStatement(expressionStatement, parent);
-                case ReturnStatementSyntax returnStatement:
-                    return new ReturnStatement(returnStatement, parent);
+                case CheckedStatementSyntax @checked:
+                    return new CheckedStatement(@checked, parent);
+                case ExpressionStatementSyntax expression:
+                    return new ExpressionStatement(expression, parent);
+                case ReturnStatementSyntax @return:
+                    return new ReturnStatement(@return, parent);
             }
 
             throw new NotImplementedException();

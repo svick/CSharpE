@@ -32,8 +32,6 @@ namespace CSharpE.Syntax.Tests
             typeof(AliasQualifiedNameSyntax),
 
             // TODO: these have to be handled
-            typeof(CheckedExpressionSyntax),
-            typeof(CheckedStatementSyntax),
             typeof(PrefixUnaryExpressionSyntax),
             typeof(PostfixUnaryExpressionSyntax),
             typeof(ConditionalAccessExpressionSyntax),

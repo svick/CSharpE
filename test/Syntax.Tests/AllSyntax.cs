@@ -1,4 +1,5 @@
-﻿using N.M;
+﻿using System.Runtime.InteropServices.ComTypes;
+using N.M;
 
 namespace N.M
 {
@@ -21,7 +22,11 @@ namespace N.M
             _ = this;
             M(42);
             new object();
-            
+            _ = (0);
+            _ = checked(unchecked(0));
+
+            checked { unchecked { } }
+
             return ref this.i;
         }
     }
