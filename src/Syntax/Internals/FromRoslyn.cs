@@ -35,6 +35,10 @@ namespace CSharpE.Syntax.Internals
                     return new NewExpression(objectCreation, parent);
                 case ParenthesizedExpressionSyntax parenthesized:
                     return new ParenthesizedExpression(parenthesized, parent);
+                case PrefixUnaryExpressionSyntax prefixUnary:
+                    return PrefixUnaryExpression(prefixUnary, parent);
+                case PostfixUnaryExpressionSyntax postfixUnary:
+                    return PostfixUnaryExpression(postfixUnary, parent);
                 case RefExpressionSyntax @ref:
                     return new RefExpression(@ref, parent);
                 case ThisExpressionSyntax @this:
@@ -48,6 +52,42 @@ namespace CSharpE.Syntax.Internals
             throw new NotImplementedException(syntax.GetType().Name);
         }
 
+        private static UnaryExpression PrefixUnaryExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
+        {
+            switch (syntax.Kind())
+            {
+                case SyntaxKind.UnaryPlusExpression:
+                    return new UnaryPlusExpression(syntax, parent);
+                case SyntaxKind.UnaryMinusExpression:
+                    return new UnaryMinusExpression(syntax, parent);
+                case SyntaxKind.BitwiseNotExpression:
+                    return new ComplementExpression(syntax, parent);
+                case SyntaxKind.LogicalNotExpression:
+                    return new NegationExpression(syntax, parent);
+                case SyntaxKind.PreIncrementExpression:
+                    return new PreIncrementExpression(syntax, parent);
+                case SyntaxKind.PreDecrementExpression:
+                    return new PreDecrementExpression(syntax, parent);
+                case SyntaxKind.AddressOfExpression:
+                    return new AddressOfExpression(syntax, parent);
+                case SyntaxKind.PointerIndirectionExpression:
+                    return new PointerIndirectionExpression(syntax, parent);
+            }
+            throw new InvalidOperationException();
+        }
+
+        private static UnaryExpression PostfixUnaryExpression(PostfixUnaryExpressionSyntax syntax, SyntaxNode parent)
+        {
+            switch (syntax.Kind())
+            {
+                case SyntaxKind.PostIncrementExpression:
+                    return new PostIncrementExpression(syntax, parent);
+                case SyntaxKind.PostDecrementExpression:
+                    return new PostDecrementExpression(syntax, parent);
+            }
+            throw new InvalidOperationException();
+        }
+
         public static LiteralExpression LiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
         {
             switch (syntax.Kind())
@@ -58,9 +98,13 @@ namespace CSharpE.Syntax.Internals
                     if (syntax.Token.Value is int)
                         return new IntLiteralExpression(syntax, parent);
                     break;
+                case SyntaxKind.TrueLiteralExpression:
+                    return new BoolLiteralExpression(syntax, parent);
+                case SyntaxKind.FalseLiteralExpression:
+                    return new BoolLiteralExpression(syntax, parent);
             }
 
-            throw new NotImplementedException();
+            throw new NotImplementedException(syntax.Kind().ToString());
         }
 
         public static Statement Statement(StatementSyntax syntax, SyntaxNode parent)

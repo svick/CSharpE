@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using N.M;
+﻿using N.M;
 
 namespace N.M
 {
@@ -24,6 +23,17 @@ namespace N.M
             new object();
             _ = (0);
             _ = checked(unchecked(0));
+
+            _ = +0;
+            _ = -0;
+            _ = ~0;
+            _ = !true;
+            --i;
+            ++i;
+            _ = &i;
+            _ = *p;
+            i--;
+            i++;
 
             checked { unchecked { } }
 

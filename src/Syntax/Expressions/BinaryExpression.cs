@@ -96,7 +96,11 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
-            throw new NotImplementedException();
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            Set(ref left, null);
+            Set(ref right, null);
+            syntax = (ExpressionSyntax)newSyntax;
+        }
     }
 }
