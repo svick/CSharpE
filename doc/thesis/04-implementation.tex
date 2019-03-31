@@ -385,6 +385,38 @@ At the same time, a transformation can introduce a large amount of "boilerplate 
 
 \medskip
 
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{errors}
+\caption{Example of error reporting}
+\label{figure-errors}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics{intellisense}
+\caption{Example of autocompletion}
+\label{figure-intellisense}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics{parameterinfo}
+\caption{Example of parameter info}
+\label{figure-parameterinfo}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics{quickinfo}
+\caption{Example of QuickInfo}
+\label{figure-quickinfo}
+\end{figure}
+
+Figures \ref{figure-errors}, \ref{figure-intellisense}, \ref{figure-parameterinfo} and \ref{figure-quickinfo} show how a very simple CSharpE extension for creating immutable records works in Visual Studio. What the extension does is that it takes a class marked with an attribute and containing some fields and turns it into a proper immutable record with a constructor, read-only properties and \cs{With} methods for creating modified instances. The figures show that Visual Studio features work using CSharpE semantics, not C\# semantics. For example, notice that invoking the parameterless constructor produces an error, while invoking the constructor with parameters corresponding to fields does not. This is the opposite of what would happen in regular C\#.
+
+\medskip
+
 \todo{Conclusion?}
 
 \section{Example extensions}
