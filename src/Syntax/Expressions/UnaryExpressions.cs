@@ -5,8 +5,6 @@ namespace CSharpE.Syntax
 {
     public sealed class UnaryPlusExpression : UnaryExpression
     {
-        private protected override SyntaxKind Kind => SyntaxKind.UnaryPlusExpression;
-
         internal UnaryPlusExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent) { }
 
@@ -17,8 +15,6 @@ namespace CSharpE.Syntax
 
     public sealed class UnaryMinusExpression : UnaryExpression
     {
-        private protected override SyntaxKind Kind => SyntaxKind.UnaryMinusExpression;
-
         internal UnaryMinusExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent) { }
 
@@ -53,8 +49,6 @@ namespace CSharpE.Syntax
 
     public sealed class PreIncrementExpression : UnaryExpression
     {
-        private protected override SyntaxKind Kind => SyntaxKind.PreIncrementExpression;
-
         internal PreIncrementExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent) { }
 
@@ -65,8 +59,6 @@ namespace CSharpE.Syntax
 
     public sealed class PreDecrementExpression : UnaryExpression
     {
-        private protected override SyntaxKind Kind => SyntaxKind.PreDecrementExpression;
-
         internal PreDecrementExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent) { }
 
@@ -77,8 +69,6 @@ namespace CSharpE.Syntax
 
     public sealed class AddressOfExpression : UnaryExpression
     {
-        private protected override SyntaxKind Kind => SyntaxKind.AddressOfExpression;
-
         internal AddressOfExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent) { }
 
@@ -89,8 +79,6 @@ namespace CSharpE.Syntax
 
     public sealed class PointerIndirectionExpression : UnaryExpression
     {
-        private protected override SyntaxKind Kind => SyntaxKind.PointerIndirectionExpression;
-
         internal PointerIndirectionExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent) { }
 
@@ -101,8 +89,6 @@ namespace CSharpE.Syntax
 
     public sealed class PostIncrementExpression : UnaryExpression
     {
-        private protected override SyntaxKind Kind => SyntaxKind.PostIncrementExpression;
-
         private protected override bool IsPrefix => false;
 
         internal PostIncrementExpression(PostfixUnaryExpressionSyntax syntax, SyntaxNode parent)
@@ -115,8 +101,6 @@ namespace CSharpE.Syntax
 
     public sealed class PostDecrementExpression : UnaryExpression
     {
-        private protected override SyntaxKind Kind => SyntaxKind.PostDecrementExpression;
-
         private protected override bool IsPrefix => false;
 
         internal PostDecrementExpression(PostfixUnaryExpressionSyntax syntax, SyntaxNode parent)
