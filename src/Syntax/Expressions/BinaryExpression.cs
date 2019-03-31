@@ -70,8 +70,10 @@ namespace CSharpE.Syntax
             }
             set => SetNotNull(ref right, value);
         }
-        
-        private protected abstract SyntaxKind Kind { get; }
+
+        // PERF: consider caching the parsed value?
+        private protected virtual SyntaxKind Kind =>
+            Enum.TryParse(GetType().Name, out SyntaxKind kind) ? kind : throw new InvalidOperationException();
 
         private protected virtual bool IsAssignment => false;
 

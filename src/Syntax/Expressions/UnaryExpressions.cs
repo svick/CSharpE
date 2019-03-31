@@ -39,16 +39,16 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new ComplementExpression(Operand);
     }
 
-    public sealed class NegationExpression : UnaryExpression
+    public sealed class NegateExpression : UnaryExpression
     {
         private protected override SyntaxKind Kind => SyntaxKind.LogicalNotExpression;
 
-        internal NegationExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
+        internal NegateExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent) { }
 
-        public NegationExpression(Expression operand) : base(operand) { }
+        public NegateExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new NegationExpression(Operand);
+        internal override SyntaxNode Clone() => new NegateExpression(Operand);
     }
 
     public sealed class PreIncrementExpression : UnaryExpression

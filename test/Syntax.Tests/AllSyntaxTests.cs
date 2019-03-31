@@ -34,7 +34,6 @@ namespace CSharpE.Syntax.Tests
             // TODO: these have to be handled
             typeof(ConditionalAccessExpressionSyntax),
             typeof(ImplicitElementAccessSyntax),
-            typeof(BinaryExpressionSyntax),
             typeof(ConditionalExpressionSyntax),
             typeof(BaseExpressionSyntax),
             typeof(DefaultExpressionSyntax),

@@ -24,16 +24,20 @@ namespace N.M
             _ = (0);
             _ = checked(unchecked(0));
 
-            _ = +0;
-            _ = -0;
-            _ = ~0;
+            _ = +-~0;
             _ = !true;
             --i;
             ++i;
-            _ = &i;
-            _ = *p;
+            _ = *&i;
             i--;
             i++;
+
+            _ = 1 + 1 - 1 * 1 / 1 % 1 << 1 >> 1 ^ 1;
+            _ = true || true && true | true & true;
+            _ = true == true != true < true <= true > true >= true;
+            _ = 1 is int;
+            _ = 1 as int;
+            _ = null ?? 0;
 
             checked { unchecked { } }
 

@@ -21,6 +21,8 @@ namespace CSharpE.Syntax.Internals
                     return new AssignmentExpression(assignment, parent);
                 case AwaitExpressionSyntax await:
                     return new AwaitExpression(await, parent);
+                case BinaryExpressionSyntax binary:
+                    return BinaryExpression(binary, parent);
                 case CheckedExpressionSyntax @checked:
                     return new CheckedExpression(@checked, parent);
                 case IdentifierNameSyntax identifierName:
@@ -35,10 +37,12 @@ namespace CSharpE.Syntax.Internals
                     return new NewExpression(objectCreation, parent);
                 case ParenthesizedExpressionSyntax parenthesized:
                     return new ParenthesizedExpression(parenthesized, parent);
-                case PrefixUnaryExpressionSyntax prefixUnary:
-                    return PrefixUnaryExpression(prefixUnary, parent);
                 case PostfixUnaryExpressionSyntax postfixUnary:
                     return PostfixUnaryExpression(postfixUnary, parent);
+                case PredefinedTypeSyntax predefinedType:
+                    return new NamedTypeReference(predefinedType, parent);
+                case PrefixUnaryExpressionSyntax prefixUnary:
+                    return PrefixUnaryExpression(prefixUnary, parent);
                 case RefExpressionSyntax @ref:
                     return new RefExpression(@ref, parent);
                 case ThisExpressionSyntax @this:
@@ -52,6 +56,56 @@ namespace CSharpE.Syntax.Internals
             throw new NotImplementedException(syntax.GetType().Name);
         }
 
+        private static BinaryExpression BinaryExpression(BinaryExpressionSyntax syntax, SyntaxNode parent)
+        {
+            switch (syntax.Kind())
+            {
+                case SyntaxKind.AddExpression:
+                    return new AddExpression(syntax, parent);
+                case SyntaxKind.SubtractExpression:
+                    return new SubtractExpression(syntax, parent);
+                case SyntaxKind.MultiplyExpression:
+                    return new MultiplyExpression(syntax, parent);
+                case SyntaxKind.DivideExpression:
+                    return new DivideExpression(syntax, parent);
+                case SyntaxKind.ModuloExpression:
+                    return new ModuloExpression(syntax, parent);
+                case SyntaxKind.LeftShiftExpression:
+                    return new LeftShiftExpression(syntax, parent);
+                case SyntaxKind.RightShiftExpression:
+                    return new RightShiftExpression(syntax, parent);
+                case SyntaxKind.LogicalOrExpression:
+                    return new LogicalOrExpression(syntax, parent);
+                case SyntaxKind.LogicalAndExpression:
+                    return new LogicalAndExpression(syntax, parent);
+                case SyntaxKind.BitwiseOrExpression:
+                    return new BitwiseOrExpression(syntax, parent);
+                case SyntaxKind.BitwiseAndExpression:
+                    return new BitwiseAndExpression(syntax, parent);
+                case SyntaxKind.ExclusiveOrExpression:
+                    return new ExclusiveOrExpression(syntax, parent);
+                case SyntaxKind.EqualsExpression:
+                    return new EqualsExpression(syntax, parent);
+                case SyntaxKind.NotEqualsExpression:
+                    return new NotEqualsExpression(syntax, parent);
+                case SyntaxKind.LessThanExpression:
+                    return new LessThanExpression(syntax, parent);
+                case SyntaxKind.LessThanOrEqualExpression:
+                    return new LessThanOrEqualExpression(syntax, parent);
+                case SyntaxKind.GreaterThanExpression:
+                    return new GreaterThanExpression(syntax, parent);
+                case SyntaxKind.GreaterThanOrEqualExpression:
+                    return new GreaterThanOrEqualExpression(syntax, parent);
+                case SyntaxKind.IsExpression:
+                    return new IsExpression(syntax, parent);
+                case SyntaxKind.AsExpression:
+                    return new AsExpression(syntax, parent);
+                case SyntaxKind.CoalesceExpression:
+                    return new CoalesceExpression(syntax, parent);
+            }
+            throw new InvalidOperationException();
+        }
+
         private static UnaryExpression PrefixUnaryExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
         {
             switch (syntax.Kind())
@@ -63,7 +117,7 @@ namespace CSharpE.Syntax.Internals
                 case SyntaxKind.BitwiseNotExpression:
                     return new ComplementExpression(syntax, parent);
                 case SyntaxKind.LogicalNotExpression:
-                    return new NegationExpression(syntax, parent);
+                    return new NegateExpression(syntax, parent);
                 case SyntaxKind.PreIncrementExpression:
                     return new PreIncrementExpression(syntax, parent);
                 case SyntaxKind.PreDecrementExpression:
