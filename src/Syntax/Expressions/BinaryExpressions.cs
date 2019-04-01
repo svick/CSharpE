@@ -3,21 +3,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
-    public sealed class AssignmentExpression : BinaryExpression
-    {
-        private protected override SyntaxKind Kind => SyntaxKind.SimpleAssignmentExpression;
-
-        private protected override bool IsAssignment => true;
-
-        internal AssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
-            : base(syntax, parent) { }
-
-        public AssignmentExpression(Expression left, Expression right)
-            : base(left, right) { }
-
-        internal override SyntaxNode Clone() => new AssignmentExpression(Left, Right);
-    }
-
     public sealed class AddExpression : BinaryExpression
     {
         internal AddExpression(BinaryExpressionSyntax syntax, SyntaxNode parent)
@@ -139,15 +124,17 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new BitwiseAndExpression(Left, Right);
     }
 
-    public sealed class ExclusiveOrExpression : BinaryExpression
+    public sealed class XorExpression : BinaryExpression
     {
-        internal ExclusiveOrExpression(BinaryExpressionSyntax syntax, SyntaxNode parent)
+        private protected override SyntaxKind Kind => SyntaxKind.ExclusiveOrExpression;
+
+        internal XorExpression(BinaryExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent) { }
 
-        public ExclusiveOrExpression(Expression left, Expression right)
+        public XorExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new ExclusiveOrExpression(Left, Right);
+        internal override SyntaxNode Clone() => new XorExpression(Left, Right);
     }
 
     public sealed class EqualsExpression : BinaryExpression
@@ -259,5 +246,152 @@ namespace CSharpE.Syntax
             : base(left, right) { }
 
         internal override SyntaxNode Clone() => new CoalesceExpression(Left, Right);
+    }
+
+    public sealed class AssignmentExpression : BinaryExpression
+    {
+        private protected override SyntaxKind Kind => SyntaxKind.SimpleAssignmentExpression;
+
+        private protected override bool IsAssignment => true;
+
+        internal AssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public AssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new AssignmentExpression(Left, Right);
+    }
+
+    public sealed class AddAssignmentExpression : BinaryExpression
+    {
+        private protected override bool IsAssignment => true;
+
+        internal AddAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public AddAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new AddAssignmentExpression(Left, Right);
+    }
+
+    public sealed class SubtractAssignmentExpression : BinaryExpression
+    {
+        private protected override bool IsAssignment => true;
+
+        internal SubtractAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public SubtractAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new SubtractAssignmentExpression(Left, Right);
+    }
+
+    public sealed class MultiplyAssignmentExpression : BinaryExpression
+    {
+        private protected override bool IsAssignment => true;
+
+        internal MultiplyAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public MultiplyAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new MultiplyAssignmentExpression(Left, Right);
+    }
+
+    public sealed class DivideAssignmentExpression : BinaryExpression
+    {
+        private protected override bool IsAssignment => true;
+
+        internal DivideAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public DivideAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new DivideAssignmentExpression(Left, Right);
+    }
+
+    public sealed class ModuloAssignmentExpression : BinaryExpression
+    {
+        private protected override bool IsAssignment => true;
+
+        internal ModuloAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public ModuloAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new ModuloAssignmentExpression(Left, Right);
+    }
+
+    public sealed class AndAssignmentExpression : BinaryExpression
+    {
+        private protected override bool IsAssignment => true;
+
+        internal AndAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public AndAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new AndAssignmentExpression(Left, Right);
+    }
+
+    public sealed class XorAssignmentExpression : BinaryExpression
+    {
+        private protected override SyntaxKind Kind => SyntaxKind.ExclusiveOrAssignmentExpression;
+
+        private protected override bool IsAssignment => true;
+
+        internal XorAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public XorAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new XorAssignmentExpression(Left, Right);
+    }
+
+    public sealed class OrAssignmentExpression : BinaryExpression
+    {
+        private protected override bool IsAssignment => true;
+
+        internal OrAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public OrAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new OrAssignmentExpression(Left, Right);
+    }
+
+    public sealed class LeftShiftAssignmentExpression : BinaryExpression
+    {
+        private protected override bool IsAssignment => true;
+
+        internal LeftShiftAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public LeftShiftAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new LeftShiftAssignmentExpression(Left, Right);
+    }
+
+    public sealed class RightShiftAssignmentExpression : BinaryExpression
+    {
+        private protected override bool IsAssignment => true;
+
+        internal RightShiftAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public RightShiftAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        internal override SyntaxNode Clone() => new AddAssignmentExpression(Left, Right);
     }
 }

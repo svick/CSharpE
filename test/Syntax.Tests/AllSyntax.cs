@@ -39,6 +39,18 @@ namespace N.M
             _ = 1 as int;
             _ = null ?? 0;
 
+            i = 1;
+            i += 1;
+            i -= 1;
+            i *= 1;
+            i /= 1;
+            i %= 1;
+            i &= 1;
+            i ^= 1;
+            i |= 1;
+            i <<= 1;
+            i >>= 1;
+
             checked { unchecked { } }
 
             return ref this.i;
