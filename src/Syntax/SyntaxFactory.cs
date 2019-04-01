@@ -29,11 +29,11 @@ namespace CSharpE.Syntax
         public static MemberAccessExpression MemberAccess(this Expression expression, FieldDefinition field) =>
             new MemberAccessExpression(expression, field);
 
-        public static MemberAccessExpression MemberAccess(this NamedTypeReference type, string mermberName) =>
-            new MemberAccessExpression(type, mermberName);
+        public static MemberAccessExpression MemberAccess(this NamedTypeReference type, string memberName) =>
+            new MemberAccessExpression(type, memberName);
 
-        public static MemberAccessExpression MemberAccess(this Expression expression, string mermberName) =>
-            new MemberAccessExpression(expression, mermberName);
+        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName) =>
+            new MemberAccessExpression(expression, memberName);
 
         public static NewExpression New(TypeReference type, params Expression[] arguments) => new NewExpression(type, arguments);
 

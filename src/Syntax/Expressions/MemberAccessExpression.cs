@@ -1,4 +1,6 @@
-﻿using CSharpE.Syntax.Internals;
+﻿using System;
+using System.Diagnostics;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -7,31 +9,56 @@ using Roslyn = Microsoft.CodeAnalysis;
 namespace CSharpE.Syntax
 {
     // TODO: generics
-    public sealed class MemberAccessExpression : Expression, ISyntaxWrapper<MemberAccessExpressionSyntax>
+    public abstract class BaseMemberAccessExpression : Expression
     {
-        private MemberAccessExpressionSyntax syntax;
+        private ExpressionSyntax syntax;
 
-        internal MemberAccessExpression(MemberAccessExpressionSyntax syntax, SyntaxNode parent)
+        internal BaseMemberAccessExpression(ExpressionSyntax syntax, SyntaxNode parent)
         {
             Init(syntax);
             Parent = parent;
         }
 
-        private void Init(MemberAccessExpressionSyntax memberAccessExpressionSyntax)
+        private void Init(ExpressionSyntax syntax)
         {
-            syntax = memberAccessExpressionSyntax;
+            this.syntax = syntax;
 
-            memberName = new Identifier(memberAccessExpressionSyntax.Name.Identifier);
+            SimpleNameSyntax nameSyntax;
+
+            switch (syntax)
+            {
+                case MemberAccessExpressionSyntax memberAccess:
+                    nameSyntax = memberAccess.Name;
+                    break;
+                case ConditionalAccessExpressionSyntax conditionalAccess:
+                    var memberBinding = (MemberBindingExpressionSyntax)conditionalAccess.WhenNotNull;
+                    nameSyntax = memberBinding.Name;
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+
+            memberName = new Identifier(nameSyntax.Identifier);
         }
 
-        public MemberAccessExpression(Expression expression, string memberName)
+        internal BaseMemberAccessExpression(Expression expression, string memberName)
         {
             Expression = expression;
             MemberName = memberName;
         }
 
-        public MemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
-            : this(expression, fieldDefinition.Name) { }
+        private ExpressionSyntax GetExpressionSyntax()
+        {
+            switch (syntax)
+            {
+                case MemberAccessExpressionSyntax memberAccess:
+                    return memberAccess.Expression;
+                case ConditionalAccessExpressionSyntax conditionalAccess:
+                    return conditionalAccess.Expression;
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
 
         private Expression expression;
         public Expression Expression
@@ -39,7 +66,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (expression == null)
-                    expression = FromRoslyn.Expression(syntax.Expression, this);
+                    expression = FromRoslyn.Expression(GetExpressionSyntax(), this);
 
                 return expression;
             }
@@ -53,21 +80,32 @@ namespace CSharpE.Syntax
             set => memberName.Text = value;
         }
 
-        
-        MemberAccessExpressionSyntax ISyntaxWrapper<MemberAccessExpressionSyntax>.GetWrapped(ref bool? changed)
+        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
             bool? thisChanged = false;
 
-            var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
+            var newExpression = expression?.GetWrapped(ref thisChanged) ?? GetExpressionSyntax();
             var newMemberName = memberName.GetWrapped(ref thisChanged);
 
             if (syntax == null || thisChanged == true)
             {
-                syntax = RoslynSyntaxFactory.MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression, newExpression,
-                    RoslynSyntaxFactory.IdentifierName(newMemberName));
+                var nameSyntax = RoslynSyntaxFactory.IdentifierName(newMemberName);
+
+                if (this is ConditionalMemberAccessExpression)
+                {
+                    syntax = RoslynSyntaxFactory.ConditionalAccessExpression(
+                        newExpression, RoslynSyntaxFactory.MemberBindingExpression(nameSyntax));
+                }
+                else
+                {
+                    syntax = RoslynSyntaxFactory.MemberAccessExpression(
+                        this is PointerMemberAccessExpression
+                            ? SyntaxKind.PointerMemberAccessExpression
+                            : SyntaxKind.SimpleMemberAccessExpression,
+                        newExpression, nameSyntax);
+                }
 
                 SetChanged(ref changed);
             }
@@ -75,18 +113,57 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed) =>
-            this.GetWrapped<MemberAccessExpressionSyntax>(ref changed);
-
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            Init((MemberAccessExpressionSyntax)newSyntax);
+            Init((ExpressionSyntax)newSyntax);
 
             Set(ref expression, null);
         }
 
-        internal override SyntaxNode Clone() => new MemberAccessExpression(Expression, MemberName);
+        internal sealed override SyntaxNode Parent { get; set; }
+    }
 
-        internal override SyntaxNode Parent { get; set; }
+    public class MemberAccessExpression : BaseMemberAccessExpression
+    {
+        internal MemberAccessExpression(MemberAccessExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent)
+            => Debug.Assert(syntax.Kind() == SyntaxKind.SimpleMemberAccessExpression);
+
+        public MemberAccessExpression(Expression expression, string memberName) : base(expression, memberName) { }
+
+        public MemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
+            : this(expression, fieldDefinition.Name) { }
+
+        internal override SyntaxNode Clone() => new MemberAccessExpression(Expression, MemberName);
+    }
+
+    public class PointerMemberAccessExpression : BaseMemberAccessExpression
+    {
+        internal PointerMemberAccessExpression(MemberAccessExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent)
+            => Debug.Assert(syntax.Kind() == SyntaxKind.PointerMemberAccessExpression);
+
+        public PointerMemberAccessExpression(Expression expression, string memberName)
+            : base(expression, memberName) { }
+
+        public PointerMemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
+            : this(expression, fieldDefinition.Name) { }
+
+        internal override SyntaxNode Clone() => new PointerMemberAccessExpression(Expression, MemberName);
+    }
+
+    public class ConditionalMemberAccessExpression : BaseMemberAccessExpression
+    {
+        internal ConditionalMemberAccessExpression(ConditionalAccessExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent)
+            => Debug.Assert(syntax.WhenNotNull is MemberBindingExpressionSyntax);
+
+        public ConditionalMemberAccessExpression(Expression expression, string memberName)
+            : base(expression, memberName) { }
+
+        public ConditionalMemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
+            : this(expression, fieldDefinition.Name) { }
+
+        internal override SyntaxNode Clone() => new ConditionalMemberAccessExpression(Expression, MemberName);
     }
 }

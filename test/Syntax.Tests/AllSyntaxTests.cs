@@ -14,7 +14,7 @@ namespace CSharpE.Syntax.Tests
     {
         private readonly HashSet<Type> encounteredNodes = new HashSet<Type>();
 
-        private static readonly Type[] excludedSyntaxNodeTypes =
+        private static readonly Type[] ExcludedSyntaxNodeTypes =
         {
             // won't be supported
             typeof(MakeRefExpressionSyntax),
@@ -32,7 +32,6 @@ namespace CSharpE.Syntax.Tests
             typeof(AliasQualifiedNameSyntax),
 
             // TODO: these have to be handled
-            typeof(ConditionalAccessExpressionSyntax),
             typeof(ImplicitElementAccessSyntax),
             typeof(ConditionalExpressionSyntax),
             typeof(BaseExpressionSyntax),
@@ -61,7 +60,7 @@ namespace CSharpE.Syntax.Tests
                 .Where(t => typeof(Roslyn::SyntaxNode).IsAssignableFrom(t) && !t.IsAbstract && !t.Name.EndsWith("ListSyntax"))
                 .ToHashSet();
 
-            syntaxNodeTypes.ExceptWith(excludedSyntaxNodeTypes);
+            syntaxNodeTypes.ExceptWith(ExcludedSyntaxNodeTypes);
 
             syntaxNodeTypes.ExceptWith(encounteredNodes);
 

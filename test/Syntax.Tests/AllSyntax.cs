@@ -51,6 +51,10 @@ namespace N.M
             i <<= 1;
             i >>= 1;
 
+            _ = c1.M;
+            _ = c1->M;
+            _ = c1?.M;
+
             checked { unchecked { } }
 
             return ref this.i;

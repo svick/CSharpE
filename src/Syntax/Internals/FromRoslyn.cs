@@ -23,6 +23,8 @@ namespace CSharpE.Syntax.Internals
                     return new AwaitExpression(await, parent);
                 case BinaryExpressionSyntax binary:
                     return BinaryExpression(binary, parent);
+                case ConditionalAccessExpressionSyntax conditionalAccess:
+                    return ConditionalAccessExpression(conditionalAccess, parent);
                 case CheckedExpressionSyntax @checked:
                     return new CheckedExpression(@checked, parent);
                 case IdentifierNameSyntax identifierName:
@@ -32,7 +34,7 @@ namespace CSharpE.Syntax.Internals
                 case LiteralExpressionSyntax literal:
                     return LiteralExpression(literal, parent);
                 case MemberAccessExpressionSyntax memberAccess:
-                    return new MemberAccessExpression(memberAccess, parent);
+                    return MemberAccessExpression(memberAccess, parent);
                 case ObjectCreationExpressionSyntax objectCreation:
                     return new NewExpression(objectCreation, parent);
                 case ParenthesizedExpressionSyntax parenthesized:
@@ -133,6 +135,34 @@ namespace CSharpE.Syntax.Internals
                 case SyntaxKind.CoalesceExpression:
                     return new CoalesceExpression(syntax, parent);
             }
+            throw new InvalidOperationException();
+        }
+
+        private static Expression ConditionalAccessExpression(
+            ConditionalAccessExpressionSyntax syntax, SyntaxNode parent)
+        {
+            switch (syntax.WhenNotNull)
+            {
+                case MemberBindingExpressionSyntax _:
+                    return new ConditionalMemberAccessExpression(syntax, parent);
+                case ElementBindingExpressionSyntax _:
+                    throw new NotImplementedException();
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        private static BaseMemberAccessExpression MemberAccessExpression(
+            MemberAccessExpressionSyntax syntax, SyntaxNode parent)
+        {
+            switch (syntax.Kind())
+            {
+                case SyntaxKind.SimpleMemberAccessExpression:
+                    return new MemberAccessExpression(syntax, parent);
+                case SyntaxKind.PointerMemberAccessExpression:
+                    return new PointerMemberAccessExpression(syntax, parent);
+            }
+
             throw new InvalidOperationException();
         }
 

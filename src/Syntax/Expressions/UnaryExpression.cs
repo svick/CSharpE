@@ -11,7 +11,7 @@ namespace CSharpE.Syntax
     {
         private ExpressionSyntax syntax;
 
-        internal override SyntaxNode Parent { get; set; }
+        internal sealed override SyntaxNode Parent { get; set; }
 
         internal UnaryExpression(ExpressionSyntax syntax, SyntaxNode parent)
         {
