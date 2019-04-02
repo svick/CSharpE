@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using LinqExpression = System.Linq.Expressions.Expression;
 
@@ -19,11 +20,20 @@ namespace CSharpE.Syntax.Internals
             }
             else
             {
-                constructorInfo = typeof(TSyntaxWrapper).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
-                    null, new[] {typeof(TSyntax), typeof(SyntaxNode)}, null);
-                
+                constructorInfo =
+                    (from ctor in typeof(TSyntaxWrapper).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
+                        let parameters = ctor.GetParameters()
+                        where parameters.Length == 2 &&
+                              typeof(TSyntax).IsAssignableFrom(parameters[0].ParameterType) &&
+                              typeof(SyntaxNode).IsAssignableFrom(parameters[1].ParameterType)
+                        select ctor).Single();
+
+                var syntaxType = constructorInfo.GetParameters()[0].ParameterType;
+                var parentType = constructorInfo.GetParameters()[1].ParameterType;
+
                 constructorExpression = LinqExpression.New(
-                    constructorInfo, param, LinqExpression.Constant(null, typeof(SyntaxNode)));
+                    constructorInfo, LinqExpression.Convert(param, syntaxType),
+                    LinqExpression.Constant(null, parentType));
             }
 
             var lambda = LinqExpression.Lambda<Func<TSyntax, TSyntaxWrapper>>(constructorExpression, param);

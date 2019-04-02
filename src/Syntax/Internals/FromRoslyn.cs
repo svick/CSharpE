@@ -221,6 +221,19 @@ namespace CSharpE.Syntax.Internals
             throw new NotImplementedException(syntax.Kind().ToString());
         }
 
+        public static Initializer Initializer(InitializerExpressionSyntax syntax, SyntaxNode parent)
+        {
+            switch (syntax?.Kind())
+            {
+                case null:
+                    return null;
+                case SyntaxKind.ObjectInitializerExpression:
+                    return new ObjectInitializer(syntax, parent);
+            }
+
+            throw new NotImplementedException(syntax.Kind().ToString());
+        }
+
         public static Statement Statement(StatementSyntax syntax, SyntaxNode parent)
         {
             switch (syntax)

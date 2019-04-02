@@ -32,7 +32,7 @@ namespace CSharpE.Syntax.Tests
             typeof(AliasQualifiedNameSyntax),
 
             // TODO: these have to be handled
-            typeof(ImplicitElementAccessSyntax),
+            typeof(AnonymousObjectMemberDeclaratorSyntax),
             typeof(ConditionalExpressionSyntax),
             typeof(BaseExpressionSyntax),
             typeof(DefaultExpressionSyntax),
@@ -44,7 +44,6 @@ namespace CSharpE.Syntax.Tests
             typeof(AnonymousMethodExpressionSyntax),
             typeof(SimpleLambdaExpressionSyntax),
             typeof(ParenthesizedLambdaExpressionSyntax),
-            typeof(InitializerExpressionSyntax)
         };
 
         [Fact]
@@ -65,7 +64,7 @@ namespace CSharpE.Syntax.Tests
             syntaxNodeTypes.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxNodeTypes.Count <= 137,
+                syntaxNodeTypes.Count <= 136,
                 $"Missed {syntaxNodeTypes.Count} types, including {syntaxNodeTypes.FirstOrDefault()?.Name}.");
         }
 

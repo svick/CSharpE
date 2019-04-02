@@ -8,7 +8,6 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    // TODO: object initializer, anonymous types
     public sealed class NewExpression : Expression, ISyntaxWrapper<ObjectCreationExpressionSyntax>
     {
         private ObjectCreationExpressionSyntax syntax;
@@ -19,14 +18,15 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        public NewExpression(TypeReference type, IEnumerable<Argument> arguments)
+        public NewExpression(TypeReference type, IEnumerable<Argument> arguments, Initializer initializer = null)
         {
             this.Type = type;
             this.arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(arguments, this);
+            this.Initializer = initializer;
         }
 
-        public NewExpression(TypeReference type, IEnumerable<Expression> arguments)
-            : this(type, arguments.Select(a => (Argument)a)) { }
+        public NewExpression(TypeReference type, IEnumerable<Expression> arguments, Initializer initializer = null)
+            : this(type, arguments.Select(a => (Argument)a), initializer) { }
 
         public NewExpression(TypeReference type, params Argument[] arguments)
             : this(type, (IEnumerable<Argument>)arguments) { }
@@ -50,14 +50,35 @@ namespace CSharpE.Syntax
             get
             {
                 if (arguments == null)
-                    arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(syntax.ArgumentList.Arguments, this);
+                    arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(
+                        syntax.ArgumentList?.Arguments ?? default, this);
 
                 return arguments;
             }
             set => SetList(ref arguments, new SeparatedSyntaxList<Argument, ArgumentSyntax>(value, this));
         }
 
-        
+        private bool initializerSet;
+        private Initializer initializer;
+        public Initializer Initializer
+        {
+            get
+            {
+                if (!initializerSet)
+                {
+                    initializer = FromRoslyn.Initializer(syntax.Initializer, this);
+                    initializerSet = true;
+                }
+
+                return initializer;
+            }
+            set
+            {
+                Set(ref initializer, value);
+                initializerSet = true;
+            }
+        }
+
         ObjectCreationExpressionSyntax ISyntaxWrapper<ObjectCreationExpressionSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
@@ -65,12 +86,13 @@ namespace CSharpE.Syntax
             bool? thisChanged = false;
 
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
-            var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList.Arguments;
+            var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList?.Arguments ?? default;
+            var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.Initializer;
 
             if (syntax == null || thisChanged == true)
             {
                 syntax = RoslynSyntaxFactory.ObjectCreationExpression(
-                    newType, RoslynSyntaxFactory.ArgumentList(newArguments), null);
+                    newType, RoslynSyntaxFactory.ArgumentList(newArguments), newInitializer);
 
                 SetChanged(ref changed);
             }
@@ -86,11 +108,15 @@ namespace CSharpE.Syntax
             syntax = (ObjectCreationExpressionSyntax)newSyntax;
 
             Set(ref type, null);
-            arguments = null;
+            SetList(ref arguments, null);
+            Set(ref initializer, null);
         }
 
-        internal override SyntaxNode Clone() => new NewExpression(Type, Arguments);
+        internal override SyntaxNode Clone() => new NewExpression(Type, Arguments, Initializer);
 
         internal override SyntaxNode Parent { get; set; }
+
+        internal override IEnumerable<SyntaxNode> GetChildren() =>
+            new SyntaxNode[] { Type }.Concat(Arguments).Concat(new[] { Initializer });
     }
 }

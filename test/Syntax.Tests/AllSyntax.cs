@@ -55,6 +55,8 @@ namespace N.M
             _ = c1->M;
             _ = c1?.M;
 
+            new C { P = 42, [0] = { } };
+
             checked { unchecked { } }
 
             return ref this.i;
