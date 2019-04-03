@@ -26,6 +26,8 @@ namespace N.M
             _ = true ? 1 : 0;
             _ = base.F;
             _ = this.F;
+            i = default;
+            _ = default(int);
 
             _ = +-~0;
             _ = !true;

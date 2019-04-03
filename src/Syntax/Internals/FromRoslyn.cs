@@ -33,6 +33,8 @@ namespace CSharpE.Syntax.Internals
                     return new ConditionalExpression(conditional, parent);
                 case CheckedExpressionSyntax @checked:
                     return new CheckedExpression(@checked, parent);
+                case DefaultExpressionSyntax @default:
+                    return new DefaultExpression(@default, parent);
                 case IdentifierNameSyntax identifierName:
                     return new IdentifierExpression(identifierName, parent);
                 case InvocationExpressionSyntax invocation:
@@ -208,12 +210,14 @@ namespace CSharpE.Syntax.Internals
             throw new InvalidOperationException();
         }
 
-        public static LiteralExpression LiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
+        public static Expression LiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
         {
             switch (syntax.Kind())
             {
                 case SyntaxKind.NullLiteralExpression:
                     return new NullExpression(syntax, parent);
+                case SyntaxKind.DefaultLiteralExpression:
+                    return new DefaultExpression(syntax, parent);
                 case SyntaxKind.NumericLiteralExpression:
                     if (syntax.Token.Value is int)
                         return new IntLiteralExpression(syntax, parent);
@@ -256,7 +260,7 @@ namespace CSharpE.Syntax.Internals
                     return new ReturnStatement(@return, parent);
             }
 
-            throw new NotImplementedException();
+            throw new NotImplementedException(syntax.Kind().ToString());
         }
 
         public static MemberModifiers MemberModifiers(SyntaxTokenList modifiers)
