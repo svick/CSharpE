@@ -23,6 +23,9 @@ namespace N.M
             new object();
             _ = (0);
             _ = checked(unchecked(0));
+            _ = true ? 1 : 0;
+            _ = base.F;
+            _ = this.F;
 
             _ = +-~0;
             _ = !true;
@@ -58,8 +61,6 @@ namespace N.M
             new C { P = 42, [0] = { } };
             new C { 42, { 42, 0 } };
             _ = new { i, x = 42 };
-
-            _ = true ? 1 : 0;
 
             checked { unchecked { } }
 

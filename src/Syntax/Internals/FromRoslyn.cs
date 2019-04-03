@@ -23,6 +23,8 @@ namespace CSharpE.Syntax.Internals
                     return AssignmentExpression(assignment, parent);
                 case AwaitExpressionSyntax await:
                     return new AwaitExpression(await, parent);
+                case BaseExpressionSyntax @base:
+                    return new BaseExpression(@base, parent);
                 case BinaryExpressionSyntax binary:
                     return BinaryExpression(binary, parent);
                 case ConditionalAccessExpressionSyntax conditionalAccess:

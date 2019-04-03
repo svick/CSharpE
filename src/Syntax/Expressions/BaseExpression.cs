@@ -4,17 +4,17 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class ThisExpression : Expression
+    public sealed class BaseExpression : Expression
     {
-        private ThisExpressionSyntax syntax;
+        private BaseExpressionSyntax syntax;
 
-        internal ThisExpression(ThisExpressionSyntax syntax, SyntaxNode parent)
+        internal BaseExpression(BaseExpressionSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax;
             Parent = parent;
         }
 
-        public ThisExpression() { }
+        public BaseExpression() { }
 
         private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
         {
@@ -22,7 +22,7 @@ namespace CSharpE.Syntax
 
             if (syntax == null)
             {
-                syntax = RoslynSyntaxFactory.ThisExpression();
+                syntax = RoslynSyntaxFactory.BaseExpression();
 
                 SetChanged(ref changed);
             }
@@ -31,9 +31,9 @@ namespace CSharpE.Syntax
         }
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
-            syntax = (ThisExpressionSyntax)newSyntax;
+            syntax = (BaseExpressionSyntax)newSyntax;
 
-        internal override SyntaxNode Clone() => new ThisExpression();
+        internal override SyntaxNode Clone() => new BaseExpression();
 
         internal override SyntaxNode Parent { get; set; }
     }
