@@ -6,7 +6,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class AwaitExpression : Expression, ISyntaxWrapper<AwaitExpressionSyntax>
+    public sealed class AwaitExpression : Expression
     {
         private AwaitExpressionSyntax syntax;
 
@@ -31,8 +31,8 @@ namespace CSharpE.Syntax
             }
             set => SetNotNull(ref operand, value);
         }
-        
-        AwaitExpressionSyntax ISyntaxWrapper<AwaitExpressionSyntax>.GetWrapped(ref bool? changed)
+
+        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -49,9 +49,6 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
-
-        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
-            => this.GetWrapped<AwaitExpressionSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

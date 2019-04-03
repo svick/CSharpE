@@ -59,6 +59,8 @@ namespace N.M
             new C { 42, { 42, 0 } };
             _ = new { i, x = 42 };
 
+            _ = true ? 1 : 0;
+
             checked { unchecked { } }
 
             return ref this.i;

@@ -27,6 +27,8 @@ namespace CSharpE.Syntax.Internals
                     return BinaryExpression(binary, parent);
                 case ConditionalAccessExpressionSyntax conditionalAccess:
                     return ConditionalAccessExpression(conditionalAccess, parent);
+                case ConditionalExpressionSyntax conditional:
+                    return new ConditionalExpression(conditional, parent);
                 case CheckedExpressionSyntax @checked:
                     return new CheckedExpression(@checked, parent);
                 case IdentifierNameSyntax identifierName:
