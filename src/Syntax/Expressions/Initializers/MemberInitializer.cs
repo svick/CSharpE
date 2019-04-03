@@ -39,7 +39,7 @@ namespace CSharpE.Syntax
                             target = new NameMemberInitializerTarget(identifierName, this);
                             break;
                         case ImplicitElementAccessSyntax implicitElementAccess:
-                            target = new IndexerMemberInitializerTarget(implicitElementAccess, this);
+                            target = new ElementAccessMemberInitializerTarget(implicitElementAccess, this);
                             break;
                         default:
                             throw new InvalidOperationException();

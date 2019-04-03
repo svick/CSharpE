@@ -66,17 +66,17 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new NameMemberInitializerTarget(Name);
     }
 
-    public sealed class IndexerMemberInitializerTarget : MemberInitializerTarget
+    public sealed class ElementAccessMemberInitializerTarget : MemberInitializerTarget
     {
         private ImplicitElementAccessSyntax syntax;
 
-        internal IndexerMemberInitializerTarget(ImplicitElementAccessSyntax syntax, MemberInitializer parent)
+        internal ElementAccessMemberInitializerTarget(ImplicitElementAccessSyntax syntax, MemberInitializer parent)
         {
             this.syntax = syntax;
             Parent = parent;
         }
 
-        public IndexerMemberInitializerTarget(IEnumerable<Argument> arguments)
+        public ElementAccessMemberInitializerTarget(IEnumerable<Argument> arguments)
             => this.arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(arguments, this);
 
         private SeparatedSyntaxList<Argument, ArgumentSyntax> arguments;
@@ -119,6 +119,6 @@ namespace CSharpE.Syntax
             syntax = (ImplicitElementAccessSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new IndexerMemberInitializerTarget(Arguments);
+        internal override SyntaxNode Clone() => new ElementAccessMemberInitializerTarget(Arguments);
     }
 }

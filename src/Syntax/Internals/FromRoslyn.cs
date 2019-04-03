@@ -35,6 +35,8 @@ namespace CSharpE.Syntax.Internals
                     return new CheckedExpression(@checked, parent);
                 case DefaultExpressionSyntax @default:
                     return new DefaultExpression(@default, parent);
+                case ElementAccessExpressionSyntax elementAccess:
+                    return new ElementAccessExpression(elementAccess, parent);
                 case IdentifierNameSyntax identifierName:
                     return new IdentifierExpression(identifierName, parent);
                 case InvocationExpressionSyntax invocation:
@@ -147,6 +149,7 @@ namespace CSharpE.Syntax.Internals
                 case SyntaxKind.CoalesceExpression:
                     return new CoalesceExpression(syntax, parent);
             }
+
             throw new InvalidOperationException();
         }
 
@@ -158,7 +161,7 @@ namespace CSharpE.Syntax.Internals
                 case MemberBindingExpressionSyntax _:
                     return new ConditionalMemberAccessExpression(syntax, parent);
                 case ElementBindingExpressionSyntax _:
-                    throw new NotImplementedException();
+                    return new ConditionalElementAccessExpression(syntax, parent);
             }
 
             throw new InvalidOperationException();
