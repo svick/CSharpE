@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
@@ -50,8 +51,13 @@ namespace CSharpE.Syntax.Tests
 
             WalkNode(file);
 
+            var excludedNamesRegexes = new[] { "Trivia$", "^Xml", "Cref", "List$" };
+
             var syntaxKinds = ((SyntaxKind[])Enum.GetValues(typeof(SyntaxKind)))
-                .Where(kind => !SyntaxFacts.IsAnyToken(kind) && !kind.ToString().EndsWith("List"))
+                .Where(
+                    kind =>
+                        !SyntaxFacts.IsAnyToken(kind) &&
+                        !excludedNamesRegexes.Any(regex => Regex.IsMatch(kind.ToString(), regex)))
                 .ToHashSet();
 
             syntaxKinds.ExceptWith(ExcludedSyntaxNodeTypes);
@@ -59,7 +65,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count <= 158,
+                syntaxKinds.Count <= 110,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 
