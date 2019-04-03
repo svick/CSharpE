@@ -229,6 +229,8 @@ namespace CSharpE.Syntax.Internals
                     return null;
                 case SyntaxKind.ObjectInitializerExpression:
                     return new ObjectInitializer(syntax, parent);
+                case SyntaxKind.CollectionInitializerExpression:
+                    return new CollectionInitializer(syntax, parent);
             }
 
             throw new NotImplementedException(syntax.Kind().ToString());
