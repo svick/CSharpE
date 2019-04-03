@@ -4,42 +4,44 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Xunit;
 using Roslyn = Microsoft.CodeAnalysis;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 
 namespace CSharpE.Syntax.Tests
 {
     public class AllSyntaxTests
     {
-        private readonly HashSet<Type> encounteredNodes = new HashSet<Type>();
+        private readonly HashSet<SyntaxKind> encounteredNodes = new HashSet<SyntaxKind>();
 
-        private static readonly Type[] ExcludedSyntaxNodeTypes =
+        private static readonly SyntaxKind[] ExcludedSyntaxNodeTypes =
         {
+            None,
+
             // won't be supported
-            typeof(MakeRefExpressionSyntax),
-            typeof(RefTypeExpressionSyntax),
-            typeof(RefValueExpressionSyntax),
+            MakeRefExpression,
+            RefTypeExpression,
+            RefValueExpression,
 
             // likely won't have matching type in CSharpE
-            typeof(ArrayRankSpecifierSyntax),
-            typeof(OmittedTypeArgumentSyntax),
-            typeof(MemberBindingExpressionSyntax),
-            typeof(ElementBindingExpressionSyntax),
-            typeof(NameColonSyntax),
+            ArrayRankSpecifier,
+            OmittedTypeArgument,
+            MemberBindingExpression,
+            ElementBindingExpression,
+            NameColon,
 
             // might not be necessary to support right now
-            typeof(AliasQualifiedNameSyntax),
+            AliasQualifiedName,
 
             // TODO: these have to be handled
-            typeof(TypeOfExpressionSyntax),
-            typeof(SizeOfExpressionSyntax),
-            typeof(ElementAccessExpressionSyntax),
-            typeof(DeclarationExpressionSyntax),
-            typeof(CastExpressionSyntax),
-            typeof(AnonymousMethodExpressionSyntax),
-            typeof(SimpleLambdaExpressionSyntax),
-            typeof(ParenthesizedLambdaExpressionSyntax),
+            TypeOfExpression,
+            SizeOfExpression,
+            ElementAccessExpression,
+            DeclarationExpression,
+            CastExpression,
+            AnonymousMethodExpression,
+            SimpleLambdaExpression,
+            ParenthesizedLambdaExpression,
         };
 
         [Fact]
@@ -51,17 +53,17 @@ namespace CSharpE.Syntax.Tests
 
             WalkNode(file);
 
-            var syntaxNodeTypes = typeof(CSharpSyntaxNode).Assembly.GetExportedTypes()
-                .Where(t => typeof(Roslyn::SyntaxNode).IsAssignableFrom(t) && !t.IsAbstract && !t.Name.EndsWith("ListSyntax"))
+            var syntaxKinds = ((SyntaxKind[])Enum.GetValues(typeof(SyntaxKind)))
+                .Where(kind => !SyntaxFacts.IsAnyToken(kind) && !kind.ToString().EndsWith("List"))
                 .ToHashSet();
 
-            syntaxNodeTypes.ExceptWith(ExcludedSyntaxNodeTypes);
+            syntaxKinds.ExceptWith(ExcludedSyntaxNodeTypes);
 
-            syntaxNodeTypes.ExceptWith(encounteredNodes);
+            syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxNodeTypes.Count <= 136,
-                $"Missed {syntaxNodeTypes.Count} types, including {syntaxNodeTypes.FirstOrDefault()?.Name}.");
+                syntaxKinds.Count <= 158,
+                $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 
         private void WalkNode(SyntaxNode node)
@@ -70,7 +72,7 @@ namespace CSharpE.Syntax.Tests
                 return;
 
             var syntaxWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)node;
-            encounteredNodes.Add(syntaxWrapper.GetWrapped().GetType());
+            encounteredNodes.Add(syntaxWrapper.GetWrapped().Kind());
 
             bool? changed = null;
             node.SetChanged(ref changed);
