@@ -34,13 +34,11 @@ namespace CSharpE.Syntax
             get
             {
                 if (type == null)
-                {
                     type = FromRoslyn.TypeReference(syntax.Type, this);
-                }
 
                 return type;
             }
-            set => type = value;
+            set => Set(ref type, value);
         }
 
         private Identifier name;
@@ -54,11 +52,11 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            type = null;
+            Set(ref type, null);
             Init((TupleElementSyntax)newSyntax);
         }
 
-        internal override SyntaxNode Clone() => throw new NotImplementedException();
+        internal override SyntaxNode Clone() => new TupleElement(Type, Name);
 
         TupleElementSyntax ISyntaxWrapper<TupleElementSyntax>.GetWrapped(ref bool? changed)
         {

@@ -17,6 +17,8 @@ namespace CSharpE.Syntax.Internals
         {
             switch (syntax)
             {
+                case AnonymousObjectCreationExpressionSyntax anonymousObjectCreation:
+                    return new AnonymousNewExpression(anonymousObjectCreation, parent);
                 case AssignmentExpressionSyntax assignment:
                     return AssignmentExpression(assignment, parent);
                 case AwaitExpressionSyntax await:

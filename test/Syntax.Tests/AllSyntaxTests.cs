@@ -32,7 +32,6 @@ namespace CSharpE.Syntax.Tests
             typeof(AliasQualifiedNameSyntax),
 
             // TODO: these have to be handled
-            typeof(AnonymousObjectMemberDeclaratorSyntax),
             typeof(ConditionalExpressionSyntax),
             typeof(BaseExpressionSyntax),
             typeof(DefaultExpressionSyntax),

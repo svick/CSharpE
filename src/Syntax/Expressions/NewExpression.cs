@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -8,13 +7,13 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class NewExpression : Expression, ISyntaxWrapper<ObjectCreationExpressionSyntax>
+    public sealed class NewExpression : Expression
     {
         private ObjectCreationExpressionSyntax syntax;
 
         internal NewExpression(ObjectCreationExpressionSyntax syntax, SyntaxNode parent)
         {
-            this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+            this.syntax = syntax;
             Parent = parent;
         }
 
@@ -79,7 +78,7 @@ namespace CSharpE.Syntax
             }
         }
 
-        ObjectCreationExpressionSyntax ISyntaxWrapper<ObjectCreationExpressionSyntax>.GetWrapped(ref bool? changed)
+        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -99,9 +98,6 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
-
-        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed) =>
-            this.GetWrapped<ObjectCreationExpressionSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
