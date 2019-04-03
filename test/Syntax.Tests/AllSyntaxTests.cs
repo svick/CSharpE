@@ -34,8 +34,6 @@ namespace CSharpE.Syntax.Tests
             AliasQualifiedName,
 
             // TODO: these have to be handled
-            TypeOfExpression,
-            SizeOfExpression,
             ElementAccessExpression,
             DeclarationExpression,
             CastExpression,

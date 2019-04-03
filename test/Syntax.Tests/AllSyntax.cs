@@ -28,6 +28,8 @@ namespace N.M
             _ = this.F;
             i = default;
             _ = default(int);
+            _ = typeof(int);
+            _ = sizeof(int);
 
             _ = +-~0;
             _ = !true;

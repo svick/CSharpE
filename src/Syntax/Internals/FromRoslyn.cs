@@ -55,10 +55,14 @@ namespace CSharpE.Syntax.Internals
                     return PrefixUnaryExpression(prefixUnary, parent);
                 case RefExpressionSyntax @ref:
                     return new RefExpression(@ref, parent);
+                case SizeOfExpressionSyntax sizeOf:
+                    return new SizeOfExpression(sizeOf, parent);
                 case ThisExpressionSyntax @this:
                     return new ThisExpression(@this, parent);
                 case TupleExpressionSyntax tuple:
                     return new TupleExpression(tuple, parent);
+                case TypeOfExpressionSyntax typeOf:
+                    return new TypeOfExpression(typeOf, parent);
                 case null:
                     return null;
             }
