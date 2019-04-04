@@ -35,7 +35,6 @@ namespace CSharpE.Syntax.Tests
             AliasQualifiedName,
 
             // TODO: these have to be handled
-            DeclarationExpression,
             CastExpression,
             AnonymousMethodExpression,
             SimpleLambdaExpression,
@@ -65,7 +64,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count <= 110,
+                syntaxKinds.Count <= 107,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 

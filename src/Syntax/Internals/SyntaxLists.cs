@@ -65,4 +65,15 @@ namespace CSharpE.Syntax.Internals
         protected override Expression CreateWrapper(ExpressionSyntax roslynSyntax) =>
             FromRoslyn.Expression(roslynSyntax, Parent);
     }
+
+    internal sealed class VariableDesignationList : SeparatedSyntaxList<VariableDesignation, VariableDesignationSyntax>
+    {
+        internal VariableDesignationList(SyntaxNode parent) : base(parent) { }
+        internal VariableDesignationList(IEnumerable<VariableDesignation> list, SyntaxNode parent) : base(list, parent) { }
+        internal VariableDesignationList(SeparatedSyntaxList<VariableDesignationSyntax> syntaxList, SyntaxNode parent)
+            : base(syntaxList, parent) { }
+
+        protected override VariableDesignation CreateWrapper(VariableDesignationSyntax roslynSyntax) =>
+            FromRoslyn.VariableDesignation(roslynSyntax, Parent);
+    }
 }

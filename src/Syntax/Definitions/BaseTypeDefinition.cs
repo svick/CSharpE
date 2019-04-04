@@ -7,7 +7,6 @@ namespace CSharpE.Syntax
     public abstract class BaseTypeDefinition : MemberDefinition
     {
         private protected Identifier name;
-
         public string Name
         {
             get => name.Text;

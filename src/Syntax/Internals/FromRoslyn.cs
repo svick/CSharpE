@@ -33,6 +33,8 @@ namespace CSharpE.Syntax.Internals
                     return new ConditionalExpression(conditional, parent);
                 case CheckedExpressionSyntax @checked:
                     return new CheckedExpression(@checked, parent);
+                case DeclarationExpressionSyntax declaration:
+                    return new DeclarationExpression(declaration, parent);
                 case DefaultExpressionSyntax @default:
                     return new DefaultExpression(@default, parent);
                 case ElementAccessExpressionSyntax elementAccess:
@@ -251,6 +253,20 @@ namespace CSharpE.Syntax.Internals
             }
 
             throw new NotImplementedException(syntax.Kind().ToString());
+        }
+
+        public static VariableDesignation VariableDesignation(VariableDesignationSyntax syntax, SyntaxNode parent)
+        {
+            switch (syntax)
+            {
+                case DiscardDesignationSyntax _:
+                case SingleVariableDesignationSyntax _:
+                    return new SingleVariableDesignation(syntax, parent);
+                case ParenthesizedVariableDesignationSyntax parenthesized:
+                    return new MultiVariableDesignation(parenthesized, parent);
+            }
+
+            throw new InvalidOperationException();
         }
 
         public static Statement Statement(StatementSyntax syntax, SyntaxNode parent)
