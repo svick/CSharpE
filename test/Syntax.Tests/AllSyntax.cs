@@ -30,6 +30,7 @@ namespace N.M
             _ = default(int);
             _ = typeof(int);
             _ = sizeof(int);
+            _ = (int)0;
 
             _ = +-~0;
             _ = !true;

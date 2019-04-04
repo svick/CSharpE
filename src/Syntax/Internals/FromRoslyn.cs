@@ -27,6 +27,8 @@ namespace CSharpE.Syntax.Internals
                     return new BaseExpression(@base, parent);
                 case BinaryExpressionSyntax binary:
                     return BinaryExpression(binary, parent);
+                case CastExpressionSyntax cast:
+                    return new CastExpression(cast, parent);
                 case ConditionalAccessExpressionSyntax conditionalAccess:
                     return ConditionalAccessExpression(conditionalAccess, parent);
                 case ConditionalExpressionSyntax conditional:
