@@ -71,6 +71,10 @@ namespace N.M
 
             var (_, x, (y, z)) = t;
 
+            _ = () => 0;
+            _ = x => { };
+            _ = async (ref int x) => { };
+
             checked { unchecked { } }
 
             return ref this.i;

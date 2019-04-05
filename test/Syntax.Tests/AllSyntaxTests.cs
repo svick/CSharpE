@@ -33,11 +33,7 @@ namespace CSharpE.Syntax.Tests
 
             // might not be necessary to support right now
             AliasQualifiedName,
-
-            // TODO: these have to be handled
             AnonymousMethodExpression,
-            SimpleLambdaExpression,
-            ParenthesizedLambdaExpression,
         };
 
         [Fact]

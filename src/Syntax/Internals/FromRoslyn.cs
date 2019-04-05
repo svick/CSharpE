@@ -45,6 +45,8 @@ namespace CSharpE.Syntax.Internals
                     return new IdentifierExpression(identifierName, parent);
                 case InvocationExpressionSyntax invocation:
                     return new InvocationExpression(invocation, parent);
+                case LambdaExpressionSyntax lambda:
+                    return new LambdaExpression(lambda, parent);
                 case LiteralExpressionSyntax literal:
                     return LiteralExpression(literal, parent);
                 case MemberAccessExpressionSyntax memberAccess:
@@ -365,6 +367,8 @@ namespace CSharpE.Syntax.Internals
         {
             switch (typeSyntax)
             {
+                case null:
+                    return null;
                 case NameSyntax _:
                 case PredefinedTypeSyntax _:
                     return new NamedTypeReference(typeSyntax, parent);
