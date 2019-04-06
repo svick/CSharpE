@@ -45,6 +45,8 @@ namespace CSharpE.Syntax.Internals
                     return new ElementAccessExpression(elementAccess, parent);
                 case IdentifierNameSyntax identifierName:
                     return new IdentifierExpression(identifierName, parent);
+                case ImplicitArrayCreationExpressionSyntax implicitArrayCreation:
+                    return new NewImplicitArrayExpression(implicitArrayCreation, parent);
                 case InvocationExpressionSyntax invocation:
                     return new InvocationExpression(invocation, parent);
                 case LambdaExpressionSyntax lambda:

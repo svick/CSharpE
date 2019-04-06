@@ -70,6 +70,7 @@ namespace N.M
             _ = new { i, x = 42 };
             _ = new int[10];
             _ = new int[,][] { { } };
+            _ = new[,] { { 0 } };
             
             var (_, x, (y, z)) = t;
 
