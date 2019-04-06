@@ -68,7 +68,9 @@ namespace N.M
             new C { P = 42, [0] = { } };
             new C { 42, { 42, 0 } };
             _ = new { i, x = 42 };
-
+            _ = new int[10];
+            _ = new int[,][] { { } };
+            
             var (_, x, (y, z)) = t;
 
             _ = () => 0;

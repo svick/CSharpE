@@ -76,4 +76,15 @@ namespace CSharpE.Syntax.Internals
         protected override VariableDesignation CreateWrapper(VariableDesignationSyntax roslynSyntax) =>
             FromRoslyn.VariableDesignation(roslynSyntax, Parent);
     }
+
+    internal sealed class VariableInitializerList : SeparatedSyntaxList<VariableInitializer, ExpressionSyntax>
+    {
+        internal VariableInitializerList(SyntaxNode parent) : base(parent) { }
+        internal VariableInitializerList(IEnumerable<VariableInitializer> list, SyntaxNode parent) : base(list, parent) { }
+        internal VariableInitializerList(SeparatedSyntaxList<ExpressionSyntax> syntaxList, SyntaxNode parent)
+            : base(syntaxList, parent) { }
+
+        protected override VariableInitializer CreateWrapper(ExpressionSyntax roslynSyntax) =>
+            FromRoslyn.VariableInitializer(roslynSyntax, Parent);
+    }
 }

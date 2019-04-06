@@ -19,6 +19,8 @@ namespace CSharpE.Syntax.Internals
             {
                 case AnonymousObjectCreationExpressionSyntax anonymousObjectCreation:
                     return new AnonymousNewExpression(anonymousObjectCreation, parent);
+                case ArrayCreationExpressionSyntax arrayCreation:
+                    return new NewArrayExpression(arrayCreation, parent);
                 case AssignmentExpressionSyntax assignment:
                     return AssignmentExpression(assignment, parent);
                 case AwaitExpressionSyntax await:
@@ -53,6 +55,8 @@ namespace CSharpE.Syntax.Internals
                     return MemberAccessExpression(memberAccess, parent);
                 case ObjectCreationExpressionSyntax objectCreation:
                     return new NewExpression(objectCreation, parent);
+                case OmittedArraySizeExpressionSyntax _:
+                    return null;
                 case ParenthesizedExpressionSyntax parenthesized:
                     return new ParenthesizedExpression(parenthesized, parent);
                 case PostfixUnaryExpressionSyntax postfixUnary:
@@ -256,7 +260,18 @@ namespace CSharpE.Syntax.Internals
                     return new CollectionInitializer(syntax, parent);
             }
 
-            throw new NotImplementedException(syntax.Kind().ToString());
+            throw new InvalidOperationException();
+        }
+
+        public static VariableInitializer VariableInitializer(ExpressionSyntax syntax, SyntaxNode parent)
+        {
+            switch (syntax)
+            {
+                case InitializerExpressionSyntax initializer:
+                    return new ArrayInitializer(initializer, parent);
+                default:
+                    return new ExpressionVariableInitializer(syntax, parent);
+            }
         }
 
         public static VariableDesignation VariableDesignation(VariableDesignationSyntax syntax, SyntaxNode parent)

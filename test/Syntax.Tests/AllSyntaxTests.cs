@@ -32,8 +32,9 @@ namespace CSharpE.Syntax.Tests
             NameColon,
 
             // might not be necessary to support right now
+            ArrayInitializerExpression,
             AliasQualifiedName,
-            AnonymousMethodExpression,
+            AnonymousMethodExpression
         };
 
         [Fact]
@@ -59,7 +60,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count <= 107,
+                syntaxKinds.Count <= 105,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 
