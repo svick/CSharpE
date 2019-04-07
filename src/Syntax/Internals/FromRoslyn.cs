@@ -71,6 +71,8 @@ namespace CSharpE.Syntax.Internals
                     return new RefExpression(@ref, parent);
                 case SizeOfExpressionSyntax sizeOf:
                     return new SizeOfExpression(sizeOf, parent);
+                case StackAllocArrayCreationExpressionSyntax stackAllocArrayCreation:
+                    return new StackAllocExpression(stackAllocArrayCreation, parent);
                 case ThisExpressionSyntax @this:
                     return new ThisExpression(@this, parent);
                 case TupleExpressionSyntax tuple:

@@ -71,7 +71,9 @@ namespace N.M
             _ = new int[10];
             _ = new int[,][] { { } };
             _ = new[,] { { 0 } };
-            
+            _ = stackalloc int[10];
+            _ = stackalloc int[] { 42 };
+
             var (_, x, (y, z)) = t;
 
             _ = () => 0;
