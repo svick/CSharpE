@@ -7,8 +7,15 @@
 
   <ItemGroup>
     <Compile Remove="AllSyntax.cs" />
-
+    <Compile Remove="AllSyntaxSource.cs" />
+    <Compile Remove="AllSyntaxTarget.cs" />
     <Content Include="AllSyntax.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AllSyntaxSource.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AllSyntaxTarget.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

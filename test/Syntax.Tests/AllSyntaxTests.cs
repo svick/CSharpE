@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace CSharpE.Syntax.Tests
             RefTypeExpression,
             RefValueExpression,
             ArgListExpression,
+            GlobalStatement,
 
             // won't have matching type in CSharpE
             ArrayRankSpecifier,
@@ -44,13 +46,18 @@ namespace CSharpE.Syntax.Tests
         };
 
         [Fact]
-        public async Task AllSyntaxRoundTrips()
+        public async Task AllSyntaxKinds()
         {
-            var file = await SourceFile.OpenAsync("AllSyntax.cs");
+            var paths = new[] { "AllSyntax.cs", "AllSyntaxSource.cs" };
 
-            new Project(file);
+            foreach (var path in paths)
+            {
+                var file = await SourceFile.OpenAsync(path);
 
-            WalkNode(file);
+                new Project(file);
+
+                WalkNode(file);
+            }
 
             var excludedNamesRegexes = new[] { "Trivia$", "^Xml", "Cref", "List$" };
 
@@ -69,6 +76,38 @@ namespace CSharpE.Syntax.Tests
                 syntaxKinds.Count <= 86,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
+
+        [Fact]
+        public async Task AllSyntaxRoundTrips1()
+        {
+            var path = "AllSyntax.cs";
+
+            var file = await SourceFile.OpenAsync(path);
+
+            new Project(file);
+
+            WalkNode(file);
+
+            Assert.Equal(await File.ReadAllTextAsync(path), file.ToString());
+        }
+
+        [Fact]
+        public async Task AllSyntaxRoundTrips2()
+        {
+            // this mostly exists due to weirdness in NormalizeWhitespace()
+
+            var sourcePath = "AllSyntaxSource.cs";
+            var targetPath = "AllSyntaxTarget.cs";
+
+            var file = await SourceFile.OpenAsync(sourcePath);
+
+            new Project(file);
+
+            WalkNode(file);
+
+            Assert.Equal(await File.ReadAllTextAsync(targetPath), file.ToString());
+        }
+
 
         private void WalkNode(SyntaxNode node)
         {

@@ -5,6 +5,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
+    // TODO: switch to AttributeListSyntax
     public class Attribute : SyntaxNode, ISyntaxWrapper<AttributeSyntax>
     {
         private AttributeSyntax syntax;

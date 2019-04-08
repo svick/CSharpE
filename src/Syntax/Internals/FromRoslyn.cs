@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
 {
@@ -333,6 +335,29 @@ namespace CSharpE.Syntax.Internals
             }
 
             return result;
+        }
+
+        public static bool IsCompacted(CSharpSyntaxNode syntaxNode) =>
+            syntaxNode is FieldDeclarationSyntax fieldDeclaration && fieldDeclaration.Declaration.Variables.Count > 1;
+
+        public static IEnumerable<TRoslynSyntax> Expand<TRoslynSyntax>(TRoslynSyntax roslynSyntax)
+            where TRoslynSyntax : CSharpSyntaxNode
+        {
+            if (roslynSyntax is FieldDeclarationSyntax fieldDeclaration)
+            {
+                foreach (var variable in fieldDeclaration.Declaration.Variables)
+                {
+                    var expandedSyntax = fieldDeclaration.WithDeclaration(
+                        fieldDeclaration.Declaration.WithVariables(
+                            RoslynSyntaxFactory.SingletonSeparatedList(variable)));
+
+                    yield return (TRoslynSyntax)(object)expandedSyntax;
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
         }
 
         public static MemberDefinition MemberDefinition(

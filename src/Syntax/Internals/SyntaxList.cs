@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp;
 using Roslyn = Microsoft.CodeAnalysis;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -14,7 +15,7 @@ namespace CSharpE.Syntax.Internals
 
     internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : SyntaxListBase, IList<TSyntax>, ISyntaxWrapper<TList>, ISyntaxCollection<TSyntax>
         where TSyntax : ISyntaxWrapper<TRoslynSyntax>
-        where TRoslynSyntax : Roslyn::SyntaxNode
+        where TRoslynSyntax : CSharpSyntaxNode
         where TList : struct, IReadOnlyList<TRoslynSyntax>
     {
         // Preserved version of Roslyn SyntaxList used to avoid unnecessary reallocations. Could be out of date.
@@ -59,7 +60,18 @@ namespace CSharpE.Syntax.Internals
         protected SyntaxListBase(TList syntaxList, SyntaxNode parent)
         {
             roslynList = syntaxList;
-            list = new List<object>(syntaxList);
+
+            // "compacted" nodes have to be expanded right now, so that list size is correct
+
+            list = new List<object>(syntaxList.Count);
+
+            foreach (var roslynSyntax in syntaxList)
+            {
+                if (FromRoslyn.IsCompacted(roslynSyntax))
+                    list.AddRange(FromRoslyn.Expand(roslynSyntax));
+                else
+                    list.Add(roslynSyntax);
+            }
 
             Parent = parent;
         }
@@ -179,7 +191,7 @@ namespace CSharpE.Syntax.Internals
     internal class SyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SyntaxList<TRoslynSyntax>>
         where TSyntax : ISyntaxWrapper<TRoslynSyntax>
-        where TRoslynSyntax : Roslyn::SyntaxNode
+        where TRoslynSyntax : CSharpSyntaxNode
     {
         internal SyntaxList(SyntaxNode parent) : base(parent) { }
 
@@ -195,7 +207,7 @@ namespace CSharpE.Syntax.Internals
     internal class SeparatedSyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SeparatedSyntaxList<TRoslynSyntax>>
         where TSyntax : ISyntaxWrapper<TRoslynSyntax>
-        where TRoslynSyntax : Roslyn::SyntaxNode
+        where TRoslynSyntax : CSharpSyntaxNode
     {
         internal SeparatedSyntaxList(SyntaxNode parent) : base(parent) { }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using CSharpE.Syntax.Internals;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -77,13 +76,16 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        private void Init(FieldDeclarationSyntax fieldDeclarationSyntax)
+        private void Init(FieldDeclarationSyntax syntax)
         {
-            syntax = fieldDeclarationSyntax;
+            if (syntax.Declaration.Variables.Count > 1)
+                throw new ArgumentException(
+                    "FieldDeclarationSyntax with more than one variable is not supported here.", nameof(syntax));
 
-            // initialize non-lazy properties
-            Modifiers = FromRoslyn.MemberModifiers(fieldDeclarationSyntax.Modifiers);
-            name = new Identifier(fieldDeclarationSyntax.Declaration.Variables.First().Identifier);
+            this.syntax = syntax;
+
+            Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
+            name = new Identifier(syntax.Declaration.Variables.First().Identifier);
         }
 
         public FieldDefinition(MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null)
