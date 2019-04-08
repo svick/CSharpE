@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -13,14 +14,15 @@ namespace CSharpE.Syntax
     {
         private StatementSyntax syntax;
 
-        internal ExpressionStatement(ExpressionStatementSyntax syntax, SyntaxNode parent)
+        internal ExpressionStatement(StatementSyntax syntax, SyntaxNode parent)
         {
-            this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+            Debug.Assert(syntax is ExpressionStatementSyntax || syntax is ThrowStatementSyntax);
+
+            this.syntax = syntax;
             Parent = parent;
         }
 
-        public ExpressionStatement(Expression expression) =>
-            Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+        public ExpressionStatement(Expression expression) => Expression = expression;
 
         private Expression expression;
         public Expression Expression
@@ -28,9 +30,19 @@ namespace CSharpE.Syntax
             get
             {
                 if (expression == null)
-                    expression = syntax is ThrowStatementSyntax throwStatement
-                        ? SyntaxFactory.Throw(FromRoslyn.Expression(throwStatement.Expression, this))
-                        : FromRoslyn.Expression(((ExpressionStatementSyntax)syntax).Expression, this);
+                {
+                    if (syntax is ThrowStatementSyntax throwStatement)
+                    {
+                        // HACK: ThrowExpression ctor with an expression from Roslyn syntax
+                        // requires that expression to be already part of the tree
+                        expression = FromRoslyn.Expression(throwStatement.Expression, this);
+                        expression = new ThrowExpression(expression);
+                    }
+                    else
+                    {
+                        expression = FromRoslyn.Expression(((ExpressionStatementSyntax)syntax).Expression, this);
+                    }
+                }
 
                 return expression;
             }

@@ -1,4 +1,3 @@
-using System;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -16,8 +15,7 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        public ThrowExpression(Expression operand) =>
-            Operand = operand ?? throw new ArgumentNullException(nameof(operand));
+        public ThrowExpression(Expression operand) => Operand = operand;
 
         private Expression operand;
         public Expression Operand

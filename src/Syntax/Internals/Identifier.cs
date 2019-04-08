@@ -10,6 +10,8 @@ namespace CSharpE.Syntax.Internals
 
         private readonly bool canBeNull;
 
+        public Identifier(SyntaxToken? syntax) : this(syntax ?? default, true) { }
+
         public Identifier(SyntaxToken syntax, bool canBeNull = false) : this()
         {
             this.syntax = syntax;

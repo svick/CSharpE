@@ -23,6 +23,7 @@ namespace CSharpE.Syntax.Tests
             MakeRefExpression,
             RefTypeExpression,
             RefValueExpression,
+            ArgListExpression,
 
             // won't have matching type in CSharpE
             ArrayRankSpecifier,
@@ -33,6 +34,8 @@ namespace CSharpE.Syntax.Tests
             NameColon,
             InterpolationAlignmentClause,
             InterpolationFormatClause,
+            CatchDeclaration,
+            CatchFilterClause,
 
             // might not be necessary to support right now
             ArrayInitializerExpression,
@@ -63,7 +66,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count <= 96,
+                syntaxKinds.Count <= 86,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 

@@ -1,4 +1,5 @@
-﻿using N.M;
+﻿using System;
+using N.M;
 
 namespace N.M
 {
@@ -15,6 +16,11 @@ namespace N.M
 
         ref int M()
         {
+            _ = 0;
+            _ = true;
+            _ = false;
+            _ = "s";
+            _ = @"\";
             _ = $"";
             _ = $@"x{0,1 + 1:X}";
 
@@ -84,6 +90,17 @@ namespace N.M
             _ = () => 0;
             _ = x => { };
             _ = async (ref int x) => { };
+
+            _ = c1 ?? throw new Exception();
+
+            if (true) { }
+
+            try
+            {
+                throw new Exception();
+            }
+            catch (Exception e) { }
+            finally { }
 
             checked { unchecked { } }
 

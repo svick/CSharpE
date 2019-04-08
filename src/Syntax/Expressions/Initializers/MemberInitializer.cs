@@ -71,7 +71,7 @@ namespace CSharpE.Syntax
 
                 return value;
             }
-            set => SetNotNull(ref value, value);
+            set => SetNotNull(ref this.value, value);
         }
 
         AssignmentExpressionSyntax ISyntaxWrapper<AssignmentExpressionSyntax>.GetWrapped(ref bool? changed)

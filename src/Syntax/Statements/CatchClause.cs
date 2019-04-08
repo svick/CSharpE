@@ -1,39 +1,162 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class CatchClause : SyntaxNode, ISyntaxWrapper<CatchClauseSyntax>
+    public sealed class CatchClause : SyntaxNode, ISyntaxWrapper<CatchClauseSyntax>
     {
-        CatchClauseSyntax ISyntaxWrapper<CatchClauseSyntax>.GetWrapped(ref bool? changed)
+        private CatchClauseSyntax syntax;
+
+        internal CatchClause(CatchClauseSyntax syntax, TryStatement parent)
         {
-            throw new NotImplementedException();
+            Init(syntax);
+            Parent = parent;
         }
 
-        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        private void Init(CatchClauseSyntax syntax)
         {
-            throw new NotImplementedException();
+            this.syntax = syntax;
+            exceptionName = new Identifier(syntax.Declaration?.Identifier);
         }
 
-        internal override SyntaxNode Clone()
+        public CatchClause(TypeReference exceptionType, string exceptionName, params Statement[] statements)
+            : this(exceptionType, exceptionName, statements.AsEnumerable()) { }
+
+        public CatchClause(TypeReference exceptionType, string exceptionName, IEnumerable<Statement> statements)
+            : this(exceptionType, exceptionName, null, statements) { }
+
+        public CatchClause(
+            TypeReference exceptionType, string exceptionName, Expression filter, IEnumerable<Statement> statements)
         {
-            throw new NotImplementedException();
+            ExceptionType = exceptionType;
+            this.exceptionName = new Identifier(exceptionName, true);
+            Filter = filter;
+            this.statements = new StatementList(statements, this);
         }
 
-        private TryStatement parent;
-        internal override SyntaxNode Parent
+        private bool exceptionTypeSet;
+        private TypeReference exceptionType;
+        public TypeReference ExceptionType
         {
-            get => parent;
+            get
+            {
+                if (!exceptionTypeSet)
+                {
+                    exceptionType = FromRoslyn.TypeReference(syntax.Declaration?.Type, this);
+                    exceptionTypeSet = true;
+                }
+
+                return exceptionType;
+            }
             set
             {
-                if (value is TryStatement tryStatement)
-                    parent = tryStatement;
-                else
-                    throw new ArgumentException(nameof(value));
+                if (value == null && ExceptionName != null)
+                    throw new ArgumentException(
+                        "Can't set ExceptionType to null while ExceptionName is not null.", nameof(value));
+
+                Set(ref exceptionType, value);
+                exceptionTypeSet = true;
             }
         }
 
+        private Identifier exceptionName;
+        public string ExceptionName
+        {
+            get => exceptionName.Text;
+            set
+            {
+                // PERF: assigning non-null should not require creating ExceptionType
+                if (value != null && ExceptionType == null)
+                    throw new ArgumentException(
+                        "Can't set ExceptionName to not null while ExceptionType is null.", nameof(value));
+
+                exceptionName.Text = value;
+            }
+        }
+
+        private bool filterSet;
+        private Expression filter;
+        public Expression Filter
+        {
+            get
+            {
+                if (!filterSet)
+                {
+                    filter = FromRoslyn.Expression(syntax.Filter?.FilterExpression, this);
+                    filterSet = true;
+                }
+
+                return filter;
+            }
+            set
+            {
+                Set(ref filter, value);
+                filterSet = true;
+            }
+        }
+
+        private StatementList statements;
+        public IList<Statement> Statements
+        {
+            get
+            {
+                if (statements == null)
+                    statements = new StatementList(syntax.Block.Statements, this);
+
+                return statements;
+            }
+            set => SetList(ref statements, new StatementList(value, this));
+        }
+
+        CatchClauseSyntax ISyntaxWrapper<CatchClauseSyntax>.GetWrapped(ref bool? changed)
+        {
+            GetAndResetChanged(ref changed);
+
+            bool? thisChanged = false;
+
+            var newExceptionType =
+                exceptionTypeSet ? exceptionType?.GetWrapped(ref thisChanged) : syntax.Declaration?.Type;
+            var newExceptionName = exceptionName.GetWrapped(ref thisChanged);
+            var newFilter = filterSet ? filter?.GetWrapped(ref thisChanged) : syntax.Filter?.FilterExpression;
+            var newStatements = statements?.GetWrapped(ref thisChanged) ?? syntax.Block.Statements;
+
+            if (syntax == null || thisChanged == true)
+            {
+                var declarationSyntax = newExceptionType == null
+                    ? null
+                    : RoslynSyntaxFactory.CatchDeclaration(newExceptionType, newExceptionName);
+
+                var filterSyntax = newFilter == null ? null : RoslynSyntaxFactory.CatchFilterClause(newFilter);
+
+                syntax = RoslynSyntaxFactory.CatchClause(
+                    declarationSyntax, filterSyntax, RoslynSyntaxFactory.Block(newStatements));
+
+                SetChanged(ref changed);
+            }
+
+            return syntax;
+        }
+
+        internal override SyntaxNode Parent { get; set; }
+
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            Set(ref exceptionType, null);
+            exceptionTypeSet = false;
+            Set(ref filter, null);
+            filterSet = false;
+            SetList(ref statements, null);
+
+            Init((CatchClauseSyntax)newSyntax);
+        }
+
+        internal override SyntaxNode Clone() => new CatchClause(ExceptionType, ExceptionName, Filter, Statements);
     }
 }

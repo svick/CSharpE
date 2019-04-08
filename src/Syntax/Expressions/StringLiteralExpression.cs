@@ -1,7 +1,5 @@
-﻿using System;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
@@ -11,7 +9,7 @@ namespace CSharpE.Syntax
     {
         internal StringLiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
         {
-            Init(syntax ?? throw new ArgumentNullException(nameof(syntax)));
+            Init(syntax);
 
             Parent = parent;
         }
@@ -19,7 +17,7 @@ namespace CSharpE.Syntax
         private void Init(LiteralExpressionSyntax syntax)
         {
             Syntax = syntax;
-            Value = syntax.Token.Value as string ?? throw new ArgumentException(nameof(syntax));
+            Value = (string)syntax.Token.Value;
         }
 
         public StringLiteralExpression(string value) => Value = value;
@@ -43,7 +41,8 @@ namespace CSharpE.Syntax
             return Syntax;
         }
 
-        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => Init((LiteralExpressionSyntax)newSyntax);
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
+            Init((LiteralExpressionSyntax)newSyntax);
 
         internal override SyntaxNode Clone() => new StringLiteralExpression(Value);
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -110,5 +111,8 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new TryStatement(TryStatements, CatchClauses, FinallyStatements);
 
         internal override SyntaxNode Parent { get; set; }
+
+        internal override IEnumerable<SyntaxNode> GetChildren() =>
+            TryStatements.Concat<SyntaxNode>(CatchClauses).Concat(FinallyStatements);
     }
 }

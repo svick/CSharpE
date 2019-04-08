@@ -17,6 +17,8 @@ namespace CSharpE.Syntax.Internals
         {
             switch (syntax)
             {
+                case null:
+                    return null;
                 case AnonymousObjectCreationExpressionSyntax anonymousObjectCreation:
                     return new AnonymousNewExpression(anonymousObjectCreation, parent);
                 case ArrayCreationExpressionSyntax arrayCreation:
@@ -79,12 +81,12 @@ namespace CSharpE.Syntax.Internals
                     return new StackAllocExpression(stackAllocArrayCreation, parent);
                 case ThisExpressionSyntax @this:
                     return new ThisExpression(@this, parent);
+                case ThrowExpressionSyntax @throw:
+                    return new ThrowExpression(@throw, parent);
                 case TupleExpressionSyntax tuple:
                     return new TupleExpression(tuple, parent);
                 case TypeOfExpressionSyntax typeOf:
                     return new TypeOfExpression(typeOf, parent);
-                case null:
-                    return null;
             }
 
             throw new NotImplementedException(syntax.GetType().Name);
@@ -247,6 +249,8 @@ namespace CSharpE.Syntax.Internals
                     if (syntax.Token.Value is int)
                         return new IntLiteralExpression(syntax, parent);
                     break;
+                case SyntaxKind.StringLiteralExpression:
+                    return new StringLiteralExpression(syntax, parent);
                 case SyntaxKind.TrueLiteralExpression:
                     return new BoolLiteralExpression(syntax, parent);
                 case SyntaxKind.FalseLiteralExpression:
@@ -306,6 +310,12 @@ namespace CSharpE.Syntax.Internals
                     return new CheckedStatement(@checked, parent);
                 case ExpressionStatementSyntax expression:
                     return new ExpressionStatement(expression, parent);
+                case IfStatementSyntax @if:
+                    return new IfStatement(@if, parent);
+                case ThrowStatementSyntax @throw:
+                    return new ExpressionStatement(@throw, parent);
+                case TryStatementSyntax @try:
+                    return new TryStatement(@try, parent);
                 case ReturnStatementSyntax @return:
                     return new ReturnStatement(@return, parent);
             }
