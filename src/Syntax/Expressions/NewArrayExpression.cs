@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -22,7 +21,7 @@ namespace CSharpE.Syntax
             : this(elementType, new Expression[] { null }, initializer) { }
 
         public NewArrayExpression(TypeReference elementType, params Expression[] lengths)
-            : this(elementType, (IEnumerable<Expression>)lengths) { }
+            : this(elementType, lengths.AsEnumerable()) { }
 
         public NewArrayExpression(
             TypeReference elementType, IEnumerable<Expression> lengths, ArrayInitializer initializer = null)

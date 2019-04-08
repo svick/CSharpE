@@ -15,6 +15,9 @@ namespace N.M
 
         ref int M()
         {
+            _ = $"";
+            _ = $@"x{0,1 + 1:X}";
+
             _ = (1, 2);
             await null;
             _ = A.B;
@@ -29,6 +32,7 @@ namespace N.M
             i = default;
             _ = default(int);
             _ = typeof(int);
+            _ = typeof(Dictionary<,>);
             _ = sizeof(int);
             _ = (int)0;
 
@@ -73,6 +77,7 @@ namespace N.M
             _ = new[,] { { 0 } };
             _ = stackalloc int[10];
             _ = stackalloc int[] { 42 };
+            _ = stackalloc[] { 42 };
 
             var (_, x, (y, z)) = t;
 

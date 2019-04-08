@@ -6,11 +6,11 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class NewImplicitArrayExpression : Expression
+    public sealed class ImplicitNewArrayExpression : Expression
     {
         private ImplicitArrayCreationExpressionSyntax syntax;
 
-        internal NewImplicitArrayExpression(ImplicitArrayCreationExpressionSyntax syntax, SyntaxNode parent)
+        internal ImplicitNewArrayExpression(ImplicitArrayCreationExpressionSyntax syntax, SyntaxNode parent)
         {
             Init(syntax);
             Parent = parent;
@@ -22,9 +22,9 @@ namespace CSharpE.Syntax
             Rank = GetSyntaxRank();
         }
 
-        public NewImplicitArrayExpression(ArrayInitializer initializer) : this(1, initializer) { }
+        public ImplicitNewArrayExpression(ArrayInitializer initializer) : this(1, initializer) { }
 
-        public NewImplicitArrayExpression(int rank, ArrayInitializer initializer)
+        public ImplicitNewArrayExpression(int rank, ArrayInitializer initializer)
         {
             Rank = rank;
             Initializer = initializer;
@@ -82,7 +82,7 @@ namespace CSharpE.Syntax
             Init((ImplicitArrayCreationExpressionSyntax)newSyntax);
         }
 
-        internal override SyntaxNode Clone() => new NewImplicitArrayExpression(Rank, Initializer);
+        internal override SyntaxNode Clone() => new ImplicitNewArrayExpression(Rank, Initializer);
 
         internal override SyntaxNode Parent { get; set; }
     }

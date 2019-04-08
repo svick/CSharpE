@@ -87,4 +87,20 @@ namespace CSharpE.Syntax.Internals
         protected override VariableInitializer CreateWrapper(ExpressionSyntax roslynSyntax) =>
             FromRoslyn.VariableInitializer(roslynSyntax, Parent);
     }
+
+    internal sealed class InterpolatedStringContentList
+        : SyntaxList<InterpolatedStringContent, InterpolatedStringContentSyntax>
+    {
+        internal InterpolatedStringContentList(SyntaxNode parent) : base(parent) { }
+
+        internal InterpolatedStringContentList(IEnumerable<InterpolatedStringContent> list, SyntaxNode parent)
+            : base(list, parent) { }
+
+        internal InterpolatedStringContentList(
+            SyntaxList<InterpolatedStringContentSyntax> syntaxList, SyntaxNode parent)
+            : base(syntaxList, parent) { }
+
+        protected override InterpolatedStringContent CreateWrapper(InterpolatedStringContentSyntax roslynSyntax) =>
+            FromRoslyn.InterpolatedStringContent(roslynSyntax, (InterpolatedStringExpression)Parent);
+    }
 }

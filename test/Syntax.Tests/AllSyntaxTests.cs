@@ -24,12 +24,15 @@ namespace CSharpE.Syntax.Tests
             RefTypeExpression,
             RefValueExpression,
 
-            // likely won't have matching type in CSharpE
+            // won't have matching type in CSharpE
             ArrayRankSpecifier,
             OmittedTypeArgument,
+            OmittedArraySizeExpression,
             MemberBindingExpression,
             ElementBindingExpression,
             NameColon,
+            InterpolationAlignmentClause,
+            InterpolationFormatClause,
 
             // might not be necessary to support right now
             ArrayInitializerExpression,
@@ -60,7 +63,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count <= 103,
+                syntaxKinds.Count <= 96,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 

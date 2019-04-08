@@ -46,7 +46,11 @@ namespace CSharpE.Syntax.Internals
                 case IdentifierNameSyntax identifierName:
                     return new IdentifierExpression(identifierName, parent);
                 case ImplicitArrayCreationExpressionSyntax implicitArrayCreation:
-                    return new NewImplicitArrayExpression(implicitArrayCreation, parent);
+                    return new ImplicitNewArrayExpression(implicitArrayCreation, parent);
+                case ImplicitStackAllocArrayCreationExpressionSyntax implicitStackAllocArrayCreation:
+                    return new ImplicitStackAllocExpression(implicitStackAllocArrayCreation, parent);
+                case InterpolatedStringExpressionSyntax interpolatedStringExpression:
+                    return new InterpolatedStringExpression(interpolatedStringExpression, parent);
                 case InvocationExpressionSyntax invocation:
                     return new InvocationExpression(invocation, parent);
                 case LambdaExpressionSyntax lambda:
@@ -321,7 +325,8 @@ namespace CSharpE.Syntax.Internals
             return result;
         }
 
-        public static MemberDefinition MemberDefinition(MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType)
+        public static MemberDefinition MemberDefinition(
+            MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType)
         {
             switch (memberDeclarationSyntax)
             {
@@ -404,6 +409,20 @@ namespace CSharpE.Syntax.Internals
                 default:
                     throw new NotImplementedException(typeSyntax.GetType().Name);
             }
+        }
+
+        public static InterpolatedStringContent InterpolatedStringContent(
+            InterpolatedStringContentSyntax contentSyntax, InterpolatedStringExpression parent)
+        {
+            switch (contentSyntax)
+            {
+                case InterpolationSyntax interpolation:
+                    return new Interpolation(interpolation, parent);
+                case InterpolatedStringTextSyntax interpolatedStringText:
+                    return new InterpolatedStringText(interpolatedStringText, parent);
+            }
+
+            throw new InvalidOperationException();
         }
     }
 }
