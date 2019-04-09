@@ -56,4 +56,10 @@ class C
             }
         }
     }
+
+    int P1
+    {
+        get;
+        set;
+    }
 }

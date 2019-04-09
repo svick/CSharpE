@@ -29,4 +29,6 @@ class C
         finally { }
         checked { unchecked { } }
     }
+
+    int P1 { get; set; }
 }

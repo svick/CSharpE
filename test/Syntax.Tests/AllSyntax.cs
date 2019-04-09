@@ -77,6 +77,14 @@ namespace N.M
         public static implicit operator S(C c)
         {
         }
+
+        C()
+        {
+        }
+
+        ~C()
+        {
+        }
     }
 
     struct S

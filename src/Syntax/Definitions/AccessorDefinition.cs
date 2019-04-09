@@ -28,17 +28,11 @@ namespace CSharpE.Syntax
         private SyntaxKind? kind;
         internal SyntaxKind Kind
         {
-            get => kind ?? syntax?.Kind() ?? throw new InvalidOperationException("Kind has not been set.");
+            get => kind ?? syntax.Kind();
             set
             {
-                switch (value)
-                {
-                    case SyntaxKind.GetAccessorDeclaration:
-                    case SyntaxKind.SetAccessorDeclaration:
-                        break;
-                    default:
-                        throw new ArgumentException($"{value} is not allowed as accessor kind.");
-                }
+                if (value != SyntaxKind.GetAccessorDeclaration && value != SyntaxKind.SetAccessorDeclaration)
+                    throw new ArgumentException($"{value} is not allowed as accessor kind.");
 
                 kind = value;
             }
