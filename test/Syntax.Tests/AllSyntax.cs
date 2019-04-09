@@ -4,7 +4,7 @@ using N.M;
 namespace N.M
 {
     [A(0, arg: 1, P = 2)]
-    class C
+    class C : B
     {
         C c1;
         N.M.C c2;
@@ -70,4 +70,19 @@ namespace N.M
             return ref this.i;
         }
     }
+
+    struct S
+    {
+    }
+
+    interface I
+    {
+    }
+
+    enum E
+    {
+        M
+    }
+
+    delegate void D(in int i);
 }

@@ -1,6 +1,7 @@
-﻿using System;
-using CSharpE.Syntax.Internals;
+﻿using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Roslyn = Microsoft.CodeAnalysis;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
@@ -9,7 +10,7 @@ namespace CSharpE.Syntax
     {
         private EnumMemberDeclarationSyntax syntax;
 
-        internal EnumMemberDefinition(EnumMemberDeclarationSyntax syntax, TypeDefinition parent)
+        internal EnumMemberDefinition(EnumMemberDeclarationSyntax syntax, EnumDefinition parent)
         {
             Init(syntax);
             Parent = parent;
@@ -60,32 +61,36 @@ namespace CSharpE.Syntax
             }
         }
 
-        private EnumDefinition parent;
-        internal override SyntaxNode Parent
-        {
-            get => parent;
-            set
-            {
-                if (value is EnumDefinition parentEnum)
-                    parent = parentEnum;
-                else
-                    throw new ArgumentException(nameof(value));
-            }
-        }
-
-        private protected override void SetSyntaxImpl(Microsoft.CodeAnalysis.SyntaxNode newSyntax)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal override SyntaxNode Clone()
-        {
-            throw new NotImplementedException();
-        }
-
         EnumMemberDeclarationSyntax ISyntaxWrapper<EnumMemberDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            throw new NotImplementedException();
+            GetAndResetChanged(ref changed);
+
+            bool? thisChanged = false;
+
+            var newName = name.GetWrapped(ref thisChanged);
+            var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.EqualsValue?.Value;
+
+            if (syntax == null || thisChanged == true)
+            {
+                var equalsValue = newInitializer == null ? null : RoslynSyntaxFactory.EqualsValueClause(newInitializer);
+
+                syntax = RoslynSyntaxFactory.EnumMemberDeclaration(default, newName, equalsValue);
+
+                SetChanged(ref changed);
+            }
+
+            return syntax;
         }
+
+        internal override SyntaxNode Parent { get; set; }
+
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            Init((EnumMemberDeclarationSyntax)newSyntax);
+            Set(ref initializer, null);
+            initializerSet = false;
+        }
+
+        internal override SyntaxNode Clone() => new EnumMemberDefinition(Name, Initializer);
     }
 }

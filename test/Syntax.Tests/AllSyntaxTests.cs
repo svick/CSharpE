@@ -42,6 +42,8 @@ namespace CSharpE.Syntax.Tests
             SyntaxKind.Attribute,
             AttributeTargetSpecifier,
             NameEquals,
+            SimpleBaseType,
+            EqualsValueClause,
 
             // might not be necessary to support right now
             ArrayInitializerExpression,
@@ -77,7 +79,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count <= 80,
+                syntaxKinds.Count <= 73,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 

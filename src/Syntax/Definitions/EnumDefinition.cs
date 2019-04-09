@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
@@ -53,13 +54,13 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            throw new System.NotImplementedException();
+            Init((EnumDeclarationSyntax)newSyntax);
+            SetList(ref attributes, null);
+            SetList(ref members, null);
         }
 
-        internal override SyntaxNode Clone()
-        {
-            throw new System.NotImplementedException();
-        }
+        internal override SyntaxNode Clone() =>
+            new EnumDefinition(Modifiers, Name, Members) { Attributes = Attributes };
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 
@@ -98,5 +99,7 @@ namespace CSharpE.Syntax
 
         private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) =>
             this.GetWrapped<EnumDeclarationSyntax>(ref changed);
+
+        internal override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat<SyntaxNode>(Members);
     }
 }
