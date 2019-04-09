@@ -15,18 +15,18 @@ namespace CSharpE.Syntax
     public enum OperatorKind
     {
         Plus,
-        Addition = Plus,
+        Add = Plus,
         Minus,
-        Subtraction = Minus,
-        Not,
+        Subtract = Minus,
+        Negate,
         Complement,
         Increment,
         Decrement,
         True,
         False,
-        Multiplication,
-        Division,
-        Modulus,
+        Multiply,
+        Divide,
+        Modulo,
         And,
         Or,
         Xor,
@@ -55,14 +55,33 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        private static readonly BiDirectionalDictionary<OperatorKind, SyntaxKind> operatorKindMapping =
+        private static readonly BiDirectionalDictionary<OperatorKind, SyntaxKind> OperatorKindMapping =
             new BiDirectionalDictionary<OperatorKind, SyntaxKind>
             {
-                {OperatorKind.Equals, EqualsEqualsToken},
-                {NotEquals, ExclamationEqualsToken},
-
-                {Implicit, ImplicitKeyword},
-                {Explicit, ExplicitKeyword}
+                { Plus, PlusToken },
+                { Minus, MinusToken },
+                { Negate, ExclamationToken },
+                { Complement, TildeToken },
+                { Increment, PlusPlusToken },
+                { Decrement, MinusMinusToken },
+                { True, TrueKeyword },
+                { False, FalseKeyword },
+                { Multiply, AsteriskToken },
+                { Divide, SlashToken },
+                { Modulo, PercentToken },
+                { And, AmpersandToken },
+                { Or, BarToken },
+                { Xor, CaretToken },
+                { LeftShift, LessThanLessThanToken },
+                { RightShift, GreaterThanGreaterThanToken },
+                { OperatorKind.Equals, EqualsEqualsToken },
+                { NotEquals, ExclamationEqualsToken },
+                { GreaterThan, GreaterThanToken },
+                { LessThan, LessThanToken },
+                { GreaterThanOrEquals, GreaterThanEqualsToken },
+                { LessThanOrEquals, LessThanEqualsToken },
+                { Implicit, ImplicitKeyword },
+                { Explicit, ExplicitKeyword }
             };
 
         private static OperatorKind GetKind(BaseMethodDeclarationSyntax syntax)
@@ -70,9 +89,9 @@ namespace CSharpE.Syntax
             switch (syntax)
             {
                 case OperatorDeclarationSyntax operatorDeclaration:
-                    return operatorKindMapping[operatorDeclaration.OperatorToken.Kind()];
+                    return OperatorKindMapping[operatorDeclaration.OperatorToken.Kind()];
                 case ConversionOperatorDeclarationSyntax conversionOperatorDeclaration:
-                    return operatorKindMapping[conversionOperatorDeclaration.ImplicitOrExplicitKeyword.Kind()];
+                    return OperatorKindMapping[conversionOperatorDeclaration.ImplicitOrExplicitKeyword.Kind()];
                 default:
                     throw new InvalidOperationException(syntax.GetType().Name);
             }
@@ -138,7 +157,7 @@ namespace CSharpE.Syntax
 
         public OperatorKind Kind { get; set; }
 
-        private static SyntaxKind GetTokenKind(OperatorKind kind) => operatorKindMapping[kind];
+        private static SyntaxKind GetTokenKind(OperatorKind kind) => OperatorKindMapping[kind];
 
         private protected override BaseMethodDeclarationSyntax GetWrappedBaseMethod(ref bool? changed)
         {

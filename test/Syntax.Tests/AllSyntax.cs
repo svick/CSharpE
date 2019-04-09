@@ -69,6 +69,14 @@ namespace N.M
             _ = c1 ?? throw new Exception();
             return ref this.i;
         }
+
+        public static C operator !(C c)
+        {
+        }
+
+        public static implicit operator S(C c)
+        {
+        }
     }
 
     struct S
