@@ -166,9 +166,10 @@ namespace CSharpE.Syntax
             Set(ref body, null);
         }
 
-        internal override SyntaxNode Clone()
-        {
-            throw new NotImplementedException();
-        }
+        internal override SyntaxNode Clone() =>
+            new MethodDefinition(Modifiers, ReturnType, Name, Parameters, Body?.Statements) { Attributes = Attributes };
+
+        internal override IEnumerable<SyntaxNode> GetChildren() =>
+            Attributes.Concat<SyntaxNode>(new[] { ReturnType }).Concat(Parameters).Concat(new[] { Body });
     }
 }
