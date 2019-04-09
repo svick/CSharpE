@@ -3,6 +3,7 @@
     C[][,] a;
     C* p;
     (int i, string) t;
+    public int i, j;
     void M()
     {
         _ = $@"x{0,1+1:X}";
