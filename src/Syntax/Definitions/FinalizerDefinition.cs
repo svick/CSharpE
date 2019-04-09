@@ -53,17 +53,18 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
+            var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
 
-            if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
+            if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || !IsAnnotated(syntax))
             {
                 if (Parent == null)
                     throw new InvalidOperationException("Can't create syntax node for finalizer with no parent type.");
 
                 var newSyntax = RoslynSyntaxFactory.DestructorDeclaration(
-                    GetNewAttributes(), newModifiers.GetWrapped(), RoslynSyntaxFactory.Identifier(ParentType.Name),
+                    newAttributes, newModifiers.GetWrapped(), RoslynSyntaxFactory.Identifier(ParentType.Name),
                     RoslynSyntaxFactory.ParameterList(), newBody);
 
                 syntax = Annotate(newSyntax);
@@ -80,10 +81,10 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Init((DestructorDeclarationSyntax)newSyntax);
-            ResetAttributes();
 
-            parameters = null;
-            body = null;
+            SetList(ref attributes, null);
+            SetList(ref parameters, null);
+            Set(ref body, null);
         }
 
         internal override SyntaxNode Clone()

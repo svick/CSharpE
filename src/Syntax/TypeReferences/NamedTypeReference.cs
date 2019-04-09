@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using CSharpE.Syntax.Internals;
@@ -48,6 +49,8 @@ namespace CSharpE.Syntax
 
         internal NamedTypeReference(TypeSyntax syntax, SyntaxNode parent)
         {
+            Debug.Assert(syntax is PredefinedTypeSyntax || syntax is NameSyntax);
+
             this.syntax = syntax;
             Parent = parent;
         }

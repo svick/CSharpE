@@ -218,18 +218,19 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
+            var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newName = name.GetWrapped(ref thisChanged);
             var newBaseTypes = baseTypes?.GetWrapped(ref thisChanged) ?? syntax.BaseList?.Types ?? default;
             var newMembers = members?.GetWrapped(ref thisChanged) ?? syntax.Members;
 
-            if (syntax == null || AttributesChanged() || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
+            if (syntax == null || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
                 thisChanged == true || !IsAnnotated(syntax))
             {
                 var newBaseList = newBaseTypes.Any() ? RoslynSyntaxFactory.BaseList(newBaseTypes) : default;
                 
                 var newSyntax = RoslynSyntaxFactory.TypeDeclaration(
-                    SyntaxFacts.GetTypeDeclarationKind(KeywordKind), GetNewAttributes(), newModifiers.GetWrapped(),
+                    SyntaxFacts.GetTypeDeclarationKind(KeywordKind), newAttributes, newModifiers.GetWrapped(),
                     RoslynSyntaxFactory.Token(KeywordKind), newName, default, newBaseList, default,
                     RoslynSyntaxFactory.Token(OpenBraceToken), newMembers, RoslynSyntaxFactory.Token(CloseBraceToken),
                     default);
@@ -251,9 +252,9 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Init((TypeDeclarationSyntax)newSyntax);
-            ResetAttributes();
 
-            members = null;
+            SetList(ref attributes, null);
+            SetList(ref members, null);
         }
 
         internal override SyntaxNode Clone()
@@ -261,7 +262,8 @@ namespace CSharpE.Syntax
             throw new NotImplementedException();
         }
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => BaseTypes.AsEnumerable<SyntaxNode>().Concat(Members);
+        internal override IEnumerable<SyntaxNode> GetChildren() =>
+            Attributes.Concat<SyntaxNode>(BaseTypes).Concat(Members);
     }
 
     public sealed class ClassDefinition : TypeDefinition, ISyntaxWrapper<ClassDeclarationSyntax>

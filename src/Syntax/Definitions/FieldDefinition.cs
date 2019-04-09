@@ -85,7 +85,7 @@ namespace CSharpE.Syntax
             this.syntax = syntax;
 
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
-            name = new Identifier(syntax.Declaration.Variables.First().Identifier);
+            name = new Identifier(syntax.Declaration.Variables.Single().Identifier);
         }
 
         public FieldDefinition(MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null)
@@ -103,24 +103,24 @@ namespace CSharpE.Syntax
         {
             GetAndResetChanged(ref changed);
 
-            var declarator = syntax?.Declaration.Variables.First();
+            var declarator = syntax?.Declaration.Variables.Single();
 
             bool? thisChanged = false;
 
+            var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Declaration.Type;
             var newName = name.GetWrapped(ref thisChanged);
             var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : declarator?.Initializer?.Value;
 
-            if (syntax == null || AttributesChanged() ||
-                FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || thisChanged == true ||
+            if (syntax == null || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || thisChanged == true ||
                 !IsAnnotated(syntax))
             {
                 var equalsValueClause =
                     newInitializer == null ? null : RoslynSyntaxFactory.EqualsValueClause(newInitializer);
 
                 var newSyntax = RoslynSyntaxFactory.FieldDeclaration(
-                    GetNewAttributes(), newModifiers.GetWrapped(), RoslynSyntaxFactory.VariableDeclaration(
+                    newAttributes, newModifiers.GetWrapped(), RoslynSyntaxFactory.VariableDeclaration(
                         newType, RoslynSyntaxFactory.SingletonSeparatedList(
                             RoslynSyntaxFactory.VariableDeclarator(newName, null, equalsValueClause))));
 
@@ -138,8 +138,8 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Init((FieldDeclarationSyntax)newSyntax);
-            ResetAttributes();
 
+            SetList(ref attributes, null);
             Set(ref type, null);
             initializerSet = false;
             Set(ref initializer, null);

@@ -3,7 +3,7 @@ using N.M;
 
 namespace N.M
 {
-    [A(0, P = 1)]
+    [A(0, arg: 1, P = 2)]
     class C
     {
         C c1;

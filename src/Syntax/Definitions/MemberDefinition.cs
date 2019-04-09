@@ -5,7 +5,6 @@ using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
-using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
@@ -18,46 +17,18 @@ namespace CSharpE.Syntax
 
         private protected abstract MemberDeclarationSyntax MemberSyntax { get; }
 
-        private List<Attribute> attributes;
+        private protected SyntaxList<Attribute, AttributeListSyntax> attributes;
         public IList<Attribute> Attributes
         {
             get
             {
                 if (attributes == null)
-                {
-                    attributes = (from attributeList in GetAttributeLists(MemberSyntax)
-                        from attribute in attributeList.Attributes
-                        select new Attribute(attribute, this)).ToList();
-                }
+                    attributes = new SyntaxList<Attribute, AttributeListSyntax>(GetAttributeLists(MemberSyntax), this);
 
                 return attributes;
             }
-            set => attributes = value.ToList();
+            set => SetList(ref attributes, new SyntaxList<Attribute, AttributeListSyntax>(value, this));
         }
-
-        private protected bool AttributesChanged()
-        {
-            if (attributes == null)
-                return false;
-
-            var newAttributes = attributes.Select(a => a.GetWrapped());
-            var oldAttributes = GetAttributeLists(MemberSyntax).SelectMany(al => al.Attributes);
-
-            return !newAttributes.SequenceEqual(oldAttributes);
-        }
-
-        private protected SyntaxList<AttributeListSyntax> GetNewAttributes()
-        {
-            if (attributes == null)
-                return GetAttributeLists(MemberSyntax);
-
-            return RoslynSyntaxFactory.List(
-                attributes.Select(
-                    a => RoslynSyntaxFactory.AttributeList(
-                        RoslynSyntaxFactory.SingletonSeparatedList(a.GetWrapped()))));
-        }
-
-        private protected void ResetAttributes() => attributes = null;
 
         public bool HasAttribute<T>() => HasAttribute(typeof(T));
 

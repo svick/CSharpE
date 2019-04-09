@@ -81,16 +81,17 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
+            var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newName = name.GetWrapped(ref thisChanged);
             var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? syntax.ReturnType;
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
 
-            if (syntax == null || AttributesChanged() || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
+            if (syntax == null || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
                 thisChanged == true || !IsAnnotated(syntax))
             {
                 var newSyntax = RoslynSyntaxFactory.DelegateDeclaration(
-                    GetNewAttributes(), newModifiers.GetWrapped(), newReturnType, newName, default,
+                    newAttributes, newModifiers.GetWrapped(), newReturnType, newName, default,
                     RoslynSyntaxFactory.ParameterList(newParameters), default);
 
                 syntax = Annotate(newSyntax);

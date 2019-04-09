@@ -70,6 +70,7 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
+            var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
             var newName = name.GetWrapped(ref thisChanged);
@@ -80,13 +81,13 @@ namespace CSharpE.Syntax
                 ? setAccessor?.GetWrapped(ref thisChanged)
                 : FindAccessor(SyntaxKind.SetAccessorDeclaration);
 
-            if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
+            if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || !IsAnnotated(syntax))
             {
                 var accessors = RoslynSyntaxFactory.List(new[] {newGetAccessor, newSetAccessor}.Where(a => a != null));
 
                 var newSyntax = RoslynSyntaxFactory.PropertyDeclaration(
-                    GetNewAttributes(), newModifiers.GetWrapped(), newType, null, newName,
+                    newAttributes, newModifiers.GetWrapped(), newType, null, newName,
                     RoslynSyntaxFactory.AccessorList(accessors));
 
                 syntax = Annotate(newSyntax);

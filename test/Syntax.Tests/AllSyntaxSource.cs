@@ -1,4 +1,5 @@
-﻿class C
+﻿[A(), B]
+class C
 {
     C[][,] a;
     C* p;

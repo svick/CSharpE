@@ -337,26 +337,45 @@ namespace CSharpE.Syntax.Internals
             return result;
         }
 
-        public static bool IsCompacted(CSharpSyntaxNode syntaxNode) =>
-            syntaxNode is FieldDeclarationSyntax fieldDeclaration && fieldDeclaration.Declaration.Variables.Count > 1;
+        public static bool IsCompacted(CSharpSyntaxNode syntaxNode)
+        {
+            switch (syntaxNode)
+            {
+                case FieldDeclarationSyntax fieldDeclaration:
+                    return fieldDeclaration.Declaration.Variables.Count > 1;
+                case AttributeListSyntax attributeList:
+                    return attributeList.Attributes.Count > 1;
+                default:
+                    return false;
+            }
+        }
 
         public static IEnumerable<TRoslynSyntax> Expand<TRoslynSyntax>(TRoslynSyntax roslynSyntax)
             where TRoslynSyntax : CSharpSyntaxNode
         {
-            if (roslynSyntax is FieldDeclarationSyntax fieldDeclaration)
+            switch (roslynSyntax)
             {
-                foreach (var variable in fieldDeclaration.Declaration.Variables)
-                {
-                    var expandedSyntax = fieldDeclaration.WithDeclaration(
-                        fieldDeclaration.Declaration.WithVariables(
-                            RoslynSyntaxFactory.SingletonSeparatedList(variable)));
+                case FieldDeclarationSyntax fieldDeclaration:
+                    foreach (var variable in fieldDeclaration.Declaration.Variables)
+                    {
+                        var expandedSyntax = fieldDeclaration.WithDeclaration(
+                            fieldDeclaration.Declaration.WithVariables(
+                                RoslynSyntaxFactory.SingletonSeparatedList(variable)));
 
-                    yield return (TRoslynSyntax)(object)expandedSyntax;
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException();
+                        yield return (TRoslynSyntax)(object)expandedSyntax;
+                    }
+                    break;
+                case AttributeListSyntax attributeList:
+                    foreach (var attribute in attributeList.Attributes)
+                    {
+                        var expandedSyntax =
+                            attributeList.WithAttributes(RoslynSyntaxFactory.SingletonSeparatedList(attribute));
+
+                        yield return (TRoslynSyntax)(object)expandedSyntax;
+                    }
+                    break;
+                default:
+                    throw new InvalidOperationException();
             }
         }
 

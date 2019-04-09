@@ -146,12 +146,13 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
+            var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? GetReturnType(syntax);
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
             var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
 
-            if (syntax == null || AttributesChanged() || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
+            if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || !IsAnnotated(syntax))
             {
                 BaseMethodDeclarationSyntax newSyntax;
@@ -161,13 +162,13 @@ namespace CSharpE.Syntax
                 if (Kind == Implicit || Kind == Explicit)
                 {
                     newSyntax = RoslynSyntaxFactory.ConversionOperatorDeclaration(
-                        GetNewAttributes(), newModifiers.GetWrapped(), token, newReturnType,
+                        newAttributes, newModifiers.GetWrapped(), token, newReturnType,
                         RoslynSyntaxFactory.ParameterList(newParameters), newBody, null);
                 }
                 else
                 {
                     newSyntax = RoslynSyntaxFactory.OperatorDeclaration(
-                        GetNewAttributes(), newModifiers.GetWrapped(), newReturnType, token,
+                        newAttributes, newModifiers.GetWrapped(), newReturnType, token,
                         RoslynSyntaxFactory.ParameterList(newParameters), newBody, null);
                 }
 
@@ -182,11 +183,11 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Init((BaseMethodDeclarationSyntax)newSyntax);
-            ResetAttributes();
 
+            SetList(ref attributes, null);
             Set(ref returnType, null);
-            parameters = null;
-            body = null;
+            SetList(ref parameters, null);
+            Set(ref body, null);
         }
 
         internal override SyntaxNode Clone()

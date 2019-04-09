@@ -38,6 +38,10 @@ namespace CSharpE.Syntax.Tests
             InterpolationFormatClause,
             CatchDeclaration,
             CatchFilterClause,
+            FinallyClause,
+            SyntaxKind.Attribute,
+            AttributeTargetSpecifier,
+            NameEquals,
 
             // might not be necessary to support right now
             ArrayInitializerExpression,
@@ -73,7 +77,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count <= 86,
+                syntaxKinds.Count <= 80,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 
