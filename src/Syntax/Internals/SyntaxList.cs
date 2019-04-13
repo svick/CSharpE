@@ -50,11 +50,9 @@ namespace CSharpE.Syntax.Internals
 
         protected SyntaxListBase(IEnumerable<TSyntax> list, SyntaxNode parent)
         {
-            this.list =
-                list?.Select(syntax => syntax is SyntaxNode node ? (object)SyntaxNode.WithParent(node, parent) : syntax)
-                    .ToList() ?? new List<object>();
+            this.parent = parent;
 
-            Parent = parent;
+            this.list = list?.Select(syntax => (object)WithParent(syntax)).ToList() ?? new List<object>();
         }
 
         protected SyntaxListBase(TList syntaxList, SyntaxNode parent)
@@ -76,6 +74,8 @@ namespace CSharpE.Syntax.Internals
             Parent = parent;
         }
 
+        private TSyntax WithParent(TSyntax syntax) => syntax is SyntaxNode node ? (TSyntax)(object)SyntaxNode.WithParent(node, Parent) : syntax;
+
         public IEnumerator<TSyntax> GetEnumerator()
         {
             for (int i = 0; i < Count; i++)
@@ -86,7 +86,7 @@ namespace CSharpE.Syntax.Internals
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public void Add(TSyntax item) => list.Add(item);
+        public void Add(TSyntax item) => list.Add(WithParent(item));
 
         public void Clear() => list.Clear();
 
@@ -110,7 +110,7 @@ namespace CSharpE.Syntax.Internals
 
         public int IndexOf(TSyntax item) => list.IndexOf(item);
 
-        public void Insert(int index, TSyntax item) => list.Insert(index, item);
+        public void Insert(int index, TSyntax item) => list.Insert(index, WithParent(item));
 
         public void RemoveAt(int index) => list.RemoveAt(index);
 
@@ -138,7 +138,7 @@ namespace CSharpE.Syntax.Internals
                 if (value == null)
                     throw new ArgumentException();
 
-                list[index] = value;
+                list[index] = WithParent(value);
             }
         }
 

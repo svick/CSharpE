@@ -15,7 +15,7 @@ namespace CSharpE.Syntax
 
         private protected override BasePropertyDeclarationSyntax BasePropertySyntax => syntax;
 
-        public PropertyDefinition(PropertyDeclarationSyntax syntax, TypeDefinition parent)
+        internal PropertyDefinition(PropertyDeclarationSyntax syntax, TypeDefinition parent)
         {
             Init(syntax);
             Parent = parent;
@@ -103,12 +103,18 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            throw new NotImplementedException();
+            Init((PropertyDeclarationSyntax)newSyntax);
+            SetList(ref attributes, null);
+            Set(ref type, null);
+            Set(ref getAccessor, null);
+            getAccessorSet = false;
+            Set(ref setAccessor, null);
+            setAccessorSet = false;
         }
 
-        internal override SyntaxNode Clone()
+        internal override SyntaxNode Clone() => new PropertyDefinition(Modifiers, Type, Name)
         {
-            throw new NotImplementedException();
-        }
+            Attributes = Attributes, GetAccessor = GetAccessor, SetAccessor = SetAccessor
+        };
     }
 }

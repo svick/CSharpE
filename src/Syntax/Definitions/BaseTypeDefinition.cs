@@ -1,5 +1,7 @@
 ﻿using System;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
@@ -37,5 +39,10 @@ namespace CSharpE.Syntax
                 throw new ArgumentException(nameof(value));
             }
         }
+
+        public INamedTypeSymbol GetSymbol() =>
+            (INamedTypeSymbol)SourceFile.SemanticModel.GetDeclaredSymbol(GetSourceFileNode());
+
+        public NamedTypeReference GetReference() => new NamedTypeReference(GetSymbol());
     }
 }

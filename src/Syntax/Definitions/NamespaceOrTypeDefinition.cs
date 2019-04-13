@@ -5,18 +5,21 @@ namespace CSharpE.Syntax
 {
     public struct NamespaceOrTypeDefinition : ISyntaxWrapper<MemberDeclarationSyntax>
     {
-        private readonly ISyntaxWrapper<MemberDeclarationSyntax> namespaceOrType;
+        internal readonly ISyntaxWrapper<MemberDeclarationSyntax> NamespaceOrType;
 
-        public NamespaceOrTypeDefinition(NamespaceDefinition ns) => namespaceOrType = ns;
-        public NamespaceOrTypeDefinition(BaseTypeDefinition type) => namespaceOrType = type;
+        internal NamespaceOrTypeDefinition(ISyntaxWrapper<MemberDeclarationSyntax> namespaceOrType) =>
+            NamespaceOrType = namespaceOrType;
 
-        public bool IsNamespace => namespaceOrType is NamespaceDefinition;
-        public bool IsType => namespaceOrType is BaseTypeDefinition;
+        public NamespaceOrTypeDefinition(NamespaceDefinition ns) => NamespaceOrType = ns;
+        public NamespaceOrTypeDefinition(BaseTypeDefinition type) => NamespaceOrType = type;
 
-        public NamespaceDefinition GetNamespaceDefinition() => (NamespaceDefinition)namespaceOrType;
-        public BaseTypeDefinition GetTypeDefinition() => (BaseTypeDefinition)namespaceOrType;
+        public bool IsNamespace => NamespaceOrType is NamespaceDefinition;
+        public bool IsType => NamespaceOrType is BaseTypeDefinition;
 
-        public SyntaxNode Value => (SyntaxNode)namespaceOrType;
+        public NamespaceDefinition GetNamespaceDefinition() => (NamespaceDefinition)NamespaceOrType;
+        public BaseTypeDefinition GetTypeDefinition() => (BaseTypeDefinition)NamespaceOrType;
+
+        public SyntaxNode Value => (SyntaxNode)NamespaceOrType;
 
         public static implicit operator NamespaceOrTypeDefinition(NamespaceDefinition ns) =>
             new NamespaceOrTypeDefinition(ns);
@@ -24,6 +27,6 @@ namespace CSharpE.Syntax
             new NamespaceOrTypeDefinition(type);
 
         MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(ref bool? changed) =>
-            namespaceOrType.GetWrapped(ref changed);
+            NamespaceOrType.GetWrapped(ref changed);
     }
 }

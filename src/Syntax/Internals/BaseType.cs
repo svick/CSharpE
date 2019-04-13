@@ -1,4 +1,3 @@
-using System;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -12,14 +11,10 @@ namespace CSharpE.Syntax.Internals
         internal BaseType(BaseTypeSyntax syntax, TypeDefinition parent)
         {
             this.syntax = syntax;
-            this.parent = parent;
+            this.Parent = parent;
         }
 
-        public BaseType(TypeReference type, TypeDefinition parent)
-        {
-            Set(ref this.type, type);
-            this.parent = parent;
-        }
+        public BaseType(TypeReference type) => Set(ref this.type, type);
 
         private TypeReference type;
         public TypeReference Type
@@ -27,26 +22,13 @@ namespace CSharpE.Syntax.Internals
             get
             {
                 if (type == null)
-                {
                     type = new NamedTypeReference(syntax.Type, this);
-                }
 
                 return type;
             }
         }
 
-        private TypeDefinition parent;
-        internal override SyntaxNode Parent
-        {
-            get => parent;
-            set
-            {
-                if (value is TypeDefinition typeDefinition)
-                    parent = typeDefinition;
-                else
-                    throw new ArgumentException(nameof(value));
-            }
-        }
+        internal override SyntaxNode Parent { get; set; }
 
         BaseTypeSyntax ISyntaxWrapper<BaseTypeSyntax>.GetWrapped(ref bool? changed)
         {
@@ -70,12 +52,10 @@ namespace CSharpE.Syntax.Internals
         
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            throw new NotImplementedException();
+            syntax = (BaseTypeSyntax)newSyntax;
+            Set(ref type, null);
         }
 
-        internal override SyntaxNode Clone()
-        {
-            throw new NotImplementedException();
-        }
+        internal override SyntaxNode Clone() => new BaseType(Type);
     }
 }

@@ -73,7 +73,8 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            throw new System.NotImplementedException();
+            Init((ParameterSyntax)newSyntax);
+            Set(ref type, null);
         }
 
         internal override SyntaxNode Clone() => new Parameter(Type, Name);

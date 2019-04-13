@@ -60,34 +60,64 @@ namespace CSharpE.Transform.VisualStudio
 
             var transformations = new List<ITransformation>();
 
-            // TODO: handle other reference kinds
-            foreach (PortableExecutableReference reference in RoslynCompilation.References)
+            foreach (var reference in RoslynCompilation.References)
             {
                 var referenceSymbol = (IAssemblySymbol)RoslynCompilation.GetAssemblyOrModuleSymbol(reference);
                 var transformationTypes = GetAllTypesVisitor.FindTypes(
-                    referenceSymbol.GlobalNamespace, type => type.TypeKind != TypeKind.Interface && !type.IsAbstract && type.AllInterfaces.Contains(iTransformation));
+                    referenceSymbol.GlobalNamespace,
+                    type => type.TypeKind != TypeKind.Interface && !type.IsAbstract && type.AllInterfaces.Contains(iTransformation));
 
                 if (!transformationTypes.Any())
                     continue;
 
                 Assembly assembly;
 
-                try
+                switch (reference)
                 {
-                    assembly = System.Reflection.Assembly.LoadFrom(reference.FilePath);
-                }
-                catch (Exception ex)
-                {
-                    // TODO: produce error
-                    return null;
-                }
+                    case PortableExecutableReference peReference:
 
-                foreach (var symbol in transformationTypes)
-                {
-                    var type = assembly.GetType(symbol.GetFullMetadataName());
-                    var instance = (ITransformation)Activator.CreateInstance(type);
+                        try
+                        {
+                            assembly = System.Reflection.Assembly.LoadFrom(peReference.FilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            // TODO: produce error
+                            return null;
+                        }
 
-                    transformations.Add(instance);
+                        foreach (var symbol in transformationTypes)
+                        {
+                            var type = assembly.GetType(symbol.GetFullMetadataName());
+                            var instance = (ITransformation)Activator.CreateInstance(type);
+
+                            transformations.Add(instance);
+                        }
+                        break;
+                    case CSharpCompilationReference compilationReference:
+                        var memoryStream = new MemoryStream();
+                        var emitResult = compilationReference.Compilation.Emit(memoryStream);
+
+                        if (!emitResult.Success)
+                        {
+                            // TODO: produce error?
+                            return null;
+                        }
+
+                        memoryStream.Position = 0;
+
+                        try
+                        {
+                            assembly = System.Reflection.Assembly.Load(memoryStream.ToArray());
+                        }
+                        catch (Exception ex)
+                        {
+                            // TODO: produce error
+                            return null;
+                        }
+                        break;
+                    default:
+                        throw new InvalidOperationException();
                 }
             }
 

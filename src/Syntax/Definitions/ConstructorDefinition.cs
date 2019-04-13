@@ -99,9 +99,6 @@ namespace CSharpE.Syntax
             Set(ref body, null);
         }
 
-        internal override SyntaxNode Clone()
-        {
-            throw new NotImplementedException();
-        }
+        internal override SyntaxNode Clone() => new ConstructorDefinition(Modifiers, Parameters, Body.Statements);
     }
 }

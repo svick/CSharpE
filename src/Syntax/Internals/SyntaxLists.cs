@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax.Internals
 {
-    internal sealed class NamespaceOrTypeList : SyntaxList<NamespaceOrTypeDefinition, MemberDeclarationSyntax>
+    internal sealed class NamespaceOrTypeList : SyntaxList<ISyntaxWrapper<MemberDeclarationSyntax>, MemberDeclarationSyntax>
     {
         internal NamespaceOrTypeList(SyntaxNode parent) : base(parent) { }
         internal NamespaceOrTypeList(IEnumerable<NamespaceOrTypeDefinition> list, SyntaxNode parent)
-            : base(list, parent) { }
+            : base(list.Select(x => x.NamespaceOrType), parent) { }
         internal NamespaceOrTypeList(SyntaxList<MemberDeclarationSyntax> syntaxList, SyntaxNode parent)
             : base(syntaxList, parent) { }
 
-        protected override NamespaceOrTypeDefinition CreateWrapper(MemberDeclarationSyntax roslynSyntax)
+        protected override ISyntaxWrapper<MemberDeclarationSyntax> CreateWrapper(MemberDeclarationSyntax roslynSyntax)
         {
             if (roslynSyntax is NamespaceDeclarationSyntax ns)
                 return new NamespaceDefinition(ns, Parent);

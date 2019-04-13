@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CSharpE.Syntax
 {
-    public static class SyntaxFactory
+    public static partial class SyntaxFactory
     {
         #region General
 
@@ -14,8 +14,6 @@ namespace CSharpE.Syntax
             new NamedTypeReference(
                 openGenericType.Namespace, openGenericType.Container, openGenericType.Name, typeParameters);
         
-        public static Parameter Parameter(TypeReference type, string name) => new Parameter(type, name);
-
         #endregion
 
         #region Expressions
@@ -43,29 +41,11 @@ namespace CSharpE.Syntax
         
         public static StringLiteralExpression Literal(string value) => new StringLiteralExpression(value);
         
-        public static ThisExpression This() => new ThisExpression();
-        
-        public static AwaitExpression Await(Expression operand) => new AwaitExpression(operand);
-        
-        public static ThrowExpression Throw(Expression operand) => new ThrowExpression(operand);
-        
-        public static IdentifierExpression Identifier(string identifier) => new IdentifierExpression(identifier);
-
-        public static NullExpression Null => new NullExpression();
-        
         public static BoolLiteralExpression True => new BoolLiteralExpression(true);
         
         public static BoolLiteralExpression False => new BoolLiteralExpression(false);
 
-        public static LogicalAndExpression LogicalAnd(Expression left, Expression right) => new LogicalAndExpression(left, right);
-
-        public static AsExpression As(Expression left, TypeReference right) => new AsExpression(left, right);
-
-        public static AssignmentExpression Assignment(Expression left, Expression right) => new AssignmentExpression(left, right);
-
         public static TupleExpression Tuple(params Expression[] expressions) => new TupleExpression(expressions);
-
-        public static TupleExpression Tuple(IEnumerable<Expression> expressions) => new TupleExpression(expressions);
 
         #endregion
 
@@ -88,20 +68,11 @@ namespace CSharpE.Syntax
             IEnumerable<Statement> tryStatements, IEnumerable<Statement> finallyStatements) =>
             new TryStatement(tryStatements, finallyStatements);
 
-        public static IfStatement If(Expression condition, IEnumerable<Statement> thenStatements) =>
-            new IfStatement(condition, thenStatements);
-
         public static IfStatement If(Expression condition, params Statement[] thenStatements) =>
             new IfStatement(condition, thenStatements);
         
-        public static ReturnStatement Return() => new ReturnStatement();
-        
-        public static ReturnStatement Return(Expression expression) => new ReturnStatement(expression);
-        
         public static BlockStatement Block(params Statement[] statements) => new BlockStatement(statements);
         
-        public static BlockStatement Block(IEnumerable<Statement> statements) => new BlockStatement(statements);
-
         #endregion
     }
 }

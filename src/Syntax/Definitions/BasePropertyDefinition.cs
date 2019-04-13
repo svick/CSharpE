@@ -78,7 +78,8 @@ namespace CSharpE.Syntax
             set
             {
                 Set(ref getAccessor, value);
-                getAccessor.Kind = SyntaxKind.GetAccessorDeclaration;
+                if (getAccessor != null)
+                    getAccessor.Kind = SyntaxKind.GetAccessorDeclaration;
                 getAccessorSet = true;
             }
         }
@@ -105,7 +106,8 @@ namespace CSharpE.Syntax
             set
             {
                 Set(ref setAccessor, value);
-                setAccessor.Kind = SyntaxKind.SetAccessorDeclaration;
+                if (setAccessor != null)
+                    setAccessor.Kind = SyntaxKind.SetAccessorDeclaration;
                 setAccessorSet = true;
             }
         }

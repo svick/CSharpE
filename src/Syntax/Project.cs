@@ -50,7 +50,8 @@ namespace CSharpE.Syntax
                 // TODO: handle other reference kinds
                 compilation.References
                     .Select(reference => new AssemblyReference(((PortableExecutableReference)reference).FilePath))
-                    .ToList<LibraryReference>()) { }
+                    .ToList<LibraryReference>(),
+                compilation) { }
 
         internal Project(IEnumerable<SourceFile> sourceFiles, IEnumerable<LibraryReference> references, CSharpCompilation compilation)
         {

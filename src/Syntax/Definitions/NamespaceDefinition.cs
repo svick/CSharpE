@@ -25,6 +25,15 @@ namespace CSharpE.Syntax
             Name = syntax.Name.ToString();
         }
 
+        public NamespaceDefinition(string name, params NamespaceOrTypeDefinition[] members)
+            : this(name, members.AsEnumerable()) { }
+
+        public NamespaceDefinition(string name, IEnumerable<NamespaceOrTypeDefinition> members)
+        {
+            Name = name;
+            this.members = new NamespaceOrTypeList(members, this);
+        }
+
         // TODO: cache NameSyntax
         public string Name { get; set; }
 
@@ -36,7 +45,8 @@ namespace CSharpE.Syntax
                 if (members == null)
                     members = new NamespaceOrTypeList(syntax.Members, this);
 
-                return members;
+                return ProjectionList.Create(
+                    members, member => new NamespaceOrTypeDefinition(member), notd => notd.NamespaceOrType);
             }
             set => SetList(ref members, new NamespaceOrTypeList(value, this));
         }
@@ -86,9 +96,6 @@ namespace CSharpE.Syntax
             throw new NotImplementedException();
         }
 
-        internal override SyntaxNode Clone()
-        {
-            throw new NotImplementedException();
-        }
+        internal override SyntaxNode Clone() => new NamespaceDefinition(Name, Members);
     }
 }

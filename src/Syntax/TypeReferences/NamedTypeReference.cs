@@ -55,7 +55,7 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        private NamedTypeReference(INamedTypeSymbol symbol) => Resolve(symbol);
+        public NamedTypeReference(INamedTypeSymbol symbol) => Resolve(symbol);
 
         private void Resolve()
         {
@@ -94,7 +94,9 @@ namespace CSharpE.Syntax
             }
             else
             {
-                syntaxNamespace = symbol.ContainingNamespace?.ToDisplayString();
+                syntaxNamespace = symbol.ContainingNamespace?.IsGlobalNamespace == true
+                    ? string.Empty
+                    : symbol.ContainingNamespace?.ToDisplayString();
                 container = symbol.ContainingType == null ? null : new NamedTypeReference(symbol.ContainingType);
                 syntaxName = symbol.Name;
                 isKnownType = true;
@@ -260,6 +262,10 @@ namespace CSharpE.Syntax
                 return syntax;
             }
 
+            // TODO: don't add the namespace we're currently in
+            if (RequiresUsingNamespace)
+                SourceFile?.EnsureUsingNamespace(Namespace);
+
             var newNamespace = ns ?? syntaxNamespace;
             var newContainer = container?.GetWrapped(ref thisChanged);
             var newName = name ?? syntaxName;
@@ -267,9 +273,6 @@ namespace CSharpE.Syntax
             if (syntax == null || thisChanged == true || newNamespace != syntaxNamespace || newName != syntaxName ||
                 !IsAnnotated(syntax))
             {
-                if (RequiresUsingNamespace)
-                    SourceFile?.EnsureUsingNamespace(Namespace);
-
                 var predefinedType = GetPredefinedType();
                 if (predefinedType != null)
                 {

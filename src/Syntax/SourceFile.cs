@@ -68,11 +68,10 @@ namespace CSharpE.Syntax
             get
             {
                 if (members == null)
-                {
                     members = new NamespaceOrTypeList(syntax.GetCompilationUnitRoot().Members, this);
-                }
 
-                return members;
+                return ProjectionList.Create(
+                    members, member => new NamespaceOrTypeDefinition(member), notd => notd.NamespaceOrType);
             }
             set => SetList(ref members, new NamespaceOrTypeList(value, this));
         }
@@ -147,6 +146,9 @@ namespace CSharpE.Syntax
 
         internal void EnsureUsingNamespace(string ns)
         {
+            if (string.IsNullOrEmpty(ns))
+                return;
+
             foreach (var recorder in usingNamespaceRecorders)
             {
                 recorder.Record(ns);
@@ -219,9 +221,14 @@ namespace CSharpE.Syntax
                             ns => RoslynSyntaxFactory.UsingDirective(RoslynSyntaxFactory.ParseName(ns))));
                 }
 
+                // Compilation requires the same LanguageVersion on all SyntaxTrees
+                var parseOptions = Project?.compilation == null
+                    ? null
+                    : new CSharpParseOptions(Project.compilation.LanguageVersion);
+
                 syntax = RoslynSyntaxFactory.SyntaxTree(
                     RoslynSyntaxFactory.CompilationUnit(default, newUsings, default, newMembers).NormalizeWhitespace(),
-                    path: Path);
+                    parseOptions, Path);
 
                 additionalNamespaces.Clear();
 

@@ -94,9 +94,12 @@ namespace CSharpE.Syntax
                         syntax.BaseList?.Types ?? default, this);
 
                 return ProjectionList.Create(
-                    baseTypes, baseType => baseType.Type, reference => new BaseType(reference, this));
+                    baseTypes, baseType => baseType.Type, reference => new BaseType(reference));
             }
-            set => ProjectionList.Set(baseTypes, reference => new BaseType(reference, this), value);
+            set => SetList(
+                ref baseTypes,
+                new SeparatedSyntaxList<BaseType, BaseTypeSyntax>(
+                    value.Select(reference => new BaseType(reference)), this));
         }
 
         private MemberList members;
@@ -136,6 +139,12 @@ namespace CSharpE.Syntax
             set => FilteredList.Set(MembersList, method => method.IsPublic, value);
         }
 
+        public IList<ConstructorDefinition> Constructors
+        {
+            get => FilteredList.Create<MemberDefinition, ConstructorDefinition>(MembersList);
+            set => FilteredList.Set(MembersList, value);
+        }
+
         public IList<TypeDefinition> Types
         {
             get => FilteredList.Create<MemberDefinition, TypeDefinition>(MembersList);
@@ -146,10 +155,8 @@ namespace CSharpE.Syntax
             MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null)
         {
             var field = new FieldDefinition(modifiers, type, name, initializer);
-            this.Members.Add(field);
 
-            // TODO: SyntaxList will probably have to notify its parent, so that it can set ContainingType of the child
-            field.Parent = this;
+            Members.Add(field);
 
             return field;
         }
@@ -167,9 +174,7 @@ namespace CSharpE.Syntax
             if (!getOnly)
                 property.SetAccessor = new AccessorDefinition();
             
-            this.Members.Add(property);
-
-            property.Parent = this;
+            Members.Add(property);
 
             return property;
         }
@@ -185,9 +190,7 @@ namespace CSharpE.Syntax
         {
             var method = new MethodDefinition(modifiers, returnType, name, parameters, body);
             
-            this.Members.Add(method);
-
-            method.Parent = this;
+            Members.Add(method);
 
             return method;
         }
@@ -197,18 +200,13 @@ namespace CSharpE.Syntax
         {
             var constructor = new ConstructorDefinition(modifiers, parameters, body);
             
-            this.Members.Add(constructor);
-
-            constructor.Parent = this;
+            Members.Add(constructor);
 
             return constructor;
         }
 
         public static implicit operator NamedTypeReference(TypeDefinition typeDefinition) =>
             typeDefinition.GetReference();
-
-        // TODO: namespace
-        public NamedTypeReference GetReference() => new NamedTypeReference(null, Name);
 
         private protected abstract SyntaxKind KeywordKind { get; }
 
@@ -257,16 +255,11 @@ namespace CSharpE.Syntax
             SetList(ref members, null);
         }
 
-        internal override SyntaxNode Clone()
-        {
-            throw new NotImplementedException();
-        }
-
         internal override IEnumerable<SyntaxNode> GetChildren() =>
             Attributes.Concat<SyntaxNode>(BaseTypes).Concat(Members);
     }
 
-    public sealed class ClassDefinition : TypeDefinition, ISyntaxWrapper<ClassDeclarationSyntax>
+    public sealed class ClassDefinition : TypeDefinition
     {
         internal ClassDefinition(ClassDeclarationSyntax classDeclarationSyntax, SyntaxNode parent)
             : base(classDeclarationSyntax, parent) { }
@@ -307,11 +300,10 @@ namespace CSharpE.Syntax
             set => Modifiers = Modifiers.With(Static, value);
         }
 
-        ClassDeclarationSyntax ISyntaxWrapper<ClassDeclarationSyntax>.GetWrapped(ref bool? changed) =>
-            (ClassDeclarationSyntax)GetWrapped(ref changed);
+        internal override SyntaxNode Clone() => new ClassDefinition(Modifiers, Name, Members) { Attributes = Attributes };
     }
 
-    public sealed class StructDefinition : TypeDefinition, ISyntaxWrapper<StructDeclarationSyntax>
+    public sealed class StructDefinition : TypeDefinition
     {
         internal StructDefinition(StructDeclarationSyntax structDeclarationSyntax, SyntaxNode parent)
             : base(structDeclarationSyntax, parent) { }
@@ -333,11 +325,10 @@ namespace CSharpE.Syntax
                 throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a struct.", nameof(value));
         }
 
-        StructDeclarationSyntax ISyntaxWrapper<StructDeclarationSyntax>.GetWrapped(ref bool? changed) =>
-            (StructDeclarationSyntax)GetWrapped(ref changed);
+        internal override SyntaxNode Clone() => new StructDefinition(Modifiers, Name, Members) { Attributes = Attributes };
     }
 
-    public sealed class InterfaceDefinition : TypeDefinition, ISyntaxWrapper<InterfaceDeclarationSyntax>
+    public sealed class InterfaceDefinition : TypeDefinition
     {
         internal InterfaceDefinition(InterfaceDeclarationSyntax interfaceDeclarationSyntax, SyntaxNode parent)
             : base(interfaceDeclarationSyntax, parent) { }
@@ -359,7 +350,6 @@ namespace CSharpE.Syntax
                 throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for an interface.", nameof(value));
         }
 
-        InterfaceDeclarationSyntax ISyntaxWrapper<InterfaceDeclarationSyntax>.GetWrapped(ref bool? changed) =>
-            (InterfaceDeclarationSyntax)GetWrapped(ref changed);
+        internal override SyntaxNode Clone() => new InterfaceDefinition(Modifiers, Name, Members) { Attributes = Attributes };
     }
 }

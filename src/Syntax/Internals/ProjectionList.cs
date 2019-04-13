@@ -12,14 +12,6 @@ namespace CSharpE.Syntax.Internals
         {
             return new ProjectionList<TSource, TTarget>(sourceList, projection, reverseProjection);
         }
-
-        public static void Set<TSource, TTarget>(
-            IList<TSource> sourceList, Func<TTarget, TSource> reverseProjection, IList<TTarget> values)
-        {
-            sourceList.Clear();
-            var projectionList = Create(sourceList, null, reverseProjection);
-            projectionList.AddRange(values);
-        }
     }
 
     // PERF: this type is currently mostly not optimized.
