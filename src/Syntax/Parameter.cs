@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
+using static CSharpE.Syntax.ParameterModifiers;
 
 namespace CSharpE.Syntax
 {
@@ -18,17 +19,53 @@ namespace CSharpE.Syntax
         private void Init(ParameterSyntax syntax)
         {
             this.syntax = syntax;
+            Modifiers = FromRoslyn.ParameterModifiers(syntax.Modifiers);
             name = new Identifier(syntax.Identifier);
         }
 
-        public Parameter(TypeReference type, string name)
+        public Parameter(TypeReference type, string name) : this(None, type, name) { }
+
+        public Parameter(ParameterModifiers modifiers, TypeReference type, string name)
         {
+            Modifiers = modifiers;
             Type = type;
             Name = name;
         }
 
-        // TODO: modifiers, default, attributes
-        
+        // TODO: default, attributes
+
+        public ParameterModifiers Modifiers { get; set; }
+
+        public bool IsRef
+        {
+            get => Modifiers.Contains(Ref);
+            set => Modifiers = Modifiers.With(Ref, value);
+        }
+
+        public bool IsOut
+        {
+            get => Modifiers.Contains(Out);
+            set => Modifiers = Modifiers.With(Out, value);
+        }
+
+        public bool IsIn
+        {
+            get => Modifiers.Contains(In);
+            set => Modifiers = Modifiers.With(In, value);
+        }
+
+        public bool IsThis
+        {
+            get => Modifiers.Contains(This);
+            set => Modifiers = Modifiers.With(This, value);
+        }
+
+        public bool IsParams
+        {
+            get => Modifiers.Contains(Params);
+            set => Modifiers = Modifiers.With(Params, value);
+        }
+
         private TypeReference type;
         public TypeReference Type
         {
@@ -59,12 +96,12 @@ namespace CSharpE.Syntax
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
             var newName = name.GetWrapped(ref thisChanged);
 
-            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || Modifiers != FromRoslyn.ParameterModifiers(syntax.Modifiers) || !IsAnnotated(syntax))
             {
-                var newSyntax = RoslynSyntaxFactory.Parameter(default, default, newType, newName, default);
+                var newSyntax = RoslynSyntaxFactory.Parameter(default, Modifiers.GetWrapped(), newType, newName, default);
 
                 syntax = Annotate(newSyntax);
-                
+
                 SetChanged(ref changed);
             }
 
@@ -77,7 +114,7 @@ namespace CSharpE.Syntax
             Set(ref type, null);
         }
 
-        internal override SyntaxNode Clone() => new Parameter(Type, Name);
+        internal override SyntaxNode Clone() => new Parameter(Modifiers, Type, Name);
 
         internal override SyntaxNode Parent { get; set; }
     }

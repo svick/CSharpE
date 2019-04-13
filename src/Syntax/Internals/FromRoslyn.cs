@@ -337,6 +337,18 @@ namespace CSharpE.Syntax.Internals
             return result;
         }
 
+        public static ParameterModifiers ParameterModifiers(SyntaxTokenList modifiers)
+        {
+            ParameterModifiers result = 0;
+
+            foreach (var modifier in modifiers)
+            {
+                result |= ParameterModifiersExtensions.ModifiersMapping[modifier.Kind()];
+            }
+
+            return result;
+        }
+
         public static bool IsCompacted(CSharpSyntaxNode syntaxNode)
         {
             switch (syntaxNode)
