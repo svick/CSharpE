@@ -32,6 +32,10 @@ namespace CSharpE.SyntaxFactory
                 if (!classDefinition.GetSymbol().HasBaseClass<SyntaxNode>())
                     continue;
 
+                // requires manually written SyntaxFactory methods
+                if (classDefinition.Name == nameof(MemberAccessExpression))
+                    continue;
+
                 var typeReference = classDefinition.GetReference();
 
                 foreach (var constructor in classDefinition.Constructors)
@@ -41,8 +45,6 @@ namespace CSharpE.SyntaxFactory
 
                     string methodName = typeReference.Name.TrimEnd("Expression").TrimEnd("Statement").TrimEnd("Reference");
 
-                    // TODO: fix params
-                    // TODO: somehow remove special cases
                     syntaxFactory.AddMethod(
                         Public | Static, typeReference, methodName, constructor.Parameters,
                         new ReturnStatement(

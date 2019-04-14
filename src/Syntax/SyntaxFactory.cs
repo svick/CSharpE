@@ -33,10 +33,6 @@ namespace CSharpE.Syntax
         public static MemberAccessExpression MemberAccess(this Expression expression, string memberName) =>
             new MemberAccessExpression(expression, memberName);
 
-        public static NewExpression New(TypeReference type, params Expression[] arguments) => new NewExpression(type, arguments);
-
-        public static NewExpression New(TypeReference type, IEnumerable<Expression> arguments) => new NewExpression(type, arguments);
-
         public static IntLiteralExpression Literal(int value) => new IntLiteralExpression(value);
         
         public static StringLiteralExpression Literal(string value) => new StringLiteralExpression(value);
