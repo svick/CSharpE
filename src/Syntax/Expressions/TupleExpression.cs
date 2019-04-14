@@ -18,13 +18,12 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
+        public TupleExpression(params Expression[] expressions) : this(expressions.AsEnumerable()) { }
+
         public TupleExpression(IEnumerable<Expression> expressions)
             : this(expressions?.Select(e => (Argument)e)) { }
 
-        public TupleExpression(IEnumerable<Argument> arguments)
-        {
-            Arguments = arguments?.ToList();
-        }
+        public TupleExpression(IEnumerable<Argument> arguments) => Arguments = arguments?.ToList();
 
         private SeparatedSyntaxList<Argument, ArgumentSyntax> arguments;
         public IList<Argument> Arguments

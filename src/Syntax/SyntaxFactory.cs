@@ -25,11 +25,9 @@ namespace CSharpE.Syntax
         
         public static StringLiteralExpression Literal(string value) => new StringLiteralExpression(value);
         
-        public static BoolLiteralExpression True => new BoolLiteralExpression(true);
+        public static BoolLiteralExpression True() => new BoolLiteralExpression(true);
         
-        public static BoolLiteralExpression False => new BoolLiteralExpression(false);
-
-        public static TupleExpression Tuple(params Expression[] expressions) => new TupleExpression(expressions);
+        public static BoolLiteralExpression False() => new BoolLiteralExpression(false);
 
         #endregion
 
@@ -52,11 +50,6 @@ namespace CSharpE.Syntax
             IEnumerable<Statement> tryStatements, IEnumerable<Statement> finallyStatements) =>
             new TryStatement(tryStatements, finallyStatements);
 
-        public static IfStatement If(Expression condition, params Statement[] thenStatements) =>
-            new IfStatement(condition, thenStatements);
-        
-        public static BlockStatement Block(params Statement[] statements) => new BlockStatement(statements);
-        
         #endregion
     }
 }

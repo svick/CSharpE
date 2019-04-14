@@ -33,8 +33,14 @@ namespace CSharpE.SyntaxFactory
                     continue;
 
                 // requires manually written SyntaxFactory methods
-                if (classDefinition.Name == nameof(MemberAccessExpression))
-                    continue;
+                switch (classDefinition.Name) {
+                    case nameof(MemberAccessExpression):
+                    case nameof(IntLiteralExpression):
+                    case nameof(StringLiteralExpression):
+                    case nameof(BoolLiteralExpression):
+                    case nameof(TryStatement):
+                        continue;
+                }
 
                 var typeReference = classDefinition.GetReference();
 

@@ -17,6 +17,8 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
+        public BlockStatement(params Statement[] statements) : this(statements.AsEnumerable()) { }
+
         public BlockStatement(IEnumerable<Statement> statements) =>
             this.statements = new StatementList(statements, this);
 

@@ -17,6 +17,8 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
+        public IfStatement(Expression condition, params Statement[] thenStatements) : this(condition, thenStatements.AsEnumerable()) { }
+
         public IfStatement(Expression condition, IEnumerable<Statement> thenStatements)
         {
             Condition = condition;

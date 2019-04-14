@@ -80,9 +80,9 @@ namespace CSharpE.Extensions.Record
                         var equalsStatements = new Statement[]
                         {
                             If(NamedType(typeof(object)).Call(nameof(ReferenceEquals), other, Null()),
-                                Return(False)),
+                                Return(False())),
                             If(NamedType(typeof(object)).Call(nameof(ReferenceEquals), other, This()),
-                                Return(True)),
+                                Return(True())),
                             Return(comparisons)
                         };
 
