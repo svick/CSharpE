@@ -18,6 +18,9 @@ namespace CSharpE.Syntax
 
         internal SourceFile SourceFile => this is SourceFile sourceFile ? sourceFile : Parent?.SourceFile;
 
+        internal BaseTypeDefinition EnclosingType =>
+            this is BaseTypeDefinition typeDefinition ? typeDefinition : Parent?.EnclosingType;
+
         // local cached syntax might not be part of the tree, so it won't have correct Span
         internal TextSpan Span => GetSourceFileNode().Span;
 

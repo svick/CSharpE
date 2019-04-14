@@ -239,7 +239,10 @@ namespace CSharpE.Syntax
 
         public string FullName => ComputeFullName(new StringBuilder()).ToString();
 
-        public bool RequiresUsingNamespace => IsKnownType && Namespace != null && !IsPredefinedType;
+        private static bool IsAncestorNamespace(string parent, string child) => parent == child || child.StartsWith(parent + '.');
+
+        public bool RequiresUsingNamespace => IsKnownType && Namespace != null && !IsPredefinedType &&
+                                              !IsAncestorNamespace(Namespace, EnclosingType.GetNamespace());
 
         public static implicit operator NamedTypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 

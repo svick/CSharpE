@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -44,5 +46,32 @@ namespace CSharpE.Syntax
             (INamedTypeSymbol)SourceFile.SemanticModel.GetDeclaredSymbol(GetSourceFileNode());
 
         public NamedTypeReference GetReference() => new NamedTypeReference(GetSymbol());
+
+        internal string GetNamespace()
+        {
+            var namespaceParts = new List<string>();
+
+            SyntaxNode node = this;
+
+            while (node != null)
+            {
+                switch (node)
+                {
+                    case BaseTypeDefinition typeDefinition:
+                        node = node.Parent;
+                        break;
+                    case NamespaceDefinition namespaceDefinition:
+                        namespaceParts.Add(namespaceDefinition.Name);
+                        node = node.Parent;
+                        break;
+                    case SourceFile _:
+                        return string.Join(".", namespaceParts.Reverse<string>());
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+
+            return null;
+        }
     }
 }
