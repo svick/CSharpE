@@ -16,6 +16,9 @@ namespace CSharpE.Syntax
     {
         private TypeSyntax syntax;
 
+        public NamedTypeReference(NamedTypeReference openGenericType, params TypeReference[] typeParameters) 
+            : this(openGenericType.Namespace, openGenericType.Container, openGenericType.Name, typeParameters) { }
+
         public NamedTypeReference(string ns, string name, params TypeReference[] typeParameters)
             : this(ns, name, typeParameters.AsEnumerable()) { }
 

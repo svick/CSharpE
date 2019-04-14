@@ -17,7 +17,7 @@ namespace CSharpE.Extensions.Record
                 if (!(baseType is TypeDefinition typeDefinition))
                     return;
                 
-                typeDefinition.BaseTypes.Add(TypeReference(typeof(IEquatable<>), typeDefinition));
+                typeDefinition.BaseTypes.Add(NamedType(typeof(IEquatable<>), typeDefinition));
                 
                 var fieldsList = Smart.ForEach(typeDefinition.Fields, field =>
                 {
@@ -72,16 +72,16 @@ namespace CSharpE.Extensions.Record
 
                         // EqualityComparer<T>.Default.Equals(this.F1, other.F1) && ...
                         var comparisons = fields
-                            .Select(f => TypeReference(typeof(EqualityComparer<>), f.Type)
+                            .Select(f => NamedType(typeof(EqualityComparer<>), f.Type)
                                 .MemberAccess(nameof(EqualityComparer<object>.Default))
                                 .Call(nameof(EqualityComparer<object>.Equals), This().MemberAccess(f.Name), other.MemberAccess(f.Name)))
                             .Aggregate<Expression>(LogicalAnd);
 
                         var equalsStatements = new Statement[]
                         {
-                            If(TypeReference(typeof(object)).Call(nameof(ReferenceEquals), other, Null()),
+                            If(NamedType(typeof(object)).Call(nameof(ReferenceEquals), other, Null()),
                                 Return(False)),
-                            If(TypeReference(typeof(object)).Call(nameof(ReferenceEquals), other, This()),
+                            If(NamedType(typeof(object)).Call(nameof(ReferenceEquals), other, This()),
                                 Return(True)),
                             Return(comparisons)
                         };

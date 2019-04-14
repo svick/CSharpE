@@ -1,21 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CSharpE.Syntax
 {
     public static partial class SyntaxFactory
     {
-        #region General
-
-        public static NamedTypeReference TypeReference(Type type) => type;
-
-        public static NamedTypeReference TypeReference(
-            NamedTypeReference openGenericType, params TypeReference[] typeParameters) =>
-            new NamedTypeReference(
-                openGenericType.Namespace, openGenericType.Container, openGenericType.Name, typeParameters);
-        
-        #endregion
-
         #region Expressions
 
         public static InvocationExpression Call(this Expression receiver, string methodName, params Expression[] arguments) =>

@@ -16,7 +16,7 @@ namespace CSharpE.Extensions.Logging
                 {
                     if (method.Body != null)
                     {
-                        Statement loggingStatement = TypeReference(typeof(Console))
+                        Statement loggingStatement = NamedType(typeof(Console))
                             .Call(nameof(Console.WriteLine), BuildWriteLineParameters(method));
 
                         method.Body = Block(loggingStatement, method.Body);

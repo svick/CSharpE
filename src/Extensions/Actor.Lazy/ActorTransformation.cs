@@ -23,7 +23,7 @@ namespace CSharpE.Extensions.Actor
 
                 Smart.ForEach(type.PublicMethods, actorSemaphoreFieldExpression, (asf, method) =>
                 {
-                    method.ReturnType = TypeReference(typeof(Task<>), method.ReturnType);
+                    method.ReturnType = NamedType(typeof(Task<>), method.ReturnType);
                     method.IsAsync = true;
 
                     method.Body.Statements = new Statement[]

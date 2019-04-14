@@ -23,7 +23,7 @@ namespace CSharpE.Extensions.Actor
 
                 foreach (var method in type.PublicMethods)
                 {
-                    method.ReturnType = TypeReference(typeof(Task<>), method.ReturnType);
+                    method.ReturnType = NamedType(typeof(Task<>), method.ReturnType);
                     method.IsAsync = true;
 
                     method.Body.Statements = new Statement[]
