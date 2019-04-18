@@ -4,8 +4,10 @@ using System.Linq;
 using CSharpE.Syntax;
 using CSharpE.Syntax.Internals;
 using CSharpE.Transform.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Roslyn = Microsoft.CodeAnalysis;
+using SyntaxNode = CSharpE.Syntax.SyntaxNode;
 
 namespace CSharpE.Transform.Transformers
 {
@@ -106,8 +108,35 @@ namespace CSharpE.Transform.Transformers
             return AddNamespacesToDiffer(input => () =>
             {
                 var afterSyntax = input.GetWrapped();
-                return nextInput => nextInput.SetSyntax(afterSyntax);
+                return nextInput =>
+                    nextInput.SetSyntax(TranslateAnnotations(beforeSyntax, nextInput.GetWrapped(), afterSyntax));
             });
+        }
+
+        private static Roslyn::SyntaxNode TranslateAnnotations(
+            Roslyn::SyntaxNode beforeSyntax, Roslyn::SyntaxNode newBeforeSyntax, Roslyn::SyntaxNode afterSyntax)
+        {
+            var annotationMap = new Dictionary<SyntaxAnnotation, SyntaxAnnotation>();
+
+            var nodePairs = beforeSyntax.DescendantNodesAndSelf().Zip(newBeforeSyntax.DescendantNodesAndSelf());
+
+            foreach (var (beforeNode, newBeforeNode) in nodePairs)
+            {
+                var newAnnotation = Annotation.Get(newBeforeNode);
+                if (newAnnotation == null)
+                    continue;
+
+                var oldAnnotation = Annotation.Get(beforeNode);
+
+                annotationMap.Add(oldAnnotation, newAnnotation);
+            }
+
+            return afterSyntax.ReplaceNodes(
+                afterSyntax.DescendantNodesAndSelf().Where(n => Annotation.Get(n) != null), (_, n) =>
+                {
+                    var annotation = Annotation.Get(n);
+                    return n.WithoutAnnotations(annotation).WithAdditionalAnnotations(annotationMap[annotation]);
+                });
         }
 
         private static Func<TInput, Func<Action<TInput>>> AddNamespacesToDiffer(Func<TInput, Func<Action<TInput>>> differ)

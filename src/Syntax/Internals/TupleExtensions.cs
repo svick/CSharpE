@@ -20,5 +20,8 @@ namespace CSharpE.Syntax.Internals
         public static IEnumerable<TResult> Select<TKey, TValue, TResult>(
             this IEnumerable<KeyValuePair<TKey, TValue>> source, Func<TKey, TValue, TResult> selector)
             => source.Select(kvp => selector(kvp.Key, kvp.Value));
+
+        public static IEnumerable<(T1, T2)> Zip<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second) =>
+            first.Zip(second, (x, y) => (x, y));
     }
 }
