@@ -12,6 +12,6 @@ namespace CSharpE.Syntax.Internals
             this.semanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
 
         internal INamedTypeSymbol Resolve(TypeSyntax typeSyntax) =>
-            (INamedTypeSymbol)semanticModel.GetSymbolInfo(typeSyntax).Symbol;
+            (INamedTypeSymbol)(semanticModel.GetSymbolInfo(typeSyntax).Symbol ?? semanticModel.GetTypeInfo(typeSyntax).Type);
     }
 }

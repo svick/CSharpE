@@ -132,10 +132,17 @@ namespace CSharpE.Transform.Transformers
             }
 
             return afterSyntax.ReplaceNodes(
-                afterSyntax.DescendantNodesAndSelf().Where(n => Annotation.Get(n) != null), (_, n) =>
+                afterSyntax.DescendantNodesAndSelf(), (_, n) =>
                 {
-                    var annotation = Annotation.Get(n);
-                    return n.WithoutAnnotations(annotation).WithAdditionalAnnotations(annotationMap[annotation]);
+                    var oldAnnotation = Annotation.Get(n);
+
+                    if (oldAnnotation == null)
+                        return n;
+
+                    if (!annotationMap.TryGetValue(oldAnnotation, out var newAnnotation))
+                        return n;
+
+                    return n.WithoutAnnotations(oldAnnotation).WithAdditionalAnnotations(newAnnotation);
                 });
         }
 

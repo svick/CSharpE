@@ -30,7 +30,12 @@ namespace CSharpE.Syntax
             set => SetList(ref attributes, new SyntaxList<Attribute, AttributeListSyntax>(value, this));
         }
 
-        public bool HasAttribute<T>() => HasAttribute(typeof(T));
+        public Attribute GetAttribute<T>() where T : System.Attribute => GetAttribute(typeof(T));
+
+        public Attribute GetAttribute(NamedTypeReference attributeType) =>
+            Attributes.SingleOrDefault(a => a.Type.Equals(attributeType));
+
+        public bool HasAttribute<T>() where T : System.Attribute => HasAttribute(typeof(T));
 
         public bool HasAttribute(NamedTypeReference attributeType) => HasAttribute(attributeType.FullName);
 

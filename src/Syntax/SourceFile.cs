@@ -117,6 +117,9 @@ namespace CSharpE.Syntax
             return SimpleCollection.Create(this, GetAllTypes(GetTypes()));
         }
 
+        public IEnumerable<ClassDefinition> GetClassesWithAttribute<T>() where T : System.Attribute =>
+            SimpleCollection.Create(this, GetClasses().Where(type => type.HasAttribute<T>()));
+
         public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>
             SimpleCollection.Create(this, GetTypes().Where(type => type.HasAttribute<T>()));
 
