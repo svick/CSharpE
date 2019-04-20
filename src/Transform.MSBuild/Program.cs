@@ -38,8 +38,22 @@ namespace CSharpE.Transform.MSBuild
             {
                 Console.WriteLine("error");
 
-                Console.WriteLine(ex);
+                Console.WriteLine($"{ex.GetType()}: {ex.Message}");
+                Console.WriteLine(TakeLines(ex.StackTrace));
             }
+        }
+
+        static string TakeLines(string s, int linesCount = 4)
+        {
+            var lines = s.Split('\n').ToList();
+
+            if (lines.Count > linesCount)
+            {
+                lines.RemoveRange(linesCount, lines.Count - linesCount);
+                lines.Add("...");
+            }
+
+            return string.Join("\n", lines);
         }
 
         // https://github.com/dotnet/corefx/blob/778fea7/src/Common/src/System/HResults.cs#L74
