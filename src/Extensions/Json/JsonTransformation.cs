@@ -28,11 +28,11 @@ namespace CSharpE.Extensions.Json
             {
                 var jsonStringLiteral = (StringLiteralExpression)type.GetAttribute<JsonAttribute>().Arguments.Single().Expression;
 
-                var jsonObject = JsonConvert.DeserializeObject<JObject>(jsonStringLiteral.Value);
+                var jsonObject = JsonConvert.DeserializeObject<JToken>(jsonStringLiteral.Value);
 
                 var jsonBuilder = new JsonBuilder();
 
-                var jsonObjectType = jsonBuilder.GetObjectType(jsonObject);
+                var jsonObjectType = jsonBuilder.GetValueType(jsonObject);
 
                 type.Members.AddRange(jsonBuilder.ObjectTypes);
 
@@ -97,7 +97,7 @@ namespace CSharpE.Extensions.Json
 
             objectTypes.Add(classDefinition);
 
-            return classDefinition;
+            return NamedType(null, classDefinition.Name);
         }
     }
 }

@@ -205,9 +205,6 @@ namespace CSharpE.Syntax
             return constructor;
         }
 
-        public static implicit operator NamedTypeReference(TypeDefinition typeDefinition) =>
-            typeDefinition.GetReference();
-
         private protected abstract SyntaxKind KeywordKind { get; }
 
         private protected TypeDeclarationSyntax GetWrapped(ref bool? changed)

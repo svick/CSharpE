@@ -17,7 +17,7 @@ namespace CSharpE.Extensions.Record
                 if (!(baseType is TypeDefinition typeDefinition))
                     return;
                 
-                typeDefinition.BaseTypes.Add(NamedType(typeof(IEquatable<>), typeDefinition));
+                typeDefinition.BaseTypes.Add(NamedType(typeof(IEquatable<>), typeDefinition.GetReference()));
                 
                 var fieldsList = Smart.ForEach(typeDefinition.Fields, field =>
                 {
