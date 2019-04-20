@@ -250,13 +250,38 @@ namespace CSharpE.Transform.VisualStudio
 
         private CSharpCompilation CreateDesignTimeCompilation()
         {
+            ErrorSource.Instance.ClearErrors();
+
             if (Transformer == null)
                 return RoslynCompilation;
 
             Syntax.Project transformed;
-            lock (Transformer)
+
+            try
             {
-                transformed = Transformer.Transform(new Syntax.Project(RoslynCompilation));
+                lock (Transformer)
+                {
+                    transformed = Transformer.Transform(new Syntax.Project(RoslynCompilation));
+                }
+            }
+            catch (Exception e)
+            {
+                string TakeLines(string s, int linesCount = 4)
+                {
+                    var lines = s.Split('\n').ToList();
+
+                    if (lines.Count > linesCount)
+                    {
+                        lines.RemoveRange(linesCount, lines.Count - linesCount);
+                        lines.Add("...");
+                    }
+
+                    return string.Join("\n", lines);
+                }
+
+                ErrorSource.Instance.AddError("CSE001", $"{e.GetType()}: {e.Message}\n{TakeLines(e.StackTrace)}", AssemblyName);
+
+                return (CSharpCompilation)RoslynCompilation.WithEventQueue(Adjust(EventQueue));
             }
 
             return (CSharpCompilation)CSharpCompilation.Create(
@@ -416,25 +441,17 @@ namespace CSharpE.Transform.VisualStudio
         }
 
         // TODO: Adjust diagnostics
-        public override ImmutableArray<Diagnostic> GetParseDiagnostics(CancellationToken cancellationToken = new CancellationToken())
-        {
-            return DesignTimeCompilation.GetParseDiagnostics(cancellationToken);
-        }
+        public override ImmutableArray<Diagnostic> GetParseDiagnostics(CancellationToken cancellationToken = new CancellationToken()) =>
+            DesignTimeCompilation.GetParseDiagnostics(cancellationToken);
 
-        public override ImmutableArray<Diagnostic> GetDeclarationDiagnostics(CancellationToken cancellationToken = new CancellationToken())
-        {
-            return DesignTimeCompilation.GetDeclarationDiagnostics(cancellationToken);
-        }
+        public override ImmutableArray<Diagnostic> GetDeclarationDiagnostics(CancellationToken cancellationToken = new CancellationToken()) =>
+            DesignTimeCompilation.GetDeclarationDiagnostics(cancellationToken);
 
-        public override ImmutableArray<Diagnostic> GetMethodBodyDiagnostics(CancellationToken cancellationToken = new CancellationToken())
-        {
-            return DesignTimeCompilation.GetMethodBodyDiagnostics(cancellationToken);
-        }
+        public override ImmutableArray<Diagnostic> GetMethodBodyDiagnostics(CancellationToken cancellationToken = new CancellationToken()) =>
+            DesignTimeCompilation.GetMethodBodyDiagnostics(cancellationToken);
 
-        public override ImmutableArray<Diagnostic> GetDiagnostics(CancellationToken cancellationToken = new CancellationToken())
-        {
-            return DesignTimeCompilation.GetDiagnostics(cancellationToken);
-        }
+        public override ImmutableArray<Diagnostic> GetDiagnostics(CancellationToken cancellationToken = new CancellationToken()) =>
+            DesignTimeCompilation.GetDiagnostics(cancellationToken);
 
         protected override void AppendDefaultVersionResource(Stream resourceStream)
         {

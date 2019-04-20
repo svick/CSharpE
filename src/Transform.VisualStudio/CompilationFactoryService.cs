@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.VisualStudio.Composition;
+using Microsoft.VisualStudio.Shell.TableManager;
 using RoslynCompilation = Microsoft.CodeAnalysis.Compilation;
 using static CSharpE.Transform.VisualStudio.Wrapping;
 
@@ -15,7 +16,13 @@ namespace CSharpE.Transform.VisualStudio
         private readonly ExportProvider exportProvider;
 
         [ImportingConstructor]
-        public CompilationFactoryServiceFactory(ExportProvider exportProvider) => this.exportProvider = exportProvider;
+        public CompilationFactoryServiceFactory(ExportProvider exportProvider)
+        {
+            if (ErrorSource.Instance == null)
+                ErrorSource.CreateInstance(exportProvider.GetExportedValue<ITableManagerProvider>());
+
+            this.exportProvider = exportProvider;
+        }
 
         public ILanguageService CreateLanguageService(HostLanguageServices languageServices) =>
             new CompilationFactoryService(exportProvider, languageServices);
@@ -29,29 +36,19 @@ namespace CSharpE.Transform.VisualStudio
             roslynCompilationFactoryService =
                 LanguageServices.GetCSharpService<ICompilationFactoryService>(exportProvider, languageServices);
 
-        public RoslynCompilation CreateCompilation(string assemblyName, CompilationOptions options)
-        {
-            return Wrap(roslynCompilationFactoryService.CreateCompilation(assemblyName, options));
-        }
+        public RoslynCompilation CreateCompilation(string assemblyName, CompilationOptions options) =>
+            Wrap(roslynCompilationFactoryService.CreateCompilation(assemblyName, options));
 
-        public RoslynCompilation CreateSubmissionCompilation(string assemblyName, CompilationOptions options, Type hostObjectType)
-        {
-            return Wrap(roslynCompilationFactoryService.CreateSubmissionCompilation(assemblyName, options, hostObjectType));
-        }
+        public RoslynCompilation CreateSubmissionCompilation(string assemblyName, CompilationOptions options, Type hostObjectType) =>
+            Wrap(roslynCompilationFactoryService.CreateSubmissionCompilation(assemblyName, options, hostObjectType));
 
-        public RoslynCompilation GetCompilationFromCompilationReference(MetadataReference reference)
-        {
-            return Wrap(roslynCompilationFactoryService.GetCompilationFromCompilationReference(reference));
-        }
+        public RoslynCompilation GetCompilationFromCompilationReference(MetadataReference reference) =>
+            Wrap(roslynCompilationFactoryService.GetCompilationFromCompilationReference(reference));
 
-        public CompilationOptions GetDefaultCompilationOptions()
-        {
-            return roslynCompilationFactoryService.GetDefaultCompilationOptions();
-        }
+        public CompilationOptions GetDefaultCompilationOptions() =>
+            roslynCompilationFactoryService.GetDefaultCompilationOptions();
 
-        public bool IsCompilationReference(MetadataReference reference)
-        {
-            return roslynCompilationFactoryService.IsCompilationReference(reference);
-        }
+        public bool IsCompilationReference(MetadataReference reference) =>
+            roslynCompilationFactoryService.IsCompilationReference(reference);
     }
 }

@@ -47,6 +47,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ErrorSource.cs" />
     <Compile Include="Compilation.cs" />
     <Compile Include="CompilationDiff.cs" />
     <Compile Include="RoslynExtensions.cs" />
@@ -75,6 +76,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Composition">
       <Version>15.8.98</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
+      <Version>15.8.28010</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.15.8.DesignTime">
+      <Version>15.8.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
