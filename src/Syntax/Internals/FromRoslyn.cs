@@ -314,6 +314,8 @@ namespace CSharpE.Syntax.Internals
                     return new ExpressionStatement(expression, parent);
                 case IfStatementSyntax @if:
                     return new IfStatement(@if, parent);
+                case LocalDeclarationStatementSyntax localDeclaration:
+                    return new VariableDeclarationStatement(localDeclaration, parent);
                 case ThrowStatementSyntax @throw:
                     return new ExpressionStatement(@throw, parent);
                 case TryStatementSyntax @try:
@@ -357,6 +359,8 @@ namespace CSharpE.Syntax.Internals
                     return fieldDeclaration.Declaration.Variables.Count > 1;
                 case AttributeListSyntax attributeList:
                     return attributeList.Attributes.Count > 1;
+                case LocalDeclarationStatementSyntax localDeclaration:
+                    return localDeclaration.Declaration.Variables.Count > 1;
                 default:
                     return false;
             }
@@ -377,6 +381,7 @@ namespace CSharpE.Syntax.Internals
                         yield return (TRoslynSyntax)(object)expandedSyntax;
                     }
                     break;
+
                 case AttributeListSyntax attributeList:
                     foreach (var attribute in attributeList.Attributes)
                     {
@@ -386,6 +391,18 @@ namespace CSharpE.Syntax.Internals
                         yield return (TRoslynSyntax)(object)expandedSyntax;
                     }
                     break;
+
+                case LocalDeclarationStatementSyntax localDeclaration:
+                    foreach (var variable in localDeclaration.Declaration.Variables)
+                    {
+                        var expandedSyntax = localDeclaration.WithDeclaration(
+                            localDeclaration.Declaration.WithVariables(
+                                RoslynSyntaxFactory.SingletonSeparatedList(variable)));
+
+                        yield return (TRoslynSyntax)(object)expandedSyntax;
+                    }
+                    break;
+
                 default:
                     throw new InvalidOperationException();
             }

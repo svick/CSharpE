@@ -861,6 +861,16 @@ namespace CSharpE.Syntax
             return new ReturnStatement();
         }
 
+        public static VariableDeclarationStatement VariableDeclaration(TypeReference type, string name, Expression initializer = null)
+        {
+            return new VariableDeclarationStatement(type, name, initializer);
+        }
+
+        public static VariableDeclarationStatement VariableDeclaration(bool isConst, TypeReference type, string name, Expression initializer = null)
+        {
+            return new VariableDeclarationStatement(isConst, type, name, initializer);
+        }
+
         public static ArrayTypeReference ArrayType(TypeReference elementType)
         {
             return new ArrayTypeReference(elementType);

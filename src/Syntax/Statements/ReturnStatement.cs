@@ -12,7 +12,7 @@ namespace CSharpE.Syntax
 
         internal ReturnStatement(ReturnStatementSyntax syntax, SyntaxNode parent)
         {
-            this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+            this.syntax = syntax;
             Parent = parent;
         }
 

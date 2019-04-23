@@ -55,6 +55,9 @@ class C
             {
             }
         }
+
+        int i;
+        int j = 42;
     }
 
     int P1

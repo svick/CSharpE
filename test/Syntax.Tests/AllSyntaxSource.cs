@@ -28,6 +28,8 @@ class C
         catch (Exception e) { }
         finally { }
         checked { unchecked { } }
+
+        int i, j = 42;
     }
 
     int P1 { get; set; }
