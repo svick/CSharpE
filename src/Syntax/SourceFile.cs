@@ -263,6 +263,14 @@ namespace CSharpE.Syntax
             set => throw new InvalidOperationException();
         }
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => Members.Select(m => m.Value);
+        public override IEnumerable<SyntaxNode> GetChildren() => Members.Select(m => m.Value);
+
+        public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression
+        {
+            foreach (var type in GetTypes())
+            {
+                type.ReplaceExpressions(filter, projection);
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Roslyn = Microsoft.CodeAnalysis;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -34,6 +35,9 @@ namespace CSharpE.Syntax
             Rank = rank;
         }
 
+        internal ArrayTypeReference(IArrayTypeSymbol arrayType)
+            : this(FromRoslyn.TypeReference(arrayType.ElementType), arrayType.Rank) { }
+
         internal static TypeSyntax GetElementTypeSyntax(ArrayTypeSyntax syntax)
         {
             if (syntax.RankSpecifiers.Count >= 2)
@@ -46,6 +50,7 @@ namespace CSharpE.Syntax
             FromRoslyn.TypeReference(GetElementTypeSyntax(syntax), parent);
 
         private TypeReference elementType;
+
         public TypeReference ElementType
         {
             get

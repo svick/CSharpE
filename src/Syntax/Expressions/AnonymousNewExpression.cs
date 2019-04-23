@@ -69,6 +69,6 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Parent { get; set; }
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => Initializers;
+        public override IEnumerable<SyntaxNode> GetChildren() => Initializers;
     }
 }

@@ -6,7 +6,6 @@ using static CSharpE.Syntax.MemberModifiers;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
-// TODO: field declarations with more than one field
 namespace CSharpE.Syntax
 {
     public sealed class FieldDefinition : MemberDefinition, ISyntaxWrapper<FieldDeclarationSyntax>
@@ -146,5 +145,8 @@ namespace CSharpE.Syntax
         }
 
         internal override SyntaxNode Clone() => new FieldDefinition(Modifiers, Type, Name, Initializer);
+
+        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
+            Initializer = Expression.ReplaceExpressions(Initializer, filter, projection);
     }
 }

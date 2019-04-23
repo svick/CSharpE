@@ -12,15 +12,6 @@ namespace CSharpE.Syntax
         public static InvocationExpression Call(this Expression receiver, string methodName, IEnumerable<Expression> arguments) =>
             new InvocationExpression(new MemberAccessExpression(receiver, methodName), arguments);
         
-        public static MemberAccessExpression MemberAccess(this Expression expression, FieldDefinition field) =>
-            new MemberAccessExpression(expression, field);
-
-        public static MemberAccessExpression MemberAccess(this NamedTypeReference type, string memberName) =>
-            new MemberAccessExpression(type, memberName);
-
-        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName) =>
-            new MemberAccessExpression(expression, memberName);
-
         public static IntLiteralExpression Literal(int value) => new IntLiteralExpression(value);
         
         public static StringLiteralExpression Literal(string value) => new StringLiteralExpression(value);

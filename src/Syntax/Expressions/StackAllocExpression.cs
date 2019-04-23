@@ -136,7 +136,7 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Parent { get; set; }
 
-        internal override IEnumerable<SyntaxNode> GetChildren() =>
+        public override IEnumerable<SyntaxNode> GetChildren() =>
             new SyntaxNode[] { ElementType }.Concat(new SyntaxNode[] { Length, Initializer });
     }
 }

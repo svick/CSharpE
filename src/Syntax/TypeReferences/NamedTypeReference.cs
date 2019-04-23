@@ -51,6 +51,7 @@ namespace CSharpE.Syntax
                 type.GenericTypeArguments.Select(a => (TypeReference)a)) { }
 
         internal NamedTypeReference(TypeSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Debug.Assert(syntax is PredefinedTypeSyntax || syntax is NameSyntax);
 
@@ -58,7 +59,7 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        public NamedTypeReference(INamedTypeSymbol symbol) => Resolve(symbol);
+        internal NamedTypeReference(INamedTypeSymbol symbol) => Resolve(symbol);
 
         private void Resolve()
         {
@@ -98,7 +99,7 @@ namespace CSharpE.Syntax
             else
             {
                 syntaxNamespace = symbol.ContainingNamespace?.IsGlobalNamespace == true
-                    ? string.Empty
+                    ? null
                     : symbol.ContainingNamespace?.ToDisplayString();
                 container = symbol.ContainingType == null ? null : new NamedTypeReference(symbol.ContainingType);
                 syntaxName = symbol.Name;
@@ -136,6 +137,9 @@ namespace CSharpE.Syntax
             }
             set
             {
+                if (value == string.Empty)
+                    throw new ArgumentException("Namespace can't be empty, use null for the global namespace.", nameof(value));
+
                 Resolve();
 
                 if (isKnownType == false)
@@ -175,6 +179,9 @@ namespace CSharpE.Syntax
             }
             set
             {
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentException("Name can't be null or empty.", nameof(value));
+
                 Resolve();
 
                 name = value;

@@ -65,10 +65,12 @@ namespace CSharpE.Syntax
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
             var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList.Arguments;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
             {
                 syntax = RoslynSyntaxFactory.InvocationExpression(
                     newExpression, RoslynSyntaxFactory.ArgumentList(newArguments));
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }
@@ -91,6 +93,6 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Parent { get; set; }
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Expression }.Concat(Arguments);
+        public override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Expression }.Concat(Arguments);
     }
 }

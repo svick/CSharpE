@@ -41,15 +41,16 @@ namespace CSharpE.Syntax
 
             var newIdentifier = identifier.GetWrapped(ref thisChanged);
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
             {
                 syntax = RoslynSyntaxFactory.IdentifierName(newIdentifier);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }
 
             return syntax;
-
         }
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
@@ -58,5 +59,12 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new IdentifierExpression(Identifier);
 
         internal override SyntaxNode Parent { get; set; }
+
+        public NamedTypeReference AsTypeReference()
+        {
+            this.GetWrapped<IdentifierNameSyntax>();
+
+            return new NamedTypeReference(syntax, Parent);
+        }
     }
 }

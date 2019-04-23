@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -72,5 +73,8 @@ namespace CSharpE.Syntax
             GetWrappedBaseMethod(ref changed);
 
         private protected abstract BaseMethodDeclarationSyntax GetWrappedBaseMethod(ref bool? changed);
+
+        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
+            Body.ReplaceExpressions(filter, projection);
     }
 }

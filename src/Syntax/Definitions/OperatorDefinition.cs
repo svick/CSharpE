@@ -215,7 +215,7 @@ namespace CSharpE.Syntax
                 Attributes = Attributes
             };
 
-        internal override IEnumerable<SyntaxNode> GetChildren() =>
+        public override IEnumerable<SyntaxNode> GetChildren() =>
             Attributes.Concat<SyntaxNode>(new[] { ReturnType }).Concat(Parameters).Concat(new[] { Body });
     }
 }

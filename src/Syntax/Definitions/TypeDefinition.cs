@@ -252,8 +252,16 @@ namespace CSharpE.Syntax
             SetList(ref members, null);
         }
 
-        internal override IEnumerable<SyntaxNode> GetChildren() =>
+        public override IEnumerable<SyntaxNode> GetChildren() =>
             Attributes.Concat<SyntaxNode>(BaseTypes).Concat(Members);
+
+        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            foreach (var member in Members)
+            {
+                member.ReplaceExpressions(filter, projection);
+            }
+        }
     }
 
     public sealed class ClassDefinition : TypeDefinition

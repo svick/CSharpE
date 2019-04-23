@@ -168,7 +168,7 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() =>
             new MethodDefinition(Modifiers, ReturnType, Name, Parameters, Body?.Statements) { Attributes = Attributes };
 
-        internal override IEnumerable<SyntaxNode> GetChildren() =>
+        public override IEnumerable<SyntaxNode> GetChildren() =>
             Attributes.Concat<SyntaxNode>(new[] { ReturnType }).Concat(Parameters).Concat(new[] { Body });
     }
 }

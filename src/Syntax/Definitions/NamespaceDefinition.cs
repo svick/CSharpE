@@ -89,7 +89,7 @@ namespace CSharpE.Syntax
             }
         }
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => Members.Select(m => m.Value);
+        public override IEnumerable<SyntaxNode> GetChildren() => Members.Select(m => m.Value);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

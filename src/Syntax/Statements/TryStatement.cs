@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -112,7 +113,25 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Parent { get; set; }
 
-        internal override IEnumerable<SyntaxNode> GetChildren() =>
+        public override IEnumerable<SyntaxNode> GetChildren() =>
             TryStatements.Concat<SyntaxNode>(CatchClauses).Concat(FinallyStatements);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            foreach (var tryStatement in TryStatements)
+            {
+                tryStatement.ReplaceExpressions(filter, projection);
+            }
+
+            foreach (var catchClause in CatchClauses)
+            {
+                catchClause.Filter = Expression.ReplaceExpressions(catchClause.Filter, filter, projection);
+            }
+
+            foreach (var finallyStatement in FinallyStatements)
+            {
+                finallyStatement.ReplaceExpressions(filter, projection);
+            }
+        }
     }
 }

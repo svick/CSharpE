@@ -78,7 +78,7 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Clone() => new ArrayInitializer(VariableInitializers);
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => VariableInitializers;
+        public override IEnumerable<SyntaxNode> GetChildren() => VariableInitializers;
     }
 
     public sealed class ExpressionVariableInitializer : VariableInitializer

@@ -100,6 +100,14 @@ namespace CSharpE.Syntax
         private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) =>
             this.GetWrapped<EnumDeclarationSyntax>(ref changed);
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat<SyntaxNode>(Members);
+        public override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat<SyntaxNode>(Members);
+
+        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            foreach (var member in Members)
+            {
+                member.Initializer = Expression.ReplaceExpressions(member.Initializer, filter, projection);
+            }
+        }
     }
 }

@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
@@ -347,12 +346,12 @@ namespace CSharpE.Syntax
             return new DefaultExpression(type);
         }
 
-        public static ElementAccessExpression ElementAccess(Expression expression, params Argument[] arguments)
+        public static ElementAccessExpression ElementAccess(this Expression expression, params Argument[] arguments)
         {
             return new ElementAccessExpression(expression, arguments);
         }
 
-        public static ElementAccessExpression ElementAccess(Expression expression, IEnumerable<Argument> arguments)
+        public static ElementAccessExpression ElementAccess(this Expression expression, IEnumerable<Argument> arguments)
         {
             return new ElementAccessExpression(expression, arguments);
         }
@@ -572,22 +571,62 @@ namespace CSharpE.Syntax
             return new LambdaParameter(modifier, type, name);
         }
 
-        public static PointerMemberAccessExpression PointerMemberAccess(Expression expression, string memberName)
+        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName)
+        {
+            return new MemberAccessExpression(expression, memberName);
+        }
+
+        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName, params TypeReference[] typeArguments)
+        {
+            return new MemberAccessExpression(expression, memberName, typeArguments);
+        }
+
+        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName, IEnumerable<TypeReference> typeArguments)
+        {
+            return new MemberAccessExpression(expression, memberName, typeArguments);
+        }
+
+        public static MemberAccessExpression MemberAccess(this Expression expression, FieldDefinition fieldDefinition)
+        {
+            return new MemberAccessExpression(expression, fieldDefinition);
+        }
+
+        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, string memberName)
         {
             return new PointerMemberAccessExpression(expression, memberName);
         }
 
-        public static PointerMemberAccessExpression PointerMemberAccess(Expression expression, FieldDefinition fieldDefinition)
+        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, string memberName, params TypeReference[] typeArguments)
+        {
+            return new PointerMemberAccessExpression(expression, memberName, typeArguments);
+        }
+
+        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, string memberName, IEnumerable<TypeReference> typeArguments)
+        {
+            return new PointerMemberAccessExpression(expression, memberName, typeArguments);
+        }
+
+        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, FieldDefinition fieldDefinition)
         {
             return new PointerMemberAccessExpression(expression, fieldDefinition);
         }
 
-        public static ConditionalMemberAccessExpression ConditionalMemberAccess(Expression expression, string memberName)
+        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, string memberName)
         {
             return new ConditionalMemberAccessExpression(expression, memberName);
         }
 
-        public static ConditionalMemberAccessExpression ConditionalMemberAccess(Expression expression, FieldDefinition fieldDefinition)
+        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, string memberName, params TypeReference[] typeArguments)
+        {
+            return new ConditionalMemberAccessExpression(expression, memberName, typeArguments);
+        }
+
+        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, string memberName, IEnumerable<TypeReference> typeArguments)
+        {
+            return new ConditionalMemberAccessExpression(expression, memberName, typeArguments);
+        }
+
+        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, FieldDefinition fieldDefinition)
         {
             return new ConditionalMemberAccessExpression(expression, fieldDefinition);
         }
@@ -855,11 +894,6 @@ namespace CSharpE.Syntax
         public static NamedTypeReference NamedType(Type type)
         {
             return new NamedTypeReference(type);
-        }
-
-        public static NamedTypeReference NamedType(INamedTypeSymbol symbol)
-        {
-            return new NamedTypeReference(symbol);
         }
 
         public static NullableTypeReference NullableType(TypeReference elementType)

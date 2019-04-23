@@ -100,5 +100,12 @@ namespace CSharpE.Syntax
         }
 
         internal override SyntaxNode Clone() => new ConstructorDefinition(Modifiers, Parameters, Body.Statements);
+
+        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            // TODO: initializers
+
+            base.ReplaceExpressionsImpl(filter, projection);
+        }
     }
 }

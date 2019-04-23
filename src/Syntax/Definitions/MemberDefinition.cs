@@ -128,5 +128,18 @@ namespace CSharpE.Syntax
             GetWrappedMember(ref changed);
 
         private protected abstract MemberDeclarationSyntax GetWrappedMember(ref bool? changed);
+
+        public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression
+        {
+            foreach (var attribute in Attributes)
+            {
+                attribute.ReplaceExpressions(filter, projection);
+            }
+
+            ReplaceExpressionsImpl(filter, projection);
+        }
+
+        protected abstract void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
+            where T : Expression;
     }
 }

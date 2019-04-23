@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
@@ -39,12 +40,19 @@ namespace CSharpE.Syntax
             }
 
             memberName = new Identifier(nameSyntax.Identifier);
+
+            var typeArgumentList = nameSyntax is GenericNameSyntax genericNameSyntax ? genericNameSyntax.TypeArgumentList.Arguments : default;
+            typeArguments = new SeparatedSyntaxList<TypeReference, TypeSyntax>(typeArgumentList, this);
         }
 
         internal BaseMemberAccessExpression(Expression expression, string memberName)
+            : this(expression, memberName, null) { }
+
+        internal BaseMemberAccessExpression(Expression expression, string memberName, IEnumerable<TypeReference> typeArguments)
         {
             Expression = expression;
             MemberName = memberName;
+            this.typeArguments = new SeparatedSyntaxList<TypeReference, TypeSyntax>(typeArguments, this);
         }
 
         private ExpressionSyntax GetExpressionSyntax()
@@ -80,6 +88,13 @@ namespace CSharpE.Syntax
             set => memberName.Text = value;
         }
 
+        private SeparatedSyntaxList<TypeReference, TypeSyntax> typeArguments;
+        public IList<TypeReference> TypeArguments
+        {
+            get => typeArguments;
+            set => SetList(ref typeArguments, new SeparatedSyntaxList<TypeReference, TypeSyntax>(value, this));
+        }
+
         private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
@@ -88,10 +103,14 @@ namespace CSharpE.Syntax
 
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? GetExpressionSyntax();
             var newMemberName = memberName.GetWrapped(ref thisChanged);
+            var newTypeArguments = typeArguments.GetWrapped(ref thisChanged);
 
             if (syntax == null || thisChanged == true)
             {
-                var nameSyntax = RoslynSyntaxFactory.IdentifierName(newMemberName);
+                var nameSyntax = newTypeArguments.Any()
+                    ? (SimpleNameSyntax)RoslynSyntaxFactory.GenericName(
+                        newMemberName, RoslynSyntaxFactory.TypeArgumentList(newTypeArguments))
+                    : RoslynSyntaxFactory.IdentifierName(newMemberName);
 
                 if (this is ConditionalMemberAccessExpression)
                 {
@@ -131,10 +150,16 @@ namespace CSharpE.Syntax
 
         public MemberAccessExpression(Expression expression, string memberName) : base(expression, memberName) { }
 
+        public MemberAccessExpression(Expression expression, string memberName, params TypeReference[] typeArguments)
+            : base(expression, memberName, typeArguments) { }
+
+        public MemberAccessExpression(Expression expression, string memberName, IEnumerable<TypeReference> typeArguments)
+            : base(expression, memberName, typeArguments) { }
+
         public MemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
             : this(expression, fieldDefinition.Name) { }
 
-        internal override SyntaxNode Clone() => new MemberAccessExpression(Expression, MemberName);
+        internal override SyntaxNode Clone() => new MemberAccessExpression(Expression, MemberName, TypeArguments);
     }
 
     public class PointerMemberAccessExpression : BaseMemberAccessExpression
@@ -146,10 +171,16 @@ namespace CSharpE.Syntax
         public PointerMemberAccessExpression(Expression expression, string memberName)
             : base(expression, memberName) { }
 
+        public PointerMemberAccessExpression(Expression expression, string memberName, params TypeReference[] typeArguments)
+            : base(expression, memberName, typeArguments) { }
+
+        public PointerMemberAccessExpression(Expression expression, string memberName, IEnumerable<TypeReference> typeArguments)
+            : base(expression, memberName, typeArguments) { }
+
         public PointerMemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
             : this(expression, fieldDefinition.Name) { }
 
-        internal override SyntaxNode Clone() => new PointerMemberAccessExpression(Expression, MemberName);
+        internal override SyntaxNode Clone() => new PointerMemberAccessExpression(Expression, MemberName, TypeArguments);
     }
 
     public class ConditionalMemberAccessExpression : BaseMemberAccessExpression
@@ -161,9 +192,15 @@ namespace CSharpE.Syntax
         public ConditionalMemberAccessExpression(Expression expression, string memberName)
             : base(expression, memberName) { }
 
+        public ConditionalMemberAccessExpression(Expression expression, string memberName, params TypeReference[] typeArguments)
+            : base(expression, memberName, typeArguments) { }
+
+        public ConditionalMemberAccessExpression(Expression expression, string memberName, IEnumerable<TypeReference> typeArguments)
+            : base(expression, memberName, typeArguments) { }
+
         public ConditionalMemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
             : this(expression, fieldDefinition.Name) { }
 
-        internal override SyntaxNode Clone() => new ConditionalMemberAccessExpression(Expression, MemberName);
+        internal override SyntaxNode Clone() => new ConditionalMemberAccessExpression(Expression, MemberName, TypeArguments);
     }
 }

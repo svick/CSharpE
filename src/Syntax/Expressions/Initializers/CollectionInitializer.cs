@@ -75,6 +75,6 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Clone() => new CollectionInitializer(ElementInitializers);
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => ElementInitializers;
+        public override IEnumerable<SyntaxNode> GetChildren() => ElementInitializers;
     }
 }

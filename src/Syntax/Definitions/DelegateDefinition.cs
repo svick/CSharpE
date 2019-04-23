@@ -57,12 +57,12 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         internal override SyntaxNode Clone()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
@@ -104,5 +104,7 @@ namespace CSharpE.Syntax
 
         private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) =>
             this.GetWrapped<DelegateDeclarationSyntax>(ref changed);
+
+        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection) { }
     }
 }

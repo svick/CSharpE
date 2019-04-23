@@ -77,6 +77,6 @@ namespace CSharpE.Syntax
         internal override StringBuilder ComputeFullName(StringBuilder stringBuilder) =>
             throw new NotImplementedException();
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => Elements;
+        public override IEnumerable<SyntaxNode> GetChildren() => Elements;
     }
 }

@@ -62,5 +62,7 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Microsoft.CodeAnalysis.SyntaxNode newSyntax) => throw new NotImplementedException();
 
         internal override SyntaxNode Clone() => new AccessorDefinition();
+
+        public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression { }
     }
 }

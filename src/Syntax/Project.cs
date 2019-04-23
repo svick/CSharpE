@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
@@ -88,5 +89,13 @@ namespace CSharpE.Syntax
 
         public IEnumerable<MethodDefinition> GetMethods() =>
             NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetMethods());
+
+        public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression
+        {
+            foreach (var sourceFile in SourceFiles)
+            {
+                sourceFile.ReplaceExpressions(filter, projection);
+            }
+        }
     }
 }

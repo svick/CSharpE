@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -24,5 +25,7 @@ namespace CSharpE.Syntax
         private protected override void ValidateModifiers(MemberModifiers modifiers) { }
 
         private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) => syntax;
+
+        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection) { }
     }
 }

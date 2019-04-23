@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
@@ -132,5 +133,11 @@ namespace CSharpE.Syntax
             GetWrappedBaseProperty(ref changed);
 
         private protected abstract BasePropertyDeclarationSyntax GetWrappedBaseProperty(ref bool? changed);
+
+        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            GetAccessor?.ReplaceExpressions(filter, projection);
+            SetAccessor?.ReplaceExpressions(filter, projection);
+        }
     }
 }

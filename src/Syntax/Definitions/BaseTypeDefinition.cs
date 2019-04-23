@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
@@ -57,7 +56,7 @@ namespace CSharpE.Syntax
             {
                 switch (node)
                 {
-                    case BaseTypeDefinition typeDefinition:
+                    case BaseTypeDefinition _:
                         node = node.Parent;
                         break;
                     case NamespaceDefinition namespaceDefinition:

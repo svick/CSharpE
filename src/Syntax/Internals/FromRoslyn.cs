@@ -477,6 +477,23 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
+        public static TypeReference TypeReference(ITypeSymbol typeSymbol)
+        {
+            switch (typeSymbol)
+            {
+                case null:
+                    return null;
+                case INamedTypeSymbol namedType:
+                    return new NamedTypeReference(namedType);
+                case IArrayTypeSymbol arrayType:
+                    return new ArrayTypeReference(arrayType);
+                case IPointerTypeSymbol pointerType:
+                    return new PointerTypeReference(pointerType);
+            }
+
+            throw new NotImplementedException();
+        }
+
         public static InterpolatedStringContent InterpolatedStringContent(
             InterpolatedStringContentSyntax contentSyntax, InterpolatedStringExpression parent)
         {

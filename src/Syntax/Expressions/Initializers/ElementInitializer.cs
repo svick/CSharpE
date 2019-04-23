@@ -88,6 +88,6 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Clone() => new ElementInitializer(Expressions);
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => Expressions;
+        public override IEnumerable<SyntaxNode> GetChildren() => Expressions;
     }
 }

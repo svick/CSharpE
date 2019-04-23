@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Roslyn = Microsoft.CodeAnalysis;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -22,7 +23,11 @@ namespace CSharpE.Syntax
             this.elementType = elementType;
         }
 
+        internal PointerTypeReference(IPointerTypeSymbol pointerType)
+            : this(FromRoslyn.TypeReference(pointerType.PointedAtType)) { }
+
         private TypeReference elementType;
+
         public TypeReference ElementType
         {
             get

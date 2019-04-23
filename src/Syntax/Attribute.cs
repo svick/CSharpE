@@ -142,7 +142,15 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Clone() => new Attribute(Target, Type, Arguments);
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Type }.Concat(Arguments);
+        public override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Type }.Concat(Arguments);
+
+        public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression
+        {
+            foreach (var argument in Arguments)
+            {
+                argument.Expression = Expression.ReplaceExpressions(argument.Expression, filter, projection);
+            }
+        }
     }
 
     public enum AttributeTarget

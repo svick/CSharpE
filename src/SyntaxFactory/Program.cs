@@ -34,7 +34,6 @@ namespace CSharpE.SyntaxFactory
 
                 // requires manually written SyntaxFactory methods
                 switch (classDefinition.Name) {
-                    case nameof(MemberAccessExpression):
                     case nameof(IntLiteralExpression):
                     case nameof(StringLiteralExpression):
                     case nameof(BoolLiteralExpression):
@@ -51,12 +50,17 @@ namespace CSharpE.SyntaxFactory
 
                     string methodName = typeReference.Name.TrimEnd("Expression").TrimEnd("Statement").TrimEnd("Reference");
 
+                    var constructorParameters = constructor.Parameters;
+
+                    if (classDefinition.Name.EndsWith(nameof(MemberAccessExpression)) || classDefinition.Name == nameof(ElementAccessExpression))
+                        constructorParameters[0].Modifiers |= ParameterModifiers.This;
+
                     syntaxFactory.AddMethod(
-                        Public | Static, typeReference, methodName, constructor.Parameters,
+                        Public | Static, typeReference, methodName, constructorParameters,
                         new ReturnStatement(
                             new NewExpression(
                                 typeReference,
-                                constructor.Parameters.Select(p => new Argument(new IdentifierExpression(p.Name))))));
+                                constructorParameters.Select(p => new Argument(new IdentifierExpression(p.Name))))));
                 }
             }
 

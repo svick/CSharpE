@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
@@ -91,5 +92,15 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new IfStatement(Condition, ThenStatements);
 
         internal override SyntaxNode Parent { get; set; }
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            Condition = Expression.ReplaceExpressions(Condition, filter, projection);
+
+            foreach (var thenStatement in ThenStatements)
+            {
+                thenStatement.ReplaceExpressions(filter, projection);
+            }
+        }
     }
 }

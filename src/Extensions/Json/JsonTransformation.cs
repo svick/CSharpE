@@ -23,7 +23,6 @@ namespace CSharpE.Extensions.Json
     {
         public override void Process(Project project, bool designTime)
         {
-            // TODO: this should throw, because it's accessing this
             Smart.ForEach(project.GetClassesWithAttribute<JsonAttribute>(), type =>
             {
                 var jsonStringLiteral = (StringLiteralExpression)type.GetAttribute<JsonAttribute>().Arguments.Single().Expression;
@@ -40,6 +39,31 @@ namespace CSharpE.Extensions.Json
                     Public | Static, jsonObjectType, "Parse", new[] { Parameter(typeof(string), "json") },
                     NotImplementedStatement);
             });
+
+            if (!designTime)
+            {
+                foreach (var jsonType in project.GetClassesWithAttribute<JsonAttribute>())
+                {
+                    var jsonTypeReference = jsonType.GetReference();
+
+                    project.ReplaceExpressions<MemberAccessExpression>(
+                        e => e.Expression.GetExpressionType() is NamedTypeReference type &&
+                             jsonTypeReference.Equals(type.Container) && type.Name.StartsWith("JsonObject"),
+                        e => e.Expression.ElementAccess(Literal(e.MemberName)));
+
+                    project.ReplaceExpressions<MemberAccessExpression>(
+                        e => e.Expression is IdentifierExpression identifier &&
+                             identifier.AsTypeReference().Equals(jsonTypeReference),
+                        e =>
+                        {
+                            if (e.MemberName != "Parse")
+                                return e;
+
+                            return NamedType(typeof(JsonConvert)).MemberAccess(
+                                nameof(JsonConvert.DeserializeObject), typeof(JToken));
+                        });
+                }
+            }
         }
     }
 

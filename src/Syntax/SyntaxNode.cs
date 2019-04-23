@@ -61,6 +61,9 @@ namespace CSharpE.Syntax
 
         private protected void Set<T>(ref T field, T value) where T : SyntaxNode
         {
+            if (ReferenceEquals(field, value))
+                return;
+
             if (field != null)
                 field.Parent = null;
 
@@ -103,14 +106,28 @@ namespace CSharpE.Syntax
 
         internal abstract SyntaxNode Clone();
 
-        // used for testing
-        internal virtual IEnumerable<SyntaxNode> GetChildren()
+        public virtual IEnumerable<SyntaxNode> GetChildren()
         {
             // TODO: is this a reasonable default implementation?
 
             return this.GetType().GetProperties()
                 .Where(p => typeof(SyntaxNode).IsAssignableFrom(p.PropertyType) && p.Name != nameof(Parent))
                 .Select(p => (SyntaxNode)p.GetValue(this));
+        }
+
+        public IEnumerable<SyntaxNode> GetDescendants()
+        {
+            // PERF: this is quadratic
+
+            foreach (var child in GetChildren())
+            {
+                yield return child;
+
+                foreach (var childDescendant in child.GetDescendants())
+                {
+                    yield return childDescendant;
+                }
+            }
         }
 
         public bool Equals(SyntaxNode other)

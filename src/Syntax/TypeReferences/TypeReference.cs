@@ -7,6 +7,10 @@ namespace CSharpE.Syntax
 {
     public abstract class TypeReference : Expression, ISyntaxWrapper<TypeSyntax>
     {
+        private protected TypeReference() { }
+
+        private protected TypeReference(TypeSyntax syntax) : base(syntax) { }
+
         public static implicit operator TypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 
         TypeSyntax ISyntaxWrapper<TypeSyntax>.GetWrapped(ref bool? changed) => GetWrappedType(ref changed);

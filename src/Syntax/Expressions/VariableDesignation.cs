@@ -140,6 +140,6 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Clone() => new MultiVariableDesignation(Variables);
 
-        internal override IEnumerable<SyntaxNode> GetChildren() => Variables;
+        public override IEnumerable<SyntaxNode> GetChildren() => Variables;
     }
 }
