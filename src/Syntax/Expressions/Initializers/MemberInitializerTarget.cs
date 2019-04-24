@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -12,6 +13,9 @@ namespace CSharpE.Syntax
 
         ExpressionSyntax ISyntaxWrapper<ExpressionSyntax>.GetWrapped(ref bool? changed)
             => GetWrapped(ref changed);
+
+        public abstract void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+            where T : Expression;
     }
 
     public sealed class NameMemberInitializerTarget : MemberInitializerTarget
@@ -64,6 +68,8 @@ namespace CSharpE.Syntax
             => Init((IdentifierNameSyntax)newSyntax);
 
         internal override SyntaxNode Clone() => new NameMemberInitializerTarget(Name);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) { }
     }
 
     public sealed class ElementAccessMemberInitializerTarget : MemberInitializerTarget
@@ -120,5 +126,13 @@ namespace CSharpE.Syntax
         }
 
         internal override SyntaxNode Clone() => new ElementAccessMemberInitializerTarget(Arguments);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            foreach (var argument in Arguments)
+            {
+                argument.ReplaceExpressions(filter, projection);
+            }
+        }
     }
 }

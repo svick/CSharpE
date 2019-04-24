@@ -94,5 +94,15 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Parent { get; set; }
 
         public override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Expression }.Concat(Arguments);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            base.ReplaceExpressions(filter, projection);
+
+            foreach (var argument in Arguments)
+            {
+                argument.ReplaceExpressions(filter, projection);
+            }
+        }
     }
 }

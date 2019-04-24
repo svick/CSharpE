@@ -136,7 +136,13 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Parent { get; set; }
 
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            new SyntaxNode[] { ElementType }.Concat(new SyntaxNode[] { Length, Initializer });
+        public override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { ElementType, Length, Initializer };
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            base.ReplaceExpressions(filter, projection);
+
+            Initializer?.ReplaceExpressions(filter, projection);
+        }
     }
 }

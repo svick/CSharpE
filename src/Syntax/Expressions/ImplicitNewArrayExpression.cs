@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -85,5 +86,8 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new ImplicitNewArrayExpression(Rank, Initializer);
 
         internal override SyntaxNode Parent { get; set; }
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
+            Initializer.ReplaceExpressions(filter, projection);
     }
 }

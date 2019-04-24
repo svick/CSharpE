@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using CSharpE.Syntax.Internals;
@@ -14,6 +15,9 @@ namespace CSharpE.Syntax
         ExpressionSyntax ISyntaxWrapper<ExpressionSyntax>.GetWrapped(ref bool? changed) => GetWrappedExpression(ref changed);
 
         internal abstract ExpressionSyntax GetWrappedExpression(ref bool? changed);
+
+        public abstract void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+            where T : Expression;
     }
 
     public sealed class ArrayInitializer : VariableInitializer
@@ -79,6 +83,14 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new ArrayInitializer(VariableInitializers);
 
         public override IEnumerable<SyntaxNode> GetChildren() => VariableInitializers;
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            foreach (var initializer in VariableInitializers)
+            {
+                initializer.ReplaceExpressions(filter, projection);
+            }
+        }
     }
 
     public sealed class ExpressionVariableInitializer : VariableInitializer
@@ -133,5 +145,8 @@ namespace CSharpE.Syntax
         }
 
         internal override SyntaxNode Clone() => new ExpressionVariableInitializer(Expression);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
+            Expression = Expression.ReplaceExpressions(Expression, filter, projection);
     }
 }

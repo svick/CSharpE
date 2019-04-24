@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -194,5 +195,23 @@ namespace CSharpE.Syntax
                 : new LambdaExpression(IsAsync, Parameters, Statements);
 
         internal override SyntaxNode Parent { get; set; }
+
+        public override IEnumerable<SyntaxNode> GetChildren() =>
+            Parameters.Concat(Expression != null ? (IEnumerable<SyntaxNode>)new[] { Expression } : Statements);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            if (Expression != null)
+            {
+                Expression = ReplaceExpressions(Expression, filter, projection);
+            }
+            else
+            {
+                foreach (var statement in Statements)
+                {
+                    statement.ReplaceExpressions(filter, projection);
+                }
+            }
+        }
     }
 }

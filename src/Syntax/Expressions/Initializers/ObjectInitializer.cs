@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using CSharpE.Syntax.Internals;
@@ -76,5 +77,14 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new ObjectInitializer(MemberInitializers);
 
         public override IEnumerable<SyntaxNode> GetChildren() => MemberInitializers;
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            foreach (var initializer in MemberInitializers)
+            {
+                initializer.Target.ReplaceExpressions(filter, projection);
+                initializer.Value.ReplaceExpressions(filter, projection);
+            }
+        }
     }
 }

@@ -14,6 +14,9 @@ namespace CSharpE.Syntax
             GetWrapped(ref changed);
 
         internal abstract InterpolatedStringContentSyntax GetWrapped(ref bool? changed);
+
+        public abstract void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+            where T : Expression;
     }
 
     public sealed class Interpolation : InterpolatedStringContent
@@ -117,6 +120,9 @@ namespace CSharpE.Syntax
         }
 
         internal override SyntaxNode Clone() => new Interpolation(Expression, Alignment, Format);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
+            Expression = Expression.ReplaceExpressions(Expression, filter, projection);
     }
 
     public sealed class InterpolatedStringText : InterpolatedStringContent
@@ -166,5 +172,7 @@ namespace CSharpE.Syntax
             Init((InterpolatedStringTextSyntax)newSyntax);
 
         internal override SyntaxNode Clone() => new InterpolatedStringText(Text);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) { }
     }
 }

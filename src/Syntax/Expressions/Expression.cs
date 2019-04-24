@@ -43,7 +43,7 @@ namespace CSharpE.Syntax
             return expression;
         }
 
-        public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression
+        public virtual void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression
         {
             // PERF
             foreach (var property in this.GetType().GetProperties())

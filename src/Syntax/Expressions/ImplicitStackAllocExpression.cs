@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
@@ -65,5 +66,8 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new ImplicitStackAllocExpression(Initializer);
 
         internal override SyntaxNode Parent { get; set; }
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
+            Initializer.ReplaceExpressions(filter, projection);
     }
 }

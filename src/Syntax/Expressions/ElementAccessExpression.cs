@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -121,6 +122,18 @@ namespace CSharpE.Syntax
         }
 
         internal sealed override SyntaxNode Parent { get; set; }
+
+        public override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Expression }.Concat(Arguments);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            base.ReplaceExpressions(filter, projection);
+
+            foreach (var argument in Arguments)
+            {
+                argument.ReplaceExpressions(filter, projection);
+            }
+        }
     }
 
     public class ElementAccessExpression : BaseElementAccessExpression
