@@ -628,15 +628,15 @@ namespace CSharpE.Transform.VisualStudio
 
         public override CommonAnonymousTypeManager CommonAnonymousTypeManager => throw new NotImplementedException();
 
-        public override CommonMessageProvider MessageProvider => throw new NotImplementedException();
+        public override CommonMessageProvider MessageProvider => RoslynCompilation.MessageProvider;
 
-        public override byte LinkerMajorVersion => throw new NotImplementedException();
+        public override byte LinkerMajorVersion => RoslynCompilation.LinkerMajorVersion;
 
-        public override bool IsDelaySigned => throw new NotImplementedException();
+        public override bool IsDelaySigned => RoslynCompilation.IsDelaySigned;
 
-        public override StrongNameKeys StrongNameKeys => throw new NotImplementedException();
+        public override StrongNameKeys StrongNameKeys => RoslynCompilation.StrongNameKeys;
 
-        public override Guid DebugSourceDocumentLanguageId => throw new NotImplementedException();
+        public override Guid DebugSourceDocumentLanguageId => RoslynCompilation.DebugSourceDocumentLanguageId;
 
         #endregion
     }
