@@ -18,12 +18,17 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        public IfStatement(Expression condition, params Statement[] thenStatements) : this(condition, thenStatements.AsEnumerable()) { }
+        public IfStatement(Expression condition, params Statement[] thenStatements)
+            : this(condition, thenStatements.AsEnumerable()) { }
 
         public IfStatement(Expression condition, IEnumerable<Statement> thenStatements)
+            : this(condition, thenStatements, null) { }
+
+        public IfStatement(Expression condition, IEnumerable<Statement> thenStatements, IEnumerable<Statement> elseStatements)
         {
             Condition = condition;
-            ThenStatements = thenStatements.ToList();
+            this.thenStatements = new StatementList(thenStatements, this);
+            this.elseStatements = new StatementList(elseStatements, this);
         }
 
         private Expression condition;
@@ -39,10 +44,18 @@ namespace CSharpE.Syntax
             set => SetNotNull(ref condition, value);
         }
 
-        private static Roslyn::SyntaxList<StatementSyntax> GetStatementList(StatementSyntax statement) =>
-            statement is BlockSyntax blockSyntax
-                ? blockSyntax.Statements
-                : RoslynSyntaxFactory.SingletonList(statement);
+        private static Roslyn::SyntaxList<StatementSyntax> GetStatementList(StatementSyntax statement)
+        {
+            switch (statement)
+            {
+                case null:
+                    return RoslynSyntaxFactory.List<StatementSyntax>();
+                case BlockSyntax blockSyntax:
+                    return blockSyntax.Statements;
+                default:
+                    return RoslynSyntaxFactory.SingletonList(statement);
+            }
+        }
 
         private StatementList thenStatements;
         public IList<Statement> ThenStatements
@@ -57,7 +70,18 @@ namespace CSharpE.Syntax
             set => SetList(ref thenStatements, new StatementList(value, this));
         }
 
-        // TODO: else
+        private StatementList elseStatements;
+        public IList<Statement> ElseStatements
+        {
+            get
+            {
+                if (elseStatements == null)
+                    elseStatements = new StatementList(GetStatementList(syntax.Else?.Statement), this);
+
+                return elseStatements;
+            }
+            set => SetList(ref elseStatements, new StatementList(value, this));
+        }
 
         IfStatementSyntax ISyntaxWrapper<IfStatementSyntax>.GetWrapped(ref bool? changed)
         {
@@ -67,10 +91,19 @@ namespace CSharpE.Syntax
 
             var newCondition = condition?.GetWrapped(ref thisChanged) ?? syntax.Condition;
             var newThenStatements = thenStatements?.GetWrapped(ref thisChanged) ?? GetStatementList(syntax.Statement);
+            var newElseStatements =
+                elseStatements?.GetWrapped(ref thisChanged) ?? GetStatementList(syntax.Else?.Statement);
 
             if (syntax == null || thisChanged == true)
             {
-                syntax = RoslynSyntaxFactory.IfStatement(newCondition, RoslynSyntaxFactory.Block(newThenStatements));
+                StatementSyntax BlockIfNecessary(Roslyn::SyntaxList<StatementSyntax> statements) =>
+                    statements.Count == 1 ? statements.Single() : RoslynSyntaxFactory.Block(statements);
+
+                var elseClause = newElseStatements.Count == 0
+                    ? null
+                    : RoslynSyntaxFactory.ElseClause(BlockIfNecessary(newElseStatements));
+
+                syntax = RoslynSyntaxFactory.IfStatement(newCondition, BlockIfNecessary(newThenStatements), elseClause);
 
                 SetChanged(ref changed);
             }
@@ -86,10 +119,11 @@ namespace CSharpE.Syntax
             syntax = (IfStatementSyntax)newSyntax;
 
             Set(ref condition, null);
-            thenStatements = null;
+            SetList(ref thenStatements, null);
+            SetList(ref elseStatements, null);
         }
 
-        internal override SyntaxNode Clone() => new IfStatement(Condition, ThenStatements);
+        internal override SyntaxNode Clone() => new IfStatement(Condition, ThenStatements, ElseStatements);
 
         internal override SyntaxNode Parent { get; set; }
 
@@ -100,6 +134,11 @@ namespace CSharpE.Syntax
             foreach (var thenStatement in ThenStatements)
             {
                 thenStatement.ReplaceExpressions(filter, projection);
+            }
+
+            foreach (var elseStatement in ElseStatements)
+            {
+                elseStatement.ReplaceExpressions(filter, projection);
             }
         }
     }

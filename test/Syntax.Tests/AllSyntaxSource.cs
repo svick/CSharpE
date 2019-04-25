@@ -20,7 +20,7 @@ class C
         var (_, x, (y, z)) = t;
         _ = x => { };
         _ = async (ref int x) => { };
-        if (true) { }
+        if (true) { } else { }
         try
         {
             throw new Exception();

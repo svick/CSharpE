@@ -856,6 +856,11 @@ namespace CSharpE.Syntax
             return new IfStatement(condition, thenStatements);
         }
 
+        public static IfStatement If(Expression condition, IEnumerable<Statement> thenStatements, IEnumerable<Statement> elseStatements)
+        {
+            return new IfStatement(condition, thenStatements, elseStatements);
+        }
+
         public static ReturnStatement Return(Expression expression)
         {
             return new ReturnStatement(expression);
