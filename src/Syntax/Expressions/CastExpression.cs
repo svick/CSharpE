@@ -15,7 +15,7 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        internal CastExpression(TypeReference type, Expression expression)
+        public CastExpression(TypeReference type, Expression expression)
         {
             Type = type;
             Expression = expression;

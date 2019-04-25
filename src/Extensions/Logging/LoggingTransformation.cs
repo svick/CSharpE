@@ -19,7 +19,7 @@ namespace CSharpE.Extensions.Logging
                         Statement loggingStatement = NamedType(typeof(Console))
                             .Call(nameof(Console.WriteLine), BuildWriteLineParameters(method));
 
-                        method.Body = Block(loggingStatement, method.Body);
+                        method.Body.Statements.Insert(0, loggingStatement);
                     }
                 });
         }
@@ -45,7 +45,9 @@ namespace CSharpE.Extensions.Logging
                     .Append(i++)
                     .Append('}');
 
-                args.Add(Identifier(parameter.Name));
+                // the cast is necessary, so that if there is a single array parameter,
+                // it is not interpreted as the whole params array for WriteLine
+                args.Add(Cast(typeof(object), Identifier(parameter.Name)));
             }
 
             formatString.Append(')');

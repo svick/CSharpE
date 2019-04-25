@@ -129,7 +129,7 @@ namespace CSharpE.Syntax
                 if (baseType is TypeDefinition type)
                     return type.Methods;
 
-                return SimpleCollection.Create(this, Enumerable.Empty<MethodDefinition>());
+                return SimpleCollection.Create(baseType, Enumerable.Empty<MethodDefinition>());
             });
 
         private readonly HashSet<string> additionalNamespaces = new HashSet<string>();

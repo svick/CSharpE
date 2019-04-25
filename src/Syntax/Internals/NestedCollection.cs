@@ -38,10 +38,9 @@ namespace CSharpE.Syntax.Internals
             where TChild : SyntaxNode =>
             new NestedCollection<Project, TChild, TItem>(parent, parent, children, itemFunction);
 
-        public static IEnumerable<TItem> Create<TParent, TChild, TItem>(
-            TParent parent, IEnumerable<TChild> children, Func<TChild, IEnumerable<TItem>> itemFunction)
-            where TParent : SyntaxNode
+        public static IEnumerable<TItem> Create<TChild, TItem>(
+            SyntaxNode parent, IEnumerable<TChild> children, Func<TChild, IEnumerable<TItem>> itemFunction)
             where TChild : SyntaxNode =>
-            new NestedCollection<TParent, TChild, TItem>(parent.SourceFile?.Project, parent, children, itemFunction);
+            new NestedCollection<SyntaxNode, TChild, TItem>(parent.SourceFile?.Project, parent, children, itemFunction);
     }
 }

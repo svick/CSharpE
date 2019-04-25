@@ -326,6 +326,11 @@ namespace CSharpE.Syntax
             return new RightShiftAssignmentExpression(left, right);
         }
 
+        public static CastExpression Cast(TypeReference type, Expression expression)
+        {
+            return new CastExpression(type, expression);
+        }
+
         public static CheckedExpression Checked(bool isChecked, Expression expression)
         {
             return new CheckedExpression(isChecked, expression);

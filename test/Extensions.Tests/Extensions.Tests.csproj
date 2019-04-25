@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\Extensions\Logging\Logging.csproj" />
       <ProjectReference Include="..\..\src\Extensions\Record\Record.csproj" />
       <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
     </ItemGroup>

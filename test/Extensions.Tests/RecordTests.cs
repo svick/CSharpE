@@ -3,7 +3,7 @@ using CSharpE.TestUtilities;
 using Xunit;
 using static CSharpE.TestUtilities.TransformTestUtils;
 
-namespace CSharpE.Record.Tests
+namespace CSharpE.Extensions.Tests
 {
     public class RecordTests
     {
@@ -139,6 +139,5 @@ class Person : IEquatable<Person>
             AssertEx.LinesEqual(
                 expectedOutput, ProcessSingleFile(input, transformation, designTime: false, typeof(RecordAttribute)));
         }
-        
     }
 }

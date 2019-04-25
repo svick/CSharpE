@@ -62,7 +62,7 @@ namespace CSharpE.Transform.Transformers
                     (SyntaxNode)(object)parent, action, data, limitedComparison);
             }
             else
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"The combination of TParent={typeof(TParent)} and TItem={typeof(TItem)} is not valid.");
 
             return (CollectionTransformer<TParent, TItem, TData, TIntermediate, TOutput>)result;
         }
