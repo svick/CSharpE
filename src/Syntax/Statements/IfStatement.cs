@@ -8,7 +8,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class IfStatement : Statement, ISyntaxWrapper<IfStatementSyntax>
+    public sealed class IfStatement : Statement
     {
         private IfStatementSyntax syntax;
 
@@ -83,7 +83,7 @@ namespace CSharpE.Syntax
             set => SetList(ref elseStatements, new StatementList(value, this));
         }
 
-        IfStatementSyntax ISyntaxWrapper<IfStatementSyntax>.GetWrapped(ref bool? changed)
+        private protected override StatementSyntax GetWrappedStatement(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -96,23 +96,23 @@ namespace CSharpE.Syntax
 
             if (syntax == null || thisChanged == true)
             {
-                StatementSyntax BlockIfNecessary(Roslyn::SyntaxList<StatementSyntax> statements) =>
-                    statements.Count == 1 ? statements.Single() : RoslynSyntaxFactory.Block(statements);
+                // always create block, except for "else if"
+                StatementSyntax Block(Roslyn::SyntaxList<StatementSyntax> statements) =>
+                    statements.Count == 1 && statements.Single() is IfStatementSyntax ifStatement
+                        ? (StatementSyntax)ifStatement
+                        : RoslynSyntaxFactory.Block(statements);
 
                 var elseClause = newElseStatements.Count == 0
                     ? null
-                    : RoslynSyntaxFactory.ElseClause(BlockIfNecessary(newElseStatements));
+                    : RoslynSyntaxFactory.ElseClause(Block(newElseStatements));
 
-                syntax = RoslynSyntaxFactory.IfStatement(newCondition, BlockIfNecessary(newThenStatements), elseClause);
+                syntax = RoslynSyntaxFactory.IfStatement(newCondition, Block(newThenStatements), elseClause);
 
                 SetChanged(ref changed);
             }
 
             return syntax;
         }
-
-        private protected override StatementSyntax GetWrappedStatement(ref bool? changed) =>
-            this.GetWrapped<IfStatementSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
