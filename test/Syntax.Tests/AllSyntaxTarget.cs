@@ -43,6 +43,18 @@ class C
         {
         }
 
+        int i = 0;
+        int j;
+        for (; i < 10; i++)
+        {
+        }
+
+        i = 0;
+        M();
+        for (; i < 10; i++)
+        {
+        }
+
         int i;
         int j = 42;
     }

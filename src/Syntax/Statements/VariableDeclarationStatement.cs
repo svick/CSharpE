@@ -85,7 +85,7 @@ namespace CSharpE.Syntax
         }
 
 
-        private protected override StatementSyntax GetWrappedStatement(ref bool? changed)
+        internal LocalDeclarationStatementSyntax GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -117,6 +117,8 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        private protected override StatementSyntax GetWrappedStatement(ref bool? changed) => GetWrapped(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {

@@ -96,6 +96,14 @@ namespace N.M
             {
             }
 
+            for (int i = 0; i < 10; i++)
+            {
+            }
+
+            for (;;)
+            {
+            }
+
             return ref this.i;
         }
 

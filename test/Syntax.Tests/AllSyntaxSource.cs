@@ -26,6 +26,14 @@ class C
         {
         }
 
+        for (int i = 0, j; i < 10; i++)
+        {
+        }
+
+        for (i = 0, M(); i < 10; i++)
+        {
+        }
+
         int i, j = 42;
     }
 

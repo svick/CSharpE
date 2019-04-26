@@ -316,6 +316,8 @@ namespace CSharpE.Syntax.Internals
                     return new ForEachStatement(forEach, parent);
                 case ForEachVariableStatementSyntax forEachVariable:
                     return new PatternForEachStatement(forEachVariable, parent);
+                case ForStatementSyntax @for:
+                    return new ForStatement(@for, parent);
                 case IfStatementSyntax @if:
                     return new IfStatement(@if, parent);
                 case LocalDeclarationStatementSyntax localDeclaration:
@@ -365,6 +367,8 @@ namespace CSharpE.Syntax.Internals
                     return attributeList.Attributes.Count > 1;
                 case LocalDeclarationStatementSyntax localDeclaration:
                     return localDeclaration.Declaration.Variables.Count > 1;
+                case ForStatementSyntax forStatement:
+                    return forStatement.Initializers != default || forStatement.Declaration?.Variables.Count > 1;
                 default:
                     return false;
             }
@@ -373,6 +377,16 @@ namespace CSharpE.Syntax.Internals
         public static IEnumerable<TRoslynSyntax> Expand<TRoslynSyntax>(TRoslynSyntax roslynSyntax)
             where TRoslynSyntax : CSharpSyntaxNode
         {
+            TRoslynSyntax Cast(CSharpSyntaxNode syntax) => (TRoslynSyntax)syntax;
+
+            IEnumerable<VariableDeclarationSyntax> ExpandVariable(VariableDeclarationSyntax declaration)
+            {
+                foreach (var variable in declaration.Variables)
+                {
+                    yield return declaration.WithVariables(RoslynSyntaxFactory.SingletonSeparatedList(variable));
+                }
+            }
+
             switch (roslynSyntax)
             {
                 case FieldDeclarationSyntax fieldDeclaration:
@@ -382,7 +396,7 @@ namespace CSharpE.Syntax.Internals
                             fieldDeclaration.Declaration.WithVariables(
                                 RoslynSyntaxFactory.SingletonSeparatedList(variable)));
 
-                        yield return (TRoslynSyntax)(object)expandedSyntax;
+                        yield return Cast(expandedSyntax);
                     }
                     break;
 
@@ -392,18 +406,37 @@ namespace CSharpE.Syntax.Internals
                         var expandedSyntax =
                             attributeList.WithAttributes(RoslynSyntaxFactory.SingletonSeparatedList(attribute));
 
-                        yield return (TRoslynSyntax)(object)expandedSyntax;
+                        yield return Cast(expandedSyntax);
                     }
                     break;
 
                 case LocalDeclarationStatementSyntax localDeclaration:
-                    foreach (var variable in localDeclaration.Declaration.Variables)
+                    foreach (var variable in ExpandVariable(localDeclaration.Declaration))
                     {
-                        var expandedSyntax = localDeclaration.WithDeclaration(
-                            localDeclaration.Declaration.WithVariables(
-                                RoslynSyntaxFactory.SingletonSeparatedList(variable)));
+                        var expandedSyntax = localDeclaration.WithDeclaration(variable);
 
-                        yield return (TRoslynSyntax)(object)expandedSyntax;
+                        yield return Cast(expandedSyntax);
+                    }
+                    break;
+
+                case ForStatementSyntax forStatement:
+                    if (forStatement.Initializers != default)
+                    {
+                        foreach (var initializer in forStatement.Initializers)
+                        {
+                            yield return Cast(RoslynSyntaxFactory.ExpressionStatement(initializer));
+                        }
+
+                        yield return Cast(forStatement.WithInitializers(default));
+                    }
+                    else
+                    {
+                        foreach (var variable in ExpandVariable(forStatement.Declaration))
+                        {
+                            yield return Cast(RoslynSyntaxFactory.LocalDeclarationStatement(variable));
+                        }
+
+                        yield return Cast(forStatement.WithDeclaration(default));
                     }
                     break;
 
