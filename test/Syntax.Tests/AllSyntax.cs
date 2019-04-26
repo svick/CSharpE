@@ -65,8 +65,37 @@ namespace N.M
             _ = c1?[0];
             _ = new int[10];
             _ = stackalloc int[10];
+            _ = stackalloc int[]{42};
+            _ = stackalloc[]{42};
             _ = () => 0;
             _ = c1 ?? throw new Exception();
+            try
+            {
+                throw new Exception();
+            }
+            catch (Exception e)
+            {
+            }
+
+            checked
+            {
+                unchecked
+                {
+                }
+            }
+
+            if (true)
+            {
+            }
+
+            foreach (int i in new int[0])
+            {
+            }
+
+            foreach (_ in new int[0])
+            {
+            }
+
             return ref this.i;
         }
 

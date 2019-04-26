@@ -15,19 +15,16 @@ class C
         _ = new { i, x = 42 };
         _ = new int[,][] { { } };
         _ = new[,] { { 0 } };
-        _ = stackalloc int[] { 42 };
-        _ = stackalloc[] { 42 };
         var (_, x, (y, z)) = t;
         _ = x => { };
         _ = async (ref int x) => { };
-        if (true) { } else { }
-        try
+        foreach ((int i, _) in new (int, int)[0])
         {
-            throw new Exception();
         }
-        catch (Exception e) { }
-        finally { }
-        checked { unchecked { } }
+
+        foreach (var (i, j) in new (int, int)[0])
+        {
+        }
 
         int i, j = 42;
     }

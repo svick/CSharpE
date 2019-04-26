@@ -44,19 +44,6 @@ namespace CSharpE.Syntax
             set => SetNotNull(ref condition, value);
         }
 
-        private static Roslyn::SyntaxList<StatementSyntax> GetStatementList(StatementSyntax statement)
-        {
-            switch (statement)
-            {
-                case null:
-                    return RoslynSyntaxFactory.List<StatementSyntax>();
-                case BlockSyntax blockSyntax:
-                    return blockSyntax.Statements;
-                default:
-                    return RoslynSyntaxFactory.SingletonList(statement);
-            }
-        }
-
         private StatementList thenStatements;
         public IList<Statement> ThenStatements
         {
@@ -126,6 +113,9 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new IfStatement(Condition, ThenStatements, ElseStatements);
 
         internal override SyntaxNode Parent { get; set; }
+
+        public override IEnumerable<SyntaxNode> GetChildren() =>
+            new SyntaxNode[] { Condition }.Concat(ThenStatements).Concat(ElseStatements);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {

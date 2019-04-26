@@ -36,7 +36,7 @@ namespace CSharpE.Syntax
                         // HACK: ThrowExpression ctor with an expression from Roslyn syntax
                         // requires that expression to be already part of the tree
                         expression = FromRoslyn.Expression(throwStatement.Expression, this);
-                        expression = new ThrowExpression(expression);
+                        Expression = new ThrowExpression(expression);
                     }
                     else
                     {

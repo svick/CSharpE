@@ -312,6 +312,10 @@ namespace CSharpE.Syntax.Internals
                     return new CheckedStatement(@checked, parent);
                 case ExpressionStatementSyntax expression:
                     return new ExpressionStatement(expression, parent);
+                case ForEachStatementSyntax forEach:
+                    return new ForEachStatement(forEach, parent);
+                case ForEachVariableStatementSyntax forEachVariable:
+                    return new PatternForEachStatement(forEachVariable, parent);
                 case IfStatementSyntax @if:
                     return new IfStatement(@if, parent);
                 case LocalDeclarationStatementSyntax localDeclaration:

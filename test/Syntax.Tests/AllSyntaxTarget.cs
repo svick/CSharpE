@@ -24,8 +24,6 @@ class C
         ;
         _ = new int[, ][]{{}};
         _ = new[, ]{{0}};
-        _ = stackalloc int[]{42};
-        _ = stackalloc[]{42};
         var(_, x, (y, z)) = t;
         _ = x =>
         {
@@ -37,23 +35,12 @@ class C
         }
 
         ;
-        if (true)
+        foreach ((int i, _)in new(int, int)[0])
         {
         }
 
-        try
+        foreach (var(i, j)in new(int, int)[0])
         {
-            throw new Exception();
-        }
-        catch (Exception e)
-        {
-        }
-
-        checked
-        {
-            unchecked
-            {
-            }
         }
 
         int i;
