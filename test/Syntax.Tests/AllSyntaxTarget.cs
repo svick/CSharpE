@@ -55,6 +55,10 @@ class C
         {
         }
 
+        do
+        {
+        }
+        while (false);
         int i;
         int j = 42;
     }

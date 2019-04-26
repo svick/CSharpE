@@ -104,6 +104,10 @@ namespace N.M
             {
             }
 
+            while (true)
+            {
+            }
+
             return ref this.i;
         }
 

@@ -126,7 +126,7 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            this.syntax = (ForStatementSyntax)newSyntax;
+            syntax = (ForStatementSyntax)newSyntax;
 
             Set(ref variableDeclaration, null);
             Set(ref condition, null);

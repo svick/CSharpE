@@ -34,6 +34,10 @@ class C
         {
         }
 
+        do
+        {
+        } while (false);
+
         int i, j = 42;
     }
 

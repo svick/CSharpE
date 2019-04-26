@@ -308,6 +308,8 @@ namespace CSharpE.Syntax.Internals
             {
                 case null:
                     return null;
+                case DoStatementSyntax @do:
+                    return new DoWhileStatement(@do, parent);
                 case CheckedStatementSyntax @checked:
                     return new CheckedStatement(@checked, parent);
                 case ExpressionStatementSyntax expression:
@@ -322,12 +324,14 @@ namespace CSharpE.Syntax.Internals
                     return new IfStatement(@if, parent);
                 case LocalDeclarationStatementSyntax localDeclaration:
                     return new VariableDeclarationStatement(localDeclaration, parent);
+                case ReturnStatementSyntax @return:
+                    return new ReturnStatement(@return, parent);
                 case ThrowStatementSyntax @throw:
                     return new ExpressionStatement(@throw, parent);
                 case TryStatementSyntax @try:
                     return new TryStatement(@try, parent);
-                case ReturnStatementSyntax @return:
-                    return new ReturnStatement(@return, parent);
+                case WhileStatementSyntax @while:
+                    return new WhileStatement(@while, parent);
             }
 
             throw new NotImplementedException(syntax.Kind().ToString());
