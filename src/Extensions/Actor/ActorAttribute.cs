@@ -3,7 +3,5 @@
 namespace CSharpE.Extensions.Actor
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class ActorAttribute : Attribute
-    {
-    }
+    public class ActorAttribute : Attribute { }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using CSharpE.Syntax;
 using CSharpE.Transform;
@@ -14,25 +11,28 @@ namespace CSharpE.Extensions.Actor
     {
         protected override void Process(Project project)
         {
-            foreach (var type in project.GetTypesWithAttribute<ActorAttribute>().OfType<TypeDefinition>())
+            Smart.ForEach(project.GetTypesWithAttribute<ActorAttribute>(), baseType =>
             {
+                if (!(baseType is TypeDefinition type))
+                    return;
+
                 var actorSemaphoreField = type.AddField(
                     ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
 
                 Expression actorSemaphoreFieldExpression = This().MemberAccess(actorSemaphoreField);
 
-                foreach (var method in type.PublicMethods)
+                Smart.ForEach(type.PublicMethods, actorSemaphoreFieldExpression, (asf, method) =>
                 {
                     method.ReturnType = NamedType(typeof(Task<>), method.ReturnType);
                     method.IsAsync = true;
 
                     method.Body.Statements = new Statement[]
                     {
-                        Await(actorSemaphoreFieldExpression.Call("WaitAsync")),
-                        TryFinally(method.Body.Statements, new Statement[] { actorSemaphoreFieldExpression.Call("Release") })
+                        Await(asf.Call("WaitAsync")),
+                        TryFinally(method.Body.Statements, new Statement[] { asf.Call("Release") })
                     };
-                }
-            }
+                });
+            });
         }
     }
 }

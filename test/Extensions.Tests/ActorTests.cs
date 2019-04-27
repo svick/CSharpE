@@ -8,7 +8,7 @@ using CSharpE.Transform.Execution;
 using Xunit;
 using static CSharpE.TestUtilities.TransformTestUtils;
 
-namespace CSharpE.Actor.Lazy.Tests
+namespace CSharpE.Extensions.Tests
 {
     public class ActorTests
     {
@@ -50,7 +50,7 @@ class C
 }";
 
             var transformation = new ActorTransformation();
-            
+
             AssertEx.LinesEqual(expectedOutput, ProcessSingleFile(input, transformation, typeof(ActorAttribute)));
         }
 
