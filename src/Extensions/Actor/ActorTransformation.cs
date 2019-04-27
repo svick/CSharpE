@@ -23,7 +23,9 @@ namespace CSharpE.Extensions.Actor
                     if (method.IsStatic)
                         return;
 
-                    method.ReturnType = NamedType(typeof(Task<>), method.ReturnType);
+                    method.ReturnType = method.ReturnType.Equals(NamedType(typeof(void)))
+                        ? NamedType(typeof(Task))
+                        : NamedType(typeof(Task<>), method.ReturnType);
                     method.IsAsync = true;
 
                     method.Body.Statements = new Statement[]

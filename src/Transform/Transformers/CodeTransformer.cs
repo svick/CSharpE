@@ -127,6 +127,8 @@ namespace CSharpE.Transform.Transformers
                     continue;
 
                 var oldAnnotation = Annotation.Get(beforeNode);
+                if (oldAnnotation == null)
+                    continue;
 
                 annotationMap.Add(oldAnnotation, newAnnotation);
             }
@@ -162,12 +164,12 @@ namespace CSharpE.Transform.Transformers
 
                     return nextInput =>
                     {
+                        differAfter(nextInput);
+
                         foreach (var ns in namespaces)
                         {
                             nextInput.SourceFile.EnsureUsingNamespace(ns);
                         }
-
-                        differAfter(nextInput);
                     };
                 };
             };

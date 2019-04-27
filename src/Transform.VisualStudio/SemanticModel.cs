@@ -349,7 +349,12 @@ namespace CSharpE.Transform.VisualStudio
 
         public override ForEachStatementInfo GetForEachStatementInfo(ForEachStatementSyntax node)
         {
-            throw new NotImplementedException();
+            var adjusted = Adjust(node);
+
+            if (adjusted == null)
+                return default;
+
+            return roslynModel.GetForEachStatementInfo(adjusted);
         }
 
         public override ForEachStatementInfo GetForEachStatementInfo(CommonForEachStatementSyntax node)
