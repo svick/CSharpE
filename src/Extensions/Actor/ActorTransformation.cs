@@ -11,11 +11,8 @@ namespace CSharpE.Extensions.Actor
     {
         protected override void Process(Project project)
         {
-            Smart.ForEach(project.GetTypesWithAttribute<ActorAttribute>(), baseType =>
+            Smart.ForEach(project.GetClassesWithAttribute<ActorAttribute>(), type =>
             {
-                if (!(baseType is TypeDefinition type))
-                    return;
-
                 var actorSemaphoreField = type.AddField(
                     ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
 
@@ -23,6 +20,9 @@ namespace CSharpE.Extensions.Actor
 
                 Smart.ForEach(type.PublicMethods, actorSemaphoreFieldExpression, (asf, method) =>
                 {
+                    if (method.IsStatic)
+                        return;
+
                     method.ReturnType = NamedType(typeof(Task<>), method.ReturnType);
                     method.IsAsync = true;
 

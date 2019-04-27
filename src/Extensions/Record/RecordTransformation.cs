@@ -18,23 +18,20 @@ namespace CSharpE.Extensions.Record
                     return;
                 
                 typeDefinition.BaseTypes.Add(NamedType(typeof(IEquatable<>), typeDefinition.GetReference()));
-                
-                var fieldsList = Smart.ForEach(typeDefinition.Fields, field =>
-                {
-                    return (field.Name, Type: field.Type.Clone());
-                });
+
+                var fieldsList = Smart.ForEach(typeDefinition.Fields, field => (field.Name, Type: field.Type.Clone()));
 
                 typeDefinition.Fields.Clear();
 
                 Smart.Segment(typeDefinition, fieldsList, isDesignTime, (fields, dt, type) =>
                 {
-                    string paramName(string name) => name.Substring(0, 1).ToLowerInvariant() + name.Substring(1);
+                    string ParamName(string name) => name.Substring(0, 1).ToLowerInvariant() + name.Substring(1);
 
                     var constructorBody = dt
                         ? new[] { NotImplementedStatement }
-                        : fields.Select(f => (Statement)Assignment(This().MemberAccess(f.Name), Identifier(paramName(f.Name))));
+                        : fields.Select(f => (Statement)Assignment(This().MemberAccess(f.Name), Identifier(ParamName(f.Name))));
 
-                    type.AddConstructor(Public, fields.Select(f => Parameter(f.Type, paramName(f.Name))), constructorBody);
+                    type.AddConstructor(Public, fields.Select(f => Parameter(f.Type, ParamName(f.Name))), constructorBody);
 
                     foreach (var field in fields)
                     {
@@ -44,9 +41,11 @@ namespace CSharpE.Extensions.Record
                             ? NotImplementedStatement
                             : Return(New(
                                 type.GetReference(),
-                                fields.Select(f => f.Name == field.Name ? (Expression)Identifier(paramName(f.Name)) : This().MemberAccess(f.Name))));
+                                fields.Select(f => f.Name == field.Name ? (Expression)Identifier(ParamName(f.Name)) : This().MemberAccess(f.Name))));
 
-                        type.AddMethod(Public, type.GetReference(), $"With{field.Name}", new[] { Parameter(field.Type, paramName(field.Name)) }, witherBody);
+                        type.AddMethod(
+                            Public, type.GetReference(), "With" + field.Name,
+                            new[] { Parameter(field.Type, ParamName(field.Name)) }, witherBody);
                     }
                 });
 
