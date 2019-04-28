@@ -118,6 +118,19 @@ namespace CSharpE.Syntax
         internal override SyntaxNode Clone() => new ArrayTypeReference(ElementType, Rank);
 
         internal override StringBuilder ComputeFullName(StringBuilder stringBuilder) =>
-            throw new NotImplementedException();
+            ElementType.ComputeFullName(stringBuilder)
+                .Append('[')
+                .Append(',', Rank - 1)
+                .Append(']');
+
+        public override bool Equals(TypeReference other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (!(other is ArrayTypeReference otherArray)) return false;
+
+            return Equals(ElementType, otherArray.ElementType) && Rank == otherArray.Rank;
+        }
+
+        public override int GetHashCode() => HashCode.Combine(ElementType, Rank);
     }
 }

@@ -23,7 +23,9 @@ namespace CSharpE.Syntax.Internals
                 symbol = methodSymbol.ContainingType;
             }
 
-            return (INamedTypeSymbol)(symbol ?? semanticModel.GetTypeInfo(typeSyntax).Type);
+            // IdentifierExpression.AsTypeReference can give TypeReference that is not actually a type,
+            // which means their symbol is not going to be an ITypeSymbol
+            return (symbol ?? semanticModel.GetTypeInfo(typeSyntax).Type) as INamedTypeSymbol;
         }
     }
 }

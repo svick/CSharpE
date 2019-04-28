@@ -70,7 +70,7 @@ namespace CSharpE.Syntax
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
-            foreach (var statement in Statements)
+            foreach (var statement in Statements.Reverse())
             {
                 statement.ReplaceExpressions(filter, projection);
             }

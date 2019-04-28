@@ -74,9 +74,46 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        internal override StringBuilder ComputeFullName(StringBuilder stringBuilder) =>
-            throw new NotImplementedException();
-
         public override IEnumerable<SyntaxNode> GetChildren() => Elements;
+
+        internal override StringBuilder ComputeFullName(StringBuilder stringBuilder)
+        {
+            stringBuilder.Append('(');
+
+            bool first = true;
+
+            foreach (var element in Elements)
+            {
+                if (!first)
+                    stringBuilder.Append(", ");
+                first = false;
+
+                element.ComputeFullName(stringBuilder);
+            }
+
+            stringBuilder.Append(')');
+
+            return stringBuilder;
+        }
+
+        public override bool Equals(TypeReference other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (!(other is TupleTypeReference otherTuple)) return false;
+
+            return Elements.SequenceEqual(otherTuple.Elements);
+        }
+
+        public override int GetHashCode()
+        {
+            var hc = new HashCode();
+
+            foreach (var element in Elements)
+            {
+                hc.Add(element);
+            }
+
+            return hc.ToHashCode();
+        }
     }
 }

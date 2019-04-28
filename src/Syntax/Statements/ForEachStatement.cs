@@ -134,12 +134,12 @@ namespace CSharpE.Syntax
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
-            Expression = Expression.ReplaceExpressions(Expression, filter, projection);
-
             foreach (var statement in Statements)
             {
                 statement.ReplaceExpressions(filter, projection);
             }
+
+            Expression = Expression.ReplaceExpressions(Expression, filter, projection);
         }
     }
 
@@ -217,14 +217,14 @@ namespace CSharpE.Syntax
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
-            ElementPattern = Expression.ReplaceExpressions(ElementPattern, filter, projection);
-
-            Expression = Expression.ReplaceExpressions(Expression, filter, projection);
-
             foreach (var statement in Statements)
             {
                 statement.ReplaceExpressions(filter, projection);
             }
+
+            ElementPattern = Expression.ReplaceExpressions(ElementPattern, filter, projection);
+
+            Expression = Expression.ReplaceExpressions(Expression, filter, projection);
         }
     }
 }

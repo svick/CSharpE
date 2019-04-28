@@ -68,6 +68,16 @@ namespace CSharpE.Syntax
         }
 
         internal override StringBuilder ComputeFullName(StringBuilder stringBuilder) =>
-            throw new NotImplementedException();
+            ElementType.ComputeFullName(stringBuilder).Append('?');
+
+        public override bool Equals(TypeReference other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (!(other is NullableTypeReference otherNullable)) return false;
+
+            return Equals(ElementType, otherNullable.ElementType);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(ElementType, nameof(NullableTypeReference));
     }
 }

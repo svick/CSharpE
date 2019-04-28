@@ -12,7 +12,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class NamedTypeReference : TypeReference, IEquatable<NamedTypeReference>
+    public sealed class NamedTypeReference : TypeReference
     {
         private TypeSyntax syntax;
 
@@ -244,8 +244,6 @@ namespace CSharpE.Syntax
             return stringBuilder;
         }
 
-        public string FullName => ComputeFullName(new StringBuilder()).ToString();
-
         private static bool IsAncestorNamespace(string parent, string child) => parent == child || child.StartsWith(parent + '.');
 
         public bool RequiresUsingNamespace => IsKnownType && Namespace != null && !IsPredefinedType &&
@@ -391,18 +389,18 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Clone() => new NamedTypeReference(Namespace, Container, Name, TypeParameters);
 
-        public bool Equals(NamedTypeReference other)
+        public override bool Equals(TypeReference other)
         {
-            if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
+            if (!(other is NamedTypeReference otherNamed)) return false;
 
             var ordinalComparer = StringComparer.Ordinal;
 
-            return ordinalComparer.Equals(Namespace, other.Namespace) && Equals(Container, other.Container) &&
-                   ordinalComparer.Equals(Name, other.Name) && TypeParameters.SequenceEqual(other.TypeParameters);
+            return ordinalComparer.Equals(Namespace, otherNamed.Namespace) &&
+                   Equals(Container, otherNamed.Container) &&
+                   ordinalComparer.Equals(Name, otherNamed.Name) &&
+                   TypeParameters.SequenceEqual(otherNamed.TypeParameters);
         }
-
-        public override bool Equals(object obj) => Equals(obj as NamedTypeReference);
 
         public override int GetHashCode()
         {

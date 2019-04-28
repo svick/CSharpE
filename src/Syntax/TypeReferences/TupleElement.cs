@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -38,7 +39,7 @@ namespace CSharpE.Syntax
 
                 return type;
             }
-            set => Set(ref type, value);
+            set => SetNotNull(ref type, value);
         }
 
         private Identifier name;
@@ -78,5 +79,26 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
+
+        public void ComputeFullName(StringBuilder stringBuilder)
+        {
+            stringBuilder.Append(Type);
+
+            if (Name != null)
+            {
+                stringBuilder.Append(' ');
+                stringBuilder.Append(Name);
+            }
+        }
+
+        public override bool Equals(object other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (!(other is TupleElement otherElement)) return false;
+
+            return Type.Equals(otherElement.Type) && Equals(Name, otherElement.Name);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Type, Name);
     }
 }

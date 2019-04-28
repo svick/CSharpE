@@ -20,9 +20,11 @@ namespace CSharpE.Syntax
         {
             GetAndResetChanged(ref changed);
 
-            if (syntax == null)
+            if (syntax == null || !IsAnnotated(syntax))
             {
                 syntax = RoslynSyntaxFactory.ThisExpression();
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

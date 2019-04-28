@@ -68,6 +68,16 @@ namespace CSharpE.Syntax
         }
 
         internal override StringBuilder ComputeFullName(StringBuilder stringBuilder) =>
-            throw new NotImplementedException();
+            ElementType.ComputeFullName(stringBuilder.Append("ref "));
+
+        public override bool Equals(TypeReference other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (!(other is RefTypeReference otherRef)) return false;
+
+            return Equals(ElementType, otherRef.ElementType);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(ElementType, nameof(RefTypeReference));
     }
 }

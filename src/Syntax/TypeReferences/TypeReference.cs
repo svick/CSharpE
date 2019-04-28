@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpE.Syntax
 {
-    public abstract class TypeReference : Expression, ISyntaxWrapper<TypeSyntax>
+    public abstract class TypeReference : Expression, ISyntaxWrapper<TypeSyntax>, IEquatable<TypeReference>
     {
         private protected TypeReference() { }
 
@@ -22,5 +22,13 @@ namespace CSharpE.Syntax
         private protected abstract TypeSyntax GetWrappedType(ref bool? changed);
 
         internal abstract StringBuilder ComputeFullName(StringBuilder stringBuilder);
+
+        public string FullName => ComputeFullName(new StringBuilder()).ToString();
+
+        public sealed override bool Equals(object obj) => Equals(obj as TypeReference);
+
+        public abstract bool Equals(TypeReference other);
+
+        public abstract override int GetHashCode();
     }
 }
