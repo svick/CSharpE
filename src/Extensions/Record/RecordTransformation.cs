@@ -19,7 +19,7 @@ namespace CSharpE.Extensions.Record
                 
                 typeDefinition.BaseTypes.Add(NamedType(typeof(IEquatable<>), typeDefinition.GetReference()));
 
-                var fieldsList = Smart.ForEach(typeDefinition.Fields, field => (field.Name, Type: field.Type.Clone()));
+                var fieldsList = Smart.ForEach(typeDefinition.Fields, field => (field.Name, field.Type));
 
                 typeDefinition.Fields.Clear();
 

@@ -107,7 +107,7 @@ namespace CSharpE.Transform
                         result = combine(result, childAction(visitArg, item));
                     }
 
-                    Result = result;
+                    Result = GeneralHandler.DeepClone(result);
                 }
             }
         }
@@ -153,7 +153,7 @@ namespace CSharpE.Transform
 
             var visitor = new Visitor<TNode, TArg, TIntermediate, TResult>(arg, action, simpleCombine, complexCombine);
             syntaxCollection.Visit(visitor);
-            return visitor.Result;
+            return GeneralHandler.DeepClone(visitor.Result);
         }
 
         private static List<TResult> AddItemToList<TResult>(List<TResult> list, TResult item)

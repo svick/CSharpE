@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
@@ -11,17 +14,37 @@ namespace CSharpE.Transform.VisualStudio
         private readonly RoslynSyntaxTree oldTree;
         private readonly RoslynSyntaxTree newTree;
 
-        private readonly IList<TextChange> changes;
+        private readonly Lazy<IList<TextChange>> changes;
 
         public SyntaxTreeDiff(RoslynSyntaxTree oldTree, RoslynSyntaxTree newTree)
         {
             this.oldTree = oldTree;
             this.newTree = newTree;
 
-            changes = SyntaxDiffer.GetTextChanges(oldTree, newTree);
+            changes = new Lazy<IList<TextChange>>(() => SyntaxDiffer.GetTextChanges(oldTree, newTree));
         }
 
         public Diagnostic Adjust(Diagnostic diagnostic) => diagnostic.WithLocation(AdjustLoose(diagnostic.Location));
+
+        private (SyntaxNode oldNode, SyntaxNode newNode)? FindNodePair(SyntaxNode oldNode)
+        {
+            while (oldNode != null)
+            {
+                var annotation = Annotation.Get(oldNode);
+                if (annotation != null)
+                {
+                    var newNode = newTree.GetRoot().GetAnnotatedNodes(annotation).FirstOrDefault();
+                    if (newNode != null)
+                    {
+                        return (oldNode, newNode);
+                    }
+                }
+
+                oldNode = oldNode.Parent;
+            }
+
+            return null;
+        }
 
         private Location AdjustLoose(Location location)
         {
@@ -29,6 +52,15 @@ namespace CSharpE.Transform.VisualStudio
                 return location;
 
             Debug.Assert(location.SourceTree == oldTree);
+
+            var oldNode = location.SourceTree.GetRoot().FindNode(location.SourceSpan);
+            var nodePair = FindNodePair(oldNode);
+
+            if (nodePair != null)
+            {
+                // TODO: if location != oldNode.Location, use diff to compute better adjusted location
+                return nodePair.Value.newNode.GetLocation();
+            }
 
             var adjusted = AdjustLoose(location.SourceSpan);
 
@@ -61,7 +93,7 @@ namespace CSharpE.Transform.VisualStudio
         {
             int? result = position;
 
-            foreach (var change in changes)
+            foreach (var change in changes.Value)
             {
                 result = Adjust(position, result, change);
             }
@@ -94,7 +126,7 @@ namespace CSharpE.Transform.VisualStudio
         {
             int? result = position;
 
-            foreach (var change in changes)
+            foreach (var change in changes.Value)
             {
                 result = Adjust(position, result, change, loose: true);
             }

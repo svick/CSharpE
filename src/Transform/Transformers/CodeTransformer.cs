@@ -46,7 +46,7 @@ namespace CSharpE.Transform.Transformers
 
             transformers = transformerCollector.Transformers;
 
-            return result;
+            return GeneralHandler.DeepClone(result);
         }
     }
 
