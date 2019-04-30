@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <LangVersion>7.1</LangVersion>
+    <CSharpEVersion>0.1.135</CSharpEVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSharpE.Actor" Version="$(CSharpEVersion)" />
+    <PackageReference Include="CSharpE.Logging" Version="$(CSharpEVersion)" />
+    <PackageReference Include="CSharpE.Json" Version="$(CSharpEVersion)" />
+    <PackageReference Include="CSharpE.Transform.MSBuild" Version="$(CSharpEVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
