@@ -121,6 +121,9 @@ namespace CSharpE.Syntax
 
             foreach (var child in GetChildren())
             {
+                if (child == null)
+                    continue;
+
                 yield return child;
 
                 foreach (var childDescendant in child.GetDescendants())

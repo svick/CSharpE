@@ -556,6 +556,7 @@ namespace CSharpE.Syntax.Internals
             switch (typeSymbol)
             {
                 case null:
+                case IErrorTypeSymbol _:
                     return null;
                 case INamedTypeSymbol namedType:
                     return new NamedTypeReference(namedType);

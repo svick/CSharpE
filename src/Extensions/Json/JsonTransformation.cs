@@ -46,9 +46,20 @@ namespace CSharpE.Extensions.Json
                 {
                     var jsonTypeReference = jsonType.GetReference();
 
+                    bool IsJsonExpression(MemberAccessExpression e) =>
+                        e.Expression.GetExpressionType() is NamedTypeReference type &&
+                        jsonTypeReference.Equals(type.Container) && type.Name.StartsWith("JsonObject");
+
+                    var invalidJsonExpressions = project.GetDescendants().OfType<MemberAccessExpression>()
+                        .Where(e => IsJsonExpression(e) && e.GetExpressionType() == null);
+
+                    // don't do anything here in case of errors
+                    // this way errors are guaranteed to stay errors and should have decent error messages
+                    if (invalidJsonExpressions.Any())
+                        return;
+
                     project.ReplaceExpressions<MemberAccessExpression>(
-                        e => e.Expression.GetExpressionType() is NamedTypeReference type &&
-                             jsonTypeReference.Equals(type.Container) && type.Name.StartsWith("JsonObject"),
+                        IsJsonExpression,
                         e => e.Expression.ElementAccess(Literal(e.MemberName)));
 
                     project.ReplaceExpressions<MemberAccessExpression>(

@@ -19,7 +19,7 @@ namespace CSharpE.Syntax
         public IList<LibraryReference> References { get; }
 
         internal CSharpCompilation compilation;
-        public CSharpCompilation Compilation
+        internal CSharpCompilation Compilation
         {
             get
             {
@@ -89,6 +89,21 @@ namespace CSharpE.Syntax
 
         public IEnumerable<MethodDefinition> GetMethods() =>
             NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetMethods());
+
+        public IEnumerable<SyntaxNode> GetDescendants()
+        {
+            // PERF: this is quadratic
+
+            foreach (var sourceFile in SourceFiles)
+            {
+                yield return sourceFile;
+
+                foreach (var childDescendant in sourceFile.GetDescendants())
+                {
+                    yield return childDescendant;
+                }
+            }
+        }
 
         public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression
         {
