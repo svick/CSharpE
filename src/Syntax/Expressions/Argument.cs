@@ -12,6 +12,7 @@ namespace CSharpE.Syntax
         private ArgumentSyntax syntax;
 
         internal Argument(ArgumentSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
             Name = syntax.NameColon?.Name.Identifier.ValueText;
@@ -47,11 +48,13 @@ namespace CSharpE.Syntax
 
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
 
-            if (syntax == null || thisChanged == true || syntax.NameColon?.Name.Identifier.ValueText != Name)
+            if (syntax == null || thisChanged == true || syntax.NameColon?.Name.Identifier.ValueText != Name || !IsAnnotated(syntax))
             {
                 syntax = RoslynSyntaxFactory.Argument(
                     Name == null ? null : RoslynSyntaxFactory.NameColon(Name),
                     default, newExpression);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

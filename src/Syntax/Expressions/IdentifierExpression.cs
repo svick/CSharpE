@@ -10,6 +10,7 @@ namespace CSharpE.Syntax
         private IdentifierNameSyntax syntax;
 
         internal IdentifierExpression(IdentifierNameSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

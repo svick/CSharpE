@@ -9,12 +9,12 @@ using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    // TODO: generics
     public abstract class BaseMemberAccessExpression : Expression
     {
         private ExpressionSyntax syntax;
 
         internal BaseMemberAccessExpression(ExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;
