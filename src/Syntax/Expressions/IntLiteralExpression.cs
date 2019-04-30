@@ -10,7 +10,7 @@ namespace CSharpE.Syntax
     {
         internal IntLiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
         {
-            Init(syntax ?? throw new ArgumentNullException(nameof(syntax)));
+            Init(syntax);
 
             Parent = parent;
         }

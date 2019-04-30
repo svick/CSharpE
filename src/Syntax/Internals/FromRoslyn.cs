@@ -251,6 +251,8 @@ namespace CSharpE.Syntax.Internals
                     if (syntax.Token.Value is int)
                         return new IntLiteralExpression(syntax, parent);
                     break;
+                case SyntaxKind.CharacterLiteralExpression:
+                    return new CharLiteralExpression(syntax, parent);
                 case SyntaxKind.StringLiteralExpression:
                     return new StringLiteralExpression(syntax, parent);
                 case SyntaxKind.TrueLiteralExpression:
@@ -308,12 +310,20 @@ namespace CSharpE.Syntax.Internals
             {
                 case null:
                     return null;
-                case DoStatementSyntax @do:
-                    return new DoWhileStatement(@do, parent);
+                case BreakStatementSyntax @break:
+                    return new BreakStatement(@break, parent);
                 case CheckedStatementSyntax @checked:
                     return new CheckedStatement(@checked, parent);
+                case ContinueStatementSyntax @continue:
+                    return new ContinueStatement(@continue, parent);
+                case DoStatementSyntax @do:
+                    return new DoWhileStatement(@do, parent);
+                case EmptyStatementSyntax empty:
+                    return new EmptyStatement(empty, parent);
                 case ExpressionStatementSyntax expression:
                     return new ExpressionStatement(expression, parent);
+                case FixedStatementSyntax @fixed:
+                    return new FixedStatement(@fixed, parent);
                 case ForEachStatementSyntax forEach:
                     return new ForEachStatement(forEach, parent);
                 case ForEachVariableStatementSyntax forEachVariable:
@@ -324,12 +334,18 @@ namespace CSharpE.Syntax.Internals
                     return new IfStatement(@if, parent);
                 case LocalDeclarationStatementSyntax localDeclaration:
                     return new VariableDeclarationStatement(localDeclaration, parent);
+                case LockStatementSyntax @lock:
+                    return new LockStatement(@lock, parent);
                 case ReturnStatementSyntax @return:
                     return new ReturnStatement(@return, parent);
                 case ThrowStatementSyntax @throw:
                     return new ExpressionStatement(@throw, parent);
                 case TryStatementSyntax @try:
                     return new TryStatement(@try, parent);
+                case UnsafeStatementSyntax @unsafe:
+                    return new UnsafeStatement(@unsafe, parent);
+                case UsingStatementSyntax @using:
+                    return new UsingStatement(@using, parent);
                 case WhileStatementSyntax @while:
                     return new WhileStatement(@while, parent);
             }
@@ -454,24 +470,24 @@ namespace CSharpE.Syntax.Internals
         {
             switch (memberDeclarationSyntax)
             {
-                case FieldDeclarationSyntax fieldDeclaration:
-                    return new FieldDefinition(fieldDeclaration, containingType);
-                case PropertyDeclarationSyntax propertyDeclaration:
-                    return new PropertyDefinition(propertyDeclaration, containingType);
-                case MethodDeclarationSyntax methodDeclaration:
-                    return new MethodDefinition(methodDeclaration, containingType);
-                case ConstructorDeclarationSyntax constructorDeclaration:
-                    return new ConstructorDefinition(constructorDeclaration, containingType);
-                case DestructorDeclarationSyntax destructorDeclaration:
-                    return new FinalizerDefinition(destructorDeclaration, containingType);
-                case OperatorDeclarationSyntax operatorDeclaration:
-                    return new OperatorDefinition(operatorDeclaration, containingType);
-                case ConversionOperatorDeclarationSyntax conversionOperatorDeclaration:
-                    return new OperatorDefinition(conversionOperatorDeclaration, containingType);
-                case BaseTypeDeclarationSyntax baseTypeDeclaration:
-                    return TypeDefinition(baseTypeDeclaration, containingType);
-                case DelegateDeclarationSyntax delegateDeclaration:
-                    return new DelegateDefinition(delegateDeclaration, containingType);
+                case FieldDeclarationSyntax field:
+                    return new FieldDefinition(field, containingType);
+                case PropertyDeclarationSyntax property:
+                    return new PropertyDefinition(property, containingType);
+                case MethodDeclarationSyntax method:
+                    return new MethodDefinition(method, containingType);
+                case ConstructorDeclarationSyntax constructor:
+                    return new ConstructorDefinition(constructor, containingType);
+                case DestructorDeclarationSyntax destructor:
+                    return new FinalizerDefinition(destructor, containingType);
+                case OperatorDeclarationSyntax @operator:
+                    return new OperatorDefinition(@operator, containingType);
+                case ConversionOperatorDeclarationSyntax conversionOperator:
+                    return new OperatorDefinition(conversionOperator, containingType);
+                case BaseTypeDeclarationSyntax baseType:
+                    return TypeDefinition(baseType, containingType);
+                case DelegateDeclarationSyntax @delegate:
+                    return new DelegateDefinition(@delegate, containingType);
                 case IncompleteMemberSyntax incompleteMember:
                     return new IncompleteMemberDefinition(incompleteMember, containingType);
                 default:

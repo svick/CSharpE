@@ -16,6 +16,7 @@ namespace N.M
             _ = 0;
             _ = true;
             _ = false;
+            _ = 'c';
             _ = "s";
             _ = @"\";
             _ = $"";
@@ -69,6 +70,9 @@ namespace N.M
             _ = stackalloc[]{42};
             _ = () => 0;
             _ = c1 ?? throw new Exception();
+            ;
+            break;
+            continue;
             try
             {
                 throw new Exception();
@@ -105,6 +109,22 @@ namespace N.M
             }
 
             while (true)
+            {
+            }
+
+            using (null)
+            {
+            }
+
+            using (object o = null)
+            {
+            }
+
+            unsafe
+            {
+            }
+
+            lock (o)
             {
             }
 

@@ -13,6 +13,8 @@ namespace CSharpE.Syntax
             new InvocationExpression(new MemberAccessExpression(receiver, methodName), arguments);
         
         public static IntLiteralExpression Literal(int value) => new IntLiteralExpression(value);
+
+        public static CharLiteralExpression Literal(char value) => new CharLiteralExpression(value);
         
         public static StringLiteralExpression Literal(string value) => new StringLiteralExpression(value);
         

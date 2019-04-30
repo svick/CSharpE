@@ -2,39 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class CheckedStatement : Statement
+    public sealed class UnsafeStatement : Statement
     {
-        private CheckedStatementSyntax syntax;
+        private UnsafeStatementSyntax syntax;
 
-        internal CheckedStatement(CheckedStatementSyntax syntax, SyntaxNode parent)
+        internal UnsafeStatement(UnsafeStatementSyntax syntax, SyntaxNode parent)
         {
-            Init(syntax);
+            this.syntax = syntax;
             Parent = parent;
         }
 
-        private void Init(CheckedStatementSyntax syntax)
-        {
-            this.syntax = syntax;
-            IsChecked = syntax.Kind() == SyntaxKind.CheckedStatement;
-        }
+        public UnsafeStatement(params Statement[] statements) : this(statements.AsEnumerable()) { }
 
-        public CheckedStatement(bool isChecked, params Statement[] statements)
-            : this(isChecked, statements.AsEnumerable()) { }
-
-        public CheckedStatement(bool isChecked, IEnumerable<Statement> statements)
-        {
-            IsChecked = isChecked;
+        public UnsafeStatement(IEnumerable<Statement> statements) =>
             this.statements = new StatementList(statements, this);
-        }
-
-        public bool IsChecked { get; set; }
 
         private StatementList statements;
         public IList<Statement> Statements
@@ -57,13 +44,9 @@ namespace CSharpE.Syntax
 
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? syntax.Block.Statements;
 
-            bool oldIsChecked = syntax.Kind() == SyntaxKind.CheckedStatement;
-
-            if (syntax == null || thisChanged == true || oldIsChecked != IsChecked)
+            if (syntax == null || thisChanged == true)
             {
-                syntax = RoslynSyntaxFactory.CheckedStatement(
-                    IsChecked ? SyntaxKind.CheckedStatement : SyntaxKind.UncheckedStatement,
-                    RoslynSyntaxFactory.Block(newStatements));
+                syntax = RoslynSyntaxFactory.UnsafeStatement(RoslynSyntaxFactory.Block(newStatements));
 
                 SetChanged(ref changed);
             }
@@ -74,10 +57,10 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             SetList(ref statements, null);
-            syntax = (CheckedStatementSyntax)newSyntax;
+            syntax = (UnsafeStatementSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new CheckedStatement(IsChecked, Statements);
+        internal override SyntaxNode Clone() => new UnsafeStatement(Statements);
 
         internal override SyntaxNode Parent { get; set; }
 

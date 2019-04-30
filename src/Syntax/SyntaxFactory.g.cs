@@ -76,19 +76,9 @@ namespace CSharpE.Syntax
             return new FinalizerDefinition(modifiers, body);
         }
 
-        public static IndexerDefinition IndexerDefinition(IndexerDeclarationSyntax syntax, TypeDefinition parent)
-        {
-            return new IndexerDefinition(syntax, parent);
-        }
-
         public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
         {
             return new MethodDefinition(modifiers, returnType, name, parameters, body);
-        }
-
-        public static NamespaceDefinition NamespaceDefinition(NamespaceDeclarationSyntax syntax, SyntaxNode parent)
-        {
-            return new NamespaceDefinition(syntax, parent);
         }
 
         public static NamespaceDefinition NamespaceDefinition(string name, params NamespaceOrTypeDefinition[] members)
@@ -369,11 +359,6 @@ namespace CSharpE.Syntax
         public static ConditionalElementAccessExpression ConditionalElementAccess(Expression expression, IEnumerable<Argument> arguments)
         {
             return new ConditionalElementAccessExpression(expression, arguments);
-        }
-
-        public static IdentifierExpression Identifier(IdentifierNameSyntax syntax, SyntaxNode parent)
-        {
-            return new IdentifierExpression(syntax, parent);
         }
 
         public static IdentifierExpression Identifier(string identifier)
@@ -821,6 +806,11 @@ namespace CSharpE.Syntax
             return new BlockStatement(statements);
         }
 
+        public static BreakStatement Break()
+        {
+            return new BreakStatement();
+        }
+
         public static CatchClause CatchClause(TypeReference exceptionType, string exceptionName, params Statement[] statements)
         {
             return new CatchClause(exceptionType, exceptionName, statements);
@@ -836,14 +826,74 @@ namespace CSharpE.Syntax
             return new CatchClause(exceptionType, exceptionName, filter, statements);
         }
 
+        public static CheckedStatement Checked(bool isChecked, params Statement[] statements)
+        {
+            return new CheckedStatement(isChecked, statements);
+        }
+
         public static CheckedStatement Checked(bool isChecked, IEnumerable<Statement> statements)
         {
             return new CheckedStatement(isChecked, statements);
         }
 
+        public static ContinueStatement Continue()
+        {
+            return new ContinueStatement();
+        }
+
+        public static DoWhileStatement DoWhile(IEnumerable<Statement> statements, Expression condition)
+        {
+            return new DoWhileStatement(statements, condition);
+        }
+
+        public static EmptyStatement Empty()
+        {
+            return new EmptyStatement();
+        }
+
         public static ExpressionStatement Expression(Expression expression)
         {
             return new ExpressionStatement(expression);
+        }
+
+        public static FixedStatement Fixed(VariableDeclarationStatement variableDeclaration, params Statement[] statements)
+        {
+            return new FixedStatement(variableDeclaration, statements);
+        }
+
+        public static FixedStatement Fixed(VariableDeclarationStatement variableDeclaration, IEnumerable<Statement> statements)
+        {
+            return new FixedStatement(variableDeclaration, statements);
+        }
+
+        public static ForEachStatement ForEach(TypeReference elementType, string elementName, Expression expression, params Statement[] statements)
+        {
+            return new ForEachStatement(elementType, elementName, expression, statements);
+        }
+
+        public static ForEachStatement ForEach(TypeReference elementType, string elementName, Expression expression, IEnumerable<Statement> statements)
+        {
+            return new ForEachStatement(elementType, elementName, expression, statements);
+        }
+
+        public static PatternForEachStatement PatternForEach(Expression elementPattern, Expression expression, params Statement[] statements)
+        {
+            return new PatternForEachStatement(elementPattern, expression, statements);
+        }
+
+        public static PatternForEachStatement PatternForEach(Expression elementPattern, Expression expression, IEnumerable<Statement> statements)
+        {
+            return new PatternForEachStatement(elementPattern, expression, statements);
+        }
+
+        public static ForStatement For(VariableDeclarationStatement variableDeclaration, Expression condition, Expression incrementor, params Statement[] statements)
+        {
+            return new ForStatement(variableDeclaration, condition, incrementor, statements);
+        }
+
+        public static ForStatement For(VariableDeclarationStatement variableDeclaration, Expression condition, IEnumerable<Expression> incrementors, IEnumerable<Statement> statements)
+        {
+            return new ForStatement(variableDeclaration, condition, incrementors, statements);
         }
 
         public static IfStatement If(Expression condition, params Statement[] thenStatements)
@@ -861,6 +911,16 @@ namespace CSharpE.Syntax
             return new IfStatement(condition, thenStatements, elseStatements);
         }
 
+        public static LockStatement Lock(Expression expression, params Statement[] statements)
+        {
+            return new LockStatement(expression, statements);
+        }
+
+        public static LockStatement Lock(Expression expression, IEnumerable<Statement> statements)
+        {
+            return new LockStatement(expression, statements);
+        }
+
         public static ReturnStatement Return(Expression expression)
         {
             return new ReturnStatement(expression);
@@ -871,6 +931,36 @@ namespace CSharpE.Syntax
             return new ReturnStatement();
         }
 
+        public static UnsafeStatement Unsafe(params Statement[] statements)
+        {
+            return new UnsafeStatement(statements);
+        }
+
+        public static UnsafeStatement Unsafe(IEnumerable<Statement> statements)
+        {
+            return new UnsafeStatement(statements);
+        }
+
+        public static UsingStatement Using(VariableDeclarationStatement variableDeclaration, params Statement[] statements)
+        {
+            return new UsingStatement(variableDeclaration, statements);
+        }
+
+        public static UsingStatement Using(VariableDeclarationStatement variableDeclaration, IEnumerable<Statement> statements)
+        {
+            return new UsingStatement(variableDeclaration, statements);
+        }
+
+        public static UsingStatement Using(Expression expression, params Statement[] statements)
+        {
+            return new UsingStatement(expression, statements);
+        }
+
+        public static UsingStatement Using(Expression expression, IEnumerable<Statement> statements)
+        {
+            return new UsingStatement(expression, statements);
+        }
+
         public static VariableDeclarationStatement VariableDeclaration(TypeReference type, string name, Expression initializer = null)
         {
             return new VariableDeclarationStatement(type, name, initializer);
@@ -879,6 +969,16 @@ namespace CSharpE.Syntax
         public static VariableDeclarationStatement VariableDeclaration(bool isConst, TypeReference type, string name, Expression initializer = null)
         {
             return new VariableDeclarationStatement(isConst, type, name, initializer);
+        }
+
+        public static WhileStatement While(Expression condition, params Statement[] statements)
+        {
+            return new WhileStatement(condition, statements);
+        }
+
+        public static WhileStatement While(Expression condition, IEnumerable<Statement> statements)
+        {
+            return new WhileStatement(condition, statements);
         }
 
         public static ArrayTypeReference ArrayType(TypeReference elementType)

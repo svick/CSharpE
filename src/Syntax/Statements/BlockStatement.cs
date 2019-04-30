@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private BlockSyntax syntax;
 
         internal BlockStatement(BlockSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;
@@ -44,9 +45,11 @@ namespace CSharpE.Syntax
 
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? syntax.Statements;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
             {
                 syntax = RoslynSyntaxFactory.Block(newStatements);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

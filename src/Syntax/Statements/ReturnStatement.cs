@@ -11,6 +11,7 @@ namespace CSharpE.Syntax
         private ReturnStatementSyntax syntax;
 
         internal ReturnStatement(ReturnStatementSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

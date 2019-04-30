@@ -11,8 +11,8 @@ namespace CSharpE.Syntax
     public sealed class NamespaceDefinition : SyntaxNode, ISyntaxWrapper<NamespaceDeclarationSyntax>
     {
         private NamespaceDeclarationSyntax syntax;
-        
-        public NamespaceDefinition(NamespaceDeclarationSyntax syntax, SyntaxNode parent)
+
+        internal NamespaceDefinition(NamespaceDeclarationSyntax syntax, SyntaxNode parent)
         {
             Init(syntax);
             Parent = parent;

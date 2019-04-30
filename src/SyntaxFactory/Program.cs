@@ -35,6 +35,7 @@ namespace CSharpE.SyntaxFactory
                 // requires manually written SyntaxFactory methods
                 switch (classDefinition.Name) {
                     case nameof(IntLiteralExpression):
+                    case nameof(CharLiteralExpression):
                     case nameof(StringLiteralExpression):
                     case nameof(BoolLiteralExpression):
                     case nameof(TryStatement):

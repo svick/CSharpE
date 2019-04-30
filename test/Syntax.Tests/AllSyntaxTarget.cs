@@ -59,6 +59,10 @@ class C
         {
         }
         while (false);
+        fixed (int *p = &new int[1])
+        {
+        }
+
         int i;
         int j = 42;
     }

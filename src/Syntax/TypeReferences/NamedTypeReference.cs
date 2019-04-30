@@ -273,7 +273,6 @@ namespace CSharpE.Syntax
                 return syntax;
             }
 
-            // TODO: don't add the namespace we're currently in
             if (RequiresUsingNamespace)
                 SourceFile?.EnsureUsingNamespace(Namespace);
 

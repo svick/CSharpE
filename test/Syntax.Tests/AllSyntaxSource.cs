@@ -38,6 +38,10 @@ class C
         {
         } while (false);
 
+        fixed (int* p = &new int[1])
+        {
+        }
+
         int i, j = 42;
     }
 

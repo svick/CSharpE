@@ -8,8 +8,8 @@ namespace CSharpE.Syntax
     public sealed class IdentifierExpression : Expression, ISyntaxWrapper<IdentifierNameSyntax>
     {
         private IdentifierNameSyntax syntax;
-        
-        public IdentifierExpression(IdentifierNameSyntax syntax, SyntaxNode parent)
+
+        internal IdentifierExpression(IdentifierNameSyntax syntax, SyntaxNode parent)
         {
             Init(syntax);
             Parent = parent;
