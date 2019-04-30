@@ -10,7 +10,7 @@ namespace CSharpE.Syntax
 
         public UnaryPlusExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new UnaryPlusExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new UnaryPlusExpression(Operand);
     }
 
     public sealed class UnaryMinusExpression : UnaryExpression
@@ -20,7 +20,7 @@ namespace CSharpE.Syntax
 
         public UnaryMinusExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new UnaryMinusExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new UnaryMinusExpression(Operand);
     }
 
     public sealed class ComplementExpression : UnaryExpression
@@ -32,7 +32,7 @@ namespace CSharpE.Syntax
 
         public ComplementExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new ComplementExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new ComplementExpression(Operand);
     }
 
     public sealed class NegateExpression : UnaryExpression
@@ -44,7 +44,7 @@ namespace CSharpE.Syntax
 
         public NegateExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new NegateExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new NegateExpression(Operand);
     }
 
     public sealed class PreIncrementExpression : UnaryExpression
@@ -54,7 +54,7 @@ namespace CSharpE.Syntax
 
         public PreIncrementExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new PreIncrementExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new PreIncrementExpression(Operand);
     }
 
     public sealed class PreDecrementExpression : UnaryExpression
@@ -64,7 +64,7 @@ namespace CSharpE.Syntax
 
         public PreDecrementExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new PreDecrementExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new PreDecrementExpression(Operand);
     }
 
     public sealed class AddressOfExpression : UnaryExpression
@@ -74,7 +74,7 @@ namespace CSharpE.Syntax
 
         public AddressOfExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new AddressOfExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new AddressOfExpression(Operand);
     }
 
     public sealed class PointerIndirectionExpression : UnaryExpression
@@ -84,7 +84,7 @@ namespace CSharpE.Syntax
 
         public PointerIndirectionExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new PointerIndirectionExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new PointerIndirectionExpression(Operand);
     }
 
     public sealed class PostIncrementExpression : UnaryExpression
@@ -96,7 +96,7 @@ namespace CSharpE.Syntax
 
         public PostIncrementExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new PostIncrementExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new PostIncrementExpression(Operand);
     }
 
     public sealed class PostDecrementExpression : UnaryExpression
@@ -108,6 +108,6 @@ namespace CSharpE.Syntax
 
         public PostDecrementExpression(Expression operand) : base(operand) { }
 
-        internal override SyntaxNode Clone() => new PostDecrementExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new PostDecrementExpression(Operand);
     }
 }

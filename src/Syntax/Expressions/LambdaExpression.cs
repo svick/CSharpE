@@ -189,7 +189,7 @@ namespace CSharpE.Syntax
             Init((LambdaExpressionSyntax)newSyntax);
         }
 
-        internal override SyntaxNode Clone() =>
+        private protected override SyntaxNode CloneImpl() =>
             Expression != null
                 ? new LambdaExpression(IsAsync, Parameters, Expression)
                 : new LambdaExpression(IsAsync, Parameters, Statements);

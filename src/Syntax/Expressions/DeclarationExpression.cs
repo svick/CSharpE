@@ -74,7 +74,7 @@ namespace CSharpE.Syntax
             Set(ref designation, null);
         }
 
-        internal override SyntaxNode Clone() => new DeclarationExpression(Type, Designation);
+        private protected override SyntaxNode CloneImpl() => new DeclarationExpression(Type, Designation);
 
         internal override SyntaxNode Parent { get; set; }
     }

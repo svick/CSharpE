@@ -37,7 +37,7 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
             Init((LiteralExpressionSyntax) newSyntax);
 
-        internal override SyntaxNode Clone() => new NullExpression();
+        private protected override SyntaxNode CloneImpl() => new NullExpression();
         
     }
 }

@@ -165,7 +165,7 @@ namespace CSharpE.Syntax
             Set(ref body, null);
         }
 
-        internal override SyntaxNode Clone() =>
+        private protected override SyntaxNode CloneImpl() =>
             new MethodDefinition(Modifiers, ReturnType, Name, Parameters, Body?.Statements) { Attributes = Attributes };
 
         public override IEnumerable<SyntaxNode> GetChildren() =>

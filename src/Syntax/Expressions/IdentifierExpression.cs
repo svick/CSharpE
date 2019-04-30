@@ -57,7 +57,7 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
             => Init((IdentifierNameSyntax)newSyntax);
 
-        internal override SyntaxNode Clone() => new IdentifierExpression(Identifier);
+        private protected override SyntaxNode CloneImpl() => new IdentifierExpression(Identifier);
 
         internal override SyntaxNode Parent { get; set; }
 

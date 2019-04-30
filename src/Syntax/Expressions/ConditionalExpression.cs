@@ -90,7 +90,7 @@ namespace CSharpE.Syntax
             Set(ref whenFalse, null);
         }
 
-        internal override SyntaxNode Clone() => new ConditionalExpression(Condition, WhenTrue, WhenFalse);
+        private protected override SyntaxNode CloneImpl() => new ConditionalExpression(Condition, WhenTrue, WhenFalse);
 
         internal override SyntaxNode Parent { get; set; }
     }

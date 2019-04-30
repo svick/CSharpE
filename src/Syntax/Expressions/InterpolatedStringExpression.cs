@@ -88,7 +88,7 @@ namespace CSharpE.Syntax
             SetList(ref contents, null);
         }
 
-        internal override SyntaxNode Clone() => new InterpolatedStringExpression(Contents);
+        private protected override SyntaxNode CloneImpl() => new InterpolatedStringExpression(Contents);
 
         internal override SyntaxNode Parent { get; set; }
 

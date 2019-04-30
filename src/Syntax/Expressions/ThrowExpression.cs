@@ -54,7 +54,7 @@ namespace CSharpE.Syntax
             syntax = (ThrowExpressionSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new ThrowExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new ThrowExpression(Operand);
 
         internal override SyntaxNode Parent { get; set; }
     }

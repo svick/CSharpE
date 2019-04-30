@@ -61,7 +61,7 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) => syntax = (TupleExpressionSyntax)newSyntax;
 
-        internal override SyntaxNode Clone() => new TupleExpression(Arguments);
+        private protected override SyntaxNode CloneImpl() => new TupleExpression(Arguments);
 
         internal override SyntaxNode Parent { get; set; }
 

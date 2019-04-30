@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
@@ -26,6 +27,15 @@ namespace CSharpE.Syntax
 
             name = new Identifier(syntax.Identifier);
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
+        }
+
+        public DelegateDefinition(TypeReference returnType, params Parameter[] parameters)
+            : this(returnType, parameters.AsEnumerable()) { }
+
+        public DelegateDefinition(TypeReference returnType, IEnumerable<Parameter> parameters)
+        {
+            ReturnType = returnType;
+            this.parameters = new SeparatedSyntaxList<Parameter, ParameterSyntax>(parameters, this);
         }
 
         private TypeReference returnType;
@@ -57,13 +67,13 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            throw new NotImplementedException();
+            Init((DelegateDeclarationSyntax)newSyntax);
+
+            Set(ref returnType, null);
+            SetList(ref parameters, null);
         }
 
-        internal override SyntaxNode Clone()
-        {
-            throw new NotImplementedException();
-        }
+        private protected override SyntaxNode CloneImpl() => new DelegateDefinition(ReturnType, Parameters);
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 

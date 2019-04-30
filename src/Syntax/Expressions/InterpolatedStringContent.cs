@@ -119,7 +119,7 @@ namespace CSharpE.Syntax
             Init((InterpolationSyntax)newSyntax);
         }
 
-        internal override SyntaxNode Clone() => new Interpolation(Expression, Alignment, Format);
+        private protected override SyntaxNode CloneImpl() => new Interpolation(Expression, Alignment, Format);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
             Expression = Expression.ReplaceExpressions(Expression, filter, projection);
@@ -171,7 +171,7 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
             Init((InterpolatedStringTextSyntax)newSyntax);
 
-        internal override SyntaxNode Clone() => new InterpolatedStringText(Text);
+        private protected override SyntaxNode CloneImpl() => new InterpolatedStringText(Text);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) { }
     }

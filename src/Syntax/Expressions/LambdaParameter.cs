@@ -124,7 +124,7 @@ namespace CSharpE.Syntax
             Init((ParameterSyntax)newSyntax);
         }
 
-        internal override SyntaxNode Clone() => new LambdaParameter(Modifier, Type, Name);
+        private protected override SyntaxNode CloneImpl() => new LambdaParameter(Modifier, Type, Name);
 
         internal override SyntaxNode Parent { get; set; }
     }

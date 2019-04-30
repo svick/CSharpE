@@ -11,7 +11,7 @@ namespace CSharpE.Syntax
         public AddExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new AddExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new AddExpression(Left, Right);
     }
 
     public sealed class SubtractExpression : BinaryExpression
@@ -22,7 +22,7 @@ namespace CSharpE.Syntax
         public SubtractExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new SubtractExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new SubtractExpression(Left, Right);
     }
 
     public sealed class MultiplyExpression : BinaryExpression
@@ -33,7 +33,7 @@ namespace CSharpE.Syntax
         public MultiplyExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new MultiplyExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new MultiplyExpression(Left, Right);
     }
 
     public sealed class DivideExpression : BinaryExpression
@@ -44,7 +44,7 @@ namespace CSharpE.Syntax
         public DivideExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new DivideExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new DivideExpression(Left, Right);
     }
 
     public sealed class ModuloExpression : BinaryExpression
@@ -55,7 +55,7 @@ namespace CSharpE.Syntax
         public ModuloExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new ModuloExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new ModuloExpression(Left, Right);
     }
 
     public sealed class LeftShiftExpression : BinaryExpression
@@ -66,7 +66,7 @@ namespace CSharpE.Syntax
         public LeftShiftExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new LeftShiftExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new LeftShiftExpression(Left, Right);
     }
 
     public sealed class RightShiftExpression : BinaryExpression
@@ -77,7 +77,7 @@ namespace CSharpE.Syntax
         public RightShiftExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new RightShiftExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new RightShiftExpression(Left, Right);
     }
 
     public sealed class LogicalOrExpression : BinaryExpression
@@ -88,7 +88,7 @@ namespace CSharpE.Syntax
         public LogicalOrExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new LogicalOrExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new LogicalOrExpression(Left, Right);
     }
 
     public sealed class LogicalAndExpression : BinaryExpression
@@ -99,7 +99,7 @@ namespace CSharpE.Syntax
         public LogicalAndExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new LogicalAndExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new LogicalAndExpression(Left, Right);
     }
 
     public sealed class BitwiseOrExpression : BinaryExpression
@@ -110,7 +110,7 @@ namespace CSharpE.Syntax
         public BitwiseOrExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new BitwiseOrExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new BitwiseOrExpression(Left, Right);
     }
 
     public sealed class BitwiseAndExpression : BinaryExpression
@@ -121,7 +121,7 @@ namespace CSharpE.Syntax
         public BitwiseAndExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new BitwiseAndExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new BitwiseAndExpression(Left, Right);
     }
 
     public sealed class XorExpression : BinaryExpression
@@ -134,7 +134,7 @@ namespace CSharpE.Syntax
         public XorExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new XorExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new XorExpression(Left, Right);
     }
 
     public sealed class EqualsExpression : BinaryExpression
@@ -145,7 +145,7 @@ namespace CSharpE.Syntax
         public EqualsExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new EqualsExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new EqualsExpression(Left, Right);
     }
 
     public sealed class NotEqualsExpression : BinaryExpression
@@ -156,7 +156,7 @@ namespace CSharpE.Syntax
         public NotEqualsExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new NotEqualsExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new NotEqualsExpression(Left, Right);
     }
 
     public sealed class LessThanExpression : BinaryExpression
@@ -167,7 +167,7 @@ namespace CSharpE.Syntax
         public LessThanExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new LessThanExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new LessThanExpression(Left, Right);
     }
 
     public sealed class LessThanOrEqualExpression : BinaryExpression
@@ -178,7 +178,7 @@ namespace CSharpE.Syntax
         public LessThanOrEqualExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new LessThanOrEqualExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new LessThanOrEqualExpression(Left, Right);
     }
 
     public sealed class GreaterThanExpression : BinaryExpression
@@ -189,7 +189,7 @@ namespace CSharpE.Syntax
         public GreaterThanExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new GreaterThanExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new GreaterThanExpression(Left, Right);
     }
 
     public sealed class GreaterThanOrEqualExpression : BinaryExpression
@@ -200,7 +200,7 @@ namespace CSharpE.Syntax
         public GreaterThanOrEqualExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new GreaterThanOrEqualExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new GreaterThanOrEqualExpression(Left, Right);
     }
 
     public sealed class IsExpression : BinaryExpression
@@ -217,7 +217,7 @@ namespace CSharpE.Syntax
             set => base.Right = value;
         }
 
-        internal override SyntaxNode Clone() => new IsExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new IsExpression(Left, Right);
     }
 
     public sealed class AsExpression : BinaryExpression
@@ -234,7 +234,7 @@ namespace CSharpE.Syntax
             set => base.Right = value;
         }
 
-        internal override SyntaxNode Clone() => new AsExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new AsExpression(Left, Right);
     }
 
     public sealed class CoalesceExpression : BinaryExpression
@@ -245,7 +245,7 @@ namespace CSharpE.Syntax
         public CoalesceExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new CoalesceExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new CoalesceExpression(Left, Right);
     }
 
     public sealed class AssignmentExpression : BinaryExpression
@@ -260,7 +260,7 @@ namespace CSharpE.Syntax
         public AssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new AssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new AssignmentExpression(Left, Right);
     }
 
     public sealed class AddAssignmentExpression : BinaryExpression
@@ -273,7 +273,7 @@ namespace CSharpE.Syntax
         public AddAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new AddAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new AddAssignmentExpression(Left, Right);
     }
 
     public sealed class SubtractAssignmentExpression : BinaryExpression
@@ -286,7 +286,7 @@ namespace CSharpE.Syntax
         public SubtractAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new SubtractAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new SubtractAssignmentExpression(Left, Right);
     }
 
     public sealed class MultiplyAssignmentExpression : BinaryExpression
@@ -299,7 +299,7 @@ namespace CSharpE.Syntax
         public MultiplyAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new MultiplyAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new MultiplyAssignmentExpression(Left, Right);
     }
 
     public sealed class DivideAssignmentExpression : BinaryExpression
@@ -312,7 +312,7 @@ namespace CSharpE.Syntax
         public DivideAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new DivideAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new DivideAssignmentExpression(Left, Right);
     }
 
     public sealed class ModuloAssignmentExpression : BinaryExpression
@@ -325,7 +325,7 @@ namespace CSharpE.Syntax
         public ModuloAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new ModuloAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new ModuloAssignmentExpression(Left, Right);
     }
 
     public sealed class AndAssignmentExpression : BinaryExpression
@@ -338,7 +338,7 @@ namespace CSharpE.Syntax
         public AndAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new AndAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new AndAssignmentExpression(Left, Right);
     }
 
     public sealed class XorAssignmentExpression : BinaryExpression
@@ -353,7 +353,7 @@ namespace CSharpE.Syntax
         public XorAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new XorAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new XorAssignmentExpression(Left, Right);
     }
 
     public sealed class OrAssignmentExpression : BinaryExpression
@@ -366,7 +366,7 @@ namespace CSharpE.Syntax
         public OrAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new OrAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new OrAssignmentExpression(Left, Right);
     }
 
     public sealed class LeftShiftAssignmentExpression : BinaryExpression
@@ -379,7 +379,7 @@ namespace CSharpE.Syntax
         public LeftShiftAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new LeftShiftAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new LeftShiftAssignmentExpression(Left, Right);
     }
 
     public sealed class RightShiftAssignmentExpression : BinaryExpression
@@ -392,6 +392,6 @@ namespace CSharpE.Syntax
         public RightShiftAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        internal override SyntaxNode Clone() => new AddAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new AddAssignmentExpression(Left, Right);
     }
 }

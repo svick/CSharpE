@@ -91,6 +91,6 @@ namespace CSharpE.Syntax
             initializerSet = false;
         }
 
-        internal override SyntaxNode Clone() => new EnumMemberDefinition(Name, Initializer);
+        private protected override SyntaxNode CloneImpl() => new EnumMemberDefinition(Name, Initializer);
     }
 }

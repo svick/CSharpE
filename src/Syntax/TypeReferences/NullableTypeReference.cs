@@ -45,7 +45,7 @@ namespace CSharpE.Syntax
             syntax = (NullableTypeSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new NullableTypeReference(ElementType);
+        private protected override SyntaxNode CloneImpl() => new NullableTypeReference(ElementType);
 
         private protected override TypeSyntax GetWrappedType(ref bool? changed)
         {

@@ -67,7 +67,7 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
             => Init((IdentifierNameSyntax)newSyntax);
 
-        internal override SyntaxNode Clone() => new NameMemberInitializerTarget(Name);
+        private protected override SyntaxNode CloneImpl() => new NameMemberInitializerTarget(Name);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) { }
     }
@@ -125,7 +125,7 @@ namespace CSharpE.Syntax
             syntax = (ImplicitElementAccessSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new ElementAccessMemberInitializerTarget(Arguments);
+        private protected override SyntaxNode CloneImpl() => new ElementAccessMemberInitializerTarget(Arguments);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {

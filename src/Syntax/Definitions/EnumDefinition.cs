@@ -59,7 +59,7 @@ namespace CSharpE.Syntax
             SetList(ref members, null);
         }
 
-        internal override SyntaxNode Clone() =>
+        private protected override SyntaxNode CloneImpl() =>
             new EnumDefinition(Modifiers, Name, Members) { Attributes = Attributes };
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;

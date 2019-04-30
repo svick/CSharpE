@@ -56,7 +56,7 @@ namespace CSharpE.Syntax
             syntax = (RefExpressionSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new RefExpression(Expression);
+        private protected override SyntaxNode CloneImpl() => new RefExpression(Expression);
 
         internal override SyntaxNode Parent { get; set; }
     }

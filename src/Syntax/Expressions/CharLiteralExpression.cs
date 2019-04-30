@@ -44,6 +44,6 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
             Init((LiteralExpressionSyntax)newSyntax);
 
-        internal override SyntaxNode Clone() => new CharLiteralExpression(Value);
+        private protected override SyntaxNode CloneImpl() => new CharLiteralExpression(Value);
     }
 }

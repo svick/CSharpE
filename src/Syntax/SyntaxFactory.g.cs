@@ -51,6 +51,16 @@ namespace CSharpE.Syntax
             return new ConstructorDefinition(modifiers, parameters, body);
         }
 
+        public static DelegateDefinition DelegateDefinition(TypeReference returnType, params Parameter[] parameters)
+        {
+            return new DelegateDefinition(returnType, parameters);
+        }
+
+        public static DelegateDefinition DelegateDefinition(TypeReference returnType, IEnumerable<Parameter> parameters)
+        {
+            return new DelegateDefinition(returnType, parameters);
+        }
+
         public static EnumDefinition EnumDefinition(MemberModifiers modifiers, string name, IEnumerable<EnumMemberDefinition> members = null)
         {
             return new EnumDefinition(modifiers, name, members);

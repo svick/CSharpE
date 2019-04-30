@@ -140,7 +140,7 @@ namespace CSharpE.Syntax
             SetList(ref arguments, null);
         }
 
-        internal override SyntaxNode Clone() => new Attribute(Target, Type, Arguments);
+        private protected override SyntaxNode CloneImpl() => new Attribute(Target, Type, Arguments);
 
         public override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Type }.Concat(Arguments);
 

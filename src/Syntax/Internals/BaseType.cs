@@ -56,6 +56,6 @@ namespace CSharpE.Syntax.Internals
             Set(ref type, null);
         }
 
-        internal override SyntaxNode Clone() => new BaseType(Type);
+        private protected override SyntaxNode CloneImpl() => new BaseType(Type);
     }
 }

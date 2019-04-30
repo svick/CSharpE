@@ -77,7 +77,7 @@ namespace CSharpE.Syntax
             Set(ref condition, null);
         }
 
-        internal override SyntaxNode Clone() => new DoWhileStatement(Statements, Condition);
+        private protected override SyntaxNode CloneImpl() => new DoWhileStatement(Statements, Condition);
 
         internal override SyntaxNode Parent { get; set; }
 

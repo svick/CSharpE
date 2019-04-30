@@ -147,7 +147,7 @@ namespace CSharpE.Syntax
         public ElementAccessExpression(Expression expression, IEnumerable<Argument> arguments)
             : base(expression, arguments) { }
 
-        internal override SyntaxNode Clone() => new ElementAccessExpression(Expression, Arguments);
+        private protected override SyntaxNode CloneImpl() => new ElementAccessExpression(Expression, Arguments);
     }
 
     public class ConditionalElementAccessExpression : BaseElementAccessExpression
@@ -162,6 +162,6 @@ namespace CSharpE.Syntax
         public ConditionalElementAccessExpression(Expression expression, IEnumerable<Argument> arguments)
             : base(expression, arguments) { }
 
-        internal override SyntaxNode Clone() => new ConditionalElementAccessExpression(Expression, Arguments);
+        private protected override SyntaxNode CloneImpl() => new ConditionalElementAccessExpression(Expression, Arguments);
     }
 }

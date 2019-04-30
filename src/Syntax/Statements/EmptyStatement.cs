@@ -35,7 +35,7 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
             syntax = (EmptyStatementSyntax)newSyntax;
 
-        internal override SyntaxNode Clone() => new EmptyStatement();
+        private protected override SyntaxNode CloneImpl() => new EmptyStatement();
 
         internal override SyntaxNode Parent { get; set; }
 

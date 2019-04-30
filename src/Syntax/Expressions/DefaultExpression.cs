@@ -96,7 +96,7 @@ namespace CSharpE.Syntax
             typeSet = false;
         }
 
-        internal override SyntaxNode Clone() => new DefaultExpression(Type);
+        private protected override SyntaxNode CloneImpl() => new DefaultExpression(Type);
 
         internal override SyntaxNode Parent { get; set; }
     }

@@ -3,6 +3,7 @@ using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
@@ -14,13 +15,8 @@ namespace CSharpE.Syntax
         
         internal AccessorDefinition(AccessorDeclarationSyntax syntax, MemberDefinition parent)
         {
-            Init(syntax);
-            Parent = parent;
-        }
-
-        private void Init(AccessorDeclarationSyntax syntax)
-        {
             this.syntax = syntax;
+            Parent = parent;
         }
 
         public AccessorDefinition() { }
@@ -58,10 +54,11 @@ namespace CSharpE.Syntax
 
             return syntax;
         }
-        
-        private protected override void SetSyntaxImpl(Microsoft.CodeAnalysis.SyntaxNode newSyntax) => throw new NotImplementedException();
 
-        internal override SyntaxNode Clone() => new AccessorDefinition();
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
+            syntax = (AccessorDeclarationSyntax)newSyntax;
+
+        private protected override SyntaxNode CloneImpl() => new AccessorDefinition();
 
         public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression { }
     }

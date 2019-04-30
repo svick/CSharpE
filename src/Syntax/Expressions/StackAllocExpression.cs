@@ -132,7 +132,7 @@ namespace CSharpE.Syntax
             Set(ref initializer, null);
         }
 
-        internal override SyntaxNode Clone() => new StackAllocExpression(ElementType, Length, Initializer);
+        private protected override SyntaxNode CloneImpl() => new StackAllocExpression(ElementType, Length, Initializer);
 
         internal override SyntaxNode Parent { get; set; }
 

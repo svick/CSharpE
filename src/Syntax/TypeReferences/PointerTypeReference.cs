@@ -50,7 +50,7 @@ namespace CSharpE.Syntax
             syntax = (PointerTypeSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new PointerTypeReference(ElementType);
+        private protected override SyntaxNode CloneImpl() => new PointerTypeReference(ElementType);
 
         private protected override TypeSyntax GetWrappedType(ref bool? changed)
         {

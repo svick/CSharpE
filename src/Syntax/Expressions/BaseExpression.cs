@@ -33,7 +33,7 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
             syntax = (BaseExpressionSyntax)newSyntax;
 
-        internal override SyntaxNode Clone() => new BaseExpression();
+        private protected override SyntaxNode CloneImpl() => new BaseExpression();
 
         internal override SyntaxNode Parent { get; set; }
     }

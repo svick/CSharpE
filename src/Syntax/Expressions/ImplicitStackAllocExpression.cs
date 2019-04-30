@@ -63,7 +63,7 @@ namespace CSharpE.Syntax
             Set(ref initializer, null);
         }
 
-        internal override SyntaxNode Clone() => new ImplicitStackAllocExpression(Initializer);
+        private protected override SyntaxNode CloneImpl() => new ImplicitStackAllocExpression(Initializer);
 
         internal override SyntaxNode Parent { get; set; }
 

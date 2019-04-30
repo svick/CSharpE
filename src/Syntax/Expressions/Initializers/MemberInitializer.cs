@@ -103,6 +103,6 @@ namespace CSharpE.Syntax
             syntax = (AssignmentExpressionSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new MemberInitializer(Target, Value);
+        private protected override SyntaxNode CloneImpl() => new MemberInitializer(Target, Value);
     }
 }

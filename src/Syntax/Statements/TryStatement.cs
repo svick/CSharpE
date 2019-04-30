@@ -109,7 +109,7 @@ namespace CSharpE.Syntax
             finallyStatements = null;
         }
 
-        internal override SyntaxNode Clone() => new TryStatement(TryStatements, CatchClauses, FinallyStatements);
+        private protected override SyntaxNode CloneImpl() => new TryStatement(TryStatements, CatchClauses, FinallyStatements);
 
         internal override SyntaxNode Parent { get; set; }
 

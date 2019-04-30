@@ -78,7 +78,7 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
             Init((VariableDesignationSyntax)newSyntax);
 
-        internal override SyntaxNode Clone() => new SingleVariableDesignation(Name);
+        private protected override SyntaxNode CloneImpl() => new SingleVariableDesignation(Name);
     }
 
     public sealed class MultiVariableDesignation : VariableDesignation
@@ -138,7 +138,7 @@ namespace CSharpE.Syntax
             SetList(ref variables, null);
         }
 
-        internal override SyntaxNode Clone() => new MultiVariableDesignation(Variables);
+        private protected override SyntaxNode CloneImpl() => new MultiVariableDesignation(Variables);
 
         public override IEnumerable<SyntaxNode> GetChildren() => Variables;
     }

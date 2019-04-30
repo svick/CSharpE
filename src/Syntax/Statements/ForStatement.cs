@@ -133,7 +133,7 @@ namespace CSharpE.Syntax
             SetList(ref statements, null);
         }
 
-        internal override SyntaxNode Clone() => new ForStatement(VariableDeclaration, Condition, Incrementors, Statements);
+        private protected override SyntaxNode CloneImpl() => new ForStatement(VariableDeclaration, Condition, Incrementors, Statements);
 
         internal override SyntaxNode Parent { get; set; }
 

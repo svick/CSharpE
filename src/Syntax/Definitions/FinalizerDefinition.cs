@@ -87,9 +87,6 @@ namespace CSharpE.Syntax
             Set(ref body, null);
         }
 
-        internal override SyntaxNode Clone()
-        {
-            throw new NotImplementedException();
-        }
+        private protected override SyntaxNode CloneImpl() => new FinalizerDefinition(Modifiers, Body.Statements);
     }
 }

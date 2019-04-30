@@ -89,7 +89,7 @@ namespace CSharpE.Syntax
             arguments = null;
         }
 
-        internal override SyntaxNode Clone() => new InvocationExpression(Expression, Arguments);
+        private protected override SyntaxNode CloneImpl() => new InvocationExpression(Expression, Arguments);
 
         internal override SyntaxNode Parent { get; set; }
 

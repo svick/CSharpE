@@ -80,6 +80,6 @@ namespace CSharpE.Syntax
             Init((AnonymousObjectMemberDeclaratorSyntax)newSyntax);
         }
 
-        internal override SyntaxNode Clone() => new AnonymousObjectInitializer(Name, Expression);
+        private protected override SyntaxNode CloneImpl() => new AnonymousObjectInitializer(Name, Expression);
     }
 }

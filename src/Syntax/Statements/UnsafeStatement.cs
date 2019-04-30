@@ -60,7 +60,7 @@ namespace CSharpE.Syntax
             syntax = (UnsafeStatementSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new UnsafeStatement(Statements);
+        private protected override SyntaxNode CloneImpl() => new UnsafeStatement(Statements);
 
         internal override SyntaxNode Parent { get; set; }
 

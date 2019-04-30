@@ -118,7 +118,7 @@ namespace CSharpE.Syntax
             Set(ref initializer, null);
         }
 
-        internal override SyntaxNode Clone() => new NewArrayExpression(ElementType, Lengths, Initializer);
+        private protected override SyntaxNode CloneImpl() => new NewArrayExpression(ElementType, Lengths, Initializer);
 
         internal override SyntaxNode Parent { get; set; }
 

@@ -115,7 +115,7 @@ namespace CSharpE.Syntax
             Init((ArrayTypeSyntax)newSyntax);
         }
 
-        internal override SyntaxNode Clone() => new ArrayTypeReference(ElementType, Rank);
+        private protected override SyntaxNode CloneImpl() => new ArrayTypeReference(ElementType, Rank);
 
         internal override StringBuilder ComputeFullName(StringBuilder stringBuilder) =>
             ElementType.ComputeFullName(stringBuilder)

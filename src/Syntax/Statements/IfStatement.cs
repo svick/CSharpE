@@ -110,7 +110,7 @@ namespace CSharpE.Syntax
             SetList(ref elseStatements, null);
         }
 
-        internal override SyntaxNode Clone() => new IfStatement(Condition, ThenStatements, ElseStatements);
+        private protected override SyntaxNode CloneImpl() => new IfStatement(Condition, ThenStatements, ElseStatements);
 
         internal override SyntaxNode Parent { get; set; }
 

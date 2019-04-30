@@ -93,9 +93,11 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            throw new NotImplementedException();
+            Init((NamespaceDeclarationSyntax)newSyntax);
+
+            SetList(ref members, null);
         }
 
-        internal override SyntaxNode Clone() => new NamespaceDefinition(Name, Members);
+        private protected override SyntaxNode CloneImpl() => new NamespaceDefinition(Name, Members);
     }
 }

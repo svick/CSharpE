@@ -209,7 +209,7 @@ namespace CSharpE.Syntax
             Set(ref body, null);
         }
 
-        internal override SyntaxNode Clone() =>
+        private protected override SyntaxNode CloneImpl() =>
             new OperatorDefinition(Modifiers, ReturnType, Kind, Parameters, Body?.Statements)
             {
                 Attributes = Attributes

@@ -83,7 +83,7 @@ namespace CSharpE.Syntax
             Init((ImplicitArrayCreationExpressionSyntax)newSyntax);
         }
 
-        internal override SyntaxNode Clone() => new ImplicitNewArrayExpression(Rank, Initializer);
+        private protected override SyntaxNode CloneImpl() => new ImplicitNewArrayExpression(Rank, Initializer);
 
         internal override SyntaxNode Parent { get; set; }
 

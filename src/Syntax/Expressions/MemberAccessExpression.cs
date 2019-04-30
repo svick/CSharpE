@@ -161,7 +161,7 @@ namespace CSharpE.Syntax
         public MemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
             : this(expression, fieldDefinition.Name) { }
 
-        internal override SyntaxNode Clone() => new MemberAccessExpression(Expression, MemberName, TypeArguments);
+        private protected override SyntaxNode CloneImpl() => new MemberAccessExpression(Expression, MemberName, TypeArguments);
     }
 
     public class PointerMemberAccessExpression : BaseMemberAccessExpression
@@ -182,7 +182,7 @@ namespace CSharpE.Syntax
         public PointerMemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
             : this(expression, fieldDefinition.Name) { }
 
-        internal override SyntaxNode Clone() => new PointerMemberAccessExpression(Expression, MemberName, TypeArguments);
+        private protected override SyntaxNode CloneImpl() => new PointerMemberAccessExpression(Expression, MemberName, TypeArguments);
     }
 
     public class ConditionalMemberAccessExpression : BaseMemberAccessExpression
@@ -203,6 +203,6 @@ namespace CSharpE.Syntax
         public ConditionalMemberAccessExpression(Expression expression, FieldDefinition fieldDefinition)
             : this(expression, fieldDefinition.Name) { }
 
-        internal override SyntaxNode Clone() => new ConditionalMemberAccessExpression(Expression, MemberName, TypeArguments);
+        private protected override SyntaxNode CloneImpl() => new ConditionalMemberAccessExpression(Expression, MemberName, TypeArguments);
     }
 }

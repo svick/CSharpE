@@ -81,7 +81,7 @@ namespace CSharpE.Syntax
             SetList(ref statements, null);
         }
 
-        internal override SyntaxNode Clone() => new FixedStatement(VariableDeclaration, Statements);
+        private protected override SyntaxNode CloneImpl() => new FixedStatement(VariableDeclaration, Statements);
 
         internal override SyntaxNode Parent { get; set; }
 

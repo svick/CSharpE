@@ -56,7 +56,7 @@ namespace CSharpE.Syntax
             syntax = (ParenthesizedExpressionSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new ParenthesizedExpression(Expression);
+        private protected override SyntaxNode CloneImpl() => new ParenthesizedExpression(Expression);
 
         internal override SyntaxNode Parent { get; set; }
     }

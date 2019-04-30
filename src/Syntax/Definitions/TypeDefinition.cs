@@ -305,7 +305,7 @@ namespace CSharpE.Syntax
             set => Modifiers = Modifiers.With(Static, value);
         }
 
-        internal override SyntaxNode Clone() => new ClassDefinition(Modifiers, Name, Members) { Attributes = Attributes };
+        private protected override SyntaxNode CloneImpl() => new ClassDefinition(Modifiers, Name, Members) { Attributes = Attributes };
     }
 
     public sealed class StructDefinition : TypeDefinition
@@ -330,7 +330,7 @@ namespace CSharpE.Syntax
                 throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a struct.", nameof(value));
         }
 
-        internal override SyntaxNode Clone() => new StructDefinition(Modifiers, Name, Members) { Attributes = Attributes };
+        private protected override SyntaxNode CloneImpl() => new StructDefinition(Modifiers, Name, Members) { Attributes = Attributes };
     }
 
     public sealed class InterfaceDefinition : TypeDefinition
@@ -355,6 +355,6 @@ namespace CSharpE.Syntax
                 throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for an interface.", nameof(value));
         }
 
-        internal override SyntaxNode Clone() => new InterfaceDefinition(Modifiers, Name, Members) { Attributes = Attributes };
+        private protected override SyntaxNode CloneImpl() => new InterfaceDefinition(Modifiers, Name, Members) { Attributes = Attributes };
     }
 }

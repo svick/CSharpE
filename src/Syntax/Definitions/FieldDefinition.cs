@@ -144,7 +144,7 @@ namespace CSharpE.Syntax
             Set(ref initializer, null);
         }
 
-        internal override SyntaxNode Clone() => new FieldDefinition(Modifiers, Type, Name, Initializer);
+        private protected override SyntaxNode CloneImpl() => new FieldDefinition(Modifiers, Type, Name, Initializer);
 
         protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
             Initializer = Expression.ReplaceExpressions(Initializer, filter, projection);

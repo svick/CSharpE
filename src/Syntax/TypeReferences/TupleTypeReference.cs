@@ -52,7 +52,7 @@ namespace CSharpE.Syntax
             syntax = (TupleTypeSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new TupleTypeReference(Elements);
+        private protected override SyntaxNode CloneImpl() => new TupleTypeReference(Elements);
 
         private protected override TypeSyntax GetWrappedType(ref bool? changed)
         {

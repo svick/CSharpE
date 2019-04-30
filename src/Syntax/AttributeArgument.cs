@@ -112,6 +112,6 @@ namespace CSharpE.Syntax
             Set(ref expression, null);
         }
 
-        internal override SyntaxNode Clone() => new AttributeArgument(Name, IsConstructorArgument, Expression);
+        private protected override SyntaxNode CloneImpl() => new AttributeArgument(Name, IsConstructorArgument, Expression);
     }
 }

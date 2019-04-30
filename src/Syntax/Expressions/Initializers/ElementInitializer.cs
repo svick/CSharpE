@@ -87,7 +87,7 @@ namespace CSharpE.Syntax
             syntax = (AssignmentExpressionSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new ElementInitializer(Expressions);
+        private protected override SyntaxNode CloneImpl() => new ElementInitializer(Expressions);
 
         public override IEnumerable<SyntaxNode> GetChildren() => Expressions;
 

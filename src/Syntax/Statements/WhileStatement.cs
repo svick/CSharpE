@@ -80,7 +80,7 @@ namespace CSharpE.Syntax
             SetList(ref statements, null);
         }
 
-        internal override SyntaxNode Clone() => new WhileStatement(Condition, Statements);
+        private protected override SyntaxNode CloneImpl() => new WhileStatement(Condition, Statements);
 
         internal override SyntaxNode Parent { get; set; }
 

@@ -57,7 +57,7 @@ namespace CSharpE.Syntax
             Init((TupleElementSyntax)newSyntax);
         }
 
-        internal override SyntaxNode Clone() => new TupleElement(Type, Name);
+        private protected override SyntaxNode CloneImpl() => new TupleElement(Type, Name);
 
         TupleElementSyntax ISyntaxWrapper<TupleElementSyntax>.GetWrapped(ref bool? changed)
         {

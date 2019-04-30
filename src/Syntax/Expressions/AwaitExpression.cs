@@ -57,7 +57,7 @@ namespace CSharpE.Syntax
             Set(ref operand, null);
         }
 
-        internal override SyntaxNode Clone() => new AwaitExpression(Operand);
+        private protected override SyntaxNode CloneImpl() => new AwaitExpression(Operand);
 
         internal override SyntaxNode Parent { get; set; }
     }

@@ -80,7 +80,7 @@ namespace CSharpE.Syntax
             SetList(ref statements, null);
         }
 
-        internal override SyntaxNode Clone() => new LockStatement(Expression, Statements);
+        private protected override SyntaxNode CloneImpl() => new LockStatement(Expression, Statements);
 
         internal override SyntaxNode Parent { get; set; }
 

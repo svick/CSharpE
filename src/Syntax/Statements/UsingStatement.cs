@@ -129,7 +129,7 @@ namespace CSharpE.Syntax
             SetList(ref statements, null);
         }
 
-        internal override SyntaxNode Clone() => VariableDeclaration != null
+        private protected override SyntaxNode CloneImpl() => VariableDeclaration != null
             ? new UsingStatement(VariableDeclaration, Statements)
             : new UsingStatement(Expression, Statements);
 

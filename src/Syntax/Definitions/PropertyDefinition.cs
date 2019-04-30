@@ -112,7 +112,7 @@ namespace CSharpE.Syntax
             setAccessorSet = false;
         }
 
-        internal override SyntaxNode Clone() => new PropertyDefinition(Modifiers, Type, Name)
+        private protected override SyntaxNode CloneImpl() => new PropertyDefinition(Modifiers, Type, Name)
         {
             Attributes = Attributes, GetAccessor = GetAccessor, SetAccessor = SetAccessor
         };

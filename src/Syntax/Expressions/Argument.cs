@@ -70,7 +70,7 @@ namespace CSharpE.Syntax
             expression = null;
         }
 
-        internal override SyntaxNode Clone() => new Argument(Expression);
+        private protected override SyntaxNode CloneImpl() => new Argument(Expression);
 
         internal override SyntaxNode Parent { get; set; }
 

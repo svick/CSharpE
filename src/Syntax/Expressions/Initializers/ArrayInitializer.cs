@@ -80,7 +80,7 @@ namespace CSharpE.Syntax
             syntax = (InitializerExpressionSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new ArrayInitializer(VariableInitializers);
+        private protected override SyntaxNode CloneImpl() => new ArrayInitializer(VariableInitializers);
 
         public override IEnumerable<SyntaxNode> GetChildren() => VariableInitializers;
 
@@ -144,7 +144,7 @@ namespace CSharpE.Syntax
             syntax = (ExpressionSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new ExpressionVariableInitializer(Expression);
+        private protected override SyntaxNode CloneImpl() => new ExpressionVariableInitializer(Expression);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
             Expression = Expression.ReplaceExpressions(Expression, filter, projection);

@@ -386,7 +386,7 @@ namespace CSharpE.Syntax
 
         internal override SyntaxNode Parent { get; set; }
 
-        internal override SyntaxNode Clone() => new NamedTypeReference(Namespace, Container, Name, TypeParameters);
+        private protected override SyntaxNode CloneImpl() => new NamedTypeReference(Namespace, Container, Name, TypeParameters);
 
         public override bool Equals(TypeReference other)
         {

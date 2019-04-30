@@ -74,7 +74,7 @@ namespace CSharpE.Syntax
             syntax = (InitializerExpressionSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new CollectionInitializer(ElementInitializers);
+        private protected override SyntaxNode CloneImpl() => new CollectionInitializer(ElementInitializers);
 
         public override IEnumerable<SyntaxNode> GetChildren() => ElementInitializers;
 

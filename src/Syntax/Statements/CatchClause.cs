@@ -155,6 +155,6 @@ namespace CSharpE.Syntax
             Init((CatchClauseSyntax)newSyntax);
         }
 
-        internal override SyntaxNode Clone() => new CatchClause(ExceptionType, ExceptionName, Filter, Statements);
+        private protected override SyntaxNode CloneImpl() => new CatchClause(ExceptionType, ExceptionName, Filter, Statements);
     }
 }

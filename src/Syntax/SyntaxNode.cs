@@ -104,7 +104,16 @@ namespace CSharpE.Syntax
 
         internal void SetChanged(ref bool? changed) => changeTracker.SetChanged(ref changed);
 
-        internal abstract SyntaxNode Clone();
+        internal SyntaxNode Clone()
+        {
+            var clone = CloneImpl();
+
+            clone.markerAnnotation = this.markerAnnotation;
+
+            return clone;
+        }
+
+        private protected abstract SyntaxNode CloneImpl();
 
         public virtual IEnumerable<SyntaxNode> GetChildren()
         {

@@ -66,7 +66,7 @@ namespace CSharpE.Syntax
             SetList(ref initializers, null);
         }
 
-        internal override SyntaxNode Clone() => new AnonymousNewExpression(Initializers);
+        private protected override SyntaxNode CloneImpl() => new AnonymousNewExpression(Initializers);
 
         internal override SyntaxNode Parent { get; set; }
 

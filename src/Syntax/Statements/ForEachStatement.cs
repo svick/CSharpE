@@ -127,7 +127,7 @@ namespace CSharpE.Syntax
             SetList(ref statements, null);
         }
 
-        internal override SyntaxNode Clone() => new ForEachStatement(ElementType, ElementName, Expression, Statements);
+        private protected override SyntaxNode CloneImpl() => new ForEachStatement(ElementType, ElementName, Expression, Statements);
 
         public override IEnumerable<SyntaxNode> GetChildren() =>
             new SyntaxNode[] { ElementType, Expression }.Concat(Statements);
@@ -210,7 +210,7 @@ namespace CSharpE.Syntax
             SetList(ref statements, null);
         }
 
-        internal override SyntaxNode Clone() => new PatternForEachStatement(ElementPattern, Expression, Statements);
+        private protected override SyntaxNode CloneImpl() => new PatternForEachStatement(ElementPattern, Expression, Statements);
 
         public override IEnumerable<SyntaxNode> GetChildren() =>
             new SyntaxNode[] { ElementPattern, Expression }.Concat(Statements);

@@ -68,7 +68,7 @@ namespace CSharpE.Syntax
             Set(ref expression, null);
         }
 
-        internal override SyntaxNode Clone() => new ReturnStatement(Expression);
+        private protected override SyntaxNode CloneImpl() => new ReturnStatement(Expression);
 
         internal override SyntaxNode Parent { get; set; }
 

@@ -65,7 +65,7 @@ namespace CSharpE.Syntax
             syntax = (BlockSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new BlockStatement(Statements);
+        private protected override SyntaxNode CloneImpl() => new BlockStatement(Statements);
 
         internal override SyntaxNode Parent { get; set; }
 

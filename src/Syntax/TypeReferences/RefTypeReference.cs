@@ -45,7 +45,7 @@ namespace CSharpE.Syntax
             syntax = (RefTypeSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new RefTypeReference(ElementType);
+        private protected override SyntaxNode CloneImpl() => new RefTypeReference(ElementType);
 
         private protected override TypeSyntax GetWrappedType(ref bool? changed)
         {

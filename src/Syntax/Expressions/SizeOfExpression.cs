@@ -55,7 +55,7 @@ namespace CSharpE.Syntax
             Set(ref type, null);
         }
 
-        internal override SyntaxNode Clone() => new SizeOfExpression(Type);
+        private protected override SyntaxNode CloneImpl() => new SizeOfExpression(Type);
 
         internal override SyntaxNode Parent { get; set; }
     }

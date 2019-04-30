@@ -67,7 +67,7 @@ namespace CSharpE.Syntax
             syntax = (ExpressionSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new ExpressionMemberInitializerValue(Expression);
+        private protected override SyntaxNode CloneImpl() => new ExpressionMemberInitializerValue(Expression);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
             Expression = Expression.ReplaceExpressions(Expression, filter, projection);
@@ -124,7 +124,7 @@ namespace CSharpE.Syntax
             syntax = (InitializerExpressionSyntax)newSyntax;
         }
 
-        internal override SyntaxNode Clone() => new InitializerMemberInitializerValue(Initializer);
+        private protected override SyntaxNode CloneImpl() => new InitializerMemberInitializerValue(Initializer);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
             Initializer.ReplaceExpressions(filter, projection);
