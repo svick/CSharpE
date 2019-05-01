@@ -31,7 +31,7 @@ namespace CSharpE.Syntax
 
         public ArrayTypeReference(TypeReference elementType, int rank)
         {
-            this.elementType = elementType;
+            ElementType = elementType;
             Rank = rank;
         }
 
@@ -60,7 +60,7 @@ namespace CSharpE.Syntax
 
                 return elementType;
             }
-            set => elementType = value;
+            set => SetNotNull(ref elementType, value);
         }
 
         public int Rank { get; set; }

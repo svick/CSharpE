@@ -46,21 +46,38 @@ namespace CSharpE.Extensions.Json
                 {
                     var jsonTypeReference = jsonType.GetReference();
 
-                    bool IsJsonExpression(MemberAccessExpression e) =>
-                        e.Expression.GetExpressionType() is NamedTypeReference type &&
-                        jsonTypeReference.Equals(type.Container) && type.Name.StartsWith("JsonObject");
+                    bool IsJsonType(TypeReference type) =>
+                        type is NamedTypeReference namedType && jsonTypeReference.Equals(namedType.Container) &&
+                        namedType.Name.StartsWith("JsonObject");
 
-                    var invalidJsonExpressions = project.GetDescendants().OfType<MemberAccessExpression>()
-                        .Where(e => IsJsonExpression(e) && e.GetExpressionType() == null);
+                    bool IsJsonExpression(MemberAccessExpression e) => IsJsonType(e.Expression.GetExpressionType());
+
+                    TypeReference GetBuildType(TypeReference designType)
+                    {
+                        if (IsJsonType(designType))
+                            return typeof(JToken);
+
+                        if (designType is ArrayTypeReference)
+                            return typeof(JArray);
+
+                        return designType;
+                    }
+
+                    var jsonTypes = project.GetDescendants().OfType<MemberAccessExpression>()
+                        .Where(IsJsonExpression)
+                        .ToDictionary(
+                            e => e, e => GetBuildType(e.GetExpressionType()),
+                            ReferenceEqualityComparer<MemberAccessExpression>.Default);
 
                     // don't do anything here in case of errors
                     // this way errors are guaranteed to stay errors and should have decent error messages
-                    if (invalidJsonExpressions.Any())
+                    if (jsonTypes.Values.Any(v => v == null))
                         return;
 
                     project.ReplaceExpressions<MemberAccessExpression>(
-                        IsJsonExpression,
-                        e => e.Expression.ElementAccess(Literal(e.MemberName)));
+                        e => jsonTypes.ContainsKey(e),
+                        e => e.Expression.Call(
+                            nameof(JToken.Value), new[] { jsonTypes[e] }, new[] { Literal(e.MemberName) }));
 
                     project.ReplaceExpressions<MemberAccessExpression>(
                         e => e.Expression is IdentifierExpression identifier &&

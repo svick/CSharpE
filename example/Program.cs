@@ -26,7 +26,9 @@ class JsonProcessor
             Console.WriteLine(author.name);
 
             foreach (var book in author.books)
+            {
                 Console.WriteLine(book.title);
+            }
         }
     }
 }

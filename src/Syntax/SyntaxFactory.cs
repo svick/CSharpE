@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace CSharpE.Syntax
 {
@@ -6,12 +7,19 @@ namespace CSharpE.Syntax
     {
         #region Expressions
 
-        public static InvocationExpression Call(this Expression receiver, string methodName, params Expression[] arguments) =>
+        public static InvocationExpression Call(
+            this Expression receiver, string methodName, params Expression[] arguments) =>
+            Call(receiver, methodName, arguments.AsEnumerable());
+
+        public static InvocationExpression Call(
+            this Expression receiver, string methodName, IEnumerable<Expression> arguments) =>
             new InvocationExpression(new MemberAccessExpression(receiver, methodName), arguments);
 
-        public static InvocationExpression Call(this Expression receiver, string methodName, IEnumerable<Expression> arguments) =>
-            new InvocationExpression(new MemberAccessExpression(receiver, methodName), arguments);
-        
+        public static InvocationExpression Call(
+            this Expression receiver, string methodName, IEnumerable<TypeReference> typeArguments,
+            IEnumerable<Expression> arguments) =>
+            new InvocationExpression(new MemberAccessExpression(receiver, methodName, typeArguments), arguments);
+
         public static IntLiteralExpression Literal(int value) => new IntLiteralExpression(value);
 
         public static CharLiteralExpression Literal(char value) => new CharLiteralExpression(value);
