@@ -135,8 +135,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new ForStatement(VariableDeclaration, Condition, Incrementors, Statements);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() =>
             new SyntaxNode[] { VariableDeclaration, Condition }.Concat(Incrementors).Concat(Statements);
 

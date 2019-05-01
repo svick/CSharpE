@@ -11,8 +11,6 @@ namespace CSharpE.Syntax
     {
         private AccessorDeclarationSyntax syntax;
 
-        internal override SyntaxNode Parent { get; set; }
-        
         internal AccessorDefinition(AccessorDeclarationSyntax syntax, MemberDefinition parent)
         {
             this.syntax = syntax;

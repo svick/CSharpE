@@ -133,8 +133,6 @@ namespace CSharpE.Syntax
             ? new UsingStatement(VariableDeclaration, Statements)
             : new UsingStatement(Expression, Statements);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() =>
             new[] { VariableDeclaration != null ? (SyntaxNode)VariableDeclaration : Expression }.Concat(Statements);
 

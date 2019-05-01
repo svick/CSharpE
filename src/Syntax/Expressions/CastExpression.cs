@@ -74,7 +74,5 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new CastExpression(Type, Expression);
-
-        internal override SyntaxNode Parent { get; set; }
     }
 }

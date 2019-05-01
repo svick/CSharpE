@@ -16,30 +16,10 @@ namespace CSharpE.Syntax
             set => name.Text = value;
         }
 
-        private SyntaxNode parent;
-
         internal BaseTypeDefinition() { }
 
         internal BaseTypeDefinition(MemberDeclarationSyntax memberDeclarationSyntax)
             : base(memberDeclarationSyntax) { }
-
-        internal override SyntaxNode Parent
-        {
-            get => parent;
-            set
-            {
-                switch (value)
-                {
-                    case TypeDefinition _:
-                    case NamespaceDefinition _:
-                    case SourceFile _:
-                        parent = value;
-                        return;
-                }
-
-                throw new ArgumentException(nameof(value));
-            }
-        }
 
         public INamedTypeSymbol GetSymbol() =>
             (INamedTypeSymbol)SourceFile.SemanticModel.GetDeclaredSymbol(GetSourceFileNode());

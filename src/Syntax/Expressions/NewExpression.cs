@@ -113,8 +113,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new NewExpression(Type, Arguments, Initializer);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() =>
             new SyntaxNode[] { Type }.Concat(Arguments).Concat(new[] { Initializer });
 

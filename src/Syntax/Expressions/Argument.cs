@@ -72,8 +72,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new Argument(Expression);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression =>
             Expression = Expression.ReplaceExpressions(Expression, filter, projection);
     }

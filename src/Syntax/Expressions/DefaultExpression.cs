@@ -97,7 +97,5 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new DefaultExpression(Type);
-
-        internal override SyntaxNode Parent { get; set; }
     }
 }

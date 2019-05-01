@@ -112,8 +112,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new IfStatement(Condition, ThenStatements, ElseStatements);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() =>
             new SyntaxNode[] { Condition }.Concat(ThenStatements).Concat(ElseStatements);
 

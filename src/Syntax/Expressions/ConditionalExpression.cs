@@ -91,7 +91,5 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new ConditionalExpression(Condition, WhenTrue, WhenFalse);
-
-        internal override SyntaxNode Parent { get; set; }
     }
 }

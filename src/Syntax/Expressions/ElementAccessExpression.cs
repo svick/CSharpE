@@ -121,8 +121,6 @@ namespace CSharpE.Syntax
             Set(ref expression, null);
         }
 
-        internal sealed override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Expression }.Concat(Arguments);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)

@@ -125,8 +125,6 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new LambdaParameter(Modifier, Type, Name);
-
-        internal override SyntaxNode Parent { get; set; }
     }
 
     public enum LambdaParameterModifier

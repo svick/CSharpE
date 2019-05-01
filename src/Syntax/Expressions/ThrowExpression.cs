@@ -55,7 +55,5 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new ThrowExpression(Operand);
-
-        internal override SyntaxNode Parent { get; set; }
     }
 }

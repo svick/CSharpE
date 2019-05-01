@@ -145,7 +145,5 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new Parameter(Modifiers, Type, Name, DefaultValue);
-
-        internal override SyntaxNode Parent { get; set; }
     }
 }

@@ -120,8 +120,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new NewArrayExpression(ElementType, Lengths, Initializer);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() =>
             new SyntaxNode[] { ElementType }.Concat(Lengths).Concat(new[] { Initializer });
 

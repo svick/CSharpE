@@ -67,8 +67,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new BlockStatement(Statements);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() => Statements;
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)

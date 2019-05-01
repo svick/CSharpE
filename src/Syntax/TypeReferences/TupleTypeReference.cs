@@ -44,8 +44,6 @@ namespace CSharpE.Syntax
             set => SetList(ref elements, new SeparatedSyntaxList<TupleElement, TupleElementSyntax>(value, this));
         }
 
-        internal override SyntaxNode Parent { get; set; }
-
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             elements = null;

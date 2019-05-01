@@ -194,8 +194,6 @@ namespace CSharpE.Syntax
                 ? new LambdaExpression(IsAsync, Parameters, Expression)
                 : new LambdaExpression(IsAsync, Parameters, Statements);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() =>
             Parameters.Concat(Expression != null ? (IEnumerable<SyntaxNode>)new[] { Expression } : Statements);
 

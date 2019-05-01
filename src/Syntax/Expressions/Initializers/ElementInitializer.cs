@@ -79,8 +79,6 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        internal override SyntaxNode Parent { get; set; }
-
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             SetList(ref expressions, null);

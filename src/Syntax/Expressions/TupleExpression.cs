@@ -63,8 +63,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new TupleExpression(Arguments);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             foreach (var argument in Arguments)

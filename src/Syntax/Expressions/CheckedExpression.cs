@@ -72,7 +72,5 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new CheckedExpression(IsChecked, Expression);
-
-        internal override SyntaxNode Parent { get; set; }
     }
 }

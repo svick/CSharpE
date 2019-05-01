@@ -257,12 +257,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => throw new InvalidOperationException();
 
-        internal override SyntaxNode Parent
-        {
-            get => null;
-            set => throw new InvalidOperationException();
-        }
-
         public override IEnumerable<SyntaxNode> GetChildren() => Members.Select(m => m.Value);
 
         public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression

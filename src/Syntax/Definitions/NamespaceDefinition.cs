@@ -70,25 +70,6 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        private SyntaxNode parent;
-        internal override SyntaxNode Parent
-        {
-            get => parent;
-            set
-            {
-                switch (value)
-                {
-                    case null:
-                    case NamespaceDefinition _:
-                    case SourceFile _:
-                        parent = value;
-                        break;
-                    default:
-                        throw new ArgumentException(nameof(value));
-                }
-            }
-        }
-
         public override IEnumerable<SyntaxNode> GetChildren() => Members.Select(m => m.Value);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)

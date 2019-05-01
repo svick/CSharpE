@@ -14,7 +14,7 @@ namespace CSharpE.Syntax
 
         internal SyntaxNode(Roslyn::SyntaxNode node) => markerAnnotation = Annotation.Get(node);
 
-        internal abstract SyntaxNode Parent { get; set; }
+        internal SyntaxNode Parent { get; set; }
 
         internal SourceFile SourceFile => this is SourceFile sourceFile ? sourceFile : Parent?.SourceFile;
 

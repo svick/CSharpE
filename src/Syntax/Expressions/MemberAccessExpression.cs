@@ -140,8 +140,6 @@ namespace CSharpE.Syntax
 
             Set(ref expression, null);
         }
-
-        internal sealed override SyntaxNode Parent { get; set; }
     }
 
     public class MemberAccessExpression : BaseMemberAccessExpression

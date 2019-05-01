@@ -111,8 +111,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new TryStatement(TryStatements, CatchClauses, FinallyStatements);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() =>
             TryStatements.Concat<SyntaxNode>(CatchClauses).Concat(FinallyStatements);
 
