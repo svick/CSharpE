@@ -422,3 +422,21 @@ Figures \ref{figure-errors}, \ref{figure-intellisense}, \ref{figure-parameterinf
 
 \section{Example extensions}
 \label{example-extensions}
+
+The CSharpE project includes several example extensions, demonstrating its use, which are described in the following sections.
+
+\subsection{CSharpE.Logging}
+
+\cs{CSharpE.Logging} is a simple built-time-only extension that logs method name and method arguments to the console at the start of each method in a project.
+
+This extension can be compared with PostSharp Diagnostics, \cite{postsharp-diag} which serves a similar purpose. While PostSharp Diagnostics has vastly more features, the extension is only 60 lines of code. This shows that simple custom transformations can be implemented very quickly and might have the potential to replace commercial tools.
+
+\todo{update number of lines if i switch to string interpolation}
+
+Because it is a build-time-only transformation, using it does not require the CSharpE Visual Studio extension. This also means it can be used from other \acp{IDE}.
+
+\subsection{CSharpE.Actor}
+
+\subsection{CSharpE.Record}
+
+\subsection{CSharpE.Json}
