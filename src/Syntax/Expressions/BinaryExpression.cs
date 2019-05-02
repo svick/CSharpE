@@ -11,8 +11,6 @@ namespace CSharpE.Syntax
     {
         private ExpressionSyntax syntax;
 
-        internal sealed override SyntaxNode Parent { get; set; }
-
         internal BinaryExpression(ExpressionSyntax syntax, SyntaxNode parent)
         {
             this.syntax = syntax;

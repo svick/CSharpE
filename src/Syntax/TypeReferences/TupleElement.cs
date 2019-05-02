@@ -49,8 +49,6 @@ namespace CSharpE.Syntax
             set => name.Text = value;
         }
 
-        internal override SyntaxNode Parent { get; set; }
-
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Set(ref type, null);

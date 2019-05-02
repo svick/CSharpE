@@ -229,95 +229,118 @@ namespace CSharpE.Transform.VisualStudio
             throw new NotImplementedException();
         }
 
-        public override ISymbol GetDeclaredSymbol(MemberDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        private TSymbol GetSymbol<TSymbol, TSyntax>(
+            TSyntax syntax, CancellationToken cancellationToken,
+            Func<TSyntax, CancellationToken, TSymbol> getDeclaredSymbol)
+            where TSymbol : class
+            where TSyntax : SyntaxNode
         {
-            var adjusted = Adjust(declarationSyntax);
+            var adjusted = Adjust(syntax);
 
             if (adjusted == null)
                 return null;
 
-            return roslynModel.GetDeclaredSymbol(adjusted, cancellationToken);
+            return getDeclaredSymbol(adjusted, cancellationToken);
         }
 
-        public override ISymbol GetDeclaredSymbol(LocalFunctionStatementSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override ISymbol GetDeclaredSymbol(
+            MemberDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default) =>
+            GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override INamespaceSymbol GetDeclaredSymbol(NamespaceDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override ISymbol GetDeclaredSymbol(
+            LocalFunctionStatementSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override INamedTypeSymbol GetDeclaredSymbol(BaseTypeDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override INamespaceSymbol GetDeclaredSymbol(
+            NamespaceDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override INamedTypeSymbol GetDeclaredSymbol(DelegateDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+        public override INamedTypeSymbol GetDeclaredSymbol(
+            BaseTypeDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IFieldSymbol GetDeclaredSymbol(EnumMemberDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override INamedTypeSymbol GetDeclaredSymbol(
+            DelegateDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IMethodSymbol GetDeclaredSymbol(BaseMethodDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override IFieldSymbol GetDeclaredSymbol(
+            EnumMemberDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override ISymbol GetDeclaredSymbol(BasePropertyDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override IMethodSymbol GetDeclaredSymbol(
+            BaseMethodDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IPropertySymbol GetDeclaredSymbol(PropertyDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override ISymbol GetDeclaredSymbol(
+            BasePropertyDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IPropertySymbol GetDeclaredSymbol(IndexerDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override IPropertySymbol GetDeclaredSymbol(
+            PropertyDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IEventSymbol GetDeclaredSymbol(EventDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override IPropertySymbol GetDeclaredSymbol(
+            IndexerDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IPropertySymbol GetDeclaredSymbol(AnonymousObjectMemberDeclaratorSyntax declaratorSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declaratorSyntax), cancellationToken);
+        public override IEventSymbol GetDeclaredSymbol(
+            EventDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override INamedTypeSymbol GetDeclaredSymbol(AnonymousObjectCreationExpressionSyntax declaratorSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declaratorSyntax), cancellationToken);
+        public override IPropertySymbol GetDeclaredSymbol(
+            AnonymousObjectMemberDeclaratorSyntax declaratorSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declaratorSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override INamedTypeSymbol GetDeclaredSymbol(TupleExpressionSyntax declaratorSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declaratorSyntax), cancellationToken);
+        public override INamedTypeSymbol GetDeclaredSymbol(
+            AnonymousObjectCreationExpressionSyntax declaratorSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declaratorSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override ISymbol GetDeclaredSymbol(ArgumentSyntax declaratorSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declaratorSyntax), cancellationToken);
+        public override INamedTypeSymbol GetDeclaredSymbol(
+            TupleExpressionSyntax declaratorSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declaratorSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IMethodSymbol GetDeclaredSymbol(AccessorDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override ISymbol GetDeclaredSymbol(
+            ArgumentSyntax declaratorSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declaratorSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IMethodSymbol GetDeclaredSymbol(ArrowExpressionClauseSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override IMethodSymbol GetDeclaredSymbol(
+            AccessorDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override ISymbol GetDeclaredSymbol(VariableDeclaratorSyntax declarationSyntax, CancellationToken cancellationToken = default)
-        {
-            var adjusted = Adjust(declarationSyntax);
+        public override IMethodSymbol GetDeclaredSymbol(
+            ArrowExpressionClauseSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-            if (adjusted == null)
-                return null;
+        public override ISymbol GetDeclaredSymbol(
+            VariableDeclaratorSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-            return roslynModel.GetDeclaredSymbol(adjusted, cancellationToken);
-        }
+        public override ISymbol GetDeclaredSymbol(
+            SingleVariableDesignationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override ISymbol GetDeclaredSymbol(SingleVariableDesignationSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override ILabelSymbol GetDeclaredSymbol(
+            LabeledStatementSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override ILabelSymbol GetDeclaredSymbol(LabeledStatementSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override ILabelSymbol GetDeclaredSymbol(
+            SwitchLabelSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override ILabelSymbol GetDeclaredSymbol(SwitchLabelSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override IAliasSymbol GetDeclaredSymbol(
+            UsingDirectiveSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IAliasSymbol GetDeclaredSymbol(UsingDirectiveSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override IAliasSymbol GetDeclaredSymbol(
+            ExternAliasDirectiveSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IAliasSymbol GetDeclaredSymbol(ExternAliasDirectiveSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
+        public override IParameterSymbol GetDeclaredSymbol(
+            ParameterSyntax declarationSyntax, CancellationToken cancellationToken = default)
+            => GetSymbol(declarationSyntax, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IParameterSymbol GetDeclaredSymbol(ParameterSyntax declarationSyntax, CancellationToken cancellationToken = default)
-            => roslynModel.GetDeclaredSymbol(Adjust(declarationSyntax), cancellationToken);
-
-        public override ImmutableArray<ISymbol> GetDeclaredSymbols(BaseFieldDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
+        public override ImmutableArray<ISymbol> GetDeclaredSymbols(
+            BaseFieldDeclarationSyntax declarationSyntax, CancellationToken cancellationToken = default)
         {
             var adjusted = Adjust(declarationSyntax);
 
@@ -327,25 +350,21 @@ namespace CSharpE.Transform.VisualStudio
             return roslynModel.GetDeclaredSymbols(adjusted, cancellationToken);
         }
 
-        public override ITypeParameterSymbol GetDeclaredSymbol(TypeParameterSyntax typeParameter, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+        public override ITypeParameterSymbol GetDeclaredSymbol(
+            TypeParameterSyntax typeParameter, CancellationToken cancellationToken = default)
+            => GetSymbol(typeParameter, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IRangeVariableSymbol GetDeclaredSymbol(QueryClauseSyntax queryClause, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+        public override IRangeVariableSymbol GetDeclaredSymbol(
+            QueryClauseSyntax queryClause, CancellationToken cancellationToken = default)
+            => GetSymbol(queryClause, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IRangeVariableSymbol GetDeclaredSymbol(JoinIntoClauseSyntax node, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+        public override IRangeVariableSymbol GetDeclaredSymbol(
+            JoinIntoClauseSyntax node, CancellationToken cancellationToken = default)
+            => GetSymbol(node, cancellationToken, roslynModel.GetDeclaredSymbol);
 
-        public override IRangeVariableSymbol GetDeclaredSymbol(QueryContinuationSyntax node, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+        public override IRangeVariableSymbol GetDeclaredSymbol(
+            QueryContinuationSyntax node, CancellationToken cancellationToken = default)
+            => GetSymbol(node, cancellationToken, roslynModel.GetDeclaredSymbol);
 
         public override ForEachStatementInfo GetForEachStatementInfo(ForEachStatementSyntax node)
         {

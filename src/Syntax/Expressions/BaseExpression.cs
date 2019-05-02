@@ -34,7 +34,5 @@ namespace CSharpE.Syntax
             syntax = (BaseExpressionSyntax)newSyntax;
 
         private protected override SyntaxNode CloneImpl() => new BaseExpression();
-
-        internal override SyntaxNode Parent { get; set; }
     }
 }

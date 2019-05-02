@@ -68,8 +68,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new AnonymousNewExpression(Initializers);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() => Initializers;
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)

@@ -85,8 +85,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new ImplicitNewArrayExpression(Rank, Initializer);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
             Initializer.ReplaceExpressions(filter, projection);
     }

@@ -11,8 +11,6 @@ namespace CSharpE.Syntax
         
         protected abstract object ValueImpl { get; }
 
-        internal override SyntaxNode Parent { get; set; }
-
         private protected abstract LiteralExpressionSyntax GetWrappedLiteral(ref bool? changed);
 
         LiteralExpressionSyntax ISyntaxWrapper<LiteralExpressionSyntax>.GetWrapped(ref bool? changed) =>

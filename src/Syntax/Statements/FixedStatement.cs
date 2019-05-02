@@ -83,8 +83,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new FixedStatement(VariableDeclaration, Statements);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public override IEnumerable<SyntaxNode> GetChildren() =>
             new SyntaxNode[] { VariableDeclaration }.Concat(Statements);
 

@@ -110,19 +110,7 @@ namespace CSharpE.Syntax
         public bool IsProtectedInternal => Accessibility == ProtectedInternal;
         public bool IsPrivateProtected => Accessibility == PrivateProtected;
 
-        private protected TypeDefinition ParentType { get; private set; }
-
-        internal override SyntaxNode Parent
-        {
-            get => ParentType;
-            set
-            {
-                if (value is TypeDefinition parentType)
-                    ParentType = parentType;
-                else
-                    throw new ArgumentException(nameof(value));
-            }
-        }
+        private protected TypeDefinition ParentType => (TypeDefinition)Parent;
 
         MemberDeclarationSyntax ISyntaxWrapper<MemberDeclarationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrappedMember(ref changed);

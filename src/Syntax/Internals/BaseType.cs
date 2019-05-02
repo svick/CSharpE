@@ -28,8 +28,6 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
-        internal override SyntaxNode Parent { get; set; }
-
         BaseTypeSyntax ISyntaxWrapper<BaseTypeSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);

@@ -59,8 +59,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new IdentifierExpression(Identifier);
 
-        internal override SyntaxNode Parent { get; set; }
-
         public NamedTypeReference AsTypeReference()
         {
             this.GetWrapped<IdentifierNameSyntax>();

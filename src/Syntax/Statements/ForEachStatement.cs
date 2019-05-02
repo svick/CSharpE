@@ -40,8 +40,6 @@ namespace CSharpE.Syntax
             }
             set => SetList(ref statements, new StatementList(value, this));
         }
-
-        internal override SyntaxNode Parent { get; set; }
     }
 
     public sealed class ForEachStatement : BaseForEachStatement
