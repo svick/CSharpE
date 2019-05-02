@@ -20,3 +20,38 @@ The attached code is a snapshot of the repository \url{https://github.com/svick/
 \item The \cs{test} directory contains tests verifying functionality of CSharpE.
 
 \end{itemize}
+
+\subsection{Prerequisites}
+
+Before using the code, it is required to have Visual Studio 2017 version 15.9 installed. All editions are supported, including the Community edition.
+
+\todo{change to VS 2019; workloads and additional components}
+
+\subsection{Building}
+
+Building the code is not necessary in order to use CSharpE, because all the required assets can be downloaded from the Internet. Specifically, the Visual Studio extension is available on the Visual Studio Marketplace and NuGet packages for the MSBuild extension and example CSharpE extensions are available on nuget.org, as is described in more detail in the following sections.
+
+In order to build the code:
+
+\begin{enumerate}
+\item Open the solution \cs{CSharpE.sln} in Visual Studio.
+\item If you are building CSharpE for the first time:
+
+\begin{enumerate}
+\item Change the target framework of the project \cs{Transform.VisualStudio} to .NET Framework 4.7.2.
+\item Build the solution.
+\item Change the target framework of \cs{Transform.VisualStudio} back to .NET Framework 4.6.
+\end{enumerate}
+
+Without this step, \cs{IgnoreAccessChecksToGenerar} will not work properly. \cite{iactg-net46}
+
+\todo{check if the workaround mentioned in the issue works}
+
+\item Build the solution. This will produce the VSIX file that contains the Visual Studio extension.
+
+\item In order to produce NuGet packages for the MSBuild extension and example CSharpE extensions, you can execute \cs{dotnet pack} from the root of the repository (add \cs{-c Release} to the command to build the packages in Release mode). Alternatively, you can build individual packages by selecting the "Pack" command from the context menu for the corresponding project in Visual Studio.
+
+\todo{can i prevent dotnet pack from producing errors?}
+\todo{is there a way to pack all from VS?}
+
+\end{enumerate}
