@@ -1,3 +1,9 @@
+## Links
+
+[Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=svick.CSharpE-Transform-VisualStudio)
+
+[Remote desktop connection](vs2017.rdp)
+
 ## Visual Studio support
 
 Basic features work:
