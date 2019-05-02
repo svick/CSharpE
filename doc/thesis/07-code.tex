@@ -58,7 +58,7 @@ Without this step, \cs{IgnoreAccessChecksToGenerar} will not work properly. \cit
 
 \subsection{Installation}
 
-To use CSharpE, install the CSharpE.Transform.VisualStudio extension from the Visual Studio Marketplace: \url{https://marketplace.visualstudio.com/items?itemName=svick.CSharpE-Transform-VisualStudio}.
+To use CSharpE, install the CSharpE.Transform.VisualStudio extension from the Visual Studio Marketplace: \url{https://marketplace.visualstudio.com/items?itemName=svick.CSharpE-Transform-VisualStudio}. All following sections assume that this extension is already installed.
 
 \subsection{Usage in example application}
 
@@ -85,3 +85,42 @@ Build-time version of the generated code can be seen by invoking "Step Over" (F1
 \todo{"immediatelly" probably won't work, explain it has to be done after code builds and starts}
 
 \subsection{Usage in new project}
+
+To use CSharpE in a new project, follow these steps:
+
+\begin{enumerate}
+\item Create a new .NET Core project in Visual Studio.
+
+\todo{Clarify that .Net Framework projects work too, but have to use new-style csproj?}
+
+\item Add reference to the NuGet package \cs{CSharpE.Transform.MSBuild}.
+
+\item Add reference to one or more NuGet packages that contain CSharpE extensions. This can be a custom package (see the next section), or one of the following example extensions:
+
+\begin{itemize}
+\item \cs{CSharpE.Actor}
+\item \cs{CSharpE.Json}
+\item \cs{CSharpE.Logging}
+\item \cs{CSharpE.Record}
+\end{itemize}
+\end{enumerate}
+
+\subsection{Creating an extension}
+
+\begin{enumerate}
+\item Create a new .NET Standard 2.0 library in Visual Studio.
+
+\item Add reference to the NuGet package \cs{CSharpE.Transform}.
+
+\item Create a \cs{public} class that implements the \cs{ITransformation} interface.
+
+The recommended approach is to do this by inheriting from one of the following \cs{abstract} classes: \cs{Transformation}, \cs{SimpleTransformation} or \cs{BuildTimeTransformation}. For more details on the available \acp{API}, see Sections~\ref{syntax-design} and \ref{transform-design}.
+
+\item Create any other types required for the transformation, such as attributes for attribute-based transformations.
+
+\item Implement the desired behavior of the extension.
+
+\item Pack the project as a NuGet package and publish it to a configured NuGet package source. such as NuGet.org or a local directory.
+
+\item To use the extension, follow the steps from the previous section.
+\end{enumerate}

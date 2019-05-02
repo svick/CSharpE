@@ -5,6 +5,7 @@ Before starting actual design of the system, its name should be decided. This na
 As explained in the previous chapter, this system has two main tasks: representing code and transforming code. This means it is natural to split the project into two main parts: \cs{CSharpE.Syntax} and \cs{CSharpE.Transform}, respectively.
 
 \section{CSharpE.Syntax}
+\label{syntax-design}
 
 The \cs{CSharpE.Syntax} namespace contains all the types necessary for representing and modifying C\# code starting from the project level and going down all the way to the expression level. There is no representation for solutions, because extensions work at the project level, which means solutions are not necessary.
 
