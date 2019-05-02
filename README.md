@@ -4,6 +4,10 @@
 
 [Remote desktop connection](https://github.com/svick/CSharpE/releases/download/20190502/vs2017.rdp)
 
+## VS 2019
+
+> System.TypeLoadException: Method 'IsSymbolAccessibleWithinCore' in type 'CSharpE.Transform.VisualStudio.Compilation' from assembly 'CSharpE.Transform.VisualStudio, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' does not have an implementation.
+
 ## Visual Studio support
 
 Basic features work:
