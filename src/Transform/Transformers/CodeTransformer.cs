@@ -130,7 +130,8 @@ namespace CSharpE.Transform.Transformers
                 if (oldAnnotation == null)
                     continue;
 
-                annotationMap.Add(oldAnnotation, newAnnotation);
+                if (!annotationMap.ContainsKey(oldAnnotation))
+                    annotationMap.Add(oldAnnotation, newAnnotation);
             }
 
             return afterSyntax.ReplaceNodes(

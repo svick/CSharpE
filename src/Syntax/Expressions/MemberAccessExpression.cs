@@ -105,7 +105,7 @@ namespace CSharpE.Syntax
             var newMemberName = memberName.GetWrapped(ref thisChanged);
             var newTypeArguments = typeArguments.GetWrapped(ref thisChanged);
 
-            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 var nameSyntax = newTypeArguments.Any()
                     ? (SimpleNameSyntax)RoslynSyntaxFactory.GenericName(

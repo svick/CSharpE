@@ -33,7 +33,7 @@ namespace CSharpE.Transform.VisualStudio
                 return false;
             }
 
-            return templateFunction(parentModel, position, syntax, out speculativeModel);
+            return templateFunction(parentModel, adjusted.Value, syntax, out speculativeModel);
         }
 
         public override bool TryGetSpeculativeSemanticModelCore(
