@@ -50,6 +50,7 @@
     <Compile Include="ErrorSource.cs" />
     <Compile Include="Compilation.cs" />
     <Compile Include="CompilationDiff.cs" />
+    <Compile Include="MemberSemanticModel.cs" />
     <Compile Include="RoslynExtensions.cs" />
     <Compile Include="SemanticModel.cs" />
     <Compile Include="SyntaxDiffer.cs" />

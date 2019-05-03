@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="CSharpE.Transform.VisualStudio.F156230B-89EE-4157-9345-F2B9466E556E" Version="0.1.151" Language="en-US" Publisher="Petr Onderka" />
+        <Identity Id="CSharpE.Transform.VisualStudio.F156230B-89EE-4157-9345-F2B9466E556E" Version="0.1.152" Language="en-US" Publisher="Petr Onderka" />
         <DisplayName>CSharpE.Transform.VisualStudio</DisplayName>
         <Description xml:space="preserve">Extension required for CSharpE in VS.</Description>
     </Metadata>

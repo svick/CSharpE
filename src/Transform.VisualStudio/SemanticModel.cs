@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using RoslynSemanticModel = Microsoft.CodeAnalysis.SemanticModel;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
+using CSharpMemberSemanticModel = Microsoft.CodeAnalysis.CSharp.MemberSemanticModel;
 using Roslyn = msca.Microsoft.CodeAnalysis;
 
 namespace CSharpE.Transform.VisualStudio
@@ -31,7 +32,7 @@ namespace CSharpE.Transform.VisualStudio
             this.roslynModel = roslynModel;
         }
 
-        private SyntaxTreeDiff GetTreeDiff() => compilation.Diff.ForTree(roslynModel.SyntaxTree.FilePath);
+        internal SyntaxTreeDiff GetTreeDiff() => compilation.Diff.ForTree(roslynModel.SyntaxTree.FilePath);
 
         private SyntaxTreeDiff GetReverseTreeDiff() => compilation.Diff.ForTreeReverse(roslynModel.SyntaxTree.FilePath);
 
@@ -207,7 +208,14 @@ namespace CSharpE.Transform.VisualStudio
             return roslynModel.GetEnclosingBinderInternal(adjusted);
         }
 
-        public override MemberSemanticModel GetMemberModel(SyntaxNode node) => roslynModel.GetMemberModel(Adjust(node));
+        public override CSharpMemberSemanticModel GetMemberModel(SyntaxNode node)
+        {
+            var adjusted = Adjust(node);
+            if (adjusted == null)
+                return null;
+
+            return new MemberSemanticModel(roslynModel.GetMemberModel(adjusted), this);
+        }
 
         public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, ArrowExpressionClauseSyntax expressionBody, out RoslynSemanticModel speculativeModel)
         {
