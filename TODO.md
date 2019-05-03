@@ -1,13 +1,17 @@
-﻿- fix moving `NamedTypeReference`s between files (doesn't update `using`s)
+- fix moving `NamedTypeReference`s between files (doesn't update `using`s)
+- make most classes `sealed`
+- consider using limited Roslyn formatting instead of `NormalizeWhitespace`
+- identifier should handle escaping keywords (including contextual ones, those can be escaped unnecessarily)
+
+---
+
 - detect reading of References/Symbols, then rerun when those symbols change
 - when `Clear()`ing a list of members, or more generally resetting `Parent` to `null`, make sure semantics of detached nodes still work by storing cached versions of necessary Roslyn types
 - allow `Where` in smart loops; check there are no sideefects on the node same as `ForEach`
 - allow modifying lists while iterating them
   - optional: make it more efficient using copy on write 
 - add tests ensuring mutating smart inputs (incl. syntax nodes) throws
-- make most classes `sealed`
 - look into how InvocationReasons.SemanticChanged works and if it could be used to decide when to rerun the whole transformation
-- consider using limited Roslyn formatting instead of `NormalizeWhitespace`
 
 ---
 
