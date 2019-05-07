@@ -24,12 +24,41 @@ namespace CSharpE.Syntax.Internals
             return errors.Except(children.SelectMany(c => c?.GetDiagnostics() ?? Array.Empty<Diagnostic>())).Any();
         }
 
+        private static IEnumerable<Roslyn::SyntaxNode> ChildExpressionsAndStatements(Roslyn::SyntaxNode syntax)
+        {
+            foreach (var childNode in syntax.ChildNodes())
+            {
+                if (childNode is ExpressionSyntax expression)
+                {
+                    yield return expression;
+                }
+                else if (childNode is StatementSyntax statement)
+                {
+                    yield return statement;
+                }
+                else
+                {
+                    foreach (var childExpression in ChildExpressionsAndStatements(childNode))
+                    {
+                        yield return childExpression;
+                    }
+                }
+            }
+        }
+
+        private static IEnumerable<Roslyn::SyntaxNode> ExpressionChildren(ExpressionSyntax syntax) =>
+            ChildExpressionsAndStatements(syntax);
+
         public static Expression Expression(ExpressionSyntax syntax, SyntaxNode parent)
         {
+            if (syntax == null)
+                return null;
+
+            if (HasUnresolvedErrors(syntax, ExpressionChildren(syntax)))
+                return new InvalidExpression(syntax, parent);
+
             switch (syntax)
             {
-                case null:
-                    return null;
                 case AnonymousObjectCreationExpressionSyntax anonymousObjectCreation:
                     return new AnonymousNewExpression(anonymousObjectCreation, parent);
                 case ArrayCreationExpressionSyntax arrayCreation:
