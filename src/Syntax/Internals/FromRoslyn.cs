@@ -342,12 +342,19 @@ namespace CSharpE.Syntax.Internals
             throw new InvalidOperationException();
         }
 
+        private static IEnumerable<Roslyn::SyntaxNode> StatementChildren(StatementSyntax syntax) =>
+            ChildExpressionsAndStatements(syntax);
+
         public static Statement Statement(StatementSyntax syntax, SyntaxNode parent)
         {
+            if (syntax == null)
+                return null;
+
+            if (HasUnresolvedErrors(syntax, StatementChildren(syntax)))
+                return new InvalidStatement(syntax, parent);
+
             switch (syntax)
             {
-                case null:
-                    return null;
                 case BreakStatementSyntax @break:
                     return new BreakStatement(@break, parent);
                 case CheckedStatementSyntax @checked:
