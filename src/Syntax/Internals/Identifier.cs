@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
@@ -35,7 +36,7 @@ namespace CSharpE.Syntax.Internals
                     throw new ArgumentNullException(nameof(value));
 
                 if (value == string.Empty)
-                    throw new ArgumentException(nameof(value));
+                    throw new ArgumentException("Identifier can't be the empty string.", nameof(value));
 
                 text = value;
                 textSet = true;
@@ -48,7 +49,12 @@ namespace CSharpE.Syntax.Internals
         {
             if (Text != syntax.ValueText)
             {
-                syntax = text == null ? default : RoslynSyntaxFactory.Identifier(text);
+                if (text == null)
+                    syntax = default;
+                else if (text == "_")
+                    syntax = RoslynSyntaxFactory.Identifier(default, SyntaxKind.UnderscoreToken, text, text, default);
+                else
+                    syntax = RoslynSyntaxFactory.Identifier(text);
 
                 changed = true;
             }
