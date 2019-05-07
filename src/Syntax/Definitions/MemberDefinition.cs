@@ -61,7 +61,7 @@ namespace CSharpE.Syntax
             return false;
         }
 
-        private static SyntaxList<AttributeListSyntax> GetAttributeLists(MemberDeclarationSyntax syntax)
+        internal static SyntaxList<AttributeListSyntax> GetAttributeLists(MemberDeclarationSyntax syntax)
         {
             switch (syntax)
             {

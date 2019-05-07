@@ -16,22 +16,22 @@ namespace CSharpE.Syntax
     {
         private TypeSyntax syntax;
 
-        public NamedTypeReference(NamedTypeReference openGenericType, params TypeReference[] typeParameters) 
-            : this(openGenericType.Namespace, openGenericType.Container, openGenericType.Name, typeParameters) { }
+        public NamedTypeReference(NamedTypeReference openGenericType, params TypeReference[] typeArguments) 
+            : this(openGenericType.Namespace, openGenericType.Container, openGenericType.Name, typeArguments) { }
 
-        public NamedTypeReference(string ns, string name, params TypeReference[] typeParameters)
-            : this(ns, name, typeParameters.AsEnumerable()) { }
+        public NamedTypeReference(string ns, string name, params TypeReference[] typeArguments)
+            : this(ns, name, typeArguments.AsEnumerable()) { }
 
-        public NamedTypeReference(string ns, string name, IEnumerable<TypeReference> typeParameters = null)
-            : this(ns, null, name, typeParameters) { }
+        public NamedTypeReference(string ns, string name, IEnumerable<TypeReference> typeArguments = null)
+            : this(ns, null, name, typeArguments) { }
 
-        public NamedTypeReference(string ns, NamedTypeReference container, string name, IEnumerable<TypeReference> typeParameters = null)
+        public NamedTypeReference(string ns, NamedTypeReference container, string name, IEnumerable<TypeReference> typeArguments = null)
         {
             this.ns = ns;
             this.container = container;
             this.name = name ?? throw new ArgumentNullException(nameof(name), "Name cannot be null.");
-            this.typeParameters =
-                new TypeList(typeParameters ?? Array.Empty<TypeReference>(), this);
+            this.typeArguments =
+                new TypeList(typeArguments ?? Array.Empty<TypeReference>(), this);
             isKnownType = true;
         }
 
@@ -111,9 +111,9 @@ namespace CSharpE.Syntax
         /// <summary>
         /// Indicates whether this is a known type.
         /// A known type has <see cref="Namespace"/>, <see cref="Container"/> (its containing type),
-        /// <see cref="Name"/> and <see cref="TypeParameters"/>.
+        /// <see cref="Name"/> and <see cref="TypeArguments"/>.
         /// An unknown type has <see cref="Container"/> (its containing type or namespace),
-        /// <see cref="Name"/> and <see cref="TypeParameters"/>.
+        /// <see cref="Name"/> and <see cref="TypeArguments"/>.
         /// </summary>
         private bool IsKnownType
         {
@@ -188,22 +188,22 @@ namespace CSharpE.Syntax
             }
         }
 
-        private TypeList typeParameters;
-        public IList<TypeReference> TypeParameters
+        private TypeList typeArguments;
+        public IList<TypeReference> TypeArguments
         {
             get
             {
-                if (typeParameters == null)
+                if (typeArguments == null)
                 {
                     var genericSyntax = syntax as GenericNameSyntax;
 
-                    typeParameters = new TypeList(
+                    typeArguments = new TypeList(
                         genericSyntax?.TypeArgumentList.Arguments ?? default, this);
                 }
 
-                return typeParameters;
+                return typeArguments;
             }
-            set => SetList(ref typeParameters, new TypeList(value, this));
+            set => SetList(ref typeArguments, new TypeList(value, this));
         }
 
         internal override StringBuilder ComputeFullName(StringBuilder stringBuilder)
@@ -222,13 +222,13 @@ namespace CSharpE.Syntax
 
             stringBuilder.Append(Name);
 
-            if (TypeParameters.Any())
+            if (TypeArguments.Any())
             {
                 stringBuilder.Append('<');
 
                 bool first = true;
 
-                foreach (var typeParameter in TypeParameters)
+                foreach (var typeParameter in TypeArguments)
                 {
                     if (!first)
                         stringBuilder.Append(", ");
@@ -246,9 +246,6 @@ namespace CSharpE.Syntax
 
         private static bool IsAncestorNamespace(string parent, string child) => parent == child || child.StartsWith(parent + '.');
 
-        public bool RequiresUsingNamespace => IsKnownType && Namespace != null && !IsPredefinedType &&
-                                              !IsAncestorNamespace(Namespace, EnclosingType.GetNamespace());
-
         public static implicit operator NamedTypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 
         private protected override TypeSyntax GetWrappedType(ref bool? changed)
@@ -257,23 +254,46 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
-            var newTypeParameters = typeParameters?.GetWrapped(ref thisChanged) ??
+            var newTypeArguments = typeArguments?.GetWrapped(ref thisChanged) ??
                                     (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
 
-            // if Resolve() wasn't called, only type parameters could have been changed
-            if (isKnownType == null && thisChanged == false)
+            TypeArgumentListSyntax GetTypeArguments(SeparatedSyntaxList<TypeSyntax> arguments)
             {
-                if (!IsAnnotated(syntax))
-                {
-                    syntax = Annotate(syntax);
+                if (arguments.Contains(null))
+                    arguments = RoslynSyntaxFactory.SeparatedList(
+                        newTypeArguments.Select(l => l ?? RoslynSyntaxFactory.OmittedTypeArgument()));
 
-                    SetChanged(ref changed);
-                }
-
-                return syntax;
+                return RoslynSyntaxFactory.TypeArgumentList(arguments);
             }
 
-            if (RequiresUsingNamespace)
+            // if Resolve() wasn't called, only type parameters could have been changed
+            if (isKnownType == null)
+            {
+                // either old and new are both non-generic or both are generic
+                if (newTypeArguments.Any() == syntax is GenericNameSyntax)
+                {
+                    if (thisChanged == true || !IsAnnotated(syntax))
+                    {
+                        if (thisChanged == true)
+                        {
+                            // if type parameters changed, but genericity didn't, syntax must be generic
+                            var genericSyntax = (GenericNameSyntax)syntax;
+
+                            syntax = genericSyntax.WithTypeArgumentList(GetTypeArguments(newTypeArguments));
+                        }
+
+                        syntax = Annotate(syntax);
+
+                        SetChanged(ref changed);
+                    }
+
+                    return syntax;
+                }
+            }
+
+            bool requiresUsingNamespace = IsKnownType && Namespace != null && !IsPredefinedType &&
+                                         !IsAncestorNamespace(Namespace, EnclosingType.GetNamespace());
+            if (requiresUsingNamespace)
                 SourceFile?.EnsureUsingNamespace(Namespace);
 
             var newNamespace = ns ?? syntaxNamespace;
@@ -291,11 +311,10 @@ namespace CSharpE.Syntax
                 else
                 {
                     SimpleNameSyntax simpleName;
-                    if (newTypeParameters.Any())
+                    if (newTypeArguments.Any())
                     {
                         simpleName = RoslynSyntaxFactory.GenericName(
-                            RoslynSyntaxFactory.Identifier(Name),
-                            RoslynSyntaxFactory.TypeArgumentList(newTypeParameters));
+                            RoslynSyntaxFactory.Identifier(Name), GetTypeArguments(newTypeArguments));
                     }
                     else
                     {
@@ -322,7 +341,7 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             syntax = (TypeSyntax)newSyntax;
-            typeParameters = null;
+            typeArguments = null;
             isKnownType = false;
         }
 
@@ -340,7 +359,7 @@ namespace CSharpE.Syntax
 
         private SyntaxKind GetPredefinedSyntaxKind()
         {
-            if (Namespace != nameof(System) || Container != null || TypeParameters.Any())
+            if (Namespace != nameof(System) || Container != null || TypeArguments.Any())
                 return SyntaxKind.None;
 
             switch (Name)
@@ -384,7 +403,9 @@ namespace CSharpE.Syntax
 
         public override string ToString() => FullName;
 
-        private protected override SyntaxNode CloneImpl() => new NamedTypeReference(Namespace, Container, Name, TypeParameters);
+        private protected override SyntaxNode CloneImpl() => new NamedTypeReference(Namespace, Container, Name, TypeArguments);
+
+        public override IEnumerable<SyntaxNode> GetChildren() => TypeArguments;
 
         public override bool Equals(TypeReference other)
         {
@@ -396,7 +417,7 @@ namespace CSharpE.Syntax
             return ordinalComparer.Equals(Namespace, otherNamed.Namespace) &&
                    Equals(Container, otherNamed.Container) &&
                    ordinalComparer.Equals(Name, otherNamed.Name) &&
-                   TypeParameters.SequenceEqual(otherNamed.TypeParameters);
+                   TypeArguments.SequenceEqual(otherNamed.TypeArguments);
         }
 
         public override int GetHashCode()
@@ -407,7 +428,7 @@ namespace CSharpE.Syntax
             hc.Add(Namespace, ordinalComparer);
             hc.Add(Container);
             hc.Add(Name, ordinalComparer);
-            foreach (var tp in TypeParameters)
+            foreach (var tp in TypeArguments)
                 hc.Add(tp);
             return hc.ToHashCode();
         }

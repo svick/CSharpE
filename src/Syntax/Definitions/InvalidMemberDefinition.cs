@@ -4,21 +4,22 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class IncompleteMemberDefinition : MemberDefinition
+    // InvalidMember is a BaseType, because this is required for NamespaceOrTypeList and doesn't hurt MemberList
+    public sealed class InvalidMemberDefinition : BaseTypeDefinition
     {
-        private IncompleteMemberSyntax syntax;
+        private MemberDeclarationSyntax syntax;
 
-        internal IncompleteMemberDefinition(IncompleteMemberSyntax incompleteMemberSyntax, SyntaxNode parent)
-            : base(incompleteMemberSyntax)
+        internal InvalidMemberDefinition(MemberDeclarationSyntax memberSyntax, SyntaxNode parent)
+            : base(memberSyntax)
         {
-            syntax = incompleteMemberSyntax;
+            syntax = memberSyntax;
             Parent = parent;
         }
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
-            syntax = (IncompleteMemberSyntax)newSyntax;
+            syntax = (MemberDeclarationSyntax)newSyntax;
 
-        private protected override SyntaxNode CloneImpl() => new InvalidTypeDefinition(syntax, null);
+        private protected override SyntaxNode CloneImpl() => new InvalidMemberDefinition(syntax, null);
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 

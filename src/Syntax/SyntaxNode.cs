@@ -147,6 +147,8 @@ namespace CSharpE.Syntax
             }
         }
 
+        private ISyntaxWrapper<Roslyn::SyntaxNode> AsWrapper() => (ISyntaxWrapper<Roslyn::SyntaxNode>)this;
+
         public bool Equals(SyntaxNode other)
         {
             if (other is null) return false;
@@ -157,10 +159,7 @@ namespace CSharpE.Syntax
             if (other.SourceFile != null || this.SourceFile != null)
                 return false;
 
-            var thisWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)this;
-            var otherWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)other;
-
-            return thisWrapper.GetWrapped().IsEquivalentTo(otherWrapper.GetWrapped());
+            return this.AsWrapper().GetWrapped().IsEquivalentTo(other.AsWrapper().GetWrapped());
         }
 
         public override bool Equals(object obj) => Equals(obj as SyntaxNode);
@@ -171,17 +170,10 @@ namespace CSharpE.Syntax
             if (SourceFile != null)
                 return base.GetHashCode();
 
-            var thisWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)this;
-
             // if nodes are equivalent, their strings should be equal
-            return StringComparer.Ordinal.GetHashCode(thisWrapper.GetWrapped().ToString());
+            return StringComparer.Ordinal.GetHashCode(this.AsWrapper().GetWrapped().ToString());
         }
 
-        public override string ToString()
-        {
-            var thisWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)this;
-
-            return thisWrapper.GetWrapped().NormalizeWhitespace().ToString();
-        }
+        public override string ToString() => this.AsWrapper().GetWrapped().NormalizeWhitespace().ToString();
     }
 }

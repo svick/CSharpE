@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Roslyn = Microsoft.CodeAnalysis;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
@@ -15,6 +17,13 @@ namespace CSharpE.Syntax.Internals
     /// </remarks>
     internal static class FromRoslyn
     {
+        private static bool HasUnresolvedErrors(Roslyn::SyntaxNode node, IEnumerable<Roslyn::SyntaxNode> children)
+        {
+            var errors = node.GetDiagnostics().Where(d => d.DefaultSeverity == DiagnosticSeverity.Error);
+
+            return errors.Except(children.SelectMany(c => c?.GetDiagnostics() ?? Array.Empty<Diagnostic>())).Any();
+        }
+
         public static Expression Expression(ExpressionSyntax syntax, SyntaxNode parent)
         {
             switch (syntax)
@@ -465,9 +474,44 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
+        private static IEnumerable<ExpressionSyntax> MemberAttributeExpressions(
+            MemberDeclarationSyntax memberDeclarationSyntax) =>
+            Syntax.MemberDefinition.GetAttributeLists(memberDeclarationSyntax)
+                .SelectMany(al => al.Attributes)
+                .SelectMany(a => a.ArgumentList?.Arguments ?? default)
+                .Select(a => a.Expression);
+
+        private static IEnumerable<Roslyn::SyntaxNode> MemberDeclarationChildren(MemberDeclarationSyntax memberDeclarationSyntax)
+        {
+            return MemberAttributeExpressions(memberDeclarationSyntax).Concat(GetChildrenImpl());
+
+            IEnumerable<Roslyn::SyntaxNode> GetChildrenImpl()
+            {
+                switch (memberDeclarationSyntax)
+                {
+                    case FieldDeclarationSyntax field:
+                        return new[] { field.Declaration.Variables.Single().Initializer };
+                    case BasePropertyDeclarationSyntax property:
+                        return Array.Empty<Roslyn::SyntaxNode>(); // TODO
+                    case BaseMethodDeclarationSyntax method:
+                        return new[] { method.Body };
+                    case BaseTypeDeclarationSyntax baseType:
+                        return TypeDefinitionChildren(baseType);
+                    case DelegateDeclarationSyntax _:
+                    case IncompleteMemberSyntax _:
+                        return Array.Empty<Roslyn::SyntaxNode>();
+                    default:
+                        throw new NotImplementedException(memberDeclarationSyntax.GetType().Name);
+                }
+            }
+        }
+
         public static MemberDefinition MemberDefinition(
             MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType)
         {
+            if (HasUnresolvedErrors(memberDeclarationSyntax, MemberDeclarationChildren(memberDeclarationSyntax)))
+                return new InvalidMemberDefinition(memberDeclarationSyntax, containingType);
+
             switch (memberDeclarationSyntax)
             {
                 case FieldDeclarationSyntax field:
@@ -488,30 +532,45 @@ namespace CSharpE.Syntax.Internals
                     return TypeDefinition(baseType, containingType);
                 case DelegateDeclarationSyntax @delegate:
                     return new DelegateDefinition(@delegate, containingType);
-                case IncompleteMemberSyntax incompleteMember:
-                    return new IncompleteMemberDefinition(incompleteMember, containingType);
                 default:
                     throw new NotImplementedException(memberDeclarationSyntax.GetType().Name);
             }
         }
 
-        public static BaseTypeDefinition TypeDefinition(MemberDeclarationSyntax memberDeclarationSyntax, SyntaxNode parent)
+        public static BaseTypeDefinition TypeDefinition(
+            MemberDeclarationSyntax memberDeclarationSyntax, SyntaxNode parent)
         {
+            if (HasUnresolvedErrors(memberDeclarationSyntax, MemberDeclarationChildren(memberDeclarationSyntax)))
+                return new InvalidMemberDefinition(memberDeclarationSyntax, parent);
+
             switch (memberDeclarationSyntax)
             {
                 case DelegateDeclarationSyntax delegateDeclaration:
                     return new DelegateDefinition(delegateDeclaration, parent);
                 case BaseTypeDeclarationSyntax baseTypeDeclaration:
                     return TypeDefinition(baseTypeDeclaration, parent);
-                case IncompleteMemberSyntax _:
-                case FieldDeclarationSyntax _:
-                case MethodDeclarationSyntax _:
-                    return new InvalidTypeDefinition(memberDeclarationSyntax, parent);
             }
             throw new InvalidOperationException();
         }
 
-        public static BaseTypeDefinition TypeDefinition(BaseTypeDeclarationSyntax typeDeclarationSyntax, SyntaxNode parent)
+        private static IEnumerable<Roslyn::SyntaxNode> TypeDefinitionChildren(BaseTypeDeclarationSyntax baseTypeDeclarationSyntax)
+        {
+            return MemberAttributeExpressions(baseTypeDeclarationSyntax).Concat(GetChildrenImpl());
+
+            IEnumerable<Roslyn::SyntaxNode> GetChildrenImpl()
+            {
+                switch (baseTypeDeclarationSyntax)
+                {
+                    case EnumDeclarationSyntax enumDeclaration:
+                        return enumDeclaration.Members.Select(m => m.EqualsValue?.Value);
+                    case TypeDeclarationSyntax typeDeclaration:
+                        return typeDeclaration.Members;
+                }
+                throw new InvalidOperationException();
+            }
+        }
+
+        private static BaseTypeDefinition TypeDefinition(BaseTypeDeclarationSyntax typeDeclarationSyntax, SyntaxNode parent)
         {
             switch (typeDeclarationSyntax)
             {
@@ -532,6 +591,7 @@ namespace CSharpE.Syntax.Internals
             switch (typeSyntax)
             {
                 case null:
+                case OmittedTypeArgumentSyntax _:
                     return null;
                 case NameSyntax _:
                 case PredefinedTypeSyntax _:

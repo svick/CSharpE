@@ -1001,24 +1001,24 @@ namespace CSharpE.Syntax
             return new ArrayTypeReference(elementType, rank);
         }
 
-        public static NamedTypeReference NamedType(NamedTypeReference openGenericType, params TypeReference[] typeParameters)
+        public static NamedTypeReference NamedType(NamedTypeReference openGenericType, params TypeReference[] typeArguments)
         {
-            return new NamedTypeReference(openGenericType, typeParameters);
+            return new NamedTypeReference(openGenericType, typeArguments);
         }
 
-        public static NamedTypeReference NamedType(string ns, string name, params TypeReference[] typeParameters)
+        public static NamedTypeReference NamedType(string ns, string name, params TypeReference[] typeArguments)
         {
-            return new NamedTypeReference(ns, name, typeParameters);
+            return new NamedTypeReference(ns, name, typeArguments);
         }
 
-        public static NamedTypeReference NamedType(string ns, string name, IEnumerable<TypeReference> typeParameters = null)
+        public static NamedTypeReference NamedType(string ns, string name, IEnumerable<TypeReference> typeArguments = null)
         {
-            return new NamedTypeReference(ns, name, typeParameters);
+            return new NamedTypeReference(ns, name, typeArguments);
         }
 
-        public static NamedTypeReference NamedType(string ns, NamedTypeReference container, string name, IEnumerable<TypeReference> typeParameters = null)
+        public static NamedTypeReference NamedType(string ns, NamedTypeReference container, string name, IEnumerable<TypeReference> typeArguments = null)
         {
-            return new NamedTypeReference(ns, container, name, typeParameters);
+            return new NamedTypeReference(ns, container, name, typeArguments);
         }
 
         public static NamedTypeReference NamedType(Type type)

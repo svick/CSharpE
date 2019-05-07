@@ -13,7 +13,7 @@ namespace CSharpE.Syntax.Tests
             var typeReference = new NamedTypeReference(typeof(Array));
             
             Assert.Equal("System.Array", typeReference.FullName);
-            Assert.Empty(typeReference.TypeParameters);
+            Assert.Empty(typeReference.TypeArguments);
         }
 
         [Fact]
@@ -22,8 +22,8 @@ namespace CSharpE.Syntax.Tests
             var typeReference = new NamedTypeReference(typeof(List<int>));
 
             Assert.Equal("System.Collections.Generic.List<System.Int32>", typeReference.FullName);
-            Assert.Equal(1, typeReference.TypeParameters.Count);
-            Assert.Equal("System.Int32", typeReference.TypeParameters[0].ToString());
+            Assert.Equal(1, typeReference.TypeArguments.Count);
+            Assert.Equal("System.Int32", typeReference.TypeArguments[0].ToString());
         }
 
         [Fact]
@@ -32,7 +32,7 @@ namespace CSharpE.Syntax.Tests
             var typeReference = new NamedTypeReference(typeof(List<>));
 
             Assert.Equal("System.Collections.Generic.List", typeReference.FullName);
-            Assert.Empty(typeReference.TypeParameters);
+            Assert.Empty(typeReference.TypeArguments);
         }
 
         [Fact]
