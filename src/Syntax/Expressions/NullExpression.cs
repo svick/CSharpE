@@ -8,6 +8,7 @@ namespace CSharpE.Syntax
     public sealed class NullExpression : LiteralExpression
     {
         internal NullExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
 
@@ -24,9 +25,11 @@ namespace CSharpE.Syntax
         {
             GetAndResetChanged(ref changed);
 
-            if (Syntax == null)
+            if (Syntax == null || ShouldAnnotate(Syntax, changed))
             {
                 Syntax = RoslynSyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+
+                Syntax = Annotate(Syntax);
 
                 SetChanged(ref changed);
             }

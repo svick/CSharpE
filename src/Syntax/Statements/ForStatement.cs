@@ -112,11 +112,13 @@ namespace CSharpE.Syntax
             var newIncrementors = incrementors?.GetWrapped(ref thisChanged) ?? syntax.Incrementors;
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? GetStatementList(syntax.Statement);
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.ForStatement(
                     newVariableDeclaration, default, newCondition, newIncrementors,
                     RoslynSyntaxFactory.Block(newStatements));
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

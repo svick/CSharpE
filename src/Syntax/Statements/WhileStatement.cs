@@ -62,9 +62,11 @@ namespace CSharpE.Syntax
             var newCondition = condition?.GetWrapped(ref thisChanged) ?? syntax.Condition;
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? GetStatementList(syntax.Statement);
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.WhileStatement(newCondition, RoslynSyntaxFactory.Block(newStatements));
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

@@ -15,6 +15,7 @@ namespace CSharpE.Syntax
         private StatementSyntax syntax;
 
         internal ExpressionStatement(StatementSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Debug.Assert(syntax is ExpressionStatementSyntax || syntax is ThrowStatementSyntax);
 
@@ -75,12 +76,14 @@ namespace CSharpE.Syntax
 
             bool oldIsThrow = syntax is ThrowStatementSyntax;
 
-            if (syntax == null || newIsThrow != oldIsThrow || thisChanged == true)
+            if (syntax == null || newIsThrow != oldIsThrow || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 if (newIsThrow)
                     syntax = RoslynSyntaxFactory.ThrowStatement(newExpression);
                 else
                     syntax = RoslynSyntaxFactory.ExpressionStatement(newExpression);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

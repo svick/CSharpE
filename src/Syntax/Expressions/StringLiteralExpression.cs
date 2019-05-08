@@ -8,6 +8,7 @@ namespace CSharpE.Syntax
     public sealed class StringLiteralExpression : LiteralExpression
     {
         internal StringLiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
 
@@ -30,10 +31,12 @@ namespace CSharpE.Syntax
         {
             GetAndResetChanged(ref changed);
 
-            if (Syntax == null || Value != (string)Syntax.Token.Value)
+            if (Syntax == null || Value != (string)Syntax.Token.Value || ShouldAnnotate(Syntax, changed))
             {
                 Syntax = RoslynSyntaxFactory.LiteralExpression(
                     SyntaxKind.StringLiteralExpression, RoslynSyntaxFactory.Literal(Value));
+
+                Syntax = Annotate(Syntax);
 
                 SetChanged(ref changed);
             }

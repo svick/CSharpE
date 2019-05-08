@@ -9,6 +9,7 @@ namespace CSharpE.Syntax
     public sealed class BoolLiteralExpression : LiteralExpression
     {
         internal BoolLiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
 
@@ -31,9 +32,11 @@ namespace CSharpE.Syntax
         {
             GetAndResetChanged(ref changed);
 
-            if (Syntax == null || Value != (bool)Syntax.Token.Value)
+            if (Syntax == null || Value != (bool)Syntax.Token.Value || ShouldAnnotate(Syntax, changed))
             {
                 Syntax = RoslynSyntaxFactory.LiteralExpression(Value ? TrueLiteralExpression : FalseLiteralExpression);
+
+                Syntax = Annotate(Syntax);
 
                 SetChanged(ref changed);
             }

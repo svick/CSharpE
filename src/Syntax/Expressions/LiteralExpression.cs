@@ -5,6 +5,10 @@ namespace CSharpE.Syntax
 {
     public abstract class LiteralExpression : Expression, ISyntaxWrapper<LiteralExpressionSyntax>
     {
+        protected LiteralExpression() { }
+
+        protected LiteralExpression(LiteralExpressionSyntax syntax) : base(syntax) { }
+
         private protected LiteralExpressionSyntax Syntax;
 
         public object Value => ValueImpl;

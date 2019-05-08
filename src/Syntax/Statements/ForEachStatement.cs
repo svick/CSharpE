@@ -105,10 +105,12 @@ namespace CSharpE.Syntax
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? GetStatementList(syntax.Statement);
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.ForEachStatement(
                     newType, newName, newExpression, RoslynSyntaxFactory.Block(newStatements));
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }
@@ -188,10 +190,12 @@ namespace CSharpE.Syntax
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? GetStatementList(syntax.Statement);
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.ForEachVariableStatement(
                     newPattern, newExpression, RoslynSyntaxFactory.Block(newStatements));
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

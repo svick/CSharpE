@@ -51,7 +51,7 @@ namespace CSharpE.Syntax
 
         // since annotations are only useful as part of a whole SyntaxTree,
         // there is no need to recreate the syntax node because of a missing annotation if we're not building a tree
-        private protected bool ShouldAnnotate(Roslyn::SyntaxNode syntax, bool? changed) => !IsAnnotated(syntax) && changed != null;
+        private protected bool ShouldAnnotate(Roslyn::SyntaxNode syntax, bool? changed) => changed != null && !IsAnnotated(syntax);
 
         private protected T Annotate<T>(T syntax) where T : Roslyn::SyntaxNode =>
             syntax.WithAdditionalAnnotations(MarkerAnnotation);
