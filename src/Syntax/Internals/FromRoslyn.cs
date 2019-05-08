@@ -355,6 +355,8 @@ namespace CSharpE.Syntax.Internals
 
             switch (syntax)
             {
+                case BlockSyntax block:
+                    return new BlockStatement(block, parent);
                 case BreakStatementSyntax @break:
                     return new BreakStatement(@break, parent);
                 case CheckedStatementSyntax @checked:

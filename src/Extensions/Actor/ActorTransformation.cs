@@ -7,21 +7,23 @@ using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Extensions.Actor
 {
-    public class ActorTransformation : SimpleTransformation
+    public class ActorTransformation : Transformation
     {
-        protected override void Process(Project project)
+        public override void Process(Project project, bool designTime)
         {
-            Smart.ForEach(project.GetClassesWithAttribute<ActorAttribute>(), type =>
+            Smart.ForEach(project.GetClassesWithAttribute<ActorAttribute>(), designTime, (designTime1, type) =>
             {
                 var actorSemaphoreField = type.AddField(
                     ReadOnly, typeof(SemaphoreSlim), "_actor_semaphore", New(typeof(SemaphoreSlim), Literal(1)));
 
                 Expression actorSemaphoreFieldExpression = This().MemberAccess(actorSemaphoreField);
 
-                Smart.ForEach(type.PublicMethods, actorSemaphoreFieldExpression, (asf, method) =>
+                Smart.ForEach(type.PublicMethods, actorSemaphoreFieldExpression, designTime1, (asf, designTime2, method) =>
                 {
                     if (method.IsStatic)
                         return;
+
+                    bool needsYield = false;
 
                     if (!method.IsAsync)
                     {
@@ -29,13 +31,22 @@ namespace CSharpE.Extensions.Actor
                             ? NamedType(typeof(Task))
                             : NamedType(typeof(Task<>), method.ReturnType);
                         method.IsAsync = true;
+                        needsYield = true;
                     }
 
-                    method.Body.Statements = new Statement[]
+                    if (designTime2)
                     {
-                        Await(asf.Call("WaitAsync")),
-                        TryFinally(method.Body.Statements, new Statement[] { asf.Call("Release") })
-                    };
+                        if (needsYield)
+                            method.Body.Statements.Insert(0, Await(NamedType(typeof(Task)).Call(nameof(Task.Yield))));
+                    }
+                    else
+                    {
+                        method.Body.Statements = new Statement[]
+                        {
+                            Await(asf.Call("WaitAsync")),
+                            TryFinally(method.Body.Statements, new Statement[] { asf.Call("Release") })
+                        };
+                    }
                 });
             });
         }

@@ -132,6 +132,10 @@ namespace CSharpE.Transform
             syntaxCollection.Visit(new Visitor<TNode, T1>(arg1, action));
         }
 
+        public static void ForEach<TNode, T1, T2>(IEnumerable<TNode> nodes, T1 arg1, T2 arg2, Action<T1, T2, TNode> action)
+            where TNode : SyntaxNode =>
+            ForEach(nodes, (action, arg1, arg2), (t, n) => t.action(t.arg1, t.arg2, n));
+
         public static IReadOnlyList<TResult> ForEach<TNode, TResult>(
             IEnumerable<TNode> nodes, Func<TNode, TResult> action) where TNode : SyntaxNode =>
             ForEach(nodes, action, (a, node) => a(node));
