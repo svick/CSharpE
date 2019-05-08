@@ -427,11 +427,9 @@ The CSharpE project includes several example extensions, demonstrating its use, 
 
 \subsection{CSharpE.Logging}
 
-\cs{CSharpE.Logging} is a simple built-time-only extension that logs method name and method arguments to the console at the start of each method in a project.
+\cs{CSharpE.Logging} is a simple build-time-only extension that logs method name and method arguments to the console at the start of each method in a project.
 
-This extension can be compared with PostSharp Diagnostics, \cite{postsharp-diag} which serves a similar purpose. While PostSharp Diagnostics has vastly more features, the extension is only 60 lines of code. This shows that simple custom transformations can be implemented very quickly and might have the potential to replace commercial tools, especially since a single user is likely not going to use all features of a comprehensive tool.
-
-\todo{update number of lines if i switch to string interpolation}
+This extension can be compared with PostSharp Diagnostics, \cite{postsharp-diag} which serves a similar purpose. While PostSharp Diagnostics has vastly more features, the extension is only 50 lines of code. This shows that simple custom transformations can be implemented very quickly and might have the potential to replace commercial tools, especially since a single user is likely not going to use all features of a comprehensive tool.
 
 Because it is a build-time-only transformation, using it does not require the CSharpE Visual Studio extension. This also means it can be used from other \acp{IDE}.
 

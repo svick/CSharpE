@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 
@@ -451,19 +450,9 @@ namespace CSharpE.Syntax
             return new ElementAccessMemberInitializerTarget(arguments);
         }
 
-        public static ExpressionMemberInitializerValue ExpressionMemberInitializerValue(ExpressionSyntax syntax, MemberInitializer parent)
-        {
-            return new ExpressionMemberInitializerValue(syntax, parent);
-        }
-
         public static ExpressionMemberInitializerValue ExpressionMemberInitializerValue(Expression expression)
         {
             return new ExpressionMemberInitializerValue(expression);
-        }
-
-        public static InitializerMemberInitializerValue InitializerMemberInitializerValue(InitializerExpressionSyntax syntax, MemberInitializer parent)
-        {
-            return new InitializerMemberInitializerValue(syntax, parent);
         }
 
         public static InitializerMemberInitializerValue InitializerMemberInitializerValue(Initializer initializer)
@@ -481,19 +470,9 @@ namespace CSharpE.Syntax
             return new ObjectInitializer(memberInitializers);
         }
 
-        public static Interpolation Interpolation(InterpolationSyntax syntax, InterpolatedStringExpression parent)
-        {
-            return new Interpolation(syntax, parent);
-        }
-
         public static Interpolation Interpolation(Expression expression, Expression alignment = null, string format = null)
         {
             return new Interpolation(expression, alignment, format);
-        }
-
-        public static InterpolatedStringText InterpolatedStringText(InterpolatedStringTextSyntax syntax, InterpolatedStringExpression parent)
-        {
-            return new InterpolatedStringText(syntax, parent);
         }
 
         public static InterpolatedStringText InterpolatedStringText(string text)

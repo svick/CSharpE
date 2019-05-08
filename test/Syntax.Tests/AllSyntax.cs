@@ -18,7 +18,6 @@ namespace N.M
             _ = false;
             _ = 'c';
             _ = "s";
-            _ = @"\";
             _ = $"";
             _ = (1, 2);
             await null;

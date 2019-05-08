@@ -21,7 +21,7 @@ class C
 {
     void M(int i)
     {
-        Console.WriteLine(""M(i: {0})"", (object)i);
+        Console.WriteLine($""M(i: {i})"");
     }
 }";
 

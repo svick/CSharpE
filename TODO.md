@@ -12,6 +12,7 @@
   - optional: make it more efficient using copy on write 
 - add tests ensuring mutating smart inputs (incl. syntax nodes) throws
 - look into how InvocationReasons.SemanticChanged works and if it could be used to decide when to rerun the whole transformation
+- consistent treatment of verbatim strings and verbatim interpolated strings
 
 ---
 

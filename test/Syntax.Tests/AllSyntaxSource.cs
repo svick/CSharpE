@@ -8,6 +8,7 @@ class C
     void M()
     {
         _ = $@"x{0,1+1:X}";
+        _ = @"\";
         new object();
         _ = typeof(Dictionary<,>);
         new C { P = 42, [0] = { } };

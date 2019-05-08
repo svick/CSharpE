@@ -20,7 +20,7 @@ namespace CSharpE.Syntax
     {
         private ExpressionSyntax syntax;
 
-        public ExpressionMemberInitializerValue(ExpressionSyntax syntax, MemberInitializer parent)
+        internal ExpressionMemberInitializerValue(ExpressionSyntax syntax, MemberInitializer parent)
         {
             this.syntax = syntax;
             Parent = parent;
@@ -75,7 +75,7 @@ namespace CSharpE.Syntax
     {
         private InitializerExpressionSyntax syntax;
 
-        public InitializerMemberInitializerValue(InitializerExpressionSyntax syntax, MemberInitializer parent)
+        internal InitializerMemberInitializerValue(InitializerExpressionSyntax syntax, MemberInitializer parent)
         {
             this.syntax = syntax;
             Parent = parent;

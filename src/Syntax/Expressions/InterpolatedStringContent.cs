@@ -17,13 +17,15 @@ namespace CSharpE.Syntax
 
         public abstract void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
             where T : Expression;
+
+        public static implicit operator InterpolatedStringContent(string text) => new InterpolatedStringText(text);
     }
 
     public sealed class Interpolation : InterpolatedStringContent
     {
         private InterpolationSyntax syntax;
 
-        public Interpolation(InterpolationSyntax syntax, InterpolatedStringExpression parent)
+        internal Interpolation(InterpolationSyntax syntax, InterpolatedStringExpression parent)
         {
             Init(syntax);
             Parent = parent;
@@ -127,7 +129,7 @@ namespace CSharpE.Syntax
     {
         private InterpolatedStringTextSyntax syntax;
 
-        public InterpolatedStringText(InterpolatedStringTextSyntax syntax, InterpolatedStringExpression parent)
+        internal InterpolatedStringText(InterpolatedStringTextSyntax syntax, InterpolatedStringExpression parent)
         {
             Init(syntax);
             Parent = parent;

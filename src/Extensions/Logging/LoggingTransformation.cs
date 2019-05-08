@@ -11,50 +11,36 @@ namespace CSharpE.Extensions.Logging
     {
         protected override void Process(Project project)
         {
-            Smart.ForEach(
-                project.GetMethods(), method =>
+            foreach (var method in project.GetMethods())
+            {
+                if (method.Body != null)
                 {
-                    if (method.Body != null)
-                    {
-                        Statement loggingStatement = NamedType(typeof(Console))
-                            .Call(nameof(Console.WriteLine), BuildWriteLineParameters(method));
+                    Statement loggingStatement = NamedType(typeof(Console))
+                        .Call(nameof(Console.WriteLine), InterpolatedString(BuildInterpolation(method)));
 
-                        method.Body.Statements.Insert(0, loggingStatement);
-                    }
-                });
+                    method.Body.Statements.Insert(0, loggingStatement);
+                }
+            }
         }
 
-        private static IEnumerable<Expression> BuildWriteLineParameters(MethodDefinition method)
+        private static IEnumerable<InterpolatedStringContent> BuildInterpolation(MethodDefinition method)
         {
-            var formatString = new StringBuilder();
-            var args = new List<Expression>();
+            yield return method.Name + "(";
 
-            formatString.Append(method.Name);
-
-            formatString.Append('(');
-
-            int i = 0;
+            bool first = true;
 
             foreach (var parameter in method.Parameters)
             {
-                if (i != 0)
-                    formatString.Append(", ");
+                if (!first)
+                    yield return ", ";
+                first = false;
 
-                formatString.Append(parameter.Name)
-                    .Append(": {")
-                    .Append(i++)
-                    .Append('}');
+                yield return parameter.Name + ": ";
 
-                // the cast is necessary, so that if there is a single array parameter,
-                // it is not interpreted as the whole params array for WriteLine
-                args.Add(Cast(typeof(object), Identifier(parameter.Name)));
+                yield return Interpolation(Identifier(parameter.Name));
             }
 
-            formatString.Append(')');
-
-            args.Insert(0, Literal(formatString.ToString()));
-
-            return args;
+            yield return ")";
         }
     }
 }
