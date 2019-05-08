@@ -92,7 +92,10 @@ namespace CSharpE.Syntax
                     container = null;
                     nameSyntax = (SimpleNameSyntax)syntax;
                 }
-                syntaxName = symbol?.Name ?? nameSyntax.Identifier.ValueText;
+
+                syntaxName = symbol?.Name;
+                if (string.IsNullOrEmpty(syntaxName))
+                    syntaxName = nameSyntax.Identifier.ValueText;
 
                 isKnownType = false;
             }
