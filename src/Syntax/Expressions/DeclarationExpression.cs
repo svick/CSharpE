@@ -56,9 +56,11 @@ namespace CSharpE.Syntax
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
             var newDesignation = designation?.GetWrapped(ref thisChanged) ?? syntax.Designation;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.DeclarationExpression(newType, newDesignation);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

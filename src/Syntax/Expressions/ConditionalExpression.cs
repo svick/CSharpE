@@ -71,9 +71,11 @@ namespace CSharpE.Syntax
             var newWhenTrue = whenTrue?.GetWrapped(ref thisChanged) ?? syntax.WhenTrue;
             var newWhenFalse = whenFalse?.GetWrapped(ref thisChanged) ?? syntax.WhenFalse;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.ConditionalExpression(newCondition, newWhenTrue, newWhenFalse);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

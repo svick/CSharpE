@@ -70,7 +70,7 @@ namespace CSharpE.Syntax
 
             var newType = type?.GetWrapped(ref thisChanged) ?? GetTypeSyntax();
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 if (newType == null)
                 {
@@ -81,6 +81,8 @@ namespace CSharpE.Syntax
                 {
                     syntax = RoslynSyntaxFactory.DefaultExpression(newType);
                 }
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

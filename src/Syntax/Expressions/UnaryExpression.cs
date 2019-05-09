@@ -59,11 +59,13 @@ namespace CSharpE.Syntax
 
             var newOperand = operand?.GetWrapped(ref thisChanged) ?? GetOperand(syntax);
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = IsPrefix 
                     ? (ExpressionSyntax)RoslynSyntaxFactory.PrefixUnaryExpression(Kind, newOperand)
                     : RoslynSyntaxFactory.PostfixUnaryExpression(Kind, newOperand);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

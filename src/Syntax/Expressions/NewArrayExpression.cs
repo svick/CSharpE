@@ -92,7 +92,7 @@ namespace CSharpE.Syntax
             var newLengths = lengths?.GetWrapped(ref thisChanged) ?? syntax.Type.RankSpecifiers[0].Sizes;
             var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.Initializer;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 if (newLengths.Contains(null))
                     newLengths = RoslynSyntaxFactory.SeparatedList(
@@ -102,6 +102,8 @@ namespace CSharpE.Syntax
                     newType, RoslynSyntaxFactory.ArrayRankSpecifier(newLengths));
 
                 syntax = RoslynSyntaxFactory.ArrayCreationExpression(arrayType, newInitializer);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

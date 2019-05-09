@@ -304,7 +304,7 @@ namespace CSharpE.Syntax
             var newName = name ?? syntaxName;
 
             if (syntax == null || thisChanged == true || newNamespace != syntaxNamespace || newName != syntaxName ||
-                !IsAnnotated(syntax))
+                ShouldAnnotate(syntax, changed))
             {
                 var predefinedType = GetPredefinedType();
                 if (predefinedType != null)

@@ -53,7 +53,7 @@ namespace CSharpE.Syntax
 
             var newElementType = elementType?.GetWrapped(ref thisChanged) ?? syntax.ElementType;
 
-            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.NullableType(newElementType);
 

@@ -88,7 +88,7 @@ namespace CSharpE.Syntax
             var newElementType = elementType?.GetWrapped(ref thisChanged);
 
             if (syntax == null || thisChanged == true || Rank != syntax.RankSpecifiers.First().Rank ||
-                !IsAnnotated(syntax))
+                ShouldAnnotate(syntax, changed))
             {
                 if (newElementType == null)
                     newElementType = ElementType.GetWrapped(ref thisChanged);

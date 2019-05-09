@@ -46,9 +46,11 @@ namespace CSharpE.Syntax
 
             var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.Arguments;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.TupleExpression(newArguments);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

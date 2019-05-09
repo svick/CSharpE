@@ -92,7 +92,7 @@ namespace CSharpE.Syntax
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? GetExpressionSyntax();
             var newArguments = arguments?.GetWrapped(ref thisChanged) ?? GetArgumentsSyntax();
 
-            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 var argumentsSyntax = RoslynSyntaxFactory.BracketedArgumentList(newArguments);
 

@@ -19,6 +19,16 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new InvalidExpression(syntax, null);
 
-        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed) => syntax;
+        private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
+        {
+            if (ShouldAnnotate(syntax, changed))
+            {
+                syntax = Annotate(syntax);
+
+                changed = true;
+            }
+
+            return syntax;
+        }
     }
 }

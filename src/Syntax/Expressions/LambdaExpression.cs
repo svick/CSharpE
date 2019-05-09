@@ -157,7 +157,7 @@ namespace CSharpE.Syntax
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? GetSyntaxParameters();
             var newBody = GetBody();
 
-            if (syntax == null || thisChanged == true || IsAsync != IsSyntaxAsync())
+            if (syntax == null || thisChanged == true || IsAsync != IsSyntaxAsync() || ShouldAnnotate(syntax, changed))
             {
                 var asyncKeyword = IsAsync ? RoslynSyntaxFactory.Token(SyntaxKind.AsyncKeyword) : default;
                 var arrowToken = RoslynSyntaxFactory.Token(SyntaxKind.EqualsGreaterThanToken);
@@ -174,6 +174,8 @@ namespace CSharpE.Syntax
                     syntax = RoslynSyntaxFactory.ParenthesizedLambdaExpression(
                         asyncKeyword, RoslynSyntaxFactory.ParameterList(newParameters), arrowToken, newBody);
                 }
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

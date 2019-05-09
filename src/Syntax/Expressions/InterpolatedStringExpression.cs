@@ -66,7 +66,7 @@ namespace CSharpE.Syntax
 
             var newContents = contents?.GetWrapped(ref thisChanged) ?? syntax.Contents;
 
-            if (syntax == null || thisChanged == true || IsVerbatim != IsSyntaxVerbatim())
+            if (syntax == null || thisChanged == true || IsVerbatim != IsSyntaxVerbatim() || ShouldAnnotate(syntax, changed))
             {
                 var startTokenKind = IsVerbatim
                     ? SyntaxKind.InterpolatedVerbatimStringStartToken
@@ -74,6 +74,8 @@ namespace CSharpE.Syntax
 
                 syntax = RoslynSyntaxFactory.InterpolatedStringExpression(
                     RoslynSyntaxFactory.Token(startTokenKind), newContents);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

@@ -64,12 +64,14 @@ namespace CSharpE.Syntax
 
             var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.Initializer;
 
-            if (syntax == null || thisChanged == true || Rank != GetSyntaxRank())
+            if (syntax == null || thisChanged == true || Rank != GetSyntaxRank() || ShouldAnnotate(syntax, changed))
             {
                 var commas = RoslynSyntaxFactory.TokenList(
                     Enumerable.Repeat(RoslynSyntaxFactory.Token(SyntaxKind.CommaToken), Rank - 1));
 
                 syntax = RoslynSyntaxFactory.ImplicitArrayCreationExpression(commas, newInitializer);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

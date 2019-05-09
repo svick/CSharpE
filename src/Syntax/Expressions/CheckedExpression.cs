@@ -54,10 +54,12 @@ namespace CSharpE.Syntax
 
             bool oldIsChecked = syntax.Kind() == SyntaxKind.CheckedExpression;
 
-            if (syntax == null || thisChanged == true || oldIsChecked != IsChecked)
+            if (syntax == null || thisChanged == true || oldIsChecked != IsChecked || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.CheckedExpression(
                     IsChecked ? SyntaxKind.CheckedExpression : SyntaxKind.UncheckedExpression, newExpression);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

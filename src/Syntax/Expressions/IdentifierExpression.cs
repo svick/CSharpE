@@ -42,7 +42,7 @@ namespace CSharpE.Syntax
 
             var newIdentifier = identifier.GetWrapped(ref thisChanged);
 
-            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.IdentifierName(newIdentifier);
 

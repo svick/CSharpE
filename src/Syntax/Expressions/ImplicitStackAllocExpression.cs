@@ -46,9 +46,11 @@ namespace CSharpE.Syntax
 
             var newInitializer = initializerSet ? initializer.GetWrapped(ref thisChanged) : syntax.Initializer;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.ImplicitStackAllocArrayCreationExpression(newInitializer);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

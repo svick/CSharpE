@@ -84,11 +84,13 @@ namespace CSharpE.Syntax
             var newLeft = left?.GetWrapped(ref thisChanged) ?? GetLeft(syntax);
             var newRight = right?.GetWrapped(ref thisChanged) ?? GetRight(syntax);
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = IsAssignment 
                     ? (ExpressionSyntax)RoslynSyntaxFactory.AssignmentExpression(Kind, newLeft, newRight)
                     : RoslynSyntaxFactory.BinaryExpression(Kind, newLeft, newRight);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

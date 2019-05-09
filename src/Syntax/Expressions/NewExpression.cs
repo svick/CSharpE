@@ -89,7 +89,7 @@ namespace CSharpE.Syntax
             var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList?.Arguments ?? default;
             var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.Initializer;
 
-            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.ObjectCreationExpression(
                     newType, RoslynSyntaxFactory.ArgumentList(newArguments), newInitializer);

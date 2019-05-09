@@ -49,9 +49,11 @@ namespace CSharpE.Syntax
 
             var newInitializers = initializers?.GetWrapped(ref thisChanged) ?? syntax.Initializers;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.AnonymousObjectCreationExpression(newInitializers);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

@@ -40,9 +40,11 @@ namespace CSharpE.Syntax
 
             var newOperand = operand?.GetWrapped(ref thisChanged) ?? syntax.Expression;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.AwaitExpression(newOperand);
+
+                syntax = Annotate(syntax);
 
                 SetChanged(ref changed);
             }

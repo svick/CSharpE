@@ -60,7 +60,7 @@ namespace CSharpE.Syntax
 
             var newElements = elements?.GetWrapped(ref thisChanged) ?? syntax.Elements;
 
-            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.TupleType(newElements);
 

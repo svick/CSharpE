@@ -65,7 +65,7 @@ namespace CSharpE.Syntax
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
             var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList.Arguments;
 
-            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.InvocationExpression(
                     newExpression, RoslynSyntaxFactory.ArgumentList(newArguments));
