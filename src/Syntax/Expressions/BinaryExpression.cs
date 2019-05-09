@@ -12,6 +12,7 @@ namespace CSharpE.Syntax
         private ExpressionSyntax syntax;
 
         internal BinaryExpression(ExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

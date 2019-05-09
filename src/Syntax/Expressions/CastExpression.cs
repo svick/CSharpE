@@ -10,6 +10,7 @@ namespace CSharpE.Syntax
         private CastExpressionSyntax syntax;
 
         internal CastExpression(CastExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

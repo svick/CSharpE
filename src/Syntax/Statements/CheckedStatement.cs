@@ -14,6 +14,7 @@ namespace CSharpE.Syntax
         private CheckedStatementSyntax syntax;
 
         internal CheckedStatement(CheckedStatementSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

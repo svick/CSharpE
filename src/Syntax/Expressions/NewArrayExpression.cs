@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private ArrayCreationExpressionSyntax syntax;
 
         internal NewArrayExpression(ArrayCreationExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

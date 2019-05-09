@@ -11,6 +11,7 @@ namespace CSharpE.Syntax
         private AwaitExpressionSyntax syntax;
 
         internal AwaitExpression(AwaitExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

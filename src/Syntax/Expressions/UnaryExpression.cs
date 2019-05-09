@@ -12,15 +12,13 @@ namespace CSharpE.Syntax
         private ExpressionSyntax syntax;
 
         internal UnaryExpression(ExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;
         }
 
-        internal UnaryExpression(Expression operand)
-        {
-            Operand = operand;
-        }
+        internal UnaryExpression(Expression operand) => Operand = operand;
 
         ExpressionSyntax GetOperand(ExpressionSyntax expression)
         {

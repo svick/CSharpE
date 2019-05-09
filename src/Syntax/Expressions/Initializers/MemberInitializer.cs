@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private AssignmentExpressionSyntax syntax;
 
         internal MemberInitializer(AssignmentExpressionSyntax syntax, ObjectInitializer parent)
+            : base(syntax)
         {
             Debug.Assert(syntax.Kind() == SyntaxKind.SimpleAssignmentExpression);
 

@@ -10,6 +10,9 @@ namespace CSharpE.Syntax
 {
     public abstract class VariableDesignation : SyntaxNode, ISyntaxWrapper<VariableDesignationSyntax>
     {
+        private protected VariableDesignation() { }
+        private protected VariableDesignation(VariableDesignationSyntax syntax) : base(syntax) { }
+
         VariableDesignationSyntax ISyntaxWrapper<VariableDesignationSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);
 
@@ -21,6 +24,7 @@ namespace CSharpE.Syntax
         private VariableDesignationSyntax syntax;
 
         internal SingleVariableDesignation(VariableDesignationSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Debug.Assert(syntax is DiscardDesignationSyntax || syntax is SingleVariableDesignationSyntax);
 
@@ -84,6 +88,7 @@ namespace CSharpE.Syntax
         private ParenthesizedVariableDesignationSyntax syntax;
 
         internal MultiVariableDesignation(ParenthesizedVariableDesignationSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

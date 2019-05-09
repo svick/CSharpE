@@ -10,6 +10,7 @@ namespace CSharpE.Syntax
         private DeclarationExpressionSyntax syntax;
 
         internal DeclarationExpression(DeclarationExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

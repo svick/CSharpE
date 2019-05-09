@@ -14,6 +14,7 @@ namespace CSharpE.Syntax
         private InterpolatedStringExpressionSyntax syntax;
 
         internal InterpolatedStringExpression(InterpolatedStringExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

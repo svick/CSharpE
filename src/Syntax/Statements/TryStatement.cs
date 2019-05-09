@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private TryStatementSyntax syntax;
 
         internal TryStatement(TryStatementSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

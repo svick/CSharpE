@@ -12,6 +12,7 @@ namespace CSharpE.Syntax
         private AccessorDeclarationSyntax syntax;
 
         internal AccessorDefinition(AccessorDeclarationSyntax syntax, MemberDefinition parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

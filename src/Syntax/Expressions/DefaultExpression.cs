@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private ExpressionSyntax syntax;
 
         internal DefaultExpression(ExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Debug.Assert(
                 (syntax is LiteralExpressionSyntax literal && literal.Kind() == SyntaxKind.DefaultLiteralExpression) ||

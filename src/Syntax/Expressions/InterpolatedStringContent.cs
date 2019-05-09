@@ -9,6 +9,8 @@ namespace CSharpE.Syntax
 {
     public abstract class InterpolatedStringContent : SyntaxNode, ISyntaxWrapper<InterpolatedStringContentSyntax>
     {
+        private protected InterpolatedStringContent() { }
+        private protected InterpolatedStringContent(InterpolatedStringContentSyntax syntax) : base(syntax) { }
 
         InterpolatedStringContentSyntax ISyntaxWrapper<InterpolatedStringContentSyntax>.GetWrapped(ref bool? changed) =>
             GetWrapped(ref changed);
@@ -26,6 +28,7 @@ namespace CSharpE.Syntax
         private InterpolationSyntax syntax;
 
         internal Interpolation(InterpolationSyntax syntax, InterpolatedStringExpression parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;
@@ -130,6 +133,7 @@ namespace CSharpE.Syntax
         private InterpolatedStringTextSyntax syntax;
 
         internal InterpolatedStringText(InterpolatedStringTextSyntax syntax, InterpolatedStringExpression parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

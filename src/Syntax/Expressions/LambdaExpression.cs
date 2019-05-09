@@ -14,6 +14,7 @@ namespace CSharpE.Syntax
         private LambdaExpressionSyntax syntax;
 
         internal LambdaExpression(LambdaExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

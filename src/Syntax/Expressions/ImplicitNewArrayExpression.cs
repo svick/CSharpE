@@ -12,6 +12,7 @@ namespace CSharpE.Syntax
         private ImplicitArrayCreationExpressionSyntax syntax;
 
         internal ImplicitNewArrayExpression(ImplicitArrayCreationExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

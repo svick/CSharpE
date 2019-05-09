@@ -15,6 +15,7 @@ namespace CSharpE.Syntax
         private ExpressionSyntax syntax;
 
         internal ElementInitializer(ExpressionSyntax syntax, CollectionInitializer parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

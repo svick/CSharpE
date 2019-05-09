@@ -11,6 +11,7 @@ namespace CSharpE.Syntax
         private EnumMemberDeclarationSyntax syntax;
 
         internal EnumMemberDefinition(EnumMemberDeclarationSyntax syntax, EnumDefinition parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

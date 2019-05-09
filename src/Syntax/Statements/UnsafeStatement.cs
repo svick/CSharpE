@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private UnsafeStatementSyntax syntax;
 
         internal UnsafeStatement(UnsafeStatementSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

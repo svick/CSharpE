@@ -14,6 +14,7 @@ namespace CSharpE.Syntax
         private ParameterSyntax syntax;
         
         internal LambdaParameter(ParameterSyntax syntax, LambdaExpression parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

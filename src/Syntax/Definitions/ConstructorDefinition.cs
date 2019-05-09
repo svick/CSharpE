@@ -16,6 +16,7 @@ namespace CSharpE.Syntax
         private protected override BaseMethodDeclarationSyntax BaseMethodSyntax => syntax;
 
         internal ConstructorDefinition(ConstructorDeclarationSyntax syntax, TypeDefinition parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

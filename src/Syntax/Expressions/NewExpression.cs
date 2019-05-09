@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private ObjectCreationExpressionSyntax syntax;
 
         internal NewExpression(ObjectCreationExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

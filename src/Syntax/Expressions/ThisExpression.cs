@@ -9,6 +9,7 @@ namespace CSharpE.Syntax
         private ThisExpressionSyntax syntax;
 
         internal ThisExpression(ThisExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

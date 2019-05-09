@@ -10,6 +10,7 @@ namespace CSharpE.Syntax
         private AnonymousObjectMemberDeclaratorSyntax syntax;
 
         internal AnonymousObjectInitializer(AnonymousObjectMemberDeclaratorSyntax syntax, AnonymousNewExpression parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

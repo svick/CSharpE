@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private NamespaceDeclarationSyntax syntax;
 
         internal NamespaceDefinition(NamespaceDeclarationSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

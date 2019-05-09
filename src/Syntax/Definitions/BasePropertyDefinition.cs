@@ -12,7 +12,10 @@ namespace CSharpE.Syntax
         private protected abstract BasePropertyDeclarationSyntax BasePropertySyntax { get; }
         
         private protected sealed override MemberDeclarationSyntax MemberSyntax => BasePropertySyntax;
-        
+
+        private protected BasePropertyDefinition() { }
+        private protected BasePropertyDefinition(BasePropertyDeclarationSyntax syntax) : base(syntax) { }
+
         public bool IsNew
         {
             get => Modifiers.Contains(MemberModifiers.New);

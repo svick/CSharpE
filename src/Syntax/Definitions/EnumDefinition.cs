@@ -14,9 +14,10 @@ namespace CSharpE.Syntax
     {
         private EnumDeclarationSyntax syntax;
 
-        internal EnumDefinition(EnumDeclarationSyntax enumDeclarationSyntax, SyntaxNode parent)
+        internal EnumDefinition(EnumDeclarationSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
-            Init(enumDeclarationSyntax);
+            Init(syntax);
 
             Parent = parent;
         }
@@ -29,12 +30,12 @@ namespace CSharpE.Syntax
             this.members = new SeparatedSyntaxList<EnumMemberDefinition, EnumMemberDeclarationSyntax>(members, this);
         }
 
-        private void Init(EnumDeclarationSyntax enumDeclarationSyntax)
+        private void Init(EnumDeclarationSyntax syntax)
         {
-            syntax = enumDeclarationSyntax;
+            this.syntax = syntax;
 
-            name = new Identifier(syntax.Identifier);
-            Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
+            name = new Identifier(this.syntax.Identifier);
+            Modifiers = FromRoslyn.MemberModifiers(this.syntax.Modifiers);
         }
 
         private SeparatedSyntaxList<EnumMemberDefinition, EnumMemberDeclarationSyntax> members;

@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private StackAllocArrayCreationExpressionSyntax syntax;
 
         internal StackAllocExpression(StackAllocArrayCreationExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

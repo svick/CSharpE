@@ -14,6 +14,7 @@ namespace CSharpE.Syntax
         private ExpressionSyntax syntax;
 
         internal BaseElementAccessExpression(ExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Debug.Assert(
                 syntax is ElementAccessExpressionSyntax ||

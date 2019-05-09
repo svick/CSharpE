@@ -12,6 +12,7 @@ namespace CSharpE.Syntax
         private CheckedExpressionSyntax syntax;
         
         internal CheckedExpression(CheckedExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

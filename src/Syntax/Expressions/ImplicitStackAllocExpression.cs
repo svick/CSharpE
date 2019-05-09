@@ -10,6 +10,7 @@ namespace CSharpE.Syntax
         private ImplicitStackAllocArrayCreationExpressionSyntax syntax;
 
         internal ImplicitStackAllocExpression(ImplicitStackAllocArrayCreationExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

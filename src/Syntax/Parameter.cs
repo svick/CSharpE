@@ -11,6 +11,7 @@ namespace CSharpE.Syntax
         private ParameterSyntax syntax;
         
         internal Parameter(ParameterSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

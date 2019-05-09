@@ -8,9 +8,8 @@ namespace CSharpE.Syntax
 {
     public abstract class Statement : SyntaxNode, ISyntaxWrapper<StatementSyntax>
     {
-        protected Statement() { }
-
-        protected Statement(Roslyn::SyntaxNode node) : base(node) { }
+        private protected Statement() { }
+        private protected Statement(Roslyn::SyntaxNode syntax) : base(syntax) { }
 
         StatementSyntax ISyntaxWrapper<StatementSyntax>.GetWrapped(ref bool? changed) => GetWrappedStatement(ref changed);
 

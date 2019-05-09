@@ -14,6 +14,7 @@ namespace CSharpE.Syntax
         private TupleTypeSyntax syntax;
 
         internal TupleTypeReference(TupleTypeSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

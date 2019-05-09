@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private AttributeListSyntax syntax;
 
         internal Attribute(AttributeListSyntax syntax, MemberDefinition parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

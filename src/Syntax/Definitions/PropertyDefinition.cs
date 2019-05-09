@@ -16,6 +16,7 @@ namespace CSharpE.Syntax
         private protected override BasePropertyDeclarationSyntax BasePropertySyntax => syntax;
 
         internal PropertyDefinition(PropertyDeclarationSyntax syntax, TypeDefinition parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

@@ -12,6 +12,7 @@ namespace CSharpE.Syntax
         private RefTypeSyntax syntax;
 
         internal RefTypeReference(RefTypeSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

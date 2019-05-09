@@ -11,6 +11,7 @@ namespace CSharpE.Syntax
         private RefExpressionSyntax syntax;
         
         internal RefExpression(RefExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

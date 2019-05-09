@@ -14,6 +14,7 @@ namespace CSharpE.Syntax
         private ArrayTypeSyntax syntax;
 
         internal ArrayTypeReference(ArrayTypeSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

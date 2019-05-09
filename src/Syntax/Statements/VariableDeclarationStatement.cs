@@ -14,6 +14,7 @@ namespace CSharpE.Syntax
         private LocalDeclarationStatementSyntax syntax;
 
         internal VariableDeclarationStatement(LocalDeclarationStatementSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Debug.Assert(syntax.Declaration.Variables.Count == 1);
             Debug.Assert(syntax.Declaration.Variables.Single().ArgumentList == null);

@@ -11,6 +11,7 @@ namespace CSharpE.Syntax
         private AttributeArgumentSyntax syntax;
 
         internal AttributeArgument(AttributeArgumentSyntax syntax, Attribute parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

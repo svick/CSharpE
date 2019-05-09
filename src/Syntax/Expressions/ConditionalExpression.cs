@@ -10,6 +10,7 @@ namespace CSharpE.Syntax
         private ConditionalExpressionSyntax syntax;
 
         internal ConditionalExpression(ConditionalExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

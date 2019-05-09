@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private CatchClauseSyntax syntax;
 
         internal CatchClause(CatchClauseSyntax syntax, TryStatement parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

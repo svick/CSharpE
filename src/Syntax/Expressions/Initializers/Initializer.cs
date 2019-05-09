@@ -6,6 +6,9 @@ namespace CSharpE.Syntax
 {
     public abstract class Initializer : SyntaxNode, ISyntaxWrapper<InitializerExpressionSyntax>
     {
+        private protected Initializer() { }
+        private protected Initializer(InitializerExpressionSyntax syntax) : base(syntax) { }
+
         internal abstract InitializerExpressionSyntax GetWrapped(ref bool? changed);
 
         InitializerExpressionSyntax ISyntaxWrapper<InitializerExpressionSyntax>.GetWrapped(ref bool? changed)

@@ -11,6 +11,7 @@ namespace CSharpE.Syntax
         private ParenthesizedExpressionSyntax syntax;
         
         internal ParenthesizedExpression(ParenthesizedExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

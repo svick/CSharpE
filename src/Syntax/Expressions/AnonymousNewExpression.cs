@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private AnonymousObjectCreationExpressionSyntax syntax;
 
         internal AnonymousNewExpression(AnonymousObjectCreationExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

@@ -12,6 +12,7 @@ namespace CSharpE.Syntax
         private TupleElementSyntax syntax;
 
         internal TupleElement(TupleElementSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;

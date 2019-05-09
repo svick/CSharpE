@@ -12,6 +12,7 @@ namespace CSharpE.Syntax
         private NullableTypeSyntax syntax;
 
         internal NullableTypeReference(NullableTypeSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

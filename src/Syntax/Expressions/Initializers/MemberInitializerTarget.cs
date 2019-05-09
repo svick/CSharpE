@@ -9,6 +9,9 @@ namespace CSharpE.Syntax
 {
     public abstract class MemberInitializerTarget : SyntaxNode, ISyntaxWrapper<ExpressionSyntax>
     {
+        private protected MemberInitializerTarget() { }
+        private protected MemberInitializerTarget(ExpressionSyntax syntax) : base(syntax) { }
+
         internal abstract ExpressionSyntax GetWrapped(ref bool? changed);
 
         ExpressionSyntax ISyntaxWrapper<ExpressionSyntax>.GetWrapped(ref bool? changed)
@@ -23,6 +26,7 @@ namespace CSharpE.Syntax
         private IdentifierNameSyntax syntax;
 
         internal NameMemberInitializerTarget(IdentifierNameSyntax syntax, MemberInitializer parent)
+            : base(syntax)
         {
             Init(syntax);
             Parent = parent;
@@ -75,6 +79,7 @@ namespace CSharpE.Syntax
         private ImplicitElementAccessSyntax syntax;
 
         internal ElementAccessMemberInitializerTarget(ImplicitElementAccessSyntax syntax, MemberInitializer parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

@@ -12,6 +12,9 @@ namespace CSharpE.Syntax
 {
     public abstract class VariableInitializer : SyntaxNode, ISyntaxWrapper<ExpressionSyntax>
     {
+        private protected VariableInitializer() { }
+        private protected VariableInitializer(ExpressionSyntax syntax) : base(syntax) { }
+
         ExpressionSyntax ISyntaxWrapper<ExpressionSyntax>.GetWrapped(ref bool? changed) => GetWrappedExpression(ref changed);
 
         internal abstract ExpressionSyntax GetWrappedExpression(ref bool? changed);
@@ -25,6 +28,7 @@ namespace CSharpE.Syntax
         private InitializerExpressionSyntax syntax;
 
         internal ArrayInitializer(InitializerExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Debug.Assert(syntax.Kind() == SyntaxKind.ArrayInitializerExpression);
 
@@ -96,6 +100,7 @@ namespace CSharpE.Syntax
         private ExpressionSyntax syntax;
 
         internal ExpressionVariableInitializer(ExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

@@ -13,6 +13,7 @@ namespace CSharpE.Syntax
         private PointerTypeSyntax syntax;
 
         internal PointerTypeReference(PointerTypeSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;

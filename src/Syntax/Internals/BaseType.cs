@@ -9,6 +9,7 @@ namespace CSharpE.Syntax.Internals
         private BaseTypeSyntax syntax;
         
         internal BaseType(BaseTypeSyntax syntax, TypeDefinition parent)
+            : base(syntax)
         {
             this.syntax = syntax;
             this.Parent = parent;

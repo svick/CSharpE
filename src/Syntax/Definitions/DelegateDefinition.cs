@@ -14,19 +14,20 @@ namespace CSharpE.Syntax
     {
         private DelegateDeclarationSyntax syntax;
 
-        internal DelegateDefinition(DelegateDeclarationSyntax delegateDeclarationSyntax, SyntaxNode parent)
+        internal DelegateDefinition(DelegateDeclarationSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
-            Init(delegateDeclarationSyntax);
+            Init(syntax);
 
             Parent = parent;
         }
 
-        private void Init(DelegateDeclarationSyntax delegateDeclarationSyntax)
+        private void Init(DelegateDeclarationSyntax syntax)
         {
-            syntax = delegateDeclarationSyntax;
+            this.syntax = syntax;
 
-            name = new Identifier(syntax.Identifier);
-            Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
+            name = new Identifier(this.syntax.Identifier);
+            Modifiers = FromRoslyn.MemberModifiers(this.syntax.Modifiers);
         }
 
         public DelegateDefinition(TypeReference returnType, params Parameter[] parameters)

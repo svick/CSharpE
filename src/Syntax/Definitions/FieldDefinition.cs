@@ -24,6 +24,36 @@ namespace CSharpE.Syntax
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 
+        internal FieldDefinition(FieldDeclarationSyntax syntax, TypeDefinition parent)
+            : base(syntax)
+        {
+            Init(syntax);
+            Parent = parent;
+        }
+
+        private void Init(FieldDeclarationSyntax syntax)
+        {
+            if (syntax.Declaration.Variables.Count > 1)
+                throw new ArgumentException(
+                    "FieldDeclarationSyntax with more than one variable is not supported here.", nameof(syntax));
+
+            this.syntax = syntax;
+
+            Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
+            name = new Identifier(syntax.Declaration.Variables.Single().Identifier);
+        }
+
+        public FieldDefinition(MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null)
+        {
+            Modifiers = modifiers;
+            Type = type;
+            Name = name;
+            Initializer = initializer;
+        }
+
+        public FieldDefinition(TypeReference type, string name, Expression initializer = null)
+            : this(None, type, name, initializer) { }
+
         private TypeReference type;
         public TypeReference Type
         {
@@ -68,35 +98,6 @@ namespace CSharpE.Syntax
                 initializerSet = true;
             }
         }
-
-        internal FieldDefinition(FieldDeclarationSyntax syntax, TypeDefinition parent)
-        {
-            Init(syntax);
-            Parent = parent;
-        }
-
-        private void Init(FieldDeclarationSyntax syntax)
-        {
-            if (syntax.Declaration.Variables.Count > 1)
-                throw new ArgumentException(
-                    "FieldDeclarationSyntax with more than one variable is not supported here.", nameof(syntax));
-
-            this.syntax = syntax;
-
-            Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
-            name = new Identifier(syntax.Declaration.Variables.Single().Identifier);
-        }
-
-        public FieldDefinition(MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null)
-        {
-            Modifiers = modifiers;
-            Type = type;
-            Name = name;
-            Initializer = initializer;
-        }
-
-        public FieldDefinition(TypeReference type, string name, Expression initializer = null)
-            : this(None, type, name, initializer) { }
 
         FieldDeclarationSyntax ISyntaxWrapper<FieldDeclarationSyntax>.GetWrapped(ref bool? changed)
         {

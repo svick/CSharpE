@@ -13,8 +13,9 @@ namespace CSharpE.Syntax
         private InvocationExpressionSyntax syntax;
 
         internal InvocationExpression(InvocationExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
-            this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
+            this.syntax = syntax;
             Parent = parent;
         }
 

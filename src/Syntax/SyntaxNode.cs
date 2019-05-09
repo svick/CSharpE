@@ -10,9 +10,8 @@ namespace CSharpE.Syntax
 {
     public abstract class SyntaxNode : IEquatable<SyntaxNode>
     {
-        internal SyntaxNode() { }
-
-        internal SyntaxNode(Roslyn::SyntaxNode node) => markerAnnotation = Annotation.Get(node);
+        private protected SyntaxNode() { }
+        private protected SyntaxNode(Roslyn::SyntaxNode syntax) => markerAnnotation = Annotation.Get(syntax);
 
         internal SyntaxNode Parent { get; set; }
 

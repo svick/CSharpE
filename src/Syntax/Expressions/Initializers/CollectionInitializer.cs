@@ -15,6 +15,7 @@ namespace CSharpE.Syntax
         private InitializerExpressionSyntax syntax;
 
         internal CollectionInitializer(InitializerExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax)
         {
             Debug.Assert(syntax.Kind() == SyntaxKind.CollectionInitializerExpression);
 
