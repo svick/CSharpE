@@ -119,7 +119,7 @@ namespace CSharpE.Syntax
             var newName = name.GetWrapped(ref thisChanged);
             var newDefaultValue = defaultValueSet ? defaultValue?.GetWrapped(ref thisChanged) : syntax.Default?.Value;
 
-            if (syntax == null || thisChanged == true || Modifiers != FromRoslyn.ParameterModifiers(syntax.Modifiers) || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || Modifiers != FromRoslyn.ParameterModifiers(syntax.Modifiers) || ShouldAnnotate(syntax, changed))
             {
                 var defaultClause = newDefaultValue == null
                     ? null

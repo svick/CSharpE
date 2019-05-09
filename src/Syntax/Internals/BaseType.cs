@@ -36,7 +36,7 @@ namespace CSharpE.Syntax.Internals
 
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
 
-            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 var newSyntax = RoslynSyntaxFactory.SimpleBaseType(newType);
 

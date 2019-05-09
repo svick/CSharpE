@@ -97,7 +97,7 @@ namespace CSharpE.Syntax
             var newType = typeSet ? type?.GetWrapped(ref thisChanged) : syntax.Type;
             var newName = name.GetWrapped(ref thisChanged);
 
-            if (syntax == null || thisChanged == true || Modifier != GetSyntaxModifier() || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || Modifier != GetSyntaxModifier() || ShouldAnnotate(syntax, changed))
             {
                 SyntaxTokenList GetModifierSyntax()
                 {

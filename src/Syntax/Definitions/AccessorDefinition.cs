@@ -40,7 +40,7 @@ namespace CSharpE.Syntax
 
             var newKind = Kind;
 
-            if (syntax == null || syntax.Kind() != Kind || !IsAnnotated(syntax))
+            if (syntax == null || syntax.Kind() != Kind || ShouldAnnotate(syntax, changed))
             {
                 var newSyntax = RoslynSyntaxFactory.AccessorDeclaration(newKind)
                     .WithSemicolonToken(RoslynSyntaxFactory.Token(SyntaxKind.SemicolonToken));

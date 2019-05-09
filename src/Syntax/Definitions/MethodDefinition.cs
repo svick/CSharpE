@@ -138,7 +138,7 @@ namespace CSharpE.Syntax
             var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
 
             if (syntax == null || Modifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
-                thisChanged == true || !IsAnnotated(syntax))
+                thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 var newSyntax = RoslynSyntaxFactory.MethodDeclaration(
                     newAttributes, Modifiers.GetWrapped(), newReturnType, null, newName, null,

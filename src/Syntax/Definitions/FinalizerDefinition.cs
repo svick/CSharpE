@@ -58,7 +58,7 @@ namespace CSharpE.Syntax
             var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
 
             if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
-                thisChanged == true || !IsAnnotated(syntax))
+                thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 if (Parent == null)
                     throw new InvalidOperationException("Can't create syntax node for finalizer with no parent type.");

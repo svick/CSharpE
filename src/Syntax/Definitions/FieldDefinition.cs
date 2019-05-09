@@ -113,7 +113,7 @@ namespace CSharpE.Syntax
             var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : declarator?.Initializer?.Value;
 
             if (syntax == null || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers || thisChanged == true ||
-                !IsAnnotated(syntax))
+                ShouldAnnotate(syntax, changed))
             {
                 var equalsValueClause =
                     newInitializer == null ? null : RoslynSyntaxFactory.EqualsValueClause(newInitializer);

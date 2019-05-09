@@ -275,7 +275,7 @@ namespace CSharpE.Syntax
                 // either old and new are both non-generic or both are generic
                 if (newTypeArguments.Any() == syntax is GenericNameSyntax)
                 {
-                    if (thisChanged == true || !IsAnnotated(syntax))
+                    if (thisChanged == true || ShouldAnnotate(syntax, changed))
                     {
                         if (thisChanged == true)
                         {

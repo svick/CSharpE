@@ -220,7 +220,7 @@ namespace CSharpE.Syntax
             var newMembers = members?.GetWrapped(ref thisChanged) ?? syntax.Members;
 
             if (syntax == null || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
-                thisChanged == true || !IsAnnotated(syntax))
+                thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 var newBaseList = newBaseTypes.Any() ? RoslynSyntaxFactory.BaseList(newBaseTypes) : default;
                 

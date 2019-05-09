@@ -45,7 +45,7 @@ namespace CSharpE.Syntax
 
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? syntax.Statements;
 
-            if (syntax == null || thisChanged == true || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.Block(newStatements);
 

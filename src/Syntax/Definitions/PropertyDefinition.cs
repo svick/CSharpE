@@ -82,7 +82,7 @@ namespace CSharpE.Syntax
                 : FindAccessor(SyntaxKind.SetAccessorDeclaration);
 
             if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
-                thisChanged == true || !IsAnnotated(syntax))
+                thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 var accessors = RoslynSyntaxFactory.List(new[] {newGetAccessor, newSetAccessor}.Where(a => a != null));
 

@@ -48,7 +48,7 @@ namespace CSharpE.Syntax
 
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
 
-            if (syntax == null || thisChanged == true || syntax.NameColon?.Name.Identifier.ValueText != Name || !IsAnnotated(syntax))
+            if (syntax == null || thisChanged == true || syntax.NameColon?.Name.Identifier.ValueText != Name || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.Argument(
                     Name == null ? null : RoslynSyntaxFactory.NameColon(Name),

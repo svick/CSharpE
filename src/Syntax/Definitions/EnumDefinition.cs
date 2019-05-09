@@ -84,7 +84,7 @@ namespace CSharpE.Syntax
             var newMembers = members?.GetWrapped(ref thisChanged) ?? syntax.Members;
 
             if (syntax == null || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
-                thisChanged == true || !IsAnnotated(syntax))
+                thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 var newSyntax = RoslynSyntaxFactory.EnumDeclaration(
                     newAttributes, newModifiers.GetWrapped(), newName, default, newMembers);

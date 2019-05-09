@@ -98,7 +98,7 @@ namespace CSharpE.Syntax
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
 
             if (syntax == null || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
-                thisChanged == true || !IsAnnotated(syntax))
+                thisChanged == true || ShouldAnnotate(syntax, changed))
             {
                 var newSyntax = RoslynSyntaxFactory.DelegateDeclaration(
                     newAttributes, newModifiers.GetWrapped(), newReturnType, newName, default,
