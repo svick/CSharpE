@@ -13,7 +13,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public class SourceFile : SyntaxNode, ISyntaxWrapper<CompilationUnitSyntax>
+    public sealed class SourceFile : SyntaxNode, ISyntaxWrapper<CompilationUnitSyntax>
     {
         public string Path { get; }
 

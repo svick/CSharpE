@@ -142,7 +142,7 @@ namespace CSharpE.Syntax
         }
     }
 
-    public class MemberAccessExpression : BaseMemberAccessExpression
+    public sealed class MemberAccessExpression : BaseMemberAccessExpression
     {
         internal MemberAccessExpression(MemberAccessExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent)
@@ -162,7 +162,7 @@ namespace CSharpE.Syntax
         private protected override SyntaxNode CloneImpl() => new MemberAccessExpression(Expression, MemberName, TypeArguments);
     }
 
-    public class PointerMemberAccessExpression : BaseMemberAccessExpression
+    public sealed class PointerMemberAccessExpression : BaseMemberAccessExpression
     {
         internal PointerMemberAccessExpression(MemberAccessExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent)
@@ -183,7 +183,7 @@ namespace CSharpE.Syntax
         private protected override SyntaxNode CloneImpl() => new PointerMemberAccessExpression(Expression, MemberName, TypeArguments);
     }
 
-    public class ConditionalMemberAccessExpression : BaseMemberAccessExpression
+    public sealed class ConditionalMemberAccessExpression : BaseMemberAccessExpression
     {
         internal ConditionalMemberAccessExpression(ConditionalAccessExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent)

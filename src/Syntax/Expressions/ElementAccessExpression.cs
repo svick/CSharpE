@@ -135,7 +135,7 @@ namespace CSharpE.Syntax
         }
     }
 
-    public class ElementAccessExpression : BaseElementAccessExpression
+    public sealed class ElementAccessExpression : BaseElementAccessExpression
     {
         internal ElementAccessExpression(ElementAccessExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent) { }
@@ -149,7 +149,7 @@ namespace CSharpE.Syntax
         private protected override SyntaxNode CloneImpl() => new ElementAccessExpression(Expression, Arguments);
     }
 
-    public class ConditionalElementAccessExpression : BaseElementAccessExpression
+    public sealed class ConditionalElementAccessExpression : BaseElementAccessExpression
     {
         internal ConditionalElementAccessExpression(ConditionalAccessExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax, parent)
