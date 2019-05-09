@@ -65,36 +65,39 @@ namespace CSharpE.Extensions.Record
                 }
                 else
                 {
-                    Smart.Segment(typeDefinition, fieldsList, (fields, type) =>
-                    {
-                        var other = Identifier("other");
+                    var other = Identifier("other");
 
-                        // EqualityComparer<T>.Default.Equals(this.F1, other.F1) && ...
-                        var comparisons = fields
-                            .Select(f => NamedType(typeof(EqualityComparer<>), f.Type)
+                    // EqualityComparer<T>.Default.Equals(this.F1, other.F1) && ...
+                    var comparisons = fieldsList
+                        .Select(
+                            f => NamedType(typeof(EqualityComparer<>), f.Type)
                                 .MemberAccess(nameof(EqualityComparer<object>.Default))
-                                .Call(nameof(EqualityComparer<object>.Equals), This().MemberAccess(f.Name), other.MemberAccess(f.Name)))
-                            .Aggregate<Expression>(LogicalAnd);
+                                .Call(
+                                    nameof(EqualityComparer<object>.Equals), This().MemberAccess(f.Name),
+                                    other.MemberAccess(f.Name)))
+                        .Aggregate<Expression>(LogicalAnd);
 
-                        var equalsStatements = new Statement[]
-                        {
-                            If(NamedType(typeof(object)).Call(nameof(ReferenceEquals), other, Null()),
-                                Return(False())),
-                            If(NamedType(typeof(object)).Call(nameof(ReferenceEquals), other, This()),
-                                Return(True())),
-                            Return(comparisons)
-                        };
+                    var equalsStatements = new Statement[]
+                    {
+                        If(
+                            NamedType(typeof(object)).Call(nameof(ReferenceEquals), other, Null()), Return(False())),
+                        If(
+                            NamedType(typeof(object)).Call(nameof(ReferenceEquals), other, This()), Return(True())),
+                        Return(comparisons)
+                    };
 
-                        type.AddMethod(Public, typeof(bool), nameof(IEquatable<object>.Equals),
-                            new[] {Parameter(type.GetReference(), "other")}, equalsStatements);
+                    typeDefinition.AddMethod(
+                        Public, typeof(bool), nameof(IEquatable<object>.Equals),
+                        new[] { Parameter(typeDefinition.GetReference(), "other") }, equalsStatements);
 
-                        type.AddMethod(Public | Override, typeof(bool), nameof(object.Equals),
-                            new[] {Parameter(typeof(object), "obj")},
-                            Return(This().Call("Equals", As(Identifier("obj"), type.GetReference()))));
+                    typeDefinition.AddMethod(
+                        Public | Override, typeof(bool), nameof(object.Equals),
+                        new[] { Parameter(typeof(object), "obj") },
+                        Return(This().Call("Equals", As(Identifier("obj"), typeDefinition.GetReference()))));
 
-                        type.AddMethod(Public | Override, typeof(int), nameof(GetHashCode), null,
-                            Return(Tuple(fields.Select(f => This().MemberAccess(f.Name))).Call(nameof(GetHashCode))));
-                    });
+                    typeDefinition.AddMethod(
+                        Public | Override, typeof(int), nameof(GetHashCode), null,
+                        Return(Tuple(fieldsList.Select(f => This().MemberAccess(f.Name))).Call(nameof(GetHashCode))));
                 }
             });
         }

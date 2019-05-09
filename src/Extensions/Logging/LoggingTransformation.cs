@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using CSharpE.Syntax;
 using CSharpE.Transform;
 using static CSharpE.Syntax.SyntaxFactory;
