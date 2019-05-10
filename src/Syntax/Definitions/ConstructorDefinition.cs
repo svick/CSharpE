@@ -94,7 +94,7 @@ namespace CSharpE.Syntax
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
-            var newInitializer = initializer?.GetWrapped(ref thisChanged) ?? syntax?.Initializer;
+            var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.Initializer;
             var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
 
             if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||

@@ -395,6 +395,11 @@ namespace CSharpE.Syntax.Internals
                     return new UsingStatement(@using, parent);
                 case WhileStatementSyntax @while:
                     return new WhileStatement(@while, parent);
+                case YieldStatementSyntax yield:
+                    if (yield.Kind() == SyntaxKind.YieldBreakStatement)
+                        return new YieldBreakStatement(yield, parent);
+                    else
+                        return new YieldReturnStatement(yield, parent);
             }
 
             throw new NotImplementedException(syntax.Kind().ToString());
