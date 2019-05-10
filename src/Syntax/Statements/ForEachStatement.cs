@@ -143,23 +143,23 @@ namespace CSharpE.Syntax
         }
     }
 
-    public sealed class PatternForEachStatement : BaseForEachStatement
+    public sealed class ForEachPatternStatement : BaseForEachStatement
     {
         private ForEachVariableStatementSyntax syntax;
 
         private protected override CommonForEachStatementSyntax Syntax => syntax;
 
-        internal PatternForEachStatement(ForEachVariableStatementSyntax syntax, SyntaxNode parent) : base(syntax)
+        internal ForEachPatternStatement(ForEachVariableStatementSyntax syntax, SyntaxNode parent) : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;
         }
 
-        public PatternForEachStatement(
+        public ForEachPatternStatement(
             Expression elementPattern, Expression expression, params Statement[] statements)
             : this(elementPattern, expression, statements.AsEnumerable()) { }
 
-        public PatternForEachStatement(
+        public ForEachPatternStatement(
             Expression elementPattern, Expression expression, IEnumerable<Statement> statements)
         {
             ElementPattern = elementPattern;
@@ -212,7 +212,7 @@ namespace CSharpE.Syntax
             SetList(ref statements, null);
         }
 
-        private protected override SyntaxNode CloneImpl() => new PatternForEachStatement(ElementPattern, Expression, Statements);
+        private protected override SyntaxNode CloneImpl() => new ForEachPatternStatement(ElementPattern, Expression, Statements);
 
         public override IEnumerable<SyntaxNode> GetChildren() =>
             new SyntaxNode[] { ElementPattern, Expression }.Concat(Statements);

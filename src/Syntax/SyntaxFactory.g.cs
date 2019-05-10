@@ -865,14 +865,14 @@ namespace CSharpE.Syntax
             return new ForEachStatement(elementType, elementName, expression, statements);
         }
 
-        public static PatternForEachStatement PatternForEach(Expression elementPattern, Expression expression, params Statement[] statements)
+        public static ForEachPatternStatement ForEachPattern(Expression elementPattern, Expression expression, params Statement[] statements)
         {
-            return new PatternForEachStatement(elementPattern, expression, statements);
+            return new ForEachPatternStatement(elementPattern, expression, statements);
         }
 
-        public static PatternForEachStatement PatternForEach(Expression elementPattern, Expression expression, IEnumerable<Statement> statements)
+        public static ForEachPatternStatement ForEachPattern(Expression elementPattern, Expression expression, IEnumerable<Statement> statements)
         {
-            return new PatternForEachStatement(elementPattern, expression, statements);
+            return new ForEachPatternStatement(elementPattern, expression, statements);
         }
 
         public static ForStatement For(VariableDeclarationStatement variableDeclaration, Expression condition, Expression incrementor, params Statement[] statements)

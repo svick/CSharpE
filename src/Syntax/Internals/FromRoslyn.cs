@@ -374,7 +374,7 @@ namespace CSharpE.Syntax.Internals
                 case ForEachStatementSyntax forEach:
                     return new ForEachStatement(forEach, parent);
                 case ForEachVariableStatementSyntax forEachVariable:
-                    return new PatternForEachStatement(forEachVariable, parent);
+                    return new ForEachPatternStatement(forEachVariable, parent);
                 case ForStatementSyntax @for:
                     return new ForStatement(@for, parent);
                 case IfStatementSyntax @if:
