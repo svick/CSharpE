@@ -42,7 +42,6 @@ namespace CSharpE.Syntax
             }
         }
 
-
         private protected override StatementSyntax GetWrappedStatement(ref bool? changed)
         {
             GetAndResetChanged(ref changed);

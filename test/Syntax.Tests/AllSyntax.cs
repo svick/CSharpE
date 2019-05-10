@@ -74,6 +74,8 @@ namespace N.M
             continue;
             yield return 42;
             yield break;
+            l:
+                goto l;
             try
             {
                 throw new Exception();

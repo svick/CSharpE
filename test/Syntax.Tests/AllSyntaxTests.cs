@@ -84,7 +84,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count == 42,
+                syntaxKinds.Count == 40,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 

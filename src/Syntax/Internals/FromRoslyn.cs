@@ -377,8 +377,12 @@ namespace CSharpE.Syntax.Internals
                     return new ForEachPatternStatement(forEachVariable, parent);
                 case ForStatementSyntax @for:
                     return new ForStatement(@for, parent);
+                case GotoStatementSyntax @goto:
+                    return new GotoStatement(@goto, parent);
                 case IfStatementSyntax @if:
                     return new IfStatement(@if, parent);
+                case LabeledStatementSyntax labeled:
+                    return new LabelStatement(labeled, parent);
                 case LocalDeclarationStatementSyntax localDeclaration:
                     return new VariableDeclarationStatement(localDeclaration, parent);
                 case LockStatementSyntax @lock:
