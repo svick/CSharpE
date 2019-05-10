@@ -52,6 +52,18 @@ namespace CSharpE.Syntax
             new TryStatement(tryStatements, finallyStatements);
 
         #endregion
+
+        public static ConstructorInitializer ThisInitializer(params Argument[] arguments) =>
+            ConstructorInitializer(ConstructorInitializerKind.This, arguments);
+
+        public static ConstructorInitializer ThisInitializer(IEnumerable<Argument> arguments) =>
+            ConstructorInitializer(ConstructorInitializerKind.This, arguments);
+
+        public static ConstructorInitializer BaseInitializer(params Argument[] arguments) =>
+            ConstructorInitializer(ConstructorInitializerKind.Base, arguments);
+
+        public static ConstructorInitializer BaseInitializer(IEnumerable<Argument> arguments) =>
+            ConstructorInitializer(ConstructorInitializerKind.Base, arguments);
     }
 }
  

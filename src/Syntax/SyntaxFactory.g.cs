@@ -50,6 +50,16 @@ namespace CSharpE.Syntax
             return new ConstructorDefinition(modifiers, parameters, body);
         }
 
+        public static ConstructorInitializer ConstructorInitializer(ConstructorInitializerKind kind, params Argument[] arguments)
+        {
+            return new ConstructorInitializer(kind, arguments);
+        }
+
+        public static ConstructorInitializer ConstructorInitializer(ConstructorInitializerKind kind, IEnumerable<Argument> arguments)
+        {
+            return new ConstructorInitializer(kind, arguments);
+        }
+
         public static DelegateDefinition DelegateDefinition(TypeReference returnType, params Parameter[] parameters)
         {
             return new DelegateDefinition(returnType, parameters);

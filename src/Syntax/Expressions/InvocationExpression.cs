@@ -96,7 +96,7 @@ namespace CSharpE.Syntax
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
-            base.ReplaceExpressions(filter, projection);
+            Expression = ReplaceExpressions(Expression, filter, projection);
 
             foreach (var argument in Arguments)
             {

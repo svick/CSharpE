@@ -47,4 +47,12 @@ class C
     }
 
     int P1 { get; set; }
+
+    C() : this(42)
+    {
+    }
+
+    C(int i) : base()
+    {
+    }
 }

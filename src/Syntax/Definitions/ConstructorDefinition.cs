@@ -31,9 +31,14 @@ namespace CSharpE.Syntax
 
         public ConstructorDefinition(
             MemberModifiers modifiers, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
+            : this(modifiers, parameters, null, body) { }
+
+        public ConstructorDefinition(
+            MemberModifiers modifiers, IEnumerable<Parameter> parameters, ConstructorInitializer initializer, IEnumerable<Statement> body)
         {
             Modifiers = modifiers;
             Parameters = parameters?.ToList();
+            Initializer = initializer;
             Body = new BlockStatement(body?.ToList());
         }
 
@@ -57,7 +62,28 @@ namespace CSharpE.Syntax
 
         #endregion
 
-        // TODO: initializers (: base and : this)
+        private bool initializerSet;
+        private ConstructorInitializer initializer;
+        public ConstructorInitializer Initializer
+        {
+            get
+            {
+                if (!initializerSet)
+                {
+                    initializer = syntax.Initializer == null
+                        ? null
+                        : new ConstructorInitializer(syntax.Initializer, this);
+                    initializerSet = true;
+                }
+
+                return initializer;
+            }
+            set
+            {
+                initializer = value;
+                initializerSet = true;
+            }
+        }
 
         ConstructorDeclarationSyntax ISyntaxWrapper<ConstructorDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
@@ -68,6 +94,7 @@ namespace CSharpE.Syntax
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
+            var newInitializer = initializer?.GetWrapped(ref thisChanged) ?? syntax?.Initializer;
             var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
 
             if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
@@ -78,7 +105,7 @@ namespace CSharpE.Syntax
 
                 var newSyntax = RoslynSyntaxFactory.ConstructorDeclaration(
                     newAttributes, newModifiers.GetWrapped(), RoslynSyntaxFactory.Identifier(ParentType.Name),
-                    RoslynSyntaxFactory.ParameterList(newParameters), default, newBody);
+                    RoslynSyntaxFactory.ParameterList(newParameters), newInitializer, newBody);
 
                 syntax = Annotate(newSyntax);
 
@@ -97,14 +124,16 @@ namespace CSharpE.Syntax
 
             SetList(ref attributes, null);
             SetList(ref parameters, null);
+            Set(ref initializer, null);
+            initializerSet = false;
             Set(ref body, null);
         }
 
-        private protected override SyntaxNode CloneImpl() => new ConstructorDefinition(Modifiers, Parameters, Body.Statements);
+        private protected override SyntaxNode CloneImpl() => new ConstructorDefinition(Modifiers, Parameters, Initializer, Body.Statements);
 
         protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
-            // TODO: initializers
+            Initializer?.ReplaceExpressions(filter, projection);
 
             base.ReplaceExpressionsImpl(filter, projection);
         }
