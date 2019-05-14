@@ -38,9 +38,8 @@ namespace CSharpE.Syntax
             ReturnType = returnType;
             Name = name;
             Parameters = parameters?.ToList();
-            Body = new BlockStatement(body?.ToList());
+            Body = new BlockStatement(body);
         }
-
 
         #region Modifiers
 
@@ -137,8 +136,8 @@ namespace CSharpE.Syntax
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
             var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
 
-            if (syntax == null || Modifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
-                thisChanged == true || ShouldAnnotate(syntax, changed))
+            if (syntax == null || thisChanged == true || Modifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
+                ShouldAnnotate(syntax, changed))
             {
                 var newSyntax = RoslynSyntaxFactory.MethodDeclaration(
                     newAttributes, Modifiers.GetWrapped(), newReturnType, null, newName, null,

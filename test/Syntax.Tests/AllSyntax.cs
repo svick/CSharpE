@@ -139,6 +139,11 @@ namespace N.M
                     goto case 0;
             }
 
+            async void F(int i)
+            {
+                return;
+            }
+
             return ref this.i;
         }
 

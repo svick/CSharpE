@@ -383,6 +383,8 @@ namespace CSharpE.Syntax.Internals
                     return new IfStatement(@if, parent);
                 case LabeledStatementSyntax labeled:
                     return new LabelStatement(labeled, parent);
+                case LocalFunctionStatementSyntax localFunction:
+                    return new LocalFunctionStatement(localFunction, parent);
                 case LocalDeclarationStatementSyntax localDeclaration:
                     return new VariableDeclarationStatement(localDeclaration, parent);
                 case LockStatementSyntax @lock:

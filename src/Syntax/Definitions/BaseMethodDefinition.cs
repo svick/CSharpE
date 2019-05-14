@@ -46,7 +46,6 @@ namespace CSharpE.Syntax
 
         private protected bool bodySet;
         private protected BlockStatement body;
-
         public BlockStatement Body
         {
             get
