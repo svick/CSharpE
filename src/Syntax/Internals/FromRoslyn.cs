@@ -378,7 +378,7 @@ namespace CSharpE.Syntax.Internals
                 case ForStatementSyntax @for:
                     return new ForStatement(@for, parent);
                 case GotoStatementSyntax @goto:
-                    return new GotoStatement(@goto, parent);
+                    return GotoStatement(@goto, parent);
                 case IfStatementSyntax @if:
                     return new IfStatement(@if, parent);
                 case LabeledStatementSyntax labeled:
@@ -409,6 +409,21 @@ namespace CSharpE.Syntax.Internals
             }
 
             throw new NotImplementedException(syntax.Kind().ToString());
+        }
+
+        private static Statement GotoStatement(GotoStatementSyntax syntax, SyntaxNode parent)
+        {
+            switch (syntax.Kind())
+            {
+                case SyntaxKind.GotoStatement:
+                    return new GotoStatement(syntax, parent);
+                case SyntaxKind.GotoCaseStatement:
+                    return new GotoCaseStatement(syntax, parent);
+                case SyntaxKind.GotoDefaultStatement:
+                    return new GotoDefaultStatement(syntax, parent);
+            }
+
+            throw new InvalidOperationException();
         }
 
         public static MemberModifiers MemberModifiers(SyntaxTokenList modifiers)

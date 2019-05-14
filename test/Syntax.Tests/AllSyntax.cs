@@ -134,10 +134,10 @@ namespace N.M
             switch (i)
             {
                 case 0:
-                    return true;
+                    goto default;
                 case 1:
                 default:
-                    return false;
+                    goto case 0;
             }
 
             return ref this.i;
