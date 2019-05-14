@@ -56,12 +56,32 @@ namespace CSharpE.Syntax
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
         }
 
-        public TypeDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+        protected TypeDefinition(string name, params MemberDefinition[] members)
+            : this(name, members.AsEnumerable()) { }
+
+        protected TypeDefinition(string name, IEnumerable<MemberDefinition> members)
+            : this(default, name, members) { }
+
+        protected TypeDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
+            : this(modifiers, name, members.AsEnumerable()) { }
+
+        protected TypeDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
+            : this(modifiers, name, null, members) { }
+
+        protected TypeDefinition(
+            MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
+            params MemberDefinition[] members)
+            : this(modifiers, name, baseTypes, members.AsEnumerable()) { }
+
+        protected TypeDefinition(
+            MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
+            IEnumerable<MemberDefinition> members)
         {
             Modifiers = modifiers;
             Name = name;
+            this.baseTypes = new SeparatedSyntaxList<BaseType, BaseTypeSyntax>(
+                baseTypes?.Select(reference => new BaseType(reference)), this);
             Members = members?.ToList();
-            baseTypes = new SeparatedSyntaxList<BaseType, BaseTypeSyntax>(this);
         }
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
@@ -207,7 +227,7 @@ namespace CSharpE.Syntax
 
         private protected abstract SyntaxKind KeywordKind { get; }
 
-        private protected TypeDeclarationSyntax GetWrapped(ref bool? changed)
+        private TypeDeclarationSyntax GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -269,11 +289,27 @@ namespace CSharpE.Syntax
         internal ClassDefinition(ClassDeclarationSyntax classDeclarationSyntax, SyntaxNode parent)
             : base(classDeclarationSyntax, parent) { }
 
-        public ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+        public ClassDefinition(string name, params MemberDefinition[] members)
+            : base(name, members) { }
+
+        public ClassDefinition(string name, IEnumerable<MemberDefinition> members)
+            : base(default, name, members) { }
+
+        public ClassDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
             : base(modifiers, name, members) { }
 
-        public ClassDefinition(string name, IEnumerable<MemberDefinition> members = null)
-            : this(MemberModifiers.None, name, members) { }
+        public ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
+            : base(modifiers, name, null, members) { }
+
+        public ClassDefinition(
+            MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
+            params MemberDefinition[] members)
+            : base(modifiers, name, baseTypes, members) { }
+
+        public ClassDefinition(
+            MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
+            IEnumerable<MemberDefinition> members)
+            : base(modifiers, name, baseTypes, members) { }
 
         private protected override SyntaxKind KeywordKind => ClassKeyword;
 
@@ -305,7 +341,8 @@ namespace CSharpE.Syntax
             set => Modifiers = Modifiers.With(Static, value);
         }
 
-        private protected override SyntaxNode CloneImpl() => new ClassDefinition(Modifiers, Name, Members) { Attributes = Attributes };
+        private protected override SyntaxNode CloneImpl() =>
+            new ClassDefinition(Modifiers, Name, BaseTypes, Members) { Attributes = Attributes };
     }
 
     public sealed class StructDefinition : TypeDefinition
@@ -313,11 +350,27 @@ namespace CSharpE.Syntax
         internal StructDefinition(StructDeclarationSyntax structDeclarationSyntax, SyntaxNode parent)
             : base(structDeclarationSyntax, parent) { }
 
-        public StructDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+        public StructDefinition(string name, params MemberDefinition[] members)
+            : base(name, members) { }
+
+        public StructDefinition(string name, IEnumerable<MemberDefinition> members)
+            : base(default, name, members) { }
+
+        public StructDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
             : base(modifiers, name, members) { }
 
-        public StructDefinition(string name, IEnumerable<MemberDefinition> members = null)
-            : this(MemberModifiers.None, name, members) { }
+        public StructDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
+            : base(modifiers, name, null, members) { }
+
+        public StructDefinition(
+            MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
+            params MemberDefinition[] members)
+            : base(modifiers, name, baseTypes, members) { }
+
+        public StructDefinition(
+            MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
+            IEnumerable<MemberDefinition> members)
+            : base(modifiers, name, baseTypes, members) { }
 
         private protected override SyntaxKind KeywordKind => StructKeyword;
 
@@ -330,7 +383,8 @@ namespace CSharpE.Syntax
                 throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a struct.", nameof(value));
         }
 
-        private protected override SyntaxNode CloneImpl() => new StructDefinition(Modifiers, Name, Members) { Attributes = Attributes };
+        private protected override SyntaxNode CloneImpl() =>
+            new StructDefinition(Modifiers, Name, BaseTypes, Members) { Attributes = Attributes };
     }
 
     public sealed class InterfaceDefinition : TypeDefinition
@@ -338,11 +392,27 @@ namespace CSharpE.Syntax
         internal InterfaceDefinition(InterfaceDeclarationSyntax interfaceDeclarationSyntax, SyntaxNode parent)
             : base(interfaceDeclarationSyntax, parent) { }
 
-        public InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+        public InterfaceDefinition(string name, params MemberDefinition[] members)
+            : base(name, members) { }
+
+        public InterfaceDefinition(string name, IEnumerable<MemberDefinition> members)
+            : base(default, name, members) { }
+
+        public InterfaceDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
             : base(modifiers, name, members) { }
 
-        public InterfaceDefinition(string name, IEnumerable<MemberDefinition> members = null)
-            : this(MemberModifiers.None, name, members) { }
+        public InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
+            : base(modifiers, name, null, members) { }
+
+        public InterfaceDefinition(
+            MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
+            params MemberDefinition[] members)
+            : base(modifiers, name, baseTypes, members) { }
+
+        public InterfaceDefinition(
+            MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
+            IEnumerable<MemberDefinition> members)
+            : base(modifiers, name, baseTypes, members) { }
 
         private protected override SyntaxKind KeywordKind => InterfaceKeyword;
 
@@ -355,6 +425,7 @@ namespace CSharpE.Syntax
                 throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for an interface.", nameof(value));
         }
 
-        private protected override SyntaxNode CloneImpl() => new InterfaceDefinition(Modifiers, Name, Members) { Attributes = Attributes };
+        private protected override SyntaxNode CloneImpl() =>
+            new InterfaceDefinition(Modifiers, Name, BaseTypes, Members) { Attributes = Attributes };
     }
 }

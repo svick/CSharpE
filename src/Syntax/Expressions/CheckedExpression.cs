@@ -21,7 +21,7 @@ namespace CSharpE.Syntax
         private void Init(CheckedExpressionSyntax syntax)
         {
             this.syntax = syntax;
-            IsChecked = syntax.Kind() == SyntaxKind.CheckedExpression;
+            IsChecked = IsSyntaxChecked();
         }
 
         public CheckedExpression(bool isChecked, Expression expression)
@@ -29,6 +29,8 @@ namespace CSharpE.Syntax
             IsChecked = isChecked;
             Expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
+
+        private bool IsSyntaxChecked() => syntax.Kind() == SyntaxKind.CheckedExpression;
 
         public bool IsChecked { get; set; }
 
@@ -53,9 +55,9 @@ namespace CSharpE.Syntax
 
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
 
-            bool oldIsChecked = syntax.Kind() == SyntaxKind.CheckedExpression;
+            bool isCheckedChanged = syntax != null && IsSyntaxChecked() != IsChecked;
 
-            if (syntax == null || thisChanged == true || oldIsChecked != IsChecked || ShouldAnnotate(syntax, changed))
+            if (syntax == null || thisChanged == true || isCheckedChanged || ShouldAnnotate(syntax, changed))
             {
                 syntax = RoslynSyntaxFactory.CheckedExpression(
                     IsChecked ? SyntaxKind.CheckedExpression : SyntaxKind.UncheckedExpression, newExpression);

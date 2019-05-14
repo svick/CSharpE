@@ -62,17 +62,25 @@ namespace CSharpE.Syntax
             }
         }
 
+        private bool conditionSet;
         private Expression condition;
         public Expression Condition
         {
             get
             {
-                if (condition == null)
+                if (!conditionSet)
+                {
                     condition = FromRoslyn.Expression(syntax.Condition, this);
+                    conditionSet = true;
+                }
 
                 return condition;
             }
-            set => SetNotNull(ref condition, value);
+            set
+            {
+                Set(ref condition, value);
+                conditionSet = true;
+            }
         }
 
         private ExpressionList incrementors;
@@ -107,8 +115,10 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
-            var newVariableDeclaration = variableDeclaration?.GetWrapped(ref thisChanged).Declaration ?? syntax.Declaration;
-            var newCondition = condition?.GetWrapped(ref thisChanged) ?? syntax.Condition;
+            var newVariableDeclaration = variableDeclarationSet
+                ? variableDeclaration?.GetWrapped(ref thisChanged).Declaration
+                : syntax.Declaration;
+            var newCondition = conditionSet ? condition?.GetWrapped(ref thisChanged) : syntax.Condition;
             var newIncrementors = incrementors?.GetWrapped(ref thisChanged) ?? syntax.Incrementors;
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? GetStatementList(syntax.Statement);
 

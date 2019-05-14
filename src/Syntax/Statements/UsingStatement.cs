@@ -59,6 +59,7 @@ namespace CSharpE.Syntax
                 Set(ref variableDeclaration, value);
                 variableDeclarationSet = true;
                 Set(ref expression, null);
+                expressionSet = true;
             }
         }
 
@@ -81,6 +82,7 @@ namespace CSharpE.Syntax
                 Set(ref expression, value);
                 expressionSet = true;
                 Set(ref variableDeclaration, null);
+                variableDeclarationSet = true;
             }
         }
 
@@ -103,8 +105,10 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
-            var newVariable = variableDeclaration?.GetWrapped(ref thisChanged).Declaration ?? syntax.Declaration;
-            var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
+            var newVariable = variableDeclarationSet
+                ? variableDeclaration?.GetWrapped(ref thisChanged).Declaration
+                : syntax.Declaration;
+            var newExpression = expressionSet ? expression?.GetWrapped(ref thisChanged) : syntax.Expression;
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? GetStatementList(syntax.Statement);
 
             if (syntax == null || thisChanged == true)

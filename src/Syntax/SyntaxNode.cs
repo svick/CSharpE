@@ -103,7 +103,7 @@ namespace CSharpE.Syntax
 
         private protected void GetAndResetChanged(ref bool? changed) => changeTracker.GetAndResetChanged(ref changed);
 
-        internal void SetChanged(ref bool? changed) => changeTracker.SetChanged(ref changed);
+        private protected void SetChanged(ref bool? changed) => changeTracker.SetChanged(ref changed);
 
         internal SyntaxNode Clone()
         {

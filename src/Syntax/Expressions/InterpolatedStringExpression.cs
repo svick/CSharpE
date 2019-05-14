@@ -91,7 +91,7 @@ namespace CSharpE.Syntax
             SetList(ref contents, null);
         }
 
-        private protected override SyntaxNode CloneImpl() => new InterpolatedStringExpression(Contents);
+        private protected override SyntaxNode CloneImpl() => new InterpolatedStringExpression(IsVerbatim, Contents);
 
         public override IEnumerable<SyntaxNode> GetChildren() => Contents;
 

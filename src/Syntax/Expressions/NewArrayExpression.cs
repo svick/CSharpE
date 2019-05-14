@@ -95,10 +95,6 @@ namespace CSharpE.Syntax
 
             if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
-                if (newLengths.Contains(null))
-                    newLengths = RoslynSyntaxFactory.SeparatedList(
-                        newLengths.Select(l => l ?? RoslynSyntaxFactory.OmittedArraySizeExpression()));
-
                 var arrayType = ArrayTypeReference.AddArrayRankToType(
                     newType, RoslynSyntaxFactory.ArrayRankSpecifier(newLengths));
 

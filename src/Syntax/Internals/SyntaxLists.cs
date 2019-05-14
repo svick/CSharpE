@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax.Internals
 {
@@ -30,6 +31,9 @@ namespace CSharpE.Syntax.Internals
 
         protected override TypeReference CreateWrapper(TypeSyntax roslynSyntax) =>
             FromRoslyn.TypeReference(roslynSyntax, Parent);
+
+        protected override SeparatedSyntaxList<TypeSyntax> CreateList(IEnumerable<TypeSyntax> nodes) =>
+            base.CreateList(nodes.Select(n => n ?? RoslynSyntaxFactory.OmittedTypeArgument()));
     }
 
     internal sealed class MemberList : SyntaxList<MemberDefinition, MemberDeclarationSyntax>
@@ -64,6 +68,9 @@ namespace CSharpE.Syntax.Internals
 
         protected override Expression CreateWrapper(ExpressionSyntax roslynSyntax) =>
             FromRoslyn.Expression(roslynSyntax, Parent);
+
+        protected override SeparatedSyntaxList<ExpressionSyntax> CreateList(IEnumerable<ExpressionSyntax> nodes) =>
+            base.CreateList(nodes.Select(n => n ?? RoslynSyntaxFactory.OmittedArraySizeExpression()));
     }
 
     internal sealed class VariableDesignationList : SeparatedSyntaxList<VariableDesignation, VariableDesignationSyntax>

@@ -1,5 +1,4 @@
 ﻿using System;
-using N.M;
 
 namespace N.M
 {
@@ -7,7 +6,7 @@ namespace N.M
     class C : B
     {
         C c1;
-        N.M.C c2;
+        A.B.C c2;
         C<int> c3;
         int i;
         C? n;

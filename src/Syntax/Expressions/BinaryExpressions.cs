@@ -392,6 +392,6 @@ namespace CSharpE.Syntax
         public RightShiftAssignmentExpression(Expression left, Expression right)
             : base(left, right) { }
 
-        private protected override SyntaxNode CloneImpl() => new AddAssignmentExpression(Left, Right);
+        private protected override SyntaxNode CloneImpl() => new RightShiftAssignmentExpression(Left, Right);
     }
 }

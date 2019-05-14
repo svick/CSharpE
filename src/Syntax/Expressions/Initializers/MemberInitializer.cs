@@ -57,7 +57,7 @@ namespace CSharpE.Syntax
         {
             get
             {
-                if (target == null)
+                if (value == null)
                 {
                     switch (syntax.Right)
                     {

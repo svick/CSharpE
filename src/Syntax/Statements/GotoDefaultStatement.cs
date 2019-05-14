@@ -29,7 +29,8 @@ namespace CSharpE.Syntax
 
             if (syntax == null)
             {
-                syntax = RoslynSyntaxFactory.GotoStatement(SyntaxKind.GotoDefaultStatement);
+                syntax = RoslynSyntaxFactory.GotoStatement(
+                    SyntaxKind.GotoDefaultStatement, RoslynSyntaxFactory.Token(SyntaxKind.DefaultKeyword), null);
 
                 SetChanged(ref changed);
             }

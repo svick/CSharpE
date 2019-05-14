@@ -32,7 +32,7 @@ namespace CSharpE.Syntax
         {
             get
             {
-                if (variableDeclaration != null)
+                if (variableDeclaration == null)
                     variableDeclaration = new VariableDeclarationStatement(
                         RoslynSyntaxFactory.LocalDeclarationStatement(syntax.Declaration), this);
 

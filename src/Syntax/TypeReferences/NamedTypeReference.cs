@@ -260,15 +260,6 @@ namespace CSharpE.Syntax
             var newTypeArguments = typeArguments?.GetWrapped(ref thisChanged) ??
                                     (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;
 
-            TypeArgumentListSyntax GetTypeArguments(SeparatedSyntaxList<TypeSyntax> arguments)
-            {
-                if (arguments.Contains(null))
-                    arguments = RoslynSyntaxFactory.SeparatedList(
-                        newTypeArguments.Select(l => l ?? RoslynSyntaxFactory.OmittedTypeArgument()));
-
-                return RoslynSyntaxFactory.TypeArgumentList(arguments);
-            }
-
             // if Resolve() wasn't called, only type parameters could have been changed
             if (isKnownType == null)
             {
@@ -282,7 +273,8 @@ namespace CSharpE.Syntax
                             // if type parameters changed, but genericity didn't, syntax must be generic
                             var genericSyntax = (GenericNameSyntax)syntax;
 
-                            syntax = genericSyntax.WithTypeArgumentList(GetTypeArguments(newTypeArguments));
+                            syntax = genericSyntax.WithTypeArgumentList(
+                                RoslynSyntaxFactory.TypeArgumentList(newTypeArguments));
                         }
 
                         syntax = Annotate(syntax);
@@ -317,7 +309,8 @@ namespace CSharpE.Syntax
                     if (newTypeArguments.Any())
                     {
                         simpleName = RoslynSyntaxFactory.GenericName(
-                            RoslynSyntaxFactory.Identifier(Name), GetTypeArguments(newTypeArguments));
+                            RoslynSyntaxFactory.Identifier(Name),
+                            RoslynSyntaxFactory.TypeArgumentList(newTypeArguments));
                     }
                     else
                     {

@@ -255,7 +255,7 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
             syntax = syntax.WithRootAndOptions(newSyntax, syntax.Options);
 
-        private protected override SyntaxNode CloneImpl() => throw new InvalidOperationException();
+        private protected override SyntaxNode CloneImpl() => new SourceFile(Path) { Members = Members };
 
         public override IEnumerable<SyntaxNode> GetChildren() => Members.Select(m => m.Value);
 

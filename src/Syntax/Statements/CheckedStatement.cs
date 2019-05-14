@@ -23,7 +23,7 @@ namespace CSharpE.Syntax
         private void Init(CheckedStatementSyntax syntax)
         {
             this.syntax = syntax;
-            IsChecked = syntax.Kind() == SyntaxKind.CheckedStatement;
+            IsChecked = IsSyntaxChecked();
         }
 
         public CheckedStatement(bool isChecked, params Statement[] statements)
@@ -34,6 +34,8 @@ namespace CSharpE.Syntax
             IsChecked = isChecked;
             this.statements = new StatementList(statements, this);
         }
+
+        private bool IsSyntaxChecked() => syntax.Kind() == SyntaxKind.CheckedStatement;
 
         public bool IsChecked { get; set; }
 
@@ -58,9 +60,9 @@ namespace CSharpE.Syntax
 
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? syntax.Block.Statements;
 
-            bool oldIsChecked = syntax.Kind() == SyntaxKind.CheckedStatement;
+            bool isCheckedChanged = syntax != null && IsSyntaxChecked() != IsChecked;
 
-            if (syntax == null || thisChanged == true || oldIsChecked != IsChecked)
+            if (syntax == null || thisChanged == true || isCheckedChanged)
             {
                 syntax = RoslynSyntaxFactory.CheckedStatement(
                     IsChecked ? SyntaxKind.CheckedStatement : SyntaxKind.UncheckedStatement,

@@ -97,7 +97,7 @@ namespace CSharpE.Syntax.Tests
 
             new Project(file);
 
-            WalkNode(file);
+            file = SyntaxNodeExtensions.Clone(file);
 
             Assert.Equal(await File.ReadAllTextAsync(path), file.ToString());
         }
@@ -114,7 +114,7 @@ namespace CSharpE.Syntax.Tests
 
             new Project(file);
 
-            WalkNode(file);
+            file = SyntaxNodeExtensions.Clone(file);
 
             Assert.Equal(await File.ReadAllTextAsync(targetPath), file.ToString());
         }
@@ -127,9 +127,6 @@ namespace CSharpE.Syntax.Tests
 
             var syntaxWrapper = (ISyntaxWrapper<Roslyn::SyntaxNode>)node;
             encounteredNodes.Add(syntaxWrapper.GetWrapped().Kind());
-
-            bool? changed = null;
-            node.SetChanged(ref changed);
 
             foreach (var child in node.GetChildren())
             {

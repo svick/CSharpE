@@ -142,7 +142,7 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
-        protected abstract TList CreateList(List<TRoslynSyntax> nodes);
+        protected abstract TList CreateList(IEnumerable<TRoslynSyntax> nodes);
 
         protected virtual TSyntax CreateWrapper(TRoslynSyntax roslynSyntax)
         {
@@ -200,7 +200,7 @@ namespace CSharpE.Syntax.Internals
         internal SyntaxList(
             Roslyn::SyntaxList<TRoslynSyntax> syntaxList, SyntaxNode parent) : base(syntaxList, parent) { }
 
-        protected sealed override Roslyn::SyntaxList<TRoslynSyntax> CreateList(List<TRoslynSyntax> nodes) =>
+        protected sealed override Roslyn::SyntaxList<TRoslynSyntax> CreateList(IEnumerable<TRoslynSyntax> nodes) =>
             RoslynSyntaxFactory.List(nodes);
     }
 
@@ -216,7 +216,7 @@ namespace CSharpE.Syntax.Internals
         internal SeparatedSyntaxList(
             Roslyn::SeparatedSyntaxList<TRoslynSyntax> syntaxList, SyntaxNode parent) : base(syntaxList, parent) { }
 
-        protected sealed override Roslyn::SeparatedSyntaxList<TRoslynSyntax> CreateList(List<TRoslynSyntax> nodes) =>
+        protected override Roslyn::SeparatedSyntaxList<TRoslynSyntax> CreateList(IEnumerable<TRoslynSyntax> nodes) =>
             RoslynSyntaxFactory.SeparatedList(nodes);
     }
 }
