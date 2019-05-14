@@ -131,6 +131,15 @@ namespace N.M
             {
             }
 
+            switch (i)
+            {
+                case 0:
+                    return true;
+                case 1:
+                default:
+                    return false;
+            }
+
             return ref this.i;
         }
 

@@ -389,6 +389,8 @@ namespace CSharpE.Syntax.Internals
                     return new LockStatement(@lock, parent);
                 case ReturnStatementSyntax @return:
                     return new ReturnStatement(@return, parent);
+                case SwitchStatementSyntax @switch:
+                    return new SwitchStatement(@switch, parent);
                 case ThrowStatementSyntax @throw:
                     return new ExpressionStatement(@throw, parent);
                 case TryStatementSyntax @try:
@@ -685,6 +687,19 @@ namespace CSharpE.Syntax.Internals
                     return new Interpolation(interpolation, parent);
                 case InterpolatedStringTextSyntax interpolatedStringText:
                     return new InterpolatedStringText(interpolatedStringText, parent);
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        public static SwitchLabel SwitchLabel(SwitchLabelSyntax labelSyntax, SwitchSection parent)
+        {
+            switch (labelSyntax)
+            {
+                case CaseSwitchLabelSyntax @case:
+                    return new SwitchCase(@case, parent);
+                case DefaultSwitchLabelSyntax @default:
+                    return new SwitchDefault(@default, parent);
             }
 
             throw new InvalidOperationException();

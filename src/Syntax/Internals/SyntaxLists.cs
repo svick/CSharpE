@@ -103,4 +103,19 @@ namespace CSharpE.Syntax.Internals
         protected override InterpolatedStringContent CreateWrapper(InterpolatedStringContentSyntax roslynSyntax) =>
             FromRoslyn.InterpolatedStringContent(roslynSyntax, (InterpolatedStringExpression)Parent);
     }
+
+    internal sealed class SwitchLabelList : SyntaxList<SwitchLabel, SwitchLabelSyntax>
+    {
+        internal SwitchLabelList(SyntaxNode parent) : base(parent) { }
+
+        internal SwitchLabelList(IEnumerable<SwitchLabel> list, SyntaxNode parent)
+            : base(list, parent) { }
+
+        internal SwitchLabelList(
+            SyntaxList<SwitchLabelSyntax> syntaxList, SyntaxNode parent)
+            : base(syntaxList, parent) { }
+
+        protected override SwitchLabel CreateWrapper(SwitchLabelSyntax roslynSyntax) =>
+            FromRoslyn.SwitchLabel(roslynSyntax, (SwitchSection)Parent);
+    }
 }
