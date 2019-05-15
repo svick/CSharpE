@@ -115,11 +115,6 @@ namespace CSharpE.Syntax
             return new OperatorDefinition(modifiers, returnType, kind, parameters, body);
         }
 
-        public static PropertyDefinition PropertyDefinition(MemberModifiers modifiers, TypeReference type, string name)
-        {
-            return new PropertyDefinition(modifiers, type, name);
-        }
-
         public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
         {
             return new ClassDefinition(modifiers, name, members);

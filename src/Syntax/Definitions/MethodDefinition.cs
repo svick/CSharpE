@@ -33,9 +33,15 @@ namespace CSharpE.Syntax
         public MethodDefinition(
             MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
             IEnumerable<Statement> body)
+            : this(modifiers, returnType, null, name, parameters, body) { }
+
+        public MethodDefinition(
+            MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name,
+            IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
         {
             Modifiers = modifiers;
             ReturnType = returnType;
+            ExplicitInterface = explicitInterface;
             Name = name;
             Parameters = parameters?.ToList();
             Body = new BlockStatement(body);
@@ -117,6 +123,29 @@ namespace CSharpE.Syntax
             set => SetNotNull(ref returnType, value);
         }
 
+        private bool explicitInterfaceSet;
+        private NamedTypeReference explicitInterface;
+        public NamedTypeReference ExplicitInterface
+        {
+            get
+            {
+                if (!explicitInterfaceSet)
+                {
+                    explicitInterface = syntax.ExplicitInterfaceSpecifier == null
+                        ? null
+                        : new NamedTypeReference(syntax.ExplicitInterfaceSpecifier.Name, this);
+                    explicitInterfaceSet = true;
+                }
+
+                return explicitInterface;
+            }
+            set
+            {
+                Set(ref explicitInterface, value);
+                explicitInterfaceSet = true;
+            }
+        }
+
         private Identifier name;
         public string Name
         {
@@ -132,6 +161,9 @@ namespace CSharpE.Syntax
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? syntax.ReturnType;
+            var newExplicitInterface = explicitInterfaceSet
+                ? explicitInterface?.GetWrappedName(ref thisChanged)
+                : syntax.ExplicitInterfaceSpecifier?.Name;
             var newName = name.GetWrapped(ref thisChanged);
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
             var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
@@ -139,8 +171,12 @@ namespace CSharpE.Syntax
             if (syntax == null || thisChanged == true || Modifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 ShouldAnnotate(syntax, changed))
             {
+                var explicitInterfaceSpecifier = newExplicitInterface == null
+                    ? null
+                    : RoslynSyntaxFactory.ExplicitInterfaceSpecifier(newExplicitInterface);
+
                 var newSyntax = RoslynSyntaxFactory.MethodDeclaration(
-                    newAttributes, Modifiers.GetWrapped(), newReturnType, null, newName, null,
+                    newAttributes, Modifiers.GetWrapped(), newReturnType, explicitInterfaceSpecifier, newName, null,
                     RoslynSyntaxFactory.ParameterList(newParameters), default, newBody, null);
 
                 syntax = Annotate(newSyntax);
@@ -160,14 +196,19 @@ namespace CSharpE.Syntax
 
             SetList(ref attributes, null);
             Set(ref returnType, null);
+            Set(ref explicitInterface, null);
+            explicitInterfaceSet = false;
             SetList(ref parameters, null);
             Set(ref body, null);
         }
 
         private protected override SyntaxNode CloneImpl() =>
-            new MethodDefinition(Modifiers, ReturnType, Name, Parameters, Body?.Statements) { Attributes = Attributes };
+            new MethodDefinition(Modifiers, ReturnType, ExplicitInterface, Name, Parameters, Body?.Statements)
+            {
+                Attributes = Attributes
+            };
 
         public override IEnumerable<SyntaxNode> GetChildren() =>
-            Attributes.Concat<SyntaxNode>(new[] { ReturnType }).Concat(Parameters).Concat(new[] { Body });
+            Attributes.Concat<SyntaxNode>(new[] { ReturnType, ExplicitInterface }).Concat(Parameters).Concat(new[] { Body });
     }
 }

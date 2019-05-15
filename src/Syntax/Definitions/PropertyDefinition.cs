@@ -29,14 +29,22 @@ namespace CSharpE.Syntax
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
             name = new Identifier(syntax.Identifier);
         }
-        
-        public PropertyDefinition(MemberModifiers modifiers, TypeReference type, string name)
+
+        public PropertyDefinition(
+            MemberModifiers modifiers, TypeReference type, string name,
+            AccessorDefinition getAccessor, AccessorDefinition setAccessor)
+            : this(modifiers, type, null, name, getAccessor, setAccessor) { }
+
+        public PropertyDefinition(
+            MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, string name, 
+            AccessorDefinition getAccessor,AccessorDefinition setAccessor)
         {
             Modifiers = modifiers;
             Type = type;
+            ExplicitInterface = explicitInterface;
             Name = name;
-            getAccessorSet = true;
-            setAccessorSet = true;
+            GetAccessor = getAccessor;
+            SetAccessor = setAccessor;
         }
 
         private const MemberModifiers ValidModifiers =
@@ -55,7 +63,30 @@ namespace CSharpE.Syntax
             get => Modifiers.Contains(Static);
             set => Modifiers = Modifiers.With(Static, value);
         }
-        
+
+        private bool explicitInterfaceSet;
+        private NamedTypeReference explicitInterface;
+        public NamedTypeReference ExplicitInterface
+        {
+            get
+            {
+                if (!explicitInterfaceSet)
+                {
+                    explicitInterface = syntax.ExplicitInterfaceSpecifier == null
+                        ? null
+                        : new NamedTypeReference(syntax.ExplicitInterfaceSpecifier.Name, this);
+                    explicitInterfaceSet = true;
+                }
+
+                return explicitInterface;
+            }
+            set
+            {
+                Set(ref explicitInterface, value);
+                explicitInterfaceSet = true;
+            }
+        }
+
         private Identifier name;
         public string Name
         {
@@ -74,6 +105,9 @@ namespace CSharpE.Syntax
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
+            var newExplicitInterface = explicitInterfaceSet
+                ? explicitInterface?.GetWrappedName(ref thisChanged)
+                : syntax.ExplicitInterfaceSpecifier?.Name;
             var newName = name.GetWrapped(ref thisChanged);
             var newGetAccessor = getAccessorSet
                 ? getAccessor?.GetWrapped(ref thisChanged)
@@ -85,10 +119,14 @@ namespace CSharpE.Syntax
             if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || ShouldAnnotate(syntax, changed))
             {
-                var accessors = RoslynSyntaxFactory.List(new[] {newGetAccessor, newSetAccessor}.Where(a => a != null));
+                var explicitInterfaceSpecifier = newExplicitInterface == null
+                    ? null
+                    : RoslynSyntaxFactory.ExplicitInterfaceSpecifier(newExplicitInterface);
+                var accessors =
+                    RoslynSyntaxFactory.List(new[] { newGetAccessor, newSetAccessor }.Where(a => a != null));
 
                 var newSyntax = RoslynSyntaxFactory.PropertyDeclaration(
-                    newAttributes, newModifiers.GetWrapped(), newType, null, newName,
+                    newAttributes, newModifiers.GetWrapped(), newType, explicitInterfaceSpecifier, newName,
                     RoslynSyntaxFactory.AccessorList(accessors));
 
                 syntax = Annotate(newSyntax);
@@ -107,15 +145,18 @@ namespace CSharpE.Syntax
             Init((PropertyDeclarationSyntax)newSyntax);
             SetList(ref attributes, null);
             Set(ref type, null);
+            Set(ref explicitInterface, null);
+            explicitInterfaceSet = false;
             Set(ref getAccessor, null);
             getAccessorSet = false;
             Set(ref setAccessor, null);
             setAccessorSet = false;
         }
 
-        private protected override SyntaxNode CloneImpl() => new PropertyDefinition(Modifiers, Type, Name)
-        {
-            Attributes = Attributes, GetAccessor = GetAccessor, SetAccessor = SetAccessor
-        };
+        private protected override SyntaxNode CloneImpl() =>
+            new PropertyDefinition(Modifiers, Type, ExplicitInterface, Name, GetAccessor, SetAccessor)
+            {
+                Attributes = Attributes
+            };
     }
 }

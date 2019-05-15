@@ -251,7 +251,11 @@ namespace CSharpE.Syntax
 
         public static implicit operator NamedTypeReference(Type type) => type == null ? null : new NamedTypeReference(type);
 
-        private protected override TypeSyntax GetWrappedType(ref bool? changed)
+        internal NameSyntax GetWrappedName(ref bool? changed) => (NameSyntax)GetWrapped(ref changed, true);
+
+        private protected override TypeSyntax GetWrappedType(ref bool? changed) => GetWrapped(ref changed, false);
+
+        private TypeSyntax GetWrapped(ref bool? changed, bool forceName)
         {
             GetAndResetChanged(ref changed);
 
@@ -291,14 +295,16 @@ namespace CSharpE.Syntax
             if (requiresUsingNamespace)
                 SourceFile?.EnsureUsingNamespace(Namespace);
 
+            bool correctSyntaxExists = forceName ? syntax is NameSyntax : syntax != null;
+
             var newNamespace = ns ?? syntaxNamespace;
             var newContainer = container?.GetWrapped(ref thisChanged);
             var newName = name ?? syntaxName;
 
-            if (syntax == null || thisChanged == true || newNamespace != syntaxNamespace || newName != syntaxName ||
-                ShouldAnnotate(syntax, changed))
+            if (!correctSyntaxExists || thisChanged == true || newNamespace != syntaxNamespace ||
+                newName != syntaxName || ShouldAnnotate(syntax, changed))
             {
-                var predefinedType = GetPredefinedType();
+                var predefinedType = forceName ? null : GetPredefinedType();
                 if (predefinedType != null)
                 {
                     syntax = predefinedType;

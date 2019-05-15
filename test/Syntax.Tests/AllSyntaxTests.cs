@@ -49,11 +49,7 @@ namespace CSharpE.Syntax.Tests
             VariableDeclarator,
             UnknownAccessorDeclaration,
             IncompleteMember,
-
-            // might not be necessary to support right now
-            ArrayInitializerExpression,
-            AliasQualifiedName,
-            AnonymousMethodExpression
+            ExplicitInterfaceSpecifier
         };
 
         [Fact]
@@ -84,7 +80,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count == 33,
+                syntaxKinds.Count == 34,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 

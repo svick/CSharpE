@@ -187,12 +187,8 @@ namespace CSharpE.Syntax
         public PropertyDefinition AddAutoProperty(
             MemberModifiers modifiers, TypeReference type, string name, bool getOnly = false)
         {
-            var property = new PropertyDefinition(modifiers, type, name);
-            
-            property.GetAccessor = new AccessorDefinition();
-            
-            if (!getOnly)
-                property.SetAccessor = new AccessorDefinition();
+            var property = new PropertyDefinition(
+                modifiers, type, name, new AccessorDefinition(), getOnly ? null : new AccessorDefinition());
             
             Members.Add(property);
 

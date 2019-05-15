@@ -147,6 +147,10 @@ namespace N.M
             return ref this.i;
         }
 
+        void I.F()
+        {
+        }
+
         public static C operator !(C c)
         {
         }
