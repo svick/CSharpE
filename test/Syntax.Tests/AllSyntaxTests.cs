@@ -26,6 +26,7 @@ namespace CSharpE.Syntax.Tests
             RefValueExpression,
             ArgListExpression,
             GlobalStatement,
+            ExternAliasDirective,
 
             // won't have matching type in CSharpE
             ArrayRankSpecifier,
@@ -81,7 +82,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count == 32,
+                syntaxKinds.Count == 31,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 
