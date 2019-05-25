@@ -59,6 +59,8 @@ namespace CSharpE.Syntax.Internals
 
             switch (syntax)
             {
+                case AnonymousMethodExpressionSyntax anonymousMethod:
+                    return new DelegateExpression(anonymousMethod, parent);
                 case AnonymousObjectCreationExpressionSyntax anonymousObjectCreation:
                     return new AnonymousNewExpression(anonymousObjectCreation, parent);
                 case ArrayCreationExpressionSyntax arrayCreation:

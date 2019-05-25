@@ -20,6 +20,8 @@ class C
         var (_, x, (y, z)) = t;
         _ = x => { };
         _ = async (ref int x) => { };
+        _ = async delegate { };
+        _ = delegate (int i) { };
         foreach ((int i, _) in new (int, int)[0])
         {
         }
