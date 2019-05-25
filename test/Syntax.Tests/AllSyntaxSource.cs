@@ -5,6 +5,7 @@ class C
     C* p;
     (int i, string) t;
     public int i, j;
+    global::System.Int32 k;
     void M()
     {
         _ = $@"x{0,1+1:X}";

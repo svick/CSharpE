@@ -7,6 +7,7 @@ class C
     (int i, string)t;
     public int i;
     public int j;
+    int k;
     void M()
     {
         _ = $@"x{0, 1 + 1:X}";

@@ -49,7 +49,8 @@ namespace CSharpE.Syntax.Tests
             VariableDeclarator,
             UnknownAccessorDeclaration,
             IncompleteMember,
-            ExplicitInterfaceSpecifier
+            ExplicitInterfaceSpecifier,
+            AliasQualifiedName
         };
 
         [Fact]
@@ -80,7 +81,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count == 34,
+                syntaxKinds.Count == 33,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 
