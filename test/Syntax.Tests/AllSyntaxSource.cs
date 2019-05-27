@@ -22,6 +22,8 @@ class C
         _ = async (ref int x) => { };
         _ = async delegate { };
         _ = delegate (int i) { };
+        _ = 1 is 1;
+        _ = 1 is int i;
         foreach ((int i, _) in new (int, int)[0])
         {
         }

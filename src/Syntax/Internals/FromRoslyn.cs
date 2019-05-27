@@ -97,6 +97,8 @@ namespace CSharpE.Syntax.Internals
                     return new InterpolatedStringExpression(interpolatedStringExpression, parent);
                 case InvocationExpressionSyntax invocation:
                     return new InvocationExpression(invocation, parent);
+                case IsPatternExpressionSyntax isPattern:
+                    return new IsPatternExpression(isPattern, parent);
                 case LambdaExpressionSyntax lambda:
                     return new LambdaExpression(lambda, parent);
                 case LiteralExpressionSyntax literal:
@@ -719,6 +721,19 @@ namespace CSharpE.Syntax.Internals
                     return new SwitchCase(@case, parent);
                 case DefaultSwitchLabelSyntax @default:
                     return new SwitchDefault(@default, parent);
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        public static Pattern Pattern(PatternSyntax patternSyntax, SyntaxNode parent)
+        {
+            switch (patternSyntax)
+            {
+                case ConstantPatternSyntax constant:
+                    return new ConstantPattern(constant, parent);
+                case DeclarationPatternSyntax declaration:
+                    return new TypePattern(declaration, parent);
             }
 
             throw new InvalidOperationException();
