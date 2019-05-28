@@ -49,11 +49,16 @@ namespace CSharpE.SyntaxFactory
                     if (constructor.IsInternal)
                         continue;
 
-                    string methodName = typeReference.Name.TrimEnd("Expression").TrimEnd("Statement").TrimEnd("Reference");
+                    string methodName = typeReference.Name
+                        .TrimEnd("Expression")
+                        .TrimEnd("Statement")
+                        .TrimEnd("Reference")
+                        .TrimEnd("Clause");
 
                     var constructorParameters = constructor.Parameters;
 
-                    if (classDefinition.Name.EndsWith(nameof(MemberAccessExpression)) || classDefinition.Name == nameof(ElementAccessExpression))
+                    if (classDefinition.Name.EndsWith(nameof(MemberAccessExpression)) ||
+                        classDefinition.Name == nameof(ElementAccessExpression))
                         constructorParameters[0].Modifiers |= ParameterModifiers.This;
 
                     syntaxFactory.AddMethod(

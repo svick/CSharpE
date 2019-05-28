@@ -46,11 +46,7 @@ namespace CSharpE.Syntax
             {
                 if (!typeSet)
                 {
-                    var typeSyntax = GetTypeSyntax();
-
-                    if (typeSyntax != null)
-                        type = FromRoslyn.TypeReference(typeSyntax, this);
-
+                    type = FromRoslyn.TypeReference(GetTypeSyntax(), this);
                     typeSet = true;
                 }
 

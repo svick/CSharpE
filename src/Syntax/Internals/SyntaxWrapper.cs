@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using LinqExpression = System.Linq.Expressions.Expression;
+using SystemLinqExpression = System.Linq.Expressions.Expression;
 
 namespace CSharpE.Syntax.Internals
 {
@@ -9,14 +9,14 @@ namespace CSharpE.Syntax.Internals
     {
         private static Func<TSyntax, TSyntaxWrapper> CreateConstructor()
         {
-            var param = LinqExpression.Parameter(typeof(TSyntax));
+            var param = SystemLinqExpression.Parameter(typeof(TSyntax));
 
             // TODO: does this step actually ever work?
             var constructorInfo = typeof(TSyntaxWrapper).GetConstructor(new[] { typeof(TSyntax) });
-            LinqExpression constructorExpression;
+            SystemLinqExpression constructorExpression;
             if (constructorInfo != null)
             {
-                constructorExpression = LinqExpression.New(constructorInfo, param);
+                constructorExpression = SystemLinqExpression.New(constructorInfo, param);
             }
             else
             {
@@ -31,12 +31,12 @@ namespace CSharpE.Syntax.Internals
                 var syntaxType = constructorInfo.GetParameters()[0].ParameterType;
                 var parentType = constructorInfo.GetParameters()[1].ParameterType;
 
-                constructorExpression = LinqExpression.New(
-                    constructorInfo, LinqExpression.Convert(param, syntaxType),
-                    LinqExpression.Constant(null, parentType));
+                constructorExpression = SystemLinqExpression.New(
+                    constructorInfo, SystemLinqExpression.Convert(param, syntaxType),
+                    SystemLinqExpression.Constant(null, parentType));
             }
 
-            var lambda = LinqExpression.Lambda<Func<TSyntax, TSyntaxWrapper>>(constructorExpression, param);
+            var lambda = SystemLinqExpression.Lambda<Func<TSyntax, TSyntaxWrapper>>(constructorExpression, param);
 
             return lambda.Compile();
         }

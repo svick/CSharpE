@@ -15,8 +15,8 @@ namespace CSharpE.Syntax.Internals
 
     internal abstract class SyntaxListBase<TSyntax, TRoslynSyntax, TList> : SyntaxListBase, IList<TSyntax>, ISyntaxWrapper<TList>, ISyntaxCollection<TSyntax>
         where TSyntax : ISyntaxWrapper<TRoslynSyntax>
-        where TRoslynSyntax : CSharpSyntaxNode
-        where TList : struct, IReadOnlyList<TRoslynSyntax>
+        where TRoslynSyntax : Roslyn::SyntaxNode
+        where TList : IReadOnlyList<TRoslynSyntax>
     {
         // Preserved version of Roslyn SyntaxList used to avoid unnecessary reallocations. Could be out of date.
         private TList roslynList;
@@ -74,7 +74,8 @@ namespace CSharpE.Syntax.Internals
             Parent = parent;
         }
 
-        private TSyntax WithParent(TSyntax syntax) => syntax is SyntaxNode node ? (TSyntax)(object)SyntaxNode.WithParent(node, Parent) : syntax;
+        private TSyntax WithParent(TSyntax syntax) =>
+            syntax is SyntaxNode node ? (TSyntax)(object)SyntaxNode.WithParent(node, Parent) : syntax;
 
         public IEnumerator<TSyntax> GetEnumerator()
         {
@@ -164,7 +165,7 @@ namespace CSharpE.Syntax.Internals
 
             var roslynNodes = new List<TRoslynSyntax>(Count);
 
-            bool? thisChanged = roslynList.Count != list.Count;
+            bool? thisChanged = roslynList?.Count != list.Count;
 
             for (int i = 0; i < Count; i++)
             {
@@ -191,7 +192,7 @@ namespace CSharpE.Syntax.Internals
     internal class SyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SyntaxList<TRoslynSyntax>>
         where TSyntax : ISyntaxWrapper<TRoslynSyntax>
-        where TRoslynSyntax : CSharpSyntaxNode
+        where TRoslynSyntax : Roslyn::SyntaxNode
     {
         internal SyntaxList(SyntaxNode parent) : base(parent) { }
 
@@ -207,7 +208,7 @@ namespace CSharpE.Syntax.Internals
     internal class SeparatedSyntaxList<TSyntax, TRoslynSyntax>
         : SyntaxListBase<TSyntax, TRoslynSyntax, Roslyn::SeparatedSyntaxList<TRoslynSyntax>>
         where TSyntax : ISyntaxWrapper<TRoslynSyntax>
-        where TRoslynSyntax : CSharpSyntaxNode
+        where TRoslynSyntax : Roslyn::SyntaxNode
     {
         internal SeparatedSyntaxList(SyntaxNode parent) : base(parent) { }
 

@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax.Internals
 {
@@ -124,5 +125,22 @@ namespace CSharpE.Syntax.Internals
 
         protected override SwitchLabel CreateWrapper(SwitchLabelSyntax roslynSyntax) =>
             FromRoslyn.SwitchLabel(roslynSyntax, (SwitchSection)Parent);
+    }
+
+    internal sealed class LinqClauseList : SyntaxListBase<LinqClause, Roslyn::SyntaxNode, List<Roslyn::SyntaxNode>>
+    {
+        internal LinqClauseList(SyntaxNode parent) : base(parent) { }
+
+        internal LinqClauseList(IEnumerable<LinqClause> list, SyntaxNode parent)
+            : base(list, parent) { }
+
+        internal LinqClauseList(List<Roslyn::SyntaxNode> syntaxList, SyntaxNode parent)
+            : base(syntaxList, parent) { }
+
+        protected override List<Roslyn::SyntaxNode> CreateList(IEnumerable<Roslyn::SyntaxNode> nodes) =>
+            (List<Roslyn::SyntaxNode>)nodes;
+
+        protected override LinqClause CreateWrapper(Roslyn::SyntaxNode roslynSyntax) =>
+            FromRoslyn.LinqClause(roslynSyntax, (LinqExpression)Parent);
     }
 }

@@ -68,6 +68,9 @@ namespace N.M
             _ = stackalloc[]{42};
             _ = () => 0;
             _ = c1 ?? throw new Exception();
+            _ =
+                from i in null
+                select i;
             ;
             break;
             continue;

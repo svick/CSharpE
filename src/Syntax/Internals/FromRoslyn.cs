@@ -117,6 +117,8 @@ namespace CSharpE.Syntax.Internals
                     return new NamedTypeReference(predefinedType, parent);
                 case PrefixUnaryExpressionSyntax prefixUnary:
                     return PrefixUnaryExpression(prefixUnary, parent);
+                case QueryExpressionSyntax query:
+                    return new LinqExpression(query, parent);
                 case RefExpressionSyntax @ref:
                     return new RefExpression(@ref, parent);
                 case SizeOfExpressionSyntax sizeOf:
@@ -456,7 +458,7 @@ namespace CSharpE.Syntax.Internals
             return result;
         }
 
-        public static bool IsCompacted(CSharpSyntaxNode syntaxNode)
+        public static bool IsCompacted(Roslyn::SyntaxNode syntaxNode)
         {
             switch (syntaxNode)
             {
@@ -474,9 +476,9 @@ namespace CSharpE.Syntax.Internals
         }
 
         public static IEnumerable<TRoslynSyntax> Expand<TRoslynSyntax>(TRoslynSyntax roslynSyntax)
-            where TRoslynSyntax : CSharpSyntaxNode
+            where TRoslynSyntax : Roslyn::SyntaxNode
         {
-            TRoslynSyntax Cast(CSharpSyntaxNode syntax) => (TRoslynSyntax)syntax;
+            TRoslynSyntax Cast(Roslyn::SyntaxNode syntax) => (TRoslynSyntax)syntax;
 
             IEnumerable<VariableDeclarationSyntax> ExpandVariable(VariableDeclarationSyntax declaration)
             {
@@ -738,6 +740,19 @@ namespace CSharpE.Syntax.Internals
             }
 
             throw new InvalidOperationException();
+        }
+
+        public static LinqClause LinqClause(Roslyn::SyntaxNode clauseSyntax, LinqExpression parent)
+        {
+            switch (clauseSyntax)
+            {
+                case FromClauseSyntax from:
+                    return new FromClause(from, parent);
+                case SelectClauseSyntax select:
+                    return new SelectClause(select, parent);
+            }
+
+            throw new NotImplementedException(clauseSyntax.GetType().Name);
         }
     }
 }
