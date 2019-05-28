@@ -50,7 +50,7 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            this.syntax = (SelectClauseSyntax)newSyntax;
+            syntax = (SelectClauseSyntax)newSyntax;
             Set(ref expression, null);
         }
 

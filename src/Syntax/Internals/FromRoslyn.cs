@@ -752,6 +752,8 @@ namespace CSharpE.Syntax.Internals
                     return new LetClause(let, parent);
                 case SelectClauseSyntax select:
                     return new SelectClause(select, parent);
+                case WhereClauseSyntax where:
+                    return new WhereClause(where, parent);
             }
 
             throw new NotImplementedException(clauseSyntax.GetType().Name);

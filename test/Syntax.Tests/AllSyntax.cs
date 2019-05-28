@@ -71,6 +71,7 @@ namespace N.M
             _ =
                 from i in null
                 let i2 = i * i
+                where true
                 select i;
             ;
             break;
