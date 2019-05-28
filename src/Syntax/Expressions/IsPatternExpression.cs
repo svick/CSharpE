@@ -1,3 +1,4 @@
+using System;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -78,5 +79,11 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new IsPatternExpression(Expression, Pattern);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            Expression = ReplaceExpressions(Expression, filter, projection);
+            Pattern.ReplaceExpressions(filter, projection);
+        }
     }
 }

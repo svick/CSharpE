@@ -134,6 +134,8 @@ namespace N.M
             {
                 case 0:
                     goto default;
+                case string s:
+                    break;
                 case 1:
                 default:
                     goto case 0;

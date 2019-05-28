@@ -77,6 +77,12 @@ class C
         {
         }
 
+        switch (i)
+        {
+            case 1when false:
+                break;
+        }
+
         int i;
         int j = 42;
     }

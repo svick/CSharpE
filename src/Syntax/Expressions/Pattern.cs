@@ -1,4 +1,5 @@
-﻿using CSharpE.Syntax.Internals;
+﻿using System;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -14,6 +15,9 @@ namespace CSharpE.Syntax
             GetWrapped(ref changed);
 
         protected abstract PatternSyntax GetWrapped(ref bool? changed);
+
+        public abstract void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+            where T : Expression;
     }
 
     public sealed class ConstantPattern : Pattern
@@ -67,6 +71,9 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new ConstantPattern(Expression);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
+            Expression = Expression.ReplaceExpressions(Expression, filter, projection);
     }
 
     public sealed class TypePattern : Pattern
@@ -139,5 +146,7 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new TypePattern(Type, Designation);
+
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) { }
     }
 }

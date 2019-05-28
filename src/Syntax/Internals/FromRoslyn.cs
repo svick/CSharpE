@@ -717,8 +717,9 @@ namespace CSharpE.Syntax.Internals
         {
             switch (labelSyntax)
             {
-                case CaseSwitchLabelSyntax @case:
-                    return new SwitchCase(@case, parent);
+                case CaseSwitchLabelSyntax _:
+                case CasePatternSwitchLabelSyntax _:
+                    return new SwitchCase(labelSyntax, parent);
                 case DefaultSwitchLabelSyntax @default:
                     return new SwitchDefault(@default, parent);
             }

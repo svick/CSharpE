@@ -48,6 +48,12 @@ class C
         {
         }
 
+        switch (i)
+        {
+            case 1 when false:
+                break;
+        }
+
         int i, j = 42;
     }
 

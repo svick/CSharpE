@@ -69,6 +69,8 @@ namespace CSharpE.Syntax
                 field.Parent = null;
 
             field = WithParent(value, this);
+
+            thisHasChanged = true;
         }
 
         private protected void SetList<T>(ref T field, T value) where T : SyntaxListBase
@@ -77,6 +79,8 @@ namespace CSharpE.Syntax
                 field.Parent = null;
 
             field = value;
+
+            thisHasChanged = true;
         }
 
         internal static T WithParent<T>(T node, SyntaxNode parent) where T : SyntaxNode
@@ -100,8 +104,17 @@ namespace CSharpE.Syntax
         private protected abstract void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax);
 
         private ChangeTracker changeTracker = new ChangeTracker();
+        private bool thisHasChanged = false;
 
+        // TODO: replace everywhere with the next overload
         private protected void GetAndResetChanged(ref bool? changed) => changeTracker.GetAndResetChanged(ref changed);
+
+        private protected void GetAndResetChanged(ref bool? changed, out bool? thisChanged)
+        {
+            GetAndResetChanged(ref changed);
+            thisChanged = thisHasChanged;
+            thisHasChanged = false;
+        }
 
         private protected void SetChanged(ref bool? changed) => changeTracker.SetChanged(ref changed);
 

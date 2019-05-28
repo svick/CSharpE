@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -22,41 +24,107 @@ namespace CSharpE.Syntax
 
     public sealed class SwitchCase : SwitchLabel
     {
-        private CaseSwitchLabelSyntax syntax;
+        private SwitchLabelSyntax syntax;
 
-        internal SwitchCase(CaseSwitchLabelSyntax syntax, SwitchSection parent)
+        internal SwitchCase(SwitchLabelSyntax syntax, SwitchSection parent)
             : base(syntax)
         {
+            Debug.Assert(syntax is CaseSwitchLabelSyntax || syntax is CasePatternSwitchLabelSyntax);
+
             this.syntax = syntax;
             Parent = parent;
         }
 
-        public SwitchCase(Expression value) => Value = value;
+        public SwitchCase(Expression constantPatternValue)
+            : this(new ConstantPattern(constantPatternValue)) { }
 
-        private Expression value;
-        public Expression Value
+        public SwitchCase(Pattern pattern, Expression whenCondition = null)
+        {
+            Pattern = pattern;
+            WhenCondition = whenCondition;
+        }
+
+        private PatternSyntax GetSyntaxPattern()
+        {
+            switch (syntax)
+            {
+                case CaseSwitchLabelSyntax @case:
+                    return RoslynSyntaxFactory.ConstantPattern(@case.Value);
+                case CasePatternSwitchLabelSyntax casePattern:
+                    return casePattern.Pattern;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        private Pattern pattern;
+        public Pattern Pattern
         {
             get
             {
-                if (value == null)
-                    value = FromRoslyn.Expression(syntax.Value, this);
+                if (pattern == null)
+                    pattern = FromRoslyn.Pattern(GetSyntaxPattern(), this);
 
-                return value;
+                return pattern;
             }
-            set => SetNotNull(ref this.value, value);
+            set => SetNotNull(ref pattern, value);
+        }
+
+        private ExpressionSyntax GetSyntaxWhenCondition()
+        {
+            switch (syntax)
+            {
+                case CaseSwitchLabelSyntax _:
+                    return null;
+                case CasePatternSwitchLabelSyntax casePattern:
+                    return casePattern.WhenClause?.Condition;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        private bool whenConditionSet;
+        private Expression whenCondition;
+        public Expression WhenCondition
+        {
+            get
+            {
+                if (!whenConditionSet)
+                {
+                    whenCondition = FromRoslyn.Expression(GetSyntaxWhenCondition(), this);
+                    whenConditionSet = true;
+                }
+
+                return whenCondition;
+            }
+            set
+            {
+                Set(ref whenCondition, value);
+                whenConditionSet = true;
+            }
         }
 
         internal override SwitchLabelSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
+            GetAndResetChanged(ref changed, out var thisChanged);
 
-            bool? thisChanged = false;
-
-            var newValue = value?.GetWrapped(ref thisChanged) ?? syntax.Value;
+            var newPattern = pattern?.GetWrapped(ref thisChanged) ?? GetSyntaxPattern();
+            var newWhenCondition =
+                whenConditionSet ? whenCondition?.GetWrapped(ref thisChanged) : GetSyntaxWhenCondition();
 
             if (syntax == null || thisChanged == true)
             {
-                syntax = RoslynSyntaxFactory.CaseSwitchLabel(newValue);
+                if (newWhenCondition == null && newPattern is ConstantPatternSyntax constantPattern)
+                {
+                    syntax = RoslynSyntaxFactory.CaseSwitchLabel(constantPattern.Expression);
+                }
+                else
+                {
+                    var whenClause = newWhenCondition == null ? null : RoslynSyntaxFactory.WhenClause(newWhenCondition);
+
+                    syntax = RoslynSyntaxFactory.CasePatternSwitchLabel(
+                        newPattern, whenClause, RoslynSyntaxFactory.Token(SyntaxKind.ColonToken));
+                }
 
                 SetChanged(ref changed);
             }
@@ -68,13 +136,18 @@ namespace CSharpE.Syntax
         {
             this.syntax = (CaseSwitchLabelSyntax)newSyntax;
 
-            Set(ref value, null);
+            Set(ref pattern, null);
+            Set(ref whenCondition, null);
+            whenConditionSet = false;
         }
 
-        private protected override SyntaxNode CloneImpl() => new SwitchCase(Value);
+        private protected override SyntaxNode CloneImpl() => new SwitchCase(Pattern, WhenCondition);
 
-        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
-            Value = Expression.ReplaceExpressions(Value, filter, projection);
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            Pattern.ReplaceExpressions(filter, projection);
+            WhenCondition = Expression.ReplaceExpressions(WhenCondition, filter, projection);
+        }
     }
 
     public sealed class SwitchDefault : SwitchLabel
