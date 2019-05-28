@@ -70,6 +70,7 @@ namespace N.M
             _ = c1 ?? throw new Exception();
             _ =
                 from i in null
+                let i2 = i * i
                 select i;
             ;
             break;

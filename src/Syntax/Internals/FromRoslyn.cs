@@ -748,6 +748,8 @@ namespace CSharpE.Syntax.Internals
             {
                 case FromClauseSyntax from:
                     return new FromClause(from, parent);
+                case LetClauseSyntax let:
+                    return new LetClause(let, parent);
                 case SelectClauseSyntax select:
                     return new SelectClause(select, parent);
             }
