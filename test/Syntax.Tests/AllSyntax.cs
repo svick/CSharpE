@@ -72,6 +72,7 @@ namespace N.M
                 from i in null
                 let i2 = i * i
                 where true
+                orderby i, i2 descending
                 select i;
             ;
             break;

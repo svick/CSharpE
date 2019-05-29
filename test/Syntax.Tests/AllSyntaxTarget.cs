@@ -49,6 +49,10 @@ class C
         ;
         _ = 1is 1;
         _ = 1is int i;
+        _ =
+            from i in null
+            orderby i
+            select i;
         foreach ((int i, _)in new(int, int)[0])
         {
         }

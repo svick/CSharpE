@@ -24,6 +24,10 @@ class C
         _ = delegate (int i) { };
         _ = 1 is 1;
         _ = 1 is int i;
+        _ =
+            from i in null
+            orderby i ascending
+            select i;
         foreach ((int i, _) in new (int, int)[0])
         {
         }

@@ -750,6 +750,8 @@ namespace CSharpE.Syntax.Internals
                     return new FromClause(from, parent);
                 case LetClauseSyntax let:
                     return new LetClause(let, parent);
+                case OrderByClauseSyntax orderBy:
+                    return new OrderByClause(orderBy, parent);
                 case SelectClauseSyntax select:
                     return new SelectClause(select, parent);
                 case WhereClauseSyntax where:
