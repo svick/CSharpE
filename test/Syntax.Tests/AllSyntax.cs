@@ -73,7 +73,7 @@ namespace N.M
                 let i2 = i * i
                 where true
                 orderby i, i2 descending
-                select i;
+                group i by i2;
             ;
             break;
             continue;
