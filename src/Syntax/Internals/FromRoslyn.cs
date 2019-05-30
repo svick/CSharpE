@@ -750,6 +750,8 @@ namespace CSharpE.Syntax.Internals
                     return new FromClause(from, parent);
                 case GroupClauseSyntax group:
                     return new GroupByClause(group, parent);
+                case JoinClauseSyntax join:
+                    return new JoinClause(join, parent);
                 case LetClauseSyntax let:
                     return new LetClause(let, parent);
                 case OrderByClauseSyntax orderBy:

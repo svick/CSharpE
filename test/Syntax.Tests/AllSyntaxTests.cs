@@ -52,7 +52,10 @@ namespace CSharpE.Syntax.Tests
             IncompleteMember,
             ExplicitInterfaceSpecifier,
             AliasQualifiedName,
-            WhenClause
+            WhenClause,
+            JoinIntoClause,
+            QueryContinuation,
+            QueryBody
         };
 
         [Fact]
@@ -83,7 +86,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count == 17,
+                syntaxKinds.Count == 13,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 

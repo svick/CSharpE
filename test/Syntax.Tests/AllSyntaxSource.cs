@@ -27,6 +27,8 @@ class C
         _ =
             from i in null
             orderby i ascending
+            group i by i into g
+            select i into i
             select i;
         foreach ((int i, _) in new (int, int)[0])
         {

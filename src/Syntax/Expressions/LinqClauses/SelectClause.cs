@@ -13,11 +13,21 @@ namespace CSharpE.Syntax
         internal SelectClause(SelectClauseSyntax syntax, SyntaxNode parent)
             : base(syntax)
         {
-            this.syntax = syntax;
+            Init(syntax);
             Parent = parent;
         }
 
-        public SelectClause(Expression expression) => Expression = expression;
+        private void Init(SelectClauseSyntax syntax)
+        {
+            this.syntax = syntax;
+            Into = GetSyntaxInto();
+        }
+
+        public SelectClause(Expression expression, string into = null)
+        {
+            Expression = expression;
+            Into = into;
+        }
 
         private Expression expression;
         public Expression Expression
@@ -32,15 +42,20 @@ namespace CSharpE.Syntax
             set => SetNotNull(ref expression, value);
         }
 
+        private string GetSyntaxInto() => LinqExpression.GetSyntaxInto(syntax);
+        public string Into { get; set; }
+
         internal override Roslyn::SyntaxNode GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed, out var thisChanged);
 
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || Into != GetSyntaxInto())
             {
                 syntax = RoslynSyntaxFactory.SelectClause(newExpression);
+
+                syntax = LinqExpression.WithIntoAnnotation(syntax, Into);
 
                 SetChanged(ref changed);
             }
@@ -50,11 +65,11 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            syntax = (SelectClauseSyntax)newSyntax;
+            Init((SelectClauseSyntax)newSyntax);
             Set(ref expression, null);
         }
 
-        private protected override SyntaxNode CloneImpl() => new SelectClause(Expression);
+        private protected override SyntaxNode CloneImpl() => new SelectClause(Expression, Into);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
             Expression = Expression.ReplaceExpressions(Expression, filter, projection);

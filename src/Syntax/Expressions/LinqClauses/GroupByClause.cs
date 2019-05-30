@@ -13,14 +13,21 @@ namespace CSharpE.Syntax
         internal GroupByClause(GroupClauseSyntax syntax, SyntaxNode parent)
             : base(syntax)
         {
-            this.syntax = syntax;
+            Init(syntax);
             Parent = parent;
         }
 
-        public GroupByClause(Expression groupExpression, Expression byExpression)
+        private void Init(GroupClauseSyntax syntax)
+        {
+            this.syntax = syntax;
+            Into = GetSyntaxInto();
+        }
+
+        public GroupByClause(Expression groupExpression, Expression byExpression, string into = null)
         {
             GroupExpression = groupExpression;
             ByExpression = byExpression;
+            Into = into;
         }
 
         private Expression groupExpression;
@@ -49,6 +56,9 @@ namespace CSharpE.Syntax
             set => SetNotNull(ref byExpression, value);
         }
 
+        private string GetSyntaxInto() => LinqExpression.GetSyntaxInto(syntax);
+        public string Into { get; set; }
+
         internal override Roslyn::SyntaxNode GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed, out var thisChanged);
@@ -56,9 +66,11 @@ namespace CSharpE.Syntax
             var newGroupExpression = groupExpression?.GetWrapped(ref thisChanged) ?? syntax.GroupExpression;
             var newByExpression = byExpression?.GetWrapped(ref thisChanged) ?? syntax.ByExpression;
 
-            if (syntax == null || thisChanged == true)
+            if (syntax == null || thisChanged == true || Into != GetSyntaxInto())
             {
                 syntax = RoslynSyntaxFactory.GroupClause(newGroupExpression, newByExpression);
+
+                syntax = LinqExpression.WithIntoAnnotation(syntax, Into);
 
                 SetChanged(ref changed);
             }
@@ -68,12 +80,12 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            syntax = (GroupClauseSyntax)newSyntax;
+            Init((GroupClauseSyntax)newSyntax);
             Set(ref groupExpression, null);
             Set(ref byExpression, null);
         }
 
-        private protected override SyntaxNode CloneImpl() => new GroupByClause(GroupExpression, ByExpression);
+        private protected override SyntaxNode CloneImpl() => new GroupByClause(GroupExpression, ByExpression, Into);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {

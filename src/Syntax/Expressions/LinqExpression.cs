@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -37,11 +38,13 @@ namespace CSharpE.Syntax
             {
                 syntaxClauses.AddRange(body.Clauses);
 
-                syntaxClauses.Add(body.SelectOrGroup);
-
-                if (body.Continuation != null)
+                if (body.Continuation == null)
                 {
-                    syntaxClauses.Add(RoslynSyntaxFactory.IdentifierName(body.Continuation.Identifier));
+                    syntaxClauses.Add(body.SelectOrGroup);
+                }
+                else
+                {
+                    syntaxClauses.Add(WithIntoAnnotation(body.SelectOrGroup, body.Continuation.Identifier.ValueText));
 
                     AddBody(body.Continuation.Body);
                 }
@@ -62,6 +65,15 @@ namespace CSharpE.Syntax
             }
             set => SetList(ref clauses, new LinqClauseList(value, this));
         }
+
+        private const string IntoAnnotationKind = "CSharpE.IntoAnnotation";
+
+        internal static TClause WithIntoAnnotation<TClause>(TClause clause, string into)
+            where TClause : SelectOrGroupClauseSyntax =>
+            into == null ? clause : clause.WithAdditionalAnnotations(new SyntaxAnnotation(IntoAnnotationKind, into));
+
+        internal static string GetSyntaxInto(SelectOrGroupClauseSyntax selectOrGroup) =>
+            selectOrGroup.GetAnnotations(IntoAnnotationKind).SingleOrDefault()?.Data;
 
         private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
         {
@@ -93,13 +105,28 @@ namespace CSharpE.Syntax
 
                 foreach (var clause in newClauses)
                 {
-                    if (selectOrGroup == null)
+                    if (clause is SelectOrGroupClauseSyntax sog)
                     {
-                        selectOrGroup = (SelectOrGroupClauseSyntax)clause;
-                    }
-                    else if (clause is IdentifierNameSyntax identifier)
-                    {
-                        continuation = RoslynSyntaxFactory.QueryContinuation(identifier.Identifier, CreateBody());
+                        string into = GetSyntaxInto(sog);
+
+                        if (selectOrGroup == null)
+                        {
+                            if (into != null)
+                                throw new InvalidOperationException(
+                                    "select or group by with into cannot be the last clause in a query.");
+
+                            selectOrGroup = sog;
+                        }
+                        else
+                        {
+                            if (into == null)
+                                throw new InvalidOperationException(
+                                    "select or group by without into cannot be in the middle of a query.");
+
+                            continuation = RoslynSyntaxFactory.QueryContinuation(into, CreateBody());
+
+                            selectOrGroup = sog.WithoutAnnotations(IntoAnnotationKind);
+                        }
                     }
                     else
                     {

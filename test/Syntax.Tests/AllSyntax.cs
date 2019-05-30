@@ -70,9 +70,12 @@ namespace N.M
             _ = c1 ?? throw new Exception();
             _ =
                 from i in null
-                let i2 = i * i
+                from i2 in null
+                let ii = i * i
                 where true
                 orderby i, i2 descending
+                join j in null on i equals j
+                join j2 in null on i equals j2 into g
                 group i by i2;
             ;
             break;
