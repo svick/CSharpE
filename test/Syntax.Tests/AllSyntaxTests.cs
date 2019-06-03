@@ -55,7 +55,8 @@ namespace CSharpE.Syntax.Tests
             WhenClause,
             JoinIntoClause,
             QueryContinuation,
-            QueryBody
+            QueryBody,
+            UsingDirective
         };
 
         [Fact]
@@ -86,7 +87,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count == 13,
+                syntaxKinds.Count == 12,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 

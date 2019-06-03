@@ -1,4 +1,6 @@
 ﻿using System;
+using static System.Console;
+using Foo = System.Console;
 
 namespace N.M
 {
@@ -12,6 +14,8 @@ namespace N.M
         C? n;
         ref int M()
         {
+            WriteLine();
+            Foo.WriteLine();
             _ = 0;
             _ = true;
             _ = false;
