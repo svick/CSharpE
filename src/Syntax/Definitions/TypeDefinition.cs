@@ -56,22 +56,11 @@ namespace CSharpE.Syntax
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
         }
 
-        protected TypeDefinition(string name, params MemberDefinition[] members)
-            : this(name, members.AsEnumerable()) { }
-
         protected TypeDefinition(string name, IEnumerable<MemberDefinition> members)
             : this(default, name, members) { }
 
-        protected TypeDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
-            : this(modifiers, name, members.AsEnumerable()) { }
-
         protected TypeDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
             : this(modifiers, name, null, members) { }
-
-        protected TypeDefinition(
-            MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
-            params MemberDefinition[] members)
-            : this(modifiers, name, baseTypes, members.AsEnumerable()) { }
 
         protected TypeDefinition(
             MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
@@ -104,6 +93,20 @@ namespace CSharpE.Syntax
             set => Modifiers = Modifiers.With(Partial, value);
         }
 
+        private SeparatedSyntaxList<TypeParameter, TypeParameterSyntax> typeParameters;
+        public IList<TypeParameter> TypeParameters
+        {
+            get
+            {
+                if (typeParameters == null)
+                    typeParameters = new SeparatedSyntaxList<TypeParameter, TypeParameterSyntax>(
+                        syntax.TypeParameterList?.Parameters ?? default, this);
+
+                return typeParameters;
+            }
+            set => SetList(ref typeParameters, new SeparatedSyntaxList<TypeParameter, TypeParameterSyntax>(value, this));
+        }
+
         private SeparatedSyntaxList<BaseType, BaseTypeSyntax> baseTypes;
         public IList<TypeReference> BaseTypes
         {
@@ -120,6 +123,22 @@ namespace CSharpE.Syntax
                 ref baseTypes,
                 new SeparatedSyntaxList<BaseType, BaseTypeSyntax>(
                     value.Select(reference => new BaseType(reference)), this));
+        }
+
+        private SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax> constraintClauses;
+        public IList<TypeParameterConstraintClause> ConstraintClauses
+        {
+            get
+            {
+                if (constraintClauses == null)
+                    constraintClauses = new SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax>(
+                        syntax.ConstraintClauses, this);
+
+                return constraintClauses;
+            }
+            set => SetList(
+                ref constraintClauses,
+                new SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax>(value, this));
         }
 
         private MemberList members;
@@ -225,24 +244,25 @@ namespace CSharpE.Syntax
 
         private TypeDeclarationSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out bool? thisChanged);
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newName = name.GetWrapped(ref thisChanged);
+            var newTypeParameters = typeParameters?.GetWrapped(ref thisChanged) ?? syntax.TypeParameterList?.Parameters ?? default;
             var newBaseTypes = baseTypes?.GetWrapped(ref thisChanged) ?? syntax.BaseList?.Types ?? default;
+            var newConstraints = constraintClauses?.GetWrapped(ref thisChanged) ?? syntax.ConstraintClauses;
             var newMembers = members?.GetWrapped(ref thisChanged) ?? syntax.Members;
 
             if (syntax == null || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
                 thisChanged == true || ShouldAnnotate(syntax, changed))
             {
-                var newBaseList = newBaseTypes.Any() ? RoslynSyntaxFactory.BaseList(newBaseTypes) : default;
-                
+                var typeParameterList = newTypeParameters.Any() ? RoslynSyntaxFactory.TypeParameterList(newTypeParameters) : default;
+                var baseList = newBaseTypes.Any() ? RoslynSyntaxFactory.BaseList(newBaseTypes) : default;
+
                 var newSyntax = RoslynSyntaxFactory.TypeDeclaration(
                     SyntaxFacts.GetTypeDeclarationKind(KeywordKind), newAttributes, newModifiers.GetWrapped(),
-                    RoslynSyntaxFactory.Token(KeywordKind), newName, default, newBaseList, default,
+                    RoslynSyntaxFactory.Token(KeywordKind), newName, typeParameterList, baseList, newConstraints,
                     RoslynSyntaxFactory.Token(OpenBraceToken), newMembers, RoslynSyntaxFactory.Token(CloseBraceToken),
                     default);
 
@@ -265,11 +285,14 @@ namespace CSharpE.Syntax
             Init((TypeDeclarationSyntax)newSyntax);
 
             SetList(ref attributes, null);
+            SetList(ref typeParameters, null);
+            SetList(ref baseTypes, null);
+            SetList(ref constraintClauses, null);
             SetList(ref members, null);
         }
 
         public override IEnumerable<SyntaxNode> GetChildren() =>
-            Attributes.Concat<SyntaxNode>(BaseTypes).Concat(Members);
+            Attributes.Concat<SyntaxNode>(TypeParameters).Concat(BaseTypes).Concat(ConstraintClauses).Concat(Members);
 
         protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
@@ -289,13 +312,13 @@ namespace CSharpE.Syntax
             : base(name, members) { }
 
         public ClassDefinition(string name, IEnumerable<MemberDefinition> members)
-            : base(default, name, members) { }
+            : base(name, members) { }
 
         public ClassDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
             : base(modifiers, name, members) { }
 
         public ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
-            : base(modifiers, name, null, members) { }
+            : base(modifiers, name, members) { }
 
         public ClassDefinition(
             MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
@@ -338,7 +361,10 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() =>
-            new ClassDefinition(Modifiers, Name, BaseTypes, Members) { Attributes = Attributes };
+            new ClassDefinition(Modifiers, Name, BaseTypes, Members)
+            {
+                Attributes = Attributes, TypeParameters = TypeParameters, ConstraintClauses = ConstraintClauses
+            };
     }
 
     public sealed class StructDefinition : TypeDefinition
@@ -350,13 +376,13 @@ namespace CSharpE.Syntax
             : base(name, members) { }
 
         public StructDefinition(string name, IEnumerable<MemberDefinition> members)
-            : base(default, name, members) { }
+            : base(name, members) { }
 
         public StructDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
             : base(modifiers, name, members) { }
 
         public StructDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
-            : base(modifiers, name, null, members) { }
+            : base(modifiers, name, members) { }
 
         public StructDefinition(
             MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
@@ -380,7 +406,10 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() =>
-            new StructDefinition(Modifiers, Name, BaseTypes, Members) { Attributes = Attributes };
+            new StructDefinition(Modifiers, Name, BaseTypes, Members)
+            {
+                Attributes = Attributes, TypeParameters = TypeParameters, ConstraintClauses = ConstraintClauses
+            };
     }
 
     public sealed class InterfaceDefinition : TypeDefinition
@@ -392,13 +421,13 @@ namespace CSharpE.Syntax
             : base(name, members) { }
 
         public InterfaceDefinition(string name, IEnumerable<MemberDefinition> members)
-            : base(default, name, members) { }
+            : base(name, members) { }
 
         public InterfaceDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
             : base(modifiers, name, members) { }
 
         public InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
-            : base(modifiers, name, null, members) { }
+            : base(modifiers, name, members) { }
 
         public InterfaceDefinition(
             MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes,
@@ -422,6 +451,9 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() =>
-            new InterfaceDefinition(Modifiers, Name, BaseTypes, Members) { Attributes = Attributes };
+            new InterfaceDefinition(Modifiers, Name, BaseTypes, Members)
+            {
+                Attributes = Attributes, TypeParameters = TypeParameters, ConstraintClauses = ConstraintClauses
+            };
     }
 }

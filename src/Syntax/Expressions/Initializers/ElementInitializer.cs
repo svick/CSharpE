@@ -54,9 +54,7 @@ namespace CSharpE.Syntax
 
         ExpressionSyntax ISyntaxWrapper<ExpressionSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newExpressions = expressions?.GetWrapped(ref thisChanged) ?? GetSyntaxExpressions();
 

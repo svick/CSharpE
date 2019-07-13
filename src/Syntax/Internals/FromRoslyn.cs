@@ -764,5 +764,24 @@ namespace CSharpE.Syntax.Internals
 
             throw new NotImplementedException(clauseSyntax.GetType().Name);
         }
+
+        public static TypeParameterConstraint TypeParameterConstraint(
+            TypeParameterConstraintSyntax constraintSyntax, TypeParameterConstraintClause parent)
+        {
+            switch (constraintSyntax)
+            {
+                case ClassOrStructConstraintSyntax classOrStructConstraint:
+                    if (classOrStructConstraint.Kind() == SyntaxKind.ClassConstraint)
+                        return new ClassConstraint(classOrStructConstraint, parent);
+                    else
+                        return new StructConstraint(classOrStructConstraint, parent);
+                case ConstructorConstraintSyntax constructorConstraint:
+                    return new ConstructorConstraint(constructorConstraint, parent);
+                case TypeConstraintSyntax typeConstraint:
+                    return new TypeConstraint(typeConstraint, parent);
+            }
+
+            throw new InvalidOperationException();
+        }
     }
 }

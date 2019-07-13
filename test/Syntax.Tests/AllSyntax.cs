@@ -5,7 +5,8 @@ using Foo = System.Console;
 namespace N.M
 {
     [A(0, arg: 1, P = 2)]
-    class C : B
+    class C<in T1, out T2, T3> : B where T1 : class, object, new()
+        where T2 : struct
     {
         C c1;
         A.B.C c2;

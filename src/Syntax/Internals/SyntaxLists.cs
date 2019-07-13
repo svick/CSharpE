@@ -143,4 +143,19 @@ namespace CSharpE.Syntax.Internals
         protected override LinqClause CreateWrapper(Roslyn::SyntaxNode roslynSyntax) =>
             FromRoslyn.LinqClause(roslynSyntax, (LinqExpression)Parent);
     }
+
+    internal sealed class TypeParameterConstraintList : SeparatedSyntaxList<TypeParameterConstraint, TypeParameterConstraintSyntax>
+    {
+        internal TypeParameterConstraintList(SyntaxNode parent) : base(parent) { }
+
+        internal TypeParameterConstraintList(IEnumerable<TypeParameterConstraint> list, SyntaxNode parent)
+            : base(list, parent) { }
+
+        internal TypeParameterConstraintList(
+            SeparatedSyntaxList<TypeParameterConstraintSyntax> syntaxList, SyntaxNode parent)
+            : base(syntaxList, parent) { }
+
+        protected override TypeParameterConstraint CreateWrapper(TypeParameterConstraintSyntax roslynSyntax) =>
+            FromRoslyn.TypeParameterConstraint(roslynSyntax, (TypeParameterConstraintClause)Parent);
+    }
 }
