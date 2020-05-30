@@ -30,12 +30,13 @@ namespace CSharpE.Syntax
             Modifiers = FromRoslyn.MemberModifiers(this.syntax.Modifiers);
         }
 
-        public DelegateDefinition(TypeReference returnType, params Parameter[] parameters)
-            : this(returnType, parameters.AsEnumerable()) { }
+        public DelegateDefinition(TypeReference returnType, string name, params Parameter[] parameters)
+            : this(returnType, name, parameters.AsEnumerable()) { }
 
-        public DelegateDefinition(TypeReference returnType, IEnumerable<Parameter> parameters)
+        public DelegateDefinition(TypeReference returnType, string name, IEnumerable<Parameter> parameters)
         {
             ReturnType = returnType;
+            Name = name;
             this.parameters = new SeparatedSyntaxList<Parameter, ParameterSyntax>(parameters, this);
         }
 
@@ -74,7 +75,7 @@ namespace CSharpE.Syntax
             SetList(ref parameters, null);
         }
 
-        private protected override SyntaxNode CloneImpl() => new DelegateDefinition(ReturnType, Parameters);
+        private protected override SyntaxNode CloneImpl() => new DelegateDefinition(ReturnType, Name, Parameters);
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 

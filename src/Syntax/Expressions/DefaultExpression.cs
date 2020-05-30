@@ -65,7 +65,7 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
-            var newType = type?.GetWrapped(ref thisChanged) ?? GetTypeSyntax();
+            var newType = typeSet ? type?.GetWrapped(ref thisChanged) : GetTypeSyntax();
 
             if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {

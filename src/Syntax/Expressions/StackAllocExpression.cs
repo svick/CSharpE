@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -61,19 +60,25 @@ namespace CSharpE.Syntax
             return arrayType.RankSpecifiers[0].Sizes[0];
         }
 
+        private bool lengthSet;
         private Expression length;
         public Expression Length
         {
             get
             {
-                if (length == null)
+                if (!lengthSet)
                 {
                     length = FromRoslyn.Expression(GetSyntaxLength(), this);
+                    lengthSet = true;
                 }
 
                 return length;
             }
-            set => Set(ref length, value);
+            set
+            {
+                Set(ref length, value);
+                lengthSet = true;
+            }
         }
 
         private bool initializerSet;
@@ -104,7 +109,7 @@ namespace CSharpE.Syntax
             bool? thisChanged = false;
 
             var newType = elementType?.GetWrapped(ref thisChanged) ?? GetSyntaxElementType();
-            var newLength = length?.GetWrapped(ref thisChanged) ?? GetSyntaxLength();
+            var newLength = lengthSet ? length?.GetWrapped(ref thisChanged) : GetSyntaxLength();
             var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.Initializer;
 
             if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))

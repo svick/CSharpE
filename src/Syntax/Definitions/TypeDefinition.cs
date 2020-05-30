@@ -68,8 +68,10 @@ namespace CSharpE.Syntax
         {
             Modifiers = modifiers;
             Name = name;
+            this.typeParameters = new SeparatedSyntaxList<TypeParameter, TypeParameterSyntax>(this);
             this.baseTypes = new SeparatedSyntaxList<BaseType, BaseTypeSyntax>(
                 baseTypes?.Select(reference => new BaseType(reference)), this);
+            this.constraintClauses = new SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax>(this);
             Members = members?.ToList();
         }
 

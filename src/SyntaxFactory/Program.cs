@@ -18,7 +18,7 @@ namespace CSharpE.SyntaxFactory
 
             var solution = await MSBuildWorkspace.Create().OpenSolutionAsync("../../CSharpE.sln");
 
-            var roslynProject = solution.Projects.Single(p => p.Name == "Syntax(net46)");
+            var roslynProject = solution.Projects.Single(p => p.Name == "Syntax(net461)");
 
             var project = new Project((CSharpCompilation)await roslynProject.GetCompilationAsync());
 

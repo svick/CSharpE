@@ -47,7 +47,6 @@ namespace CSharpE.Syntax
             var attributeLists = GetAttributeLists((MemberDeclarationSyntax)GetSourceFileNode());
 
             var semanticModel = SourceFile.SemanticModel;
-
             var attributeType = semanticModel.Compilation.GetTypeByMetadataName(attributeTypeFullName);
 
             foreach (var attributeSyntax in attributeLists.SelectMany(al => al.Attributes))

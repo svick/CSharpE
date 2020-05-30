@@ -50,6 +50,11 @@ namespace CSharpE.Syntax
             return new ConstructorDefinition(modifiers, parameters, body);
         }
 
+        public static ConstructorDefinition ConstructorDefinition(MemberModifiers modifiers, IEnumerable<Parameter> parameters, ConstructorInitializer initializer, IEnumerable<Statement> body)
+        {
+            return new ConstructorDefinition(modifiers, parameters, initializer, body);
+        }
+
         public static ConstructorInitializer ConstructorInitializer(ConstructorInitializerKind kind, params Argument[] arguments)
         {
             return new ConstructorInitializer(kind, arguments);
@@ -60,14 +65,14 @@ namespace CSharpE.Syntax
             return new ConstructorInitializer(kind, arguments);
         }
 
-        public static DelegateDefinition DelegateDefinition(TypeReference returnType, params Parameter[] parameters)
+        public static DelegateDefinition DelegateDefinition(TypeReference returnType, string name, params Parameter[] parameters)
         {
-            return new DelegateDefinition(returnType, parameters);
+            return new DelegateDefinition(returnType, name, parameters);
         }
 
-        public static DelegateDefinition DelegateDefinition(TypeReference returnType, IEnumerable<Parameter> parameters)
+        public static DelegateDefinition DelegateDefinition(TypeReference returnType, string name, IEnumerable<Parameter> parameters)
         {
-            return new DelegateDefinition(returnType, parameters);
+            return new DelegateDefinition(returnType, name, parameters);
         }
 
         public static EnumDefinition EnumDefinition(MemberModifiers modifiers, string name, IEnumerable<EnumMemberDefinition> members = null)
@@ -100,6 +105,11 @@ namespace CSharpE.Syntax
             return new MethodDefinition(modifiers, returnType, name, parameters, body);
         }
 
+        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
+        {
+            return new MethodDefinition(modifiers, returnType, explicitInterface, name, parameters, body);
+        }
+
         public static NamespaceDefinition NamespaceDefinition(string name, params NamespaceOrTypeDefinition[] members)
         {
             return new NamespaceDefinition(name, members);
@@ -115,34 +125,149 @@ namespace CSharpE.Syntax
             return new OperatorDefinition(modifiers, returnType, kind, parameters, body);
         }
 
-        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+        public static PropertyDefinition PropertyDefinition(MemberModifiers modifiers, TypeReference type, string name, AccessorDefinition getAccessor, AccessorDefinition setAccessor)
         {
-            return new ClassDefinition(modifiers, name, members);
+            return new PropertyDefinition(modifiers, type, name, getAccessor, setAccessor);
         }
 
-        public static ClassDefinition ClassDefinition(string name, IEnumerable<MemberDefinition> members = null)
+        public static PropertyDefinition PropertyDefinition(MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, string name, AccessorDefinition getAccessor, AccessorDefinition setAccessor)
+        {
+            return new PropertyDefinition(modifiers, type, explicitInterface, name, getAccessor, setAccessor);
+        }
+
+        public static ClassDefinition ClassDefinition(string name, params MemberDefinition[] members)
         {
             return new ClassDefinition(name, members);
         }
 
-        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+        public static ClassDefinition ClassDefinition(string name, IEnumerable<MemberDefinition> members)
         {
-            return new StructDefinition(modifiers, name, members);
+            return new ClassDefinition(name, members);
         }
 
-        public static StructDefinition StructDefinition(string name, IEnumerable<MemberDefinition> members = null)
+        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
+        {
+            return new ClassDefinition(modifiers, name, members);
+        }
+
+        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
+        {
+            return new ClassDefinition(modifiers, name, members);
+        }
+
+        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, params MemberDefinition[] members)
+        {
+            return new ClassDefinition(modifiers, name, baseTypes, members);
+        }
+
+        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, IEnumerable<MemberDefinition> members)
+        {
+            return new ClassDefinition(modifiers, name, baseTypes, members);
+        }
+
+        public static StructDefinition StructDefinition(string name, params MemberDefinition[] members)
         {
             return new StructDefinition(name, members);
         }
 
-        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members = null)
+        public static StructDefinition StructDefinition(string name, IEnumerable<MemberDefinition> members)
+        {
+            return new StructDefinition(name, members);
+        }
+
+        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
+        {
+            return new StructDefinition(modifiers, name, members);
+        }
+
+        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
+        {
+            return new StructDefinition(modifiers, name, members);
+        }
+
+        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, params MemberDefinition[] members)
+        {
+            return new StructDefinition(modifiers, name, baseTypes, members);
+        }
+
+        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, IEnumerable<MemberDefinition> members)
+        {
+            return new StructDefinition(modifiers, name, baseTypes, members);
+        }
+
+        public static InterfaceDefinition InterfaceDefinition(string name, params MemberDefinition[] members)
+        {
+            return new InterfaceDefinition(name, members);
+        }
+
+        public static InterfaceDefinition InterfaceDefinition(string name, IEnumerable<MemberDefinition> members)
+        {
+            return new InterfaceDefinition(name, members);
+        }
+
+        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
         {
             return new InterfaceDefinition(modifiers, name, members);
         }
 
-        public static InterfaceDefinition InterfaceDefinition(string name, IEnumerable<MemberDefinition> members = null)
+        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
         {
-            return new InterfaceDefinition(name, members);
+            return new InterfaceDefinition(modifiers, name, members);
+        }
+
+        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, params MemberDefinition[] members)
+        {
+            return new InterfaceDefinition(modifiers, name, baseTypes, members);
+        }
+
+        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, IEnumerable<MemberDefinition> members)
+        {
+            return new InterfaceDefinition(modifiers, name, baseTypes, members);
+        }
+
+        public static TypeParameter TypeParameter(string name)
+        {
+            return new TypeParameter(name);
+        }
+
+        public static TypeParameter TypeParameter(VarianceModifier variance, string name)
+        {
+            return new TypeParameter(variance, name);
+        }
+
+        public static TypeParameter TypeParameter(IEnumerable<Attribute> attributes, VarianceModifier variance, string name)
+        {
+            return new TypeParameter(attributes, variance, name);
+        }
+
+        public static ClassConstraint ClassConstraint()
+        {
+            return new ClassConstraint();
+        }
+
+        public static StructConstraint StructConstraint()
+        {
+            return new StructConstraint();
+        }
+
+        public static ConstructorConstraint ConstructorConstraint()
+        {
+            return new ConstructorConstraint();
+        }
+
+        public static TypeConstraint TypeConstraint(TypeReference type)
+        {
+            return new TypeConstraint(type);
+        }
+
+        public static TypeParameterConstraintClause TypeParameterConstraint(string typeParameterName, params TypeParameterConstraint[] constraints)
+        {
+            return new TypeParameterConstraintClause(typeParameterName, constraints);
+        }
+
+        public static TypeParameterConstraintClause TypeParameterConstraint(string typeParameterName, IEnumerable<TypeParameterConstraint> constraints)
+        {
+            return new TypeParameterConstraintClause(typeParameterName, constraints);
         }
 
         public static AnonymousNewExpression AnonymousNew(params AnonymousObjectInitializer[] initializers)
@@ -355,6 +480,16 @@ namespace CSharpE.Syntax
             return new DefaultExpression(type);
         }
 
+        public static DelegateExpression Delegate(IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements)
+        {
+            return new DelegateExpression(parameters, statements);
+        }
+
+        public static DelegateExpression Delegate(bool isAsync, IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements)
+        {
+            return new DelegateExpression(isAsync, parameters, statements);
+        }
+
         public static ElementAccessExpression ElementAccess(this Expression expression, params Argument[] arguments)
         {
             return new ElementAccessExpression(expression, arguments);
@@ -520,6 +655,11 @@ namespace CSharpE.Syntax
             return new InvocationExpression(expression, arguments);
         }
 
+        public static IsPatternExpression IsPattern(Expression expression, Pattern pattern)
+        {
+            return new IsPatternExpression(expression, pattern);
+        }
+
         public static LambdaExpression Lambda(IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements)
         {
             return new LambdaExpression(parameters, statements);
@@ -553,6 +693,76 @@ namespace CSharpE.Syntax
         public static LambdaParameter LambdaParameter(LambdaParameterModifier modifier, TypeReference type, string name)
         {
             return new LambdaParameter(modifier, type, name);
+        }
+
+        public static FromClause From(string name, Expression expression)
+        {
+            return new FromClause(name, expression);
+        }
+
+        public static FromClause From(TypeReference type, string name, Expression expression)
+        {
+            return new FromClause(type, name, expression);
+        }
+
+        public static GroupByClause GroupBy(Expression groupExpression, Expression byExpression, string into = null)
+        {
+            return new GroupByClause(groupExpression, byExpression, into);
+        }
+
+        public static JoinClause Join(string name, Expression inExpression, Expression leftExpression, Expression rightExpression, string into = null)
+        {
+            return new JoinClause(name, inExpression, leftExpression, rightExpression, into);
+        }
+
+        public static JoinClause Join(TypeReference type, string name, Expression inExpression, Expression leftExpression, Expression rightExpression, string into = null)
+        {
+            return new JoinClause(type, name, inExpression, leftExpression, rightExpression, into);
+        }
+
+        public static LetClause Let(string name, Expression expression)
+        {
+            return new LetClause(name, expression);
+        }
+
+        public static OrderByClause OrderBy(Expression expression, bool isDescending = false)
+        {
+            return new OrderByClause(expression, isDescending);
+        }
+
+        public static OrderByClause OrderBy(params Ordering[] orderings)
+        {
+            return new OrderByClause(orderings);
+        }
+
+        public static OrderByClause OrderBy(IEnumerable<Ordering> orderings)
+        {
+            return new OrderByClause(orderings);
+        }
+
+        public static Ordering Ordering(Expression expression, bool isDescending = false)
+        {
+            return new Ordering(expression, isDescending);
+        }
+
+        public static SelectClause Select(Expression expression, string into = null)
+        {
+            return new SelectClause(expression, into);
+        }
+
+        public static WhereClause Where(Expression condition)
+        {
+            return new WhereClause(condition);
+        }
+
+        public static LinqExpression Linq(params LinqClause[] clauses)
+        {
+            return new LinqExpression(clauses);
+        }
+
+        public static LinqExpression Linq(IEnumerable<LinqClause> clauses)
+        {
+            return new LinqExpression(clauses);
         }
 
         public static MemberAccessExpression MemberAccess(this Expression expression, string memberName)
@@ -653,6 +863,11 @@ namespace CSharpE.Syntax
         public static ParenthesizedExpression Parenthesized(Expression expression)
         {
             return new ParenthesizedExpression(expression);
+        }
+
+        public static ConstantPattern ConstantPattern(Expression expression)
+        {
+            return new ConstantPattern(expression);
         }
 
         public static RefExpression Ref(Expression expression)
@@ -805,17 +1020,17 @@ namespace CSharpE.Syntax
             return new BreakStatement();
         }
 
-        public static CatchClause CatchClause(TypeReference exceptionType, string exceptionName, params Statement[] statements)
+        public static CatchClause Catch(TypeReference exceptionType, string exceptionName, params Statement[] statements)
         {
             return new CatchClause(exceptionType, exceptionName, statements);
         }
 
-        public static CatchClause CatchClause(TypeReference exceptionType, string exceptionName, IEnumerable<Statement> statements)
+        public static CatchClause Catch(TypeReference exceptionType, string exceptionName, IEnumerable<Statement> statements)
         {
             return new CatchClause(exceptionType, exceptionName, statements);
         }
 
-        public static CatchClause CatchClause(TypeReference exceptionType, string exceptionName, Expression filter, IEnumerable<Statement> statements)
+        public static CatchClause Catch(TypeReference exceptionType, string exceptionName, Expression filter, IEnumerable<Statement> statements)
         {
             return new CatchClause(exceptionType, exceptionName, filter, statements);
         }
@@ -890,6 +1105,11 @@ namespace CSharpE.Syntax
             return new ForStatement(variableDeclaration, condition, incrementors, statements);
         }
 
+        public static GotoStatement Goto(string label)
+        {
+            return new GotoStatement(label);
+        }
+
         public static IfStatement If(Expression condition, params Statement[] thenStatements)
         {
             return new IfStatement(condition, thenStatements);
@@ -903,6 +1123,26 @@ namespace CSharpE.Syntax
         public static IfStatement If(Expression condition, IEnumerable<Statement> thenStatements, IEnumerable<Statement> elseStatements)
         {
             return new IfStatement(condition, thenStatements, elseStatements);
+        }
+
+        public static LabelStatement Label(string name, Statement statement)
+        {
+            return new LabelStatement(name, statement);
+        }
+
+        public static LocalFunctionStatement LocalFunction(TypeReference returnType, string name, IEnumerable<Parameter> parameters, params Statement[] body)
+        {
+            return new LocalFunctionStatement(returnType, name, parameters, body);
+        }
+
+        public static LocalFunctionStatement LocalFunction(TypeReference returnType, string name, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
+        {
+            return new LocalFunctionStatement(returnType, name, parameters, body);
+        }
+
+        public static LocalFunctionStatement LocalFunction(bool isAsync, bool isUnsafe, TypeReference returnType, string name, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
+        {
+            return new LocalFunctionStatement(isAsync, isUnsafe, returnType, name, parameters, body);
         }
 
         public static LockStatement Lock(Expression expression, params Statement[] statements)
@@ -923,6 +1163,51 @@ namespace CSharpE.Syntax
         public static ReturnStatement Return()
         {
             return new ReturnStatement();
+        }
+
+        public static SwitchCase SwitchCase(Expression constantPatternValue)
+        {
+            return new SwitchCase(constantPatternValue);
+        }
+
+        public static SwitchCase SwitchCase(Pattern pattern, Expression whenCondition = null)
+        {
+            return new SwitchCase(pattern, whenCondition);
+        }
+
+        public static SwitchDefault SwitchDefault()
+        {
+            return new SwitchDefault();
+        }
+
+        public static SwitchSection SwitchSection(SwitchLabel label, params Statement[] statements)
+        {
+            return new SwitchSection(label, statements);
+        }
+
+        public static SwitchSection SwitchSection(SwitchLabel label, IEnumerable<Statement> statements)
+        {
+            return new SwitchSection(label, statements);
+        }
+
+        public static SwitchSection SwitchSection(IEnumerable<SwitchLabel> labels, params Statement[] statements)
+        {
+            return new SwitchSection(labels, statements);
+        }
+
+        public static SwitchSection SwitchSection(IEnumerable<SwitchLabel> labels, IEnumerable<Statement> statements)
+        {
+            return new SwitchSection(labels, statements);
+        }
+
+        public static SwitchStatement Switch(Expression expression, params SwitchSection[] sections)
+        {
+            return new SwitchStatement(expression, sections);
+        }
+
+        public static SwitchStatement Switch(Expression expression, IEnumerable<SwitchSection> sections)
+        {
+            return new SwitchStatement(expression, sections);
         }
 
         public static UnsafeStatement Unsafe(params Statement[] statements)
@@ -973,6 +1258,16 @@ namespace CSharpE.Syntax
         public static WhileStatement While(Expression condition, IEnumerable<Statement> statements)
         {
             return new WhileStatement(condition, statements);
+        }
+
+        public static YieldBreakStatement YieldBreak()
+        {
+            return new YieldBreakStatement();
+        }
+
+        public static YieldReturnStatement YieldReturn(Expression expression)
+        {
+            return new YieldReturnStatement(expression);
         }
 
         public static ArrayTypeReference ArrayType(TypeReference elementType)
