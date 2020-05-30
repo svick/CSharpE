@@ -42,14 +42,15 @@ namespace CSharpE.Transform.VisualStudio
 
         public RoslynSyntaxTree CreateRecoverableTree(
             ProjectId cacheKey, string filePath, ParseOptions options, ValueSource<TextAndVersion> text,
-            Encoding encoding, SyntaxNode root)
+            Encoding encoding, SyntaxNode root, ImmutableDictionary<string, ReportDiagnostic> treeDiagnosticReportingOptions)
         {
             return Wrap(roslynSyntaxTreeFactoryService.CreateRecoverableTree(
-                cacheKey, filePath, options, text, encoding, root));
+                cacheKey, filePath, options, text, encoding, root, treeDiagnosticReportingOptions));
         }
 
-        public RoslynSyntaxTree CreateSyntaxTree(string filePath, ParseOptions options, Encoding encoding, SyntaxNode root) =>
-            Wrap(roslynSyntaxTreeFactoryService.CreateSyntaxTree(filePath, options, encoding, root));
+        public RoslynSyntaxTree CreateSyntaxTree(
+            string filePath, ParseOptions options, Encoding encoding, SyntaxNode root, AnalyzerConfigOptionsResult analyzerConfigOptionsResult)
+            => Wrap(roslynSyntaxTreeFactoryService.CreateSyntaxTree(filePath, options, encoding, root, analyzerConfigOptionsResult));
 
         public SyntaxNode DeserializeNodeFrom(Stream stream, CancellationToken cancellationToken) =>
             Annotate(roslynSyntaxTreeFactoryService.DeserializeNodeFrom(stream, cancellationToken));
@@ -60,13 +61,12 @@ namespace CSharpE.Transform.VisualStudio
             roslynSyntaxTreeFactoryService.GetDefaultParseOptionsWithLatestLanguageVersion();
 
         public RoslynSyntaxTree ParseSyntaxTree(
-            string filePath, ParseOptions options, SourceText text,
-            ImmutableDictionary<string, ReportDiagnostic> treeDiagnosticReportingOptionsOpt,
+            string filePath, ParseOptions options, SourceText text, AnalyzerConfigOptionsResult? analyzerConfigOptionsResult,
             CancellationToken cancellationToken)
         {
             return Wrap(
                 roslynSyntaxTreeFactoryService.ParseSyntaxTree(
-                    filePath, options, text, treeDiagnosticReportingOptionsOpt, cancellationToken));
+                    filePath, options, text, analyzerConfigOptionsResult, cancellationToken));
         }
     }
 }

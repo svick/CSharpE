@@ -18,7 +18,9 @@ using Microsoft.CodeAnalysis.Symbols;
 using RoslynCompilation = Microsoft.CodeAnalysis.Compilation;
 using RoslynSemanticModel = Microsoft.CodeAnalysis.SemanticModel;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
+using NullableAnnotation = Microsoft.CodeAnalysis.NullableAnnotation;
 using static CSharpE.Transform.VisualStudio.Wrapping;
+using Microsoft.CodeAnalysis.CSharp.Symbols;
 
 namespace CSharpE.Transform.VisualStudio
 {
@@ -65,7 +67,7 @@ namespace CSharpE.Transform.VisualStudio
                 var referenceSymbol = (IAssemblySymbol)RoslynCompilation.GetAssemblyOrModuleSymbol(reference);
                 var transformationTypes = GetAllTypesVisitor.FindTypes(
                     referenceSymbol.GlobalNamespace,
-                    type => type.TypeKind != TypeKind.Interface && !type.IsAbstract && type.AllInterfaces.Contains(iTransformation));
+                    type => type.TypeKind != TypeKind.Interface && !type.IsAbstract && type.AllInterfaces.Contains(iTransformation.GetPublicSymbol()));
 
                 if (!transformationTypes.Any())
                     continue;
@@ -383,27 +385,27 @@ namespace CSharpE.Transform.VisualStudio
 
         protected override ISymbol CommonGetAssemblyOrModuleSymbol(MetadataReference reference)
         {
-            return DesignTimeCompilation.GetAssemblyOrModuleSymbol(reference);
+            return DesignTimeCompilation.GetAssemblyOrModuleSymbol(reference).GetPublicSymbol();
         }
 
         protected override INamespaceSymbol CommonGetCompilationNamespace(INamespaceSymbol namespaceSymbol)
         {
-            return DesignTimeCompilation.GetCompilationNamespace(namespaceSymbol);
+            return DesignTimeCompilation.GetCompilationNamespace(namespaceSymbol).GetPublicSymbol();
         }
 
         protected override IMethodSymbol CommonGetEntryPoint(CancellationToken cancellationToken)
         {
-            return DesignTimeCompilation.GetEntryPoint(cancellationToken);
+            return DesignTimeCompilation.GetEntryPoint(cancellationToken).GetPublicSymbol();
         }
 
-        protected override INamedTypeSymbol CommonGetSpecialType(SpecialType specialType)
+        public override INamedTypeSymbolInternal CommonGetSpecialType(SpecialType specialType)
         {
             return DesignTimeCompilation.GetSpecialType(specialType);
         }
 
-        protected override IArrayTypeSymbol CommonCreateArrayTypeSymbol(ITypeSymbol elementType, int rank)
+        protected override IArrayTypeSymbol CommonCreateArrayTypeSymbol(ITypeSymbol elementType, int rank, NullableAnnotation elementNullableAnnotation)
         {
-            return DesignTimeCompilation.CreateArrayTypeSymbol(elementType, rank);
+            return DesignTimeCompilation.CreateArrayTypeSymbol(elementType, rank, elementNullableAnnotation);
         }
 
         protected override IPointerTypeSymbol CommonCreatePointerTypeSymbol(ITypeSymbol elementType)
@@ -413,26 +415,28 @@ namespace CSharpE.Transform.VisualStudio
 
         protected override INamedTypeSymbol CommonGetTypeByMetadataName(string metadataName)
         {
-            return DesignTimeCompilation.GetTypeByMetadataName(metadataName);
+            return DesignTimeCompilation.GetTypeByMetadataName(metadataName).GetPublicSymbol();
         }
 
         protected override INamedTypeSymbol CommonCreateTupleTypeSymbol(
-            ImmutableArray<ITypeSymbol> elementTypes, ImmutableArray<string> elementNames, ImmutableArray<Location> elementLocations)
+            ImmutableArray<ITypeSymbol> elementTypes, ImmutableArray<string> elementNames, ImmutableArray<Location> elementLocations,
+            ImmutableArray<NullableAnnotation> elementNullableAnnotations)
         {
-            return DesignTimeCompilation.CreateTupleTypeSymbol(elementTypes, elementNames, elementLocations);
+            return DesignTimeCompilation.CreateTupleTypeSymbol(elementTypes, elementNames, elementLocations, elementNullableAnnotations);
         }
 
         protected override INamedTypeSymbol CommonCreateTupleTypeSymbol(
-            INamedTypeSymbol underlyingType, ImmutableArray<string> elementNames, ImmutableArray<Location> elementLocations)
+            INamedTypeSymbol underlyingType, ImmutableArray<string> elementNames, ImmutableArray<Location> elementLocations,
+            ImmutableArray<NullableAnnotation> elementNullableAnnotations)
         {
-            return DesignTimeCompilation.CreateTupleTypeSymbol(underlyingType, elementNames, elementLocations);
+            return DesignTimeCompilation.CreateTupleTypeSymbol(underlyingType, elementNames, elementLocations, elementNullableAnnotations);
         }
 
         protected override INamedTypeSymbol CommonCreateAnonymousTypeSymbol(
             ImmutableArray<ITypeSymbol> memberTypes, ImmutableArray<string> memberNames, ImmutableArray<Location> memberLocations,
-            ImmutableArray<bool> memberIsReadOnly)
+            ImmutableArray<bool> memberIsReadOnly, ImmutableArray<NullableAnnotation> memberNullableAnnotations)
         {
-            return DesignTimeCompilation.CreateAnonymousTypeSymbol(memberTypes, memberNames, memberIsReadOnly, memberLocations);
+            return DesignTimeCompilation.CreateAnonymousTypeSymbol(memberTypes, memberNames, memberIsReadOnly, memberLocations, memberNullableAnnotations);
         }
 
         public override CommonConversion ClassifyCommonConversion(ITypeSymbol source, ITypeSymbol destination)
@@ -501,17 +505,22 @@ namespace CSharpE.Transform.VisualStudio
 
         public override CommonReferenceManager CommonGetBoundReferenceManager() => RoslynCompilation.CommonGetBoundReferenceManager();
 
-        public override ISymbol CommonGetSpecialTypeMember(SpecialMember specialMember)
+        public override ISymbolInternal CommonGetSpecialTypeMember(SpecialMember specialMember)
         {
             throw new NotImplementedException();
         }
 
-        public override bool IsSystemTypeReference(ITypeSymbol type)
+        public override bool IsSystemTypeReference(ITypeSymbolInternal type)
         {
             throw new NotImplementedException();
         }
 
-        public override ISymbol CommonGetWellKnownTypeMember(WellKnownMember member)
+        public override ISymbolInternal CommonGetWellKnownTypeMember(WellKnownMember member)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ITypeSymbolInternal CommonGetWellKnownType(WellKnownType wellknownType)
         {
             throw new NotImplementedException();
         }
@@ -544,7 +553,7 @@ namespace CSharpE.Transform.VisualStudio
         public override CommonPEModuleBuilder CreateModuleBuilder(EmitOptions emitOptions, IMethodSymbol debugEntryPoint, Stream sourceLinkStream, IEnumerable<EmbeddedText> embeddedTexts, IEnumerable<ResourceDescription> manifestResources, CompilationTestData testData, DiagnosticBag diagnostics, CancellationToken cancellationToken) =>
             DesignTimeCompilation.CreateModuleBuilder(emitOptions, debugEntryPoint, sourceLinkStream, embeddedTexts, manifestResources, testData, diagnostics, cancellationToken);
 
-        public override bool CompileMethods(CommonPEModuleBuilder moduleBuilder, bool emittingPdb, bool emitMetadataOnly, bool emitTestCoverageData, DiagnosticBag diagnostics, Predicate<ISymbol> filterOpt, CancellationToken cancellationToken) =>
+        public override bool CompileMethods(CommonPEModuleBuilder moduleBuilder, bool emittingPdb, bool emitMetadataOnly, bool emitTestCoverageData, DiagnosticBag diagnostics, Predicate<ISymbolInternal> filterOpt, CancellationToken cancellationToken) =>
             DesignTimeCompilation.CompileMethods(moduleBuilder, emittingPdb, emitMetadataOnly, emitTestCoverageData, diagnostics, filterOpt, cancellationToken);
 
         public override void AddDebugSourceDocumentsForChecksumDirectives(DebugDocumentsBuilder documentsBuilder, RoslynSyntaxTree tree, DiagnosticBag diagnostics)
@@ -609,17 +618,17 @@ namespace CSharpE.Transform.VisualStudio
 
         public override IEnumerable<AssemblyIdentity> ReferencedAssemblyNames => DesignTimeCompilation.ReferencedAssemblyNames;
 
-        protected override IAssemblySymbol CommonAssembly => DesignTimeCompilation.Assembly;
+        protected override IAssemblySymbol CommonAssembly => DesignTimeCompilation.Assembly.GetPublicSymbol();
 
-        protected override IModuleSymbol CommonSourceModule => DesignTimeCompilation.SourceModule;
+        protected override IModuleSymbol CommonSourceModule => DesignTimeCompilation.SourceModule.GetPublicSymbol();
 
-        protected override INamespaceSymbol CommonGlobalNamespace => DesignTimeCompilation.GlobalNamespace;
+        protected override INamespaceSymbol CommonGlobalNamespace => DesignTimeCompilation.GlobalNamespace.GetPublicSymbol();
 
-        protected override INamedTypeSymbol CommonObjectType => DesignTimeCompilation.ObjectType;
+        protected override INamedTypeSymbol CommonObjectType => DesignTimeCompilation.ObjectType.GetPublicSymbol();
 
-        protected override ITypeSymbol CommonDynamicType => DesignTimeCompilation.DynamicType;
+        protected override ITypeSymbol CommonDynamicType => DesignTimeCompilation.DynamicType.GetPublicSymbol();
 
-        protected override INamedTypeSymbol CommonScriptClass => DesignTimeCompilation.ScriptClass;
+        protected override INamedTypeSymbol CommonScriptClass => DesignTimeCompilation.ScriptClass.GetPublicSymbol();
 
         public override ScriptCompilationInfo CommonScriptCompilationInfo => DesignTimeCompilation.ScriptCompilationInfo;
 
@@ -638,6 +647,8 @@ namespace CSharpE.Transform.VisualStudio
         public override StrongNameKeys StrongNameKeys => RoslynCompilation.StrongNameKeys;
 
         public override Guid DebugSourceDocumentLanguageId => RoslynCompilation.DebugSourceDocumentLanguageId;
+
+        public override MetadataReference CommonGetMetadataReference(IAssemblySymbol assemblySymbol) => DesignTimeCompilation.GetMetadataReference(assemblySymbol);
 
         #endregion
     }

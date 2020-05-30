@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Composition;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Host;
@@ -39,16 +40,14 @@ namespace CSharpE.Transform.VisualStudio
         public RoslynCompilation CreateCompilation(string assemblyName, CompilationOptions options) =>
             Wrap(roslynCompilationFactoryService.CreateCompilation(assemblyName, options));
 
+        public GeneratorDriver CreateGeneratorDriver(
+            ParseOptions parseOptions, ImmutableArray<ISourceGenerator> generators, ImmutableArray<AdditionalText> additionalTexts) =>
+                throw new NotSupportedException("Using CSharpE with code generators is not supported.");
+
         public RoslynCompilation CreateSubmissionCompilation(string assemblyName, CompilationOptions options, Type hostObjectType) =>
             Wrap(roslynCompilationFactoryService.CreateSubmissionCompilation(assemblyName, options, hostObjectType));
 
-        public RoslynCompilation GetCompilationFromCompilationReference(MetadataReference reference) =>
-            Wrap(roslynCompilationFactoryService.GetCompilationFromCompilationReference(reference));
-
         public CompilationOptions GetDefaultCompilationOptions() =>
             roslynCompilationFactoryService.GetDefaultCompilationOptions();
-
-        public bool IsCompilationReference(MetadataReference reference) =>
-            roslynCompilationFactoryService.IsCompilationReference(reference);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,7 +16,7 @@ namespace CSharpE.Transform.VisualStudio
         public MemberSemanticModel(
             CSharpMemberSemanticModel wrappedModel, SemanticModel parent)
             : base(wrappedModel.Root, wrappedModel.MemberSymbol, wrappedModel.RootBinder, wrappedModel.ContainingModelOrSelf as SyntaxTreeSemanticModel,
-                  (SyntaxTreeSemanticModel)wrappedModel.ParentModel, wrappedModel.OriginalPositionForSpeculation)
+                  (SyntaxTreeSemanticModel)wrappedModel.ParentModel, null, null, wrappedModel.OriginalPositionForSpeculation)
         {
             this.wrappedModel = wrappedModel;
             this.parent = parent;
@@ -61,9 +62,9 @@ namespace CSharpE.Transform.VisualStudio
             SyntaxTreeSemanticModel parentModel, int position, AccessorDeclarationSyntax accessor, out RoslynSemanticModel speculativeModel) =>
             TryGetSpeculativeSemanticModelCoreTemplate(wrappedModel.TryGetSpeculativeSemanticModelForMethodBodyCore, parentModel, position, accessor, out speculativeModel);
 
-        protected override BoundNode RewriteNullableBoundNodes(BoundNode boundRoot, Conversions conversions, DiagnosticBag diagnostics)
-        {
-            throw new NotImplementedException();
-        }
+        protected override BoundNode RewriteNullableBoundNodesWithSnapshots(
+            BoundNode boundRoot, Binder binder, DiagnosticBag diagnostics, bool takeSnapshots,
+            out NullableWalker.SnapshotManager snapshotManager, ref ImmutableDictionary<Symbol, Symbol> remappedSymbols)
+            => throw new NotImplementedException();
     }
 }

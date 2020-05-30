@@ -175,7 +175,7 @@ namespace CSharpE.Transform.VisualStudio
             return roslynModel.GetMemberGroupWorker(adjusted, options, cancellationToken);
         }
 
-        public override ImmutableArray<PropertySymbol> GetIndexerGroupWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
+        public override ImmutableArray<IPropertySymbol> GetIndexerGroupWorker(CSharpSyntaxNode node, SymbolInfoOptions options, CancellationToken cancellationToken = default)
             => roslynModel.GetIndexerGroupWorker(Adjust(node), options, cancellationToken);
 
         public override Optional<object> GetConstantValueWorker(CSharpSyntaxNode node, CancellationToken cancellationToken = default) =>
