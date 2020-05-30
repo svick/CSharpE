@@ -55,7 +55,7 @@ namespace CSharpE.Transform.VisualStudio
 
             var iTransformation = RoslynCompilation.GetTypeByMetadataName(typeof(ITransformation).FullName);
 
-            if (iTransformation == null)
+            if (iTransformation is null)
                 return null;
 
             var transformations = new List<ITransformation>();
@@ -517,6 +517,11 @@ namespace CSharpE.Transform.VisualStudio
         }
 
         public override bool IsAttributeType(ITypeSymbol type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsSymbolAccessibleWithinCore(ISymbol symbol, ISymbol within, ITypeSymbol throughType)
         {
             throw new NotImplementedException();
         }

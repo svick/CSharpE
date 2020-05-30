@@ -1,9 +1,8 @@
-﻿using System.Composition;
+﻿using System.Collections.Immutable;
+using System.Composition;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Host.Mef;
@@ -38,10 +37,8 @@ namespace CSharpE.Transform.VisualStudio
 
         private static SyntaxTree Wrap(RoslynSyntaxTree tree) => new SyntaxTree((CSharpSyntaxTree)tree);
 
-        public bool CanCreateRecoverableTree(SyntaxNode root)
-        {
-            return roslynSyntaxTreeFactoryService.CanCreateRecoverableTree(root);
-        }
+        public bool CanCreateRecoverableTree(SyntaxNode root) =>
+            roslynSyntaxTreeFactoryService.CanCreateRecoverableTree(root);
 
         public RoslynSyntaxTree CreateRecoverableTree(
             ProjectId cacheKey, string filePath, ParseOptions options, ValueSource<TextAndVersion> text,
@@ -54,23 +51,22 @@ namespace CSharpE.Transform.VisualStudio
         public RoslynSyntaxTree CreateSyntaxTree(string filePath, ParseOptions options, Encoding encoding, SyntaxNode root) =>
             Wrap(roslynSyntaxTreeFactoryService.CreateSyntaxTree(filePath, options, encoding, root));
 
-        public SyntaxNode DeserializeNodeFrom(Stream stream, CancellationToken cancellationToken)
-        {
-            return Annotate(roslynSyntaxTreeFactoryService.DeserializeNodeFrom(stream, cancellationToken));
-        }
+        public SyntaxNode DeserializeNodeFrom(Stream stream, CancellationToken cancellationToken) =>
+            Annotate(roslynSyntaxTreeFactoryService.DeserializeNodeFrom(stream, cancellationToken));
 
-        public ParseOptions GetDefaultParseOptions()
-        {
-            return roslynSyntaxTreeFactoryService.GetDefaultParseOptions();
-        }
+        public ParseOptions GetDefaultParseOptions() => roslynSyntaxTreeFactoryService.GetDefaultParseOptions();
 
-        public ParseOptions GetDefaultParseOptionsWithLatestLanguageVersion()
-        {
-            return roslynSyntaxTreeFactoryService.GetDefaultParseOptionsWithLatestLanguageVersion();
-        }
+        public ParseOptions GetDefaultParseOptionsWithLatestLanguageVersion() =>
+            roslynSyntaxTreeFactoryService.GetDefaultParseOptionsWithLatestLanguageVersion();
 
         public RoslynSyntaxTree ParseSyntaxTree(
-            string filePath, ParseOptions options, SourceText text, CancellationToken cancellationToken) =>
-            Wrap(roslynSyntaxTreeFactoryService.ParseSyntaxTree(filePath, options, text, cancellationToken));
+            string filePath, ParseOptions options, SourceText text,
+            ImmutableDictionary<string, ReportDiagnostic> treeDiagnosticReportingOptionsOpt,
+            CancellationToken cancellationToken)
+        {
+            return Wrap(
+                roslynSyntaxTreeFactoryService.ParseSyntaxTree(
+                    filePath, options, text, treeDiagnosticReportingOptionsOpt, cancellationToken));
+        }
     }
 }

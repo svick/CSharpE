@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSemanticModel = Microsoft.CodeAnalysis.SemanticModel;
@@ -59,5 +60,10 @@ namespace CSharpE.Transform.VisualStudio
         public override bool TryGetSpeculativeSemanticModelForMethodBodyCore(
             SyntaxTreeSemanticModel parentModel, int position, AccessorDeclarationSyntax accessor, out RoslynSemanticModel speculativeModel) =>
             TryGetSpeculativeSemanticModelCoreTemplate(wrappedModel.TryGetSpeculativeSemanticModelForMethodBodyCore, parentModel, position, accessor, out speculativeModel);
+
+        protected override BoundNode RewriteNullableBoundNodes(BoundNode boundRoot, Conversions conversions, DiagnosticBag diagnostics)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
