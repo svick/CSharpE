@@ -63,7 +63,7 @@ class C
         int i, j = 42;
     }
 
-    int P1 { get; set; }
+    int P1 { get; private set; }
 
     int I.P2 { get; set; }
 

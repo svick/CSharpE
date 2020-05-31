@@ -97,7 +97,7 @@ class C
     int P1
     {
         get;
-        set;
+        private set;
     }
 
     int I.P2

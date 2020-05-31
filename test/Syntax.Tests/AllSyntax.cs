@@ -170,20 +170,34 @@ namespace N.M
         {
         }
 
+        int P1
+        {
+            get
+            {
+            }
+
+            set
+            {
+            }
+        }
+
         event EventHandler E1
         {
             add
             {
             }
+
             remove
             {
             }
         }
+
         event I.EventHandler E2
         {
             add
             {
             }
+
             remove
             {
             }

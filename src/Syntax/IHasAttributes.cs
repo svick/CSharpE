@@ -18,6 +18,6 @@ namespace CSharpE.Syntax
         public static bool HasAttribute<T>(this IHasAttributes node) where T : System.Attribute => node.HasAttribute(typeof(T));
 
         public static bool HasAttribute(this IHasAttributes node, NamedTypeReference attributeType) =>
-            node.GetAttribute(attributeType) != null;
+            node.Attributes.Any(a => a.Type.Equals(attributeType));
     }
 }
