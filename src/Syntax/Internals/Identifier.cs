@@ -29,7 +29,7 @@ namespace CSharpE.Syntax.Internals
         private string text;
         public string Text
         {
-            get => textSet ? text : syntax.ValueText;
+            get => textSet ? text : (string)syntax.Value;
             set
             {
                 if (!canBeNull && value == null)
@@ -47,7 +47,7 @@ namespace CSharpE.Syntax.Internals
         // which would mean that the change in syntax would not be remembered by the original instance
         internal SyntaxToken GetWrapped(ref bool? changed)
         {
-            if (Text != syntax.ValueText)
+            if (Text != (string)syntax.Value)
             {
                 if (text == null)
                     syntax = default;

@@ -16,6 +16,7 @@ namespace CSharpE.Syntax.Internals
             return syntaxWrapper.GetWrapped(ref changed);
         }
 
+        [DebuggerHidden]
         public static TSyntax GetWrapped<TSyntax>(this ISyntaxWrapper<TSyntax> syntaxWrapper, ref bool? changed)
         {
             // this would very likely be a temporary boxed value type, so the original would not remember that is reported changed
