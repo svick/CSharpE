@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
@@ -9,46 +10,45 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class PropertyDefinition : BasePropertyDefinition, ISyntaxWrapper<PropertyDeclarationSyntax>
+    public sealed class IndexerDefinition : BasePropertyDefinition, ISyntaxWrapper<IndexerDeclarationSyntax>
     {
-        private PropertyDeclarationSyntax syntax;
+        private IndexerDeclarationSyntax syntax;
 
         private protected override BasePropertyDeclarationSyntax BasePropertySyntax => syntax;
 
-        internal PropertyDefinition(PropertyDeclarationSyntax syntax, TypeDefinition parent)
+        internal IndexerDefinition(IndexerDeclarationSyntax syntax, TypeDefinition parent)
             : base(syntax)
         {
             Init(syntax);
             Parent = parent;
         }
 
-        private void Init(PropertyDeclarationSyntax syntax)
+        private void Init(IndexerDeclarationSyntax syntax)
         {
             this.syntax = syntax;
             
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
-            name = new Identifier(syntax.Identifier);
         }
 
-        public PropertyDefinition(
-            MemberModifiers modifiers, TypeReference type, string name,
+        public IndexerDefinition(
+            MemberModifiers modifiers, TypeReference type, IEnumerable<Parameter> parameters,
             AccessorDefinition getAccessor, AccessorDefinition setAccessor)
-            : this(modifiers, type, null, name, getAccessor, setAccessor) { }
+            : this(modifiers, type, null, parameters, getAccessor, setAccessor) { }
 
-        public PropertyDefinition(
-            MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, string name, 
+        public IndexerDefinition(
+            MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, IEnumerable<Parameter> parameters,
             AccessorDefinition getAccessor, AccessorDefinition setAccessor)
         {
             Modifiers = modifiers;
             Type = type;
             ExplicitInterface = explicitInterface;
-            Name = name;
+            Parameters = parameters?.ToList();
             GetAccessor = getAccessor;
             SetAccessor = setAccessor;
         }
 
         private const MemberModifiers ValidModifiers =
-            AccessModifiersMask | New | Static | Virtual | Sealed | Override | Abstract | Extern | Unsafe;
+            AccessModifiersMask | New | Virtual | Sealed | Override | Abstract | Extern | Unsafe;
 
         private protected override void ValidateModifiers(MemberModifiers value)
         {
@@ -57,23 +57,24 @@ namespace CSharpE.Syntax
                 throw new ArgumentException(
                     $"The modifiers {invalidModifiers} are not valid for a property.", nameof(value));
         }
-        
-        public bool IsStatic
+
+        private SeparatedSyntaxList<Parameter, ParameterSyntax> parameters;
+        public IList<Parameter> Parameters
         {
-            get => Modifiers.Contains(Static);
-            set => Modifiers = Modifiers.With(Static, value);
+            get
+            {
+                if (parameters == null)
+                    parameters = new SeparatedSyntaxList<Parameter, ParameterSyntax>(
+                        syntax.ParameterList.Parameters, this);
+
+                return parameters;
+            }
+            set => SetList(ref parameters, new SeparatedSyntaxList<Parameter, ParameterSyntax>(value, this));
         }
 
-        private Identifier name;
-        public string Name
-        {
-            get => name.Text;
-            set => name.Text = value;
-        }
-        
-        // TODO: expression body and initializer
+        // TODO: expression body
 
-        PropertyDeclarationSyntax ISyntaxWrapper<PropertyDeclarationSyntax>.GetWrapped(ref bool? changed)
+        IndexerDeclarationSyntax ISyntaxWrapper<IndexerDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
 
@@ -85,7 +86,7 @@ namespace CSharpE.Syntax
             var newExplicitInterface = explicitInterfaceSet
                 ? explicitInterface?.GetWrappedName(ref thisChanged)
                 : syntax.ExplicitInterfaceSpecifier?.Name;
-            var newName = name.GetWrapped(ref thisChanged);
+            var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
             var newGetAccessor = getAccessorSet
                 ? getAccessor?.GetWrapped(ref thisChanged)
                 : FindAccessor(SyntaxKind.GetAccessorDeclaration);
@@ -102,9 +103,9 @@ namespace CSharpE.Syntax
                 var accessors =
                     RoslynSyntaxFactory.List(new[] { newGetAccessor, newSetAccessor }.Where(a => a != null));
 
-                var newSyntax = RoslynSyntaxFactory.PropertyDeclaration(
-                    newAttributes, newModifiers.GetWrapped(), newType, explicitInterfaceSpecifier, newName,
-                    RoslynSyntaxFactory.AccessorList(accessors));
+                var newSyntax = RoslynSyntaxFactory.IndexerDeclaration(
+                    newAttributes, newModifiers.GetWrapped(), newType, explicitInterfaceSpecifier,
+                    RoslynSyntaxFactory.BracketedParameterList(newParameters), RoslynSyntaxFactory.AccessorList(accessors));
 
                 syntax = Annotate(newSyntax);
 
@@ -115,15 +116,16 @@ namespace CSharpE.Syntax
         }
 
         private protected override BasePropertyDeclarationSyntax GetWrappedBaseProperty(ref bool? changed) =>
-            this.GetWrapped<PropertyDeclarationSyntax>(ref changed);
+            this.GetWrapped<IndexerDeclarationSyntax>(ref changed);
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            Init((PropertyDeclarationSyntax)newSyntax);
+            Init((IndexerDeclarationSyntax)newSyntax);
             SetList(ref attributes, null);
             Set(ref type, null);
             Set(ref explicitInterface, null);
             explicitInterfaceSet = false;
+            SetList(ref parameters, null);
             Set(ref getAccessor, null);
             getAccessorSet = false;
             Set(ref setAccessor, null);
@@ -131,7 +133,7 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() =>
-            new PropertyDefinition(Modifiers, Type, ExplicitInterface, Name, GetAccessor, SetAccessor)
+            new IndexerDefinition(Modifiers, Type, ExplicitInterface, Parameters, GetAccessor, SetAccessor)
             {
                 Attributes = Attributes
             };

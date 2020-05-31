@@ -584,6 +584,8 @@ namespace CSharpE.Syntax.Internals
                     return new FieldDefinition(field, containingType);
                 case PropertyDeclarationSyntax property:
                     return new PropertyDefinition(property, containingType);
+                case IndexerDeclarationSyntax indexer:
+                    return new IndexerDefinition(indexer, containingType);
                 case EventDeclarationSyntax @event:
                     return new EventDefinition(@event, containingType);
                 case EventFieldDeclarationSyntax eventField:

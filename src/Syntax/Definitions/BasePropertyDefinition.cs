@@ -58,6 +58,29 @@ namespace CSharpE.Syntax
             set => Modifiers = Modifiers.With(MemberModifiers.Unsafe, value);
         }
 
+        private protected bool explicitInterfaceSet;
+        private protected NamedTypeReference explicitInterface;
+        public NamedTypeReference ExplicitInterface
+        {
+            get
+            {
+                if (!explicitInterfaceSet)
+                {
+                    explicitInterface = BasePropertySyntax.ExplicitInterfaceSpecifier == null
+                        ? null
+                        : new NamedTypeReference(BasePropertySyntax.ExplicitInterfaceSpecifier.Name, this);
+                    explicitInterfaceSet = true;
+                }
+
+                return explicitInterface;
+            }
+            set
+            {
+                Set(ref explicitInterface, value);
+                explicitInterfaceSet = true;
+            }
+        }
+
         // TODO: properties with more than one of each kind of accessor should probably be error nodes
         private protected AccessorDeclarationSyntax FindAccessor(SyntaxKind accessorKind) =>
             BasePropertySyntax.AccessorList?.Accessors.FirstOrDefault(a => a.IsKind(accessorKind));

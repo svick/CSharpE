@@ -181,6 +181,24 @@ namespace N.M
             }
         }
 
+        public int this[int i]
+        {
+            get
+            {
+            }
+        }
+
+        int I.this[int i]
+        {
+            get
+            {
+            }
+
+            set
+            {
+            }
+        }
+
         event EventHandler E1
         {
             add
