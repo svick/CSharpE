@@ -26,7 +26,8 @@ namespace CSharpE.Syntax
             Accessibility = FromRoslyn.MemberModifiers(syntax.Modifiers);
         }
 
-        public AccessorDefinition() { }
+        public AccessorDefinition()
+            : this(null) { }
 
         public AccessorDefinition(MemberModifiers accessibility)
             : this(accessibility, null) { }
@@ -66,7 +67,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (attributes == null)
-                    attributes = new SyntaxList<Attribute, AttributeListSyntax>(syntax.AttributeLists, this);
+                    attributes = new SyntaxList<Attribute, AttributeListSyntax>(syntax?.AttributeLists ?? default, this);
 
                 return attributes;
             }
