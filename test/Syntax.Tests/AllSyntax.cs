@@ -13,6 +13,7 @@ namespace N.M
         C<int> c3;
         int i;
         C? n;
+        (int i, string) t;
         ref int M()
         {
             WriteLine();

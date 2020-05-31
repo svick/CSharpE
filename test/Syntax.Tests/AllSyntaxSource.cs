@@ -3,7 +3,6 @@ class C
 {
     C[][,] a;
     C* p;
-    (int i, string) t;
     public int i, j;
     global::System.Int32 k;
     void M()

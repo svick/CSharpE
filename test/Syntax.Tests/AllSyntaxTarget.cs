@@ -4,7 +4,6 @@ class C
 {
     C[][, ] a;
     C*p;
-    (int i, string)t;
     public int i;
     public int j;
     int k;
@@ -55,11 +54,11 @@ class C
             group i by i into g
                 select i into i
                     select i;
-        foreach ((int i, _)in new(int, int)[0])
+        foreach ((int i, _)in new (int, int)[0])
         {
         }
 
-        foreach (var(i, j)in new(int, int)[0])
+        foreach (var(i, j)in new (int, int)[0])
         {
         }
 
