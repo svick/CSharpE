@@ -9,7 +9,6 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    // TODO: generics
     public sealed class DelegateDefinition : BaseTypeDefinition, ISyntaxWrapper<DelegateDeclarationSyntax>
     {
         private DelegateDeclarationSyntax syntax;

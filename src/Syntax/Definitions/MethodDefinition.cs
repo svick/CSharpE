@@ -240,7 +240,9 @@ namespace CSharpE.Syntax
             Set(ref returnType, null);
             Set(ref explicitInterface, null);
             explicitInterfaceSet = false;
+            SetList(ref typeParameters, null);
             SetList(ref parameters, null);
+            SetList(ref constraintClauses, null);
             Set(ref body, null);
         }
 
@@ -252,6 +254,7 @@ namespace CSharpE.Syntax
             };
 
         public override IEnumerable<SyntaxNode> GetChildren() =>
-            Attributes.Concat<SyntaxNode>(new[] { ReturnType, ExplicitInterface }).Concat(Parameters).Concat(new[] { Body });
+            Attributes.Concat<SyntaxNode>(new[] { ReturnType, ExplicitInterface }).Concat(TypeParameters).Concat(Parameters)
+                .Concat(ConstraintClauses).Concat(new[] { Body });
     }
 }

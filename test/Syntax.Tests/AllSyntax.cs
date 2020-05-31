@@ -157,7 +157,8 @@ namespace N.M
                     goto case 0;
             }
 
-            async void F(int i)
+            async void F<T>(int i)
+                where T : new()
             {
                 return;
             }
