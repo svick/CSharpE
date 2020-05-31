@@ -58,6 +58,7 @@ namespace CSharpE.Syntax
             set => Modifiers = Modifiers.With(MemberModifiers.Unsafe, value);
         }
 
+        // TODO: properties with more than one of each kind of accessor should probably be error nodes
         private protected AccessorDeclarationSyntax FindAccessor(SyntaxKind accessorKind) =>
             BasePropertySyntax.AccessorList?.Accessors.FirstOrDefault(a => a.IsKind(accessorKind));
 
@@ -69,7 +70,6 @@ namespace CSharpE.Syntax
             {
                 if (!getAccessorSet)
                 {
-                    // TODO: properties with more than one of each kind of accessor should probably be error nodes
                     var declaration = FindAccessor(SyntaxKind.GetAccessorDeclaration);
                     
                     if (declaration != null)
@@ -96,9 +96,7 @@ namespace CSharpE.Syntax
             {
                 if (!setAccessorSet)
                 {
-                    // TODO: properties with more than one of each kind of accessor should probably be error nodes
-                    var declaration = BasePropertySyntax.AccessorList.Accessors
-                        .FirstOrDefault(a => a.IsKind(SyntaxKind.SetAccessorDeclaration));
+                    var declaration = FindAccessor(SyntaxKind.SetAccessorDeclaration);
                     
                     if (declaration != null)
                         setAccessor = new AccessorDefinition(declaration, this);

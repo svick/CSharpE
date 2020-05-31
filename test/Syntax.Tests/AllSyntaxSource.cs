@@ -4,6 +4,7 @@ class C
     C[][,] a;
     C* p;
     public int i, j;
+    event EventHandler e1, e2;
     global::System.Int32 k;
     void M()
     {

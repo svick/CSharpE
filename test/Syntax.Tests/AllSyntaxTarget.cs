@@ -6,6 +6,8 @@ class C
     C*p;
     public int i;
     public int j;
+    event EventHandler e1;
+    event EventHandler e2;
     int k;
     void M()
     {

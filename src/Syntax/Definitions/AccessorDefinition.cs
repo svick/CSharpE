@@ -26,10 +26,17 @@ namespace CSharpE.Syntax
             get => kind ?? syntax.Kind();
             set
             {
-                if (value != SyntaxKind.GetAccessorDeclaration && value != SyntaxKind.SetAccessorDeclaration)
-                    throw new ArgumentException($"{value} is not allowed as accessor kind.");
-
-                kind = value;
+                switch (value)
+                {
+                    case SyntaxKind.GetAccessorDeclaration:
+                    case SyntaxKind.SetAccessorDeclaration:
+                    case SyntaxKind.AddAccessorDeclaration:
+                    case SyntaxKind.RemoveAccessorDeclaration:
+                        kind = value;
+                        break;
+                    default:
+                        throw new ArgumentException($"{value} is not allowed as accessor kind.");
+                }
             }
         }
 

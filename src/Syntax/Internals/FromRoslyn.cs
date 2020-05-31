@@ -458,22 +458,14 @@ namespace CSharpE.Syntax.Internals
             return result;
         }
 
-        public static bool IsCompacted(Roslyn::SyntaxNode syntaxNode)
+        public static bool IsCompacted(Roslyn::SyntaxNode syntaxNode) => syntaxNode switch
         {
-            switch (syntaxNode)
-            {
-                case FieldDeclarationSyntax fieldDeclaration:
-                    return fieldDeclaration.Declaration.Variables.Count > 1;
-                case AttributeListSyntax attributeList:
-                    return attributeList.Attributes.Count > 1;
-                case LocalDeclarationStatementSyntax localDeclaration:
-                    return localDeclaration.Declaration.Variables.Count > 1;
-                case ForStatementSyntax forStatement:
-                    return forStatement.Initializers != default || forStatement.Declaration?.Variables.Count > 1;
-                default:
-                    return false;
-            }
-        }
+            BaseFieldDeclarationSyntax fieldDeclaration => fieldDeclaration.Declaration.Variables.Count > 1,
+            AttributeListSyntax attributeList => attributeList.Attributes.Count > 1,
+            LocalDeclarationStatementSyntax localDeclaration => localDeclaration.Declaration.Variables.Count > 1,
+            ForStatementSyntax forStatement => forStatement.Initializers != default || forStatement.Declaration?.Variables.Count > 1,
+            _ => false,
+        };
 
         public static IEnumerable<TRoslynSyntax> Expand<TRoslynSyntax>(TRoslynSyntax roslynSyntax)
             where TRoslynSyntax : Roslyn::SyntaxNode
@@ -490,7 +482,7 @@ namespace CSharpE.Syntax.Internals
 
             switch (roslynSyntax)
             {
-                case FieldDeclarationSyntax fieldDeclaration:
+                case BaseFieldDeclarationSyntax fieldDeclaration:
                     foreach (var variable in fieldDeclaration.Declaration.Variables)
                     {
                         var expandedSyntax = fieldDeclaration.WithDeclaration(
@@ -564,7 +556,9 @@ namespace CSharpE.Syntax.Internals
                     case FieldDeclarationSyntax field:
                         return new[] { field.Declaration.Variables.Single().Initializer };
                     case BasePropertyDeclarationSyntax property:
-                        return Array.Empty<Roslyn::SyntaxNode>(); // TODO
+                        return property.AccessorList.Accessors;
+                    case EventFieldDeclarationSyntax _:
+                        return Array.Empty<Roslyn::SyntaxNode>();
                     case BaseMethodDeclarationSyntax method:
                         return new[] { method.Body };
                     case BaseTypeDeclarationSyntax baseType:
@@ -590,6 +584,10 @@ namespace CSharpE.Syntax.Internals
                     return new FieldDefinition(field, containingType);
                 case PropertyDeclarationSyntax property:
                     return new PropertyDefinition(property, containingType);
+                case EventDeclarationSyntax @event:
+                    return new EventDefinition(@event, containingType);
+                case EventFieldDeclarationSyntax eventField:
+                    return new EventDefinition(eventField, containingType);
                 case MethodDeclarationSyntax method:
                     return new MethodDefinition(method, containingType);
                 case ConstructorDeclarationSyntax constructor:

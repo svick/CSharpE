@@ -37,7 +37,7 @@ namespace CSharpE.Syntax
 
         public PropertyDefinition(
             MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, string name, 
-            AccessorDefinition getAccessor,AccessorDefinition setAccessor)
+            AccessorDefinition getAccessor, AccessorDefinition setAccessor)
         {
             Modifiers = modifiers;
             Type = type;

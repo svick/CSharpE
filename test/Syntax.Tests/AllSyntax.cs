@@ -170,6 +170,25 @@ namespace N.M
         {
         }
 
+        event EventHandler E1
+        {
+            add
+            {
+            }
+            remove
+            {
+            }
+        }
+        event I.EventHandler E2
+        {
+            add
+            {
+            }
+            remove
+            {
+            }
+        }
+
         public static C operator !(C c)
         {
         }
