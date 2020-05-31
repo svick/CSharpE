@@ -8,7 +8,7 @@ using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Syntax
 {
-    public abstract class MemberDefinition : SyntaxNode, ISyntaxWrapper<MemberDeclarationSyntax>
+    public abstract class MemberDefinition : SyntaxNode, ISyntaxWrapper<MemberDeclarationSyntax>, IHasAttributes
     {
         internal MemberDefinition() { }
 
@@ -28,36 +28,6 @@ namespace CSharpE.Syntax
                 return attributes;
             }
             set => SetList(ref attributes, new SyntaxList<Attribute, AttributeListSyntax>(value, this));
-        }
-
-        public Attribute GetAttribute<T>() where T : System.Attribute => GetAttribute(typeof(T));
-
-        public Attribute GetAttribute(NamedTypeReference attributeType) =>
-            Attributes.SingleOrDefault(a => a.Type.Equals(attributeType));
-
-        public bool HasAttribute<T>() where T : System.Attribute => HasAttribute(typeof(T));
-
-        public bool HasAttribute(NamedTypeReference attributeType) => HasAttribute(attributeType.FullName);
-
-        private bool HasAttribute(string attributeTypeFullName)
-        {
-            if (!GetAttributeLists(this.GetWrapped()).Any())
-                return false;
-
-            var attributeLists = GetAttributeLists((MemberDeclarationSyntax)GetSourceFileNode());
-
-            var semanticModel = SourceFile.SemanticModel;
-            var attributeType = semanticModel.Compilation.GetTypeByMetadataName(attributeTypeFullName);
-
-            foreach (var attributeSyntax in attributeLists.SelectMany(al => al.Attributes))
-            {
-                var typeSymbol = semanticModel.GetTypeInfo(attributeSyntax).Type;
-
-                if (attributeType.Equals(typeSymbol))
-                    return true;
-            }
-
-            return false;
         }
 
         internal static SyntaxList<AttributeListSyntax> GetAttributeLists(MemberDeclarationSyntax syntax)

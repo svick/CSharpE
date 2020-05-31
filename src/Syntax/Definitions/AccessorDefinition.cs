@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,18 +8,30 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class AccessorDefinition : SyntaxNode, ISyntaxWrapper<AccessorDeclarationSyntax>
+    public sealed class AccessorDefinition : SyntaxNode, ISyntaxWrapper<AccessorDeclarationSyntax>, IHasAttributes
     {
         private AccessorDeclarationSyntax syntax;
 
         internal AccessorDefinition(AccessorDeclarationSyntax syntax, MemberDefinition parent)
             : base(syntax)
         {
-            this.syntax = syntax;
+            Init(syntax);
             Parent = parent;
         }
 
+        private void Init(AccessorDeclarationSyntax syntax)
+        {
+            this.syntax = syntax;
+
+            Accessibility = FromRoslyn.MemberModifiers(syntax.Modifiers);
+        }
+
         public AccessorDefinition() { }
+
+        public AccessorDefinition(MemberModifiers accessibility)
+        {
+            Accessibility = accessibility;
+        }
 
         private SyntaxKind? kind;
         internal SyntaxKind Kind
@@ -40,7 +53,20 @@ namespace CSharpE.Syntax
             }
         }
 
-        // TODO: attributes, bodies (incl. expression bodies), modifiers
+        private SyntaxList<Attribute, AttributeListSyntax> attributes;
+        public IList<Attribute> Attributes
+        {
+            get
+            {
+                if (attributes == null)
+                    attributes = new SyntaxList<Attribute, AttributeListSyntax>(syntax.AttributeLists, this);
+
+                return attributes;
+            }
+            set => SetList(ref attributes, new SyntaxList<Attribute, AttributeListSyntax>(value, this));
+        }
+
+        // TODO: bodies (incl. expression bodies)
 
         AccessorDeclarationSyntax ISyntaxWrapper<AccessorDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
@@ -61,10 +87,21 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax) =>
-            syntax = (AccessorDeclarationSyntax)newSyntax;
+        private MemberModifiers modifiers;
+        public MemberModifiers Accessibility
+        {
+            get => modifiers;
+            set => modifiers = modifiers.WithAccessibilityModifier(value);
+        }
 
-        private protected override SyntaxNode CloneImpl() => new AccessorDefinition();
+        private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
+        {
+            Init((AccessorDeclarationSyntax)newSyntax);
+
+            SetList(ref attributes, null);
+        }
+
+        private protected override SyntaxNode CloneImpl() => new AccessorDefinition(Accessibility) { Attributes = Attributes };
 
         public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression { }
     }
