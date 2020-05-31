@@ -34,10 +34,17 @@ namespace CSharpE.Syntax
             : this(returnType, name, parameters.AsEnumerable()) { }
 
         public DelegateDefinition(TypeReference returnType, string name, IEnumerable<Parameter> parameters)
+            : this(returnType, name, null, parameters) { }
+
+        public DelegateDefinition(
+            TypeReference returnType, string name, IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters,
+            IEnumerable<TypeParameterConstraintClause> constraintClauses = null)
         {
             ReturnType = returnType;
             Name = name;
+            this.typeParameters = new SeparatedSyntaxList<TypeParameter, TypeParameterSyntax>(typeParameters, this);
             this.parameters = new SeparatedSyntaxList<Parameter, ParameterSyntax>(parameters, this);
+            this.constraintClauses = new SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax>(constraintClauses, this);
         }
 
         private TypeReference returnType;
@@ -51,6 +58,20 @@ namespace CSharpE.Syntax
                 return returnType;
             }
             set => SetNotNull(ref returnType, value);
+        }
+
+        private SeparatedSyntaxList<TypeParameter, TypeParameterSyntax> typeParameters;
+        public IList<TypeParameter> TypeParameters
+        {
+            get
+            {
+                if (typeParameters == null)
+                    typeParameters = new SeparatedSyntaxList<TypeParameter, TypeParameterSyntax>(
+                        syntax.TypeParameterList?.Parameters ?? default, this);
+
+                return typeParameters;
+            }
+            set => SetList(ref typeParameters, new SeparatedSyntaxList<TypeParameter, TypeParameterSyntax>(value, this));
         }
 
         private SeparatedSyntaxList<Parameter, ParameterSyntax> parameters;
@@ -67,15 +88,34 @@ namespace CSharpE.Syntax
             set => SetList(ref parameters, new SeparatedSyntaxList<Parameter, ParameterSyntax>(value, this));
         }
 
+        private SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax> constraintClauses;
+        public IList<TypeParameterConstraintClause> ConstraintClauses
+        {
+            get
+            {
+                if (constraintClauses == null)
+                    constraintClauses = new SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax>(
+                        syntax.ConstraintClauses, this);
+
+                return constraintClauses;
+            }
+            set => SetList(
+                ref constraintClauses,
+                new SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax>(value, this));
+        }
+
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Init((DelegateDeclarationSyntax)newSyntax);
 
             Set(ref returnType, null);
+            SetList(ref typeParameters, null);
             SetList(ref parameters, null);
+            SetList(ref constraintClauses, null);
         }
 
-        private protected override SyntaxNode CloneImpl() => new DelegateDefinition(ReturnType, Name, Parameters);
+        private protected override SyntaxNode CloneImpl() =>
+            new DelegateDefinition(ReturnType, Name, TypeParameters, Parameters, ConstraintClauses);
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 
@@ -97,14 +137,18 @@ namespace CSharpE.Syntax
             var newModifiers = Modifiers;
             var newName = name.GetWrapped(ref thisChanged);
             var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? syntax.ReturnType;
+            var newTypeParameters = typeParameters?.GetWrapped(ref thisChanged) ?? syntax.TypeParameterList?.Parameters ?? default;
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
+            var newConstraints = constraintClauses?.GetWrapped(ref thisChanged) ?? syntax.ConstraintClauses;
 
             if (syntax == null || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
                 thisChanged == true || ShouldAnnotate(syntax, changed))
             {
+                var typeParameterList = newTypeParameters.Any() ? RoslynSyntaxFactory.TypeParameterList(newTypeParameters) : default;
+
                 var newSyntax = RoslynSyntaxFactory.DelegateDeclaration(
-                    newAttributes, newModifiers.GetWrapped(), newReturnType, newName, default,
-                    RoslynSyntaxFactory.ParameterList(newParameters), default);
+                    newAttributes, newModifiers.GetWrapped(), newReturnType, newName, typeParameterList,
+                    RoslynSyntaxFactory.ParameterList(newParameters), newConstraints);
 
                 syntax = Annotate(newSyntax);
 

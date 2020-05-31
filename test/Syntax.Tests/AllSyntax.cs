@@ -194,5 +194,6 @@ namespace N.M
         M
     }
 
-    delegate void D(in int i);
+    delegate void D<T>(in int i)
+        where T : class;
 }
