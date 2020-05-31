@@ -38,12 +38,20 @@ namespace CSharpE.Syntax
         public MethodDefinition(
             MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name,
             IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
+            : this(modifiers, returnType, explicitInterface, name, null, parameters, null, body) { }
+
+        public MethodDefinition(
+            MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name,
+            IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters,
+            IEnumerable<TypeParameterConstraintClause> constraintClauses, IEnumerable<Statement> body)
         {
             Modifiers = modifiers;
             ReturnType = returnType;
             ExplicitInterface = explicitInterface;
             Name = name;
+            TypeParameters = typeParameters?.ToList();
             Parameters = parameters?.ToList();
+            ConstraintClauses = constraintClauses?.ToList();
             Body = new BlockStatement(body);
         }
 
@@ -153,6 +161,36 @@ namespace CSharpE.Syntax
             set => name.Text = value;
         }
 
+        private SeparatedSyntaxList<TypeParameter, TypeParameterSyntax> typeParameters;
+        public IList<TypeParameter> TypeParameters
+        {
+            get
+            {
+                if (typeParameters == null)
+                    typeParameters = new SeparatedSyntaxList<TypeParameter, TypeParameterSyntax>(
+                        syntax.TypeParameterList?.Parameters ?? default, this);
+
+                return typeParameters;
+            }
+            set => SetList(ref typeParameters, new SeparatedSyntaxList<TypeParameter, TypeParameterSyntax>(value, this));
+        }
+
+        private SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax> constraintClauses;
+        public IList<TypeParameterConstraintClause> ConstraintClauses
+        {
+            get
+            {
+                if (constraintClauses == null)
+                    constraintClauses = new SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax>(
+                        syntax.ConstraintClauses, this);
+
+                return constraintClauses;
+            }
+            set => SetList(
+                ref constraintClauses,
+                new SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax>(value, this));
+        }
+
         MethodDeclarationSyntax ISyntaxWrapper<MethodDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
             GetAndResetChanged(ref changed);
@@ -165,7 +203,9 @@ namespace CSharpE.Syntax
                 ? explicitInterface?.GetWrappedName(ref thisChanged)
                 : syntax.ExplicitInterfaceSpecifier?.Name;
             var newName = name.GetWrapped(ref thisChanged);
+            var newTypeParameters = typeParameters?.GetWrapped(ref thisChanged) ?? syntax.TypeParameterList?.Parameters ?? default;
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
+            var newConstraints = constraintClauses?.GetWrapped(ref thisChanged) ?? syntax.ConstraintClauses;
             var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
 
             if (syntax == null || thisChanged == true || Modifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
@@ -175,9 +215,11 @@ namespace CSharpE.Syntax
                     ? null
                     : RoslynSyntaxFactory.ExplicitInterfaceSpecifier(newExplicitInterface);
 
+                var typeParameterList = newTypeParameters.Any() ? RoslynSyntaxFactory.TypeParameterList(newTypeParameters) : default;
+
                 var newSyntax = RoslynSyntaxFactory.MethodDeclaration(
-                    newAttributes, Modifiers.GetWrapped(), newReturnType, explicitInterfaceSpecifier, newName, null,
-                    RoslynSyntaxFactory.ParameterList(newParameters), default, newBody, null);
+                    newAttributes, Modifiers.GetWrapped(), newReturnType, explicitInterfaceSpecifier, newName, typeParameterList,
+                    RoslynSyntaxFactory.ParameterList(newParameters), newConstraints, newBody, null);
 
                 syntax = Annotate(newSyntax);
 
@@ -203,7 +245,8 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() =>
-            new MethodDefinition(Modifiers, ReturnType, ExplicitInterface, Name, Parameters, Body?.Statements)
+            new MethodDefinition(
+                Modifiers, ReturnType, ExplicitInterface, Name, TypeParameters, Parameters, ConstraintClauses, Body?.Statements)
             {
                 Attributes = Attributes
             };

@@ -14,7 +14,8 @@ namespace N.M
         int i;
         C? n;
         (int i, string) t;
-        ref int M()
+        ref int M<T>()
+            where T : object
         {
             WriteLine();
             Foo.WriteLine();

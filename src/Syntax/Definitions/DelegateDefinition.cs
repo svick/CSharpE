@@ -42,9 +42,9 @@ namespace CSharpE.Syntax
         {
             ReturnType = returnType;
             Name = name;
-            this.typeParameters = new SeparatedSyntaxList<TypeParameter, TypeParameterSyntax>(typeParameters, this);
-            this.parameters = new SeparatedSyntaxList<Parameter, ParameterSyntax>(parameters, this);
-            this.constraintClauses = new SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax>(constraintClauses, this);
+            TypeParameters = typeParameters?.ToList();
+            Parameters = parameters?.ToList();
+            ConstraintClauses = constraintClauses?.ToList();
         }
 
         private TypeReference returnType;
