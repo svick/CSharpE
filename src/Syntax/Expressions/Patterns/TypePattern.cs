@@ -17,7 +17,7 @@ namespace CSharpE.Syntax
             Parent = parent;
         }
 
-        internal TypePattern(TypeReference type, VariableDesignation designation)
+        public TypePattern(TypeReference type, VariableDesignation designation)
         {
             Type = type;
             Designation = designation;

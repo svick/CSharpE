@@ -56,7 +56,9 @@ namespace CSharpE.Syntax.Tests
             JoinIntoClause,
             QueryContinuation,
             QueryBody,
-            UsingDirective
+            UsingDirective,
+            PositionalPatternClause,
+            PropertyPatternClause
         };
 
         [Fact]
