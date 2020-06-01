@@ -394,4 +394,17 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new RightShiftAssignmentExpression(Left, Right);
     }
+
+    public sealed class CoalesceAssignmentExpression : BinaryExpression
+    {
+        private protected override bool IsAssignment => true;
+
+        internal CoalesceAssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public CoalesceAssignmentExpression(Expression left, Expression right)
+            : base(left, right) { }
+
+        private protected override SyntaxNode CloneImpl() => new CoalesceAssignmentExpression(Left, Right);
+    }
 }

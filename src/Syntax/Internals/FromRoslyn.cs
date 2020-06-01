@@ -140,35 +140,23 @@ namespace CSharpE.Syntax.Internals
             throw new NotImplementedException(syntax.GetType().Name);
         }
 
-        private static BinaryExpression AssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent)
-        {
-            switch (syntax.Kind())
+        private static BinaryExpression AssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent) =>
+            (syntax.Kind()) switch
             {
-                case SyntaxKind.SimpleAssignmentExpression:
-                    return new AssignmentExpression(syntax, parent);
-                case SyntaxKind.AddAssignmentExpression:
-                    return new AddAssignmentExpression(syntax, parent);
-                case SyntaxKind.SubtractAssignmentExpression:
-                    return new SubtractAssignmentExpression(syntax, parent);
-                case SyntaxKind.MultiplyAssignmentExpression:
-                    return new MultiplyAssignmentExpression(syntax, parent);
-                case SyntaxKind.DivideAssignmentExpression:
-                    return new DivideAssignmentExpression(syntax, parent);
-                case SyntaxKind.ModuloAssignmentExpression:
-                    return new ModuloAssignmentExpression(syntax, parent);
-                case SyntaxKind.AndAssignmentExpression:
-                    return new AndAssignmentExpression(syntax, parent);
-                case SyntaxKind.ExclusiveOrAssignmentExpression:
-                    return new XorAssignmentExpression(syntax, parent);
-                case SyntaxKind.OrAssignmentExpression:
-                    return new OrAssignmentExpression(syntax, parent);
-                case SyntaxKind.LeftShiftAssignmentExpression:
-                    return new LeftShiftAssignmentExpression(syntax, parent);
-                case SyntaxKind.RightShiftAssignmentExpression:
-                    return new RightShiftAssignmentExpression(syntax, parent);
-            }
-            throw new InvalidOperationException();
-        }
+                SyntaxKind.SimpleAssignmentExpression => new AssignmentExpression(syntax, parent),
+                SyntaxKind.AddAssignmentExpression => new AddAssignmentExpression(syntax, parent),
+                SyntaxKind.SubtractAssignmentExpression => new SubtractAssignmentExpression(syntax, parent),
+                SyntaxKind.MultiplyAssignmentExpression => new MultiplyAssignmentExpression(syntax, parent),
+                SyntaxKind.DivideAssignmentExpression => new DivideAssignmentExpression(syntax, parent),
+                SyntaxKind.ModuloAssignmentExpression => new ModuloAssignmentExpression(syntax, parent),
+                SyntaxKind.AndAssignmentExpression => new AndAssignmentExpression(syntax, parent),
+                SyntaxKind.ExclusiveOrAssignmentExpression => new XorAssignmentExpression(syntax, parent),
+                SyntaxKind.OrAssignmentExpression => new OrAssignmentExpression(syntax, parent),
+                SyntaxKind.LeftShiftAssignmentExpression => new LeftShiftAssignmentExpression(syntax, parent),
+                SyntaxKind.RightShiftAssignmentExpression => new RightShiftAssignmentExpression(syntax, parent),
+                SyntaxKind.CoalesceAssignmentExpression => new CoalesceAssignmentExpression(syntax, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
         private static BinaryExpression BinaryExpression(BinaryExpressionSyntax syntax, SyntaxNode parent)
         {
