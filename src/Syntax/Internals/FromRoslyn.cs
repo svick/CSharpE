@@ -249,29 +249,20 @@ namespace CSharpE.Syntax.Internals
             throw new InvalidOperationException();
         }
 
-        private static UnaryExpression PrefixUnaryExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
-        {
-            switch (syntax.Kind())
+        private static UnaryExpression PrefixUnaryExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent) =>
+            (syntax.Kind()) switch
             {
-                case SyntaxKind.UnaryPlusExpression:
-                    return new UnaryPlusExpression(syntax, parent);
-                case SyntaxKind.UnaryMinusExpression:
-                    return new UnaryMinusExpression(syntax, parent);
-                case SyntaxKind.BitwiseNotExpression:
-                    return new ComplementExpression(syntax, parent);
-                case SyntaxKind.LogicalNotExpression:
-                    return new NegateExpression(syntax, parent);
-                case SyntaxKind.PreIncrementExpression:
-                    return new PreIncrementExpression(syntax, parent);
-                case SyntaxKind.PreDecrementExpression:
-                    return new PreDecrementExpression(syntax, parent);
-                case SyntaxKind.AddressOfExpression:
-                    return new AddressOfExpression(syntax, parent);
-                case SyntaxKind.PointerIndirectionExpression:
-                    return new PointerIndirectionExpression(syntax, parent);
-            }
-            throw new InvalidOperationException();
-        }
+                SyntaxKind.UnaryPlusExpression => new UnaryPlusExpression(syntax, parent),
+                SyntaxKind.UnaryMinusExpression => new UnaryMinusExpression(syntax, parent),
+                SyntaxKind.BitwiseNotExpression => new ComplementExpression(syntax, parent),
+                SyntaxKind.LogicalNotExpression => new NegateExpression(syntax, parent),
+                SyntaxKind.PreIncrementExpression => new PreIncrementExpression(syntax, parent),
+                SyntaxKind.PreDecrementExpression => new PreDecrementExpression(syntax, parent),
+                SyntaxKind.AddressOfExpression => new AddressOfExpression(syntax, parent),
+                SyntaxKind.PointerIndirectionExpression => new PointerIndirectionExpression(syntax, parent),
+                SyntaxKind.IndexExpression => new IndexExpression(syntax, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
         private static UnaryExpression PostfixUnaryExpression(PostfixUnaryExpressionSyntax syntax, SyntaxNode parent)
         {

@@ -110,4 +110,16 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new PostDecrementExpression(Operand);
     }
+
+    public sealed class IndexExpression : UnaryExpression
+    {
+        private protected override bool IsPrefix => true;
+
+        internal IndexExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public IndexExpression(Expression operand) : base(operand) { }
+
+        private protected override SyntaxNode CloneImpl() => new IndexExpression(Operand);
+    }
 }
