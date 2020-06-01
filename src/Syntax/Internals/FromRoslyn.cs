@@ -119,6 +119,8 @@ namespace CSharpE.Syntax.Internals
                     return PrefixUnaryExpression(prefixUnary, parent);
                 case QueryExpressionSyntax query:
                     return new LinqExpression(query, parent);
+                case RangeExpressionSyntax range:
+                    return new RangeExpression(range, parent);
                 case RefExpressionSyntax @ref:
                     return new RefExpression(@ref, parent);
                 case SizeOfExpressionSyntax sizeOf:
