@@ -280,11 +280,6 @@ namespace CSharpE.Syntax
             return new AnonymousNewExpression(initializers);
         }
 
-        public static Argument Argument(Expression expression, string name = null)
-        {
-            return new Argument(expression, name);
-        }
-
         public static AwaitExpression Await(Expression operand)
         {
             return new AwaitExpression(operand);

@@ -58,6 +58,8 @@ class C
         {
             case 1 when false:
                 break;
+            case C(arg1: 0, 1) { Prop: { } } c:
+                break;
         }
 
         int i, j = 42;

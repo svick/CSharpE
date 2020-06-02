@@ -51,7 +51,7 @@ namespace CSharpE.Syntax.Tests
         [Fact]
         public void CreteNamedArgument()
         {
-            var argument = new Argument(new NullExpression(), "arg");
+            var argument = new Argument("arg", new NullExpression());
 
             Assert.Equal("arg: null", argument.ToString());
         }

@@ -29,7 +29,7 @@ namespace N.M
             await null;
             _ = A.B;
             _ = this;
-            M(42);
+            M(42, foo: 13);
             _ = (0);
             _ = checked(unchecked(0));
             _ = true ? 1 : 0;

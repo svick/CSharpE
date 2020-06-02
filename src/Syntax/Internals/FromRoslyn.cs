@@ -319,6 +319,8 @@ namespace CSharpE.Syntax.Internals
         {
             switch (syntax)
             {
+                case null:
+                    return null;
                 case DiscardDesignationSyntax _:
                 case SingleVariableDesignationSyntax _:
                     return new SingleVariableDesignation(syntax, parent);
@@ -326,7 +328,7 @@ namespace CSharpE.Syntax.Internals
                     return new MultiVariableDesignation(parenthesized, parent);
             }
 
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(syntax.GetType().Name);
         }
 
         private static IEnumerable<Roslyn::SyntaxNode> StatementChildren(StatementSyntax syntax) =>
@@ -718,6 +720,11 @@ namespace CSharpE.Syntax.Internals
                     return new ConstantPattern(constant, parent);
                 case DeclarationPatternSyntax declaration:
                     return new TypePattern(declaration, parent);
+                case RecursivePatternSyntax recursive:
+                    if (recursive.PositionalPatternClause == null)
+                        return new PropertyPattern(recursive, parent);
+                    else
+                        return new PositionalPattern(recursive, parent);
             }
 
             throw new InvalidOperationException();

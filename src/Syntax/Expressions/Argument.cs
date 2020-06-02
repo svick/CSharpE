@@ -14,15 +14,23 @@ namespace CSharpE.Syntax
         internal Argument(ArgumentSyntax syntax, SyntaxNode parent)
             : base(syntax)
         {
-            this.syntax = syntax ?? throw new ArgumentNullException(nameof(syntax));
-            Name = syntax.NameColon?.Name.Identifier.ValueText;
+            Init(syntax);
             Parent = parent;
         }
 
-        public Argument(Expression expression, string name = null)
+        private void Init(ArgumentSyntax syntax)
         {
-            Expression = expression;
+            this.syntax = syntax;
+            Name = syntax.NameColon?.Name.Identifier.ValueText;
+        }
+
+        public Argument(Expression expression)
+            : this(null, expression) { }
+
+        public Argument(string name, Expression expression)
+        {
             Name = name;
+            Expression = expression;
         }
 
         public string Name { get; set; }
@@ -66,11 +74,11 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            syntax = (ArgumentSyntax)newSyntax;
+            Init((ArgumentSyntax)newSyntax);
             expression = null;
         }
 
-        private protected override SyntaxNode CloneImpl() => new Argument(Expression);
+        private protected override SyntaxNode CloneImpl() => new Argument(Name, Expression);
 
         public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression =>
             Expression = Expression.ReplaceExpressions(Expression, filter, projection);

@@ -30,17 +30,25 @@ namespace CSharpE.Syntax
             Designation = designation;
         }
 
+        private bool typeSet;
         private TypeReference type;
         public TypeReference Type
         {
             get
             {
-                if (type == null)
+                if (!typeSet)
+                {
                     type = FromRoslyn.TypeReference(syntax.Type, this);
+                    typeSet = true;
+                }
 
                 return type;
             }
-            set => SetNotNull(ref type, value);
+            set
+            {
+                Set(ref type, value);
+                typeSet = true;
+            }
         }
 
         private SeparatedSyntaxList<Subpattern, SubpatternSyntax> positionalSubpatterns;
@@ -71,17 +79,25 @@ namespace CSharpE.Syntax
             set => SetList(ref propertySubpatterns, new SeparatedSyntaxList<Subpattern, SubpatternSyntax>(value, this));
         }
 
+        private bool designationSet;
         private VariableDesignation designation;
         public VariableDesignation Designation
         {
             get
             {
-                if (designation == null)
+                if (!designationSet)
+                {
                     designation = FromRoslyn.VariableDesignation(syntax.Designation, this);
+                    designationSet = true;
+                }
 
                 return designation;
             }
-            set => SetNotNull(ref designation, value);
+            set
+            {
+                Set(ref designation, value);
+                designationSet = true;
+            }
         }
 
         protected override PatternSyntax GetWrapped(ref bool? changed)
@@ -90,12 +106,12 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
-            var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
+            var newType = typeSet ? type?.GetWrapped(ref thisChanged) : syntax.Type;
             var newPositionalSubpatterns =
                 positionalSubpatterns?.GetWrapped(ref thisChanged) ?? syntax.PositionalPatternClause?.Subpatterns ?? default;
             var newPropertySubpatterns =
                 propertySubpatterns?.GetWrapped(ref thisChanged) ?? syntax.PropertyPatternClause?.Subpatterns ?? default;
-            var newDesignation = designation?.GetWrapped(ref thisChanged) ?? syntax.Designation;
+            var newDesignation = designationSet ? designation?.GetWrapped(ref thisChanged) : syntax.Designation;
 
             if (syntax == null || thisChanged == true)
             {
@@ -118,15 +134,15 @@ namespace CSharpE.Syntax
         {
             syntax = (RecursivePatternSyntax)newSyntax;
             Set(ref type, null);
+            typeSet = false;
             SetList(ref positionalSubpatterns, null);
             SetList(ref propertySubpatterns, null);
             Set(ref designation, null);
+            designationSet = false;
         }
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) { }
     }
-
-    public sealed class Subpattern : SyntaxNode, ISyntaxWrapper<SubpatternSyntax> { }
 
     public sealed class PositionalPattern : RecursivePattern
     {
