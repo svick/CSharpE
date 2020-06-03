@@ -720,6 +720,8 @@ namespace CSharpE.Syntax.Internals
                     return new ConstantPattern(constant, parent);
                 case DeclarationPatternSyntax declaration:
                     return new TypePattern(declaration, parent);
+                case DiscardPatternSyntax discard:
+                    return new DiscardPattern(discard, parent);
                 case RecursivePatternSyntax recursive:
                     if (recursive.PositionalPatternClause == null)
                         return new PropertyPattern(recursive, parent);

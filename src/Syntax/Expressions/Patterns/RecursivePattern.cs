@@ -58,7 +58,7 @@ namespace CSharpE.Syntax
             {
                 if (positionalSubpatterns == null)
                     positionalSubpatterns = new SeparatedSyntaxList<Subpattern, SubpatternSyntax>(
-                        syntax.PositionalPatternClause.Subpatterns, this);
+                        syntax.PositionalPatternClause?.Subpatterns ?? default, this);
 
                 return positionalSubpatterns;
             }
@@ -141,7 +141,21 @@ namespace CSharpE.Syntax
             designationSet = false;
         }
 
-        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) { }
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            foreach (var pattern in PositionalSubpatterns)
+            {
+                pattern.ReplaceExpressions(filter, projection);
+            }
+
+            foreach (var pattern in PropertySubpatterns)
+            {
+                pattern.ReplaceExpressions(filter, projection);
+            }
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() =>
+            new SyntaxNode[] { Type }.Concat(PositionalSubpatterns).Concat(PropertySubpatterns).Concat(new[] { Designation });
     }
 
     public sealed class PositionalPattern : RecursivePattern

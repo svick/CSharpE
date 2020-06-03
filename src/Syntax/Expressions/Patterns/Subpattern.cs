@@ -1,4 +1,5 @@
-﻿using CSharpE.Syntax.Internals;
+﻿using System;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -77,5 +78,8 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new Subpattern(Name, Pattern);
+
+        public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression =>
+            Pattern.ReplaceExpressions(filter, projection);
     }
 }

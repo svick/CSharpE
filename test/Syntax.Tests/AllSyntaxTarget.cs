@@ -88,7 +88,7 @@ class C
         {
             case 1when false:
                 break;
-            case C(arg1: 0, 1)
+            case C(arg1: 0, 1, _)
             {
             Prop:
             {
