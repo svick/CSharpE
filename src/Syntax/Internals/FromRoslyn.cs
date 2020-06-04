@@ -712,25 +712,18 @@ namespace CSharpE.Syntax.Internals
             throw new InvalidOperationException();
         }
 
-        public static Pattern Pattern(PatternSyntax patternSyntax, SyntaxNode parent)
-        {
-            switch (patternSyntax)
+        public static Pattern Pattern(PatternSyntax patternSyntax, SyntaxNode parent) =>
+            patternSyntax switch
             {
-                case ConstantPatternSyntax constant:
-                    return new ConstantPattern(constant, parent);
-                case DeclarationPatternSyntax declaration:
-                    return new TypePattern(declaration, parent);
-                case DiscardPatternSyntax discard:
-                    return new DiscardPattern(discard, parent);
-                case RecursivePatternSyntax recursive:
-                    if (recursive.PositionalPatternClause == null)
-                        return new PropertyPattern(recursive, parent);
-                    else
-                        return new PositionalPattern(recursive, parent);
-            }
-
-            throw new InvalidOperationException();
-        }
+                ConstantPatternSyntax constant => new ConstantPattern(constant, parent),
+                DeclarationPatternSyntax declaration => new TypePattern(declaration, parent),
+                DiscardPatternSyntax discard => new DiscardPattern(discard, parent),
+                RecursivePatternSyntax recursive => recursive.PositionalPatternClause == null
+                    ? (Pattern)new PropertyPattern(recursive, parent)
+                    : new PositionalPattern(recursive, parent),
+                VarPatternSyntax var => new VarPattern(var, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
         public static LinqClause LinqClause(Roslyn::SyntaxNode clauseSyntax, LinqExpression parent)
         {

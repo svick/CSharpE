@@ -158,6 +158,8 @@ namespace N.M
                     goto default;
                 case string s:
                     break;
+                case var x:
+                    break;
                 case 1:
                 default:
                     goto case 0;

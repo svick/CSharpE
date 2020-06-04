@@ -6,35 +6,18 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public sealed class TypePattern : Pattern
+    public sealed class VarPattern : Pattern
     {
-        private DeclarationPatternSyntax syntax;
+        private VarPatternSyntax syntax;
 
-        internal TypePattern(DeclarationPatternSyntax syntax, SyntaxNode parent)
+        internal VarPattern(VarPatternSyntax syntax, SyntaxNode parent)
             : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;
         }
 
-        public TypePattern(TypeReference type, VariableDesignation designation)
-        {
-            Type = type;
-            Designation = designation;
-        }
-
-        private TypeReference type;
-        public TypeReference Type
-        {
-            get
-            {
-                if (type == null)
-                    type = FromRoslyn.TypeReference(syntax.Type, this);
-
-                return type;
-            }
-            set => SetNotNull(ref type, value);
-        }
+        public VarPattern(VariableDesignation designation) => Designation = designation;
 
         private VariableDesignation designation;
         public VariableDesignation Designation
@@ -53,12 +36,11 @@ namespace CSharpE.Syntax
         {
             GetAndResetChanged(ref changed, out var thisChanged);
 
-            var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
             var newDesignation = designation?.GetWrapped(ref thisChanged) ?? syntax.Designation;
 
             if (syntax == null || thisChanged == true)
             {
-                syntax = RoslynSyntaxFactory.DeclarationPattern(newType, newDesignation);
+                syntax = RoslynSyntaxFactory.VarPattern(newDesignation);
 
                 SetChanged(ref changed);
             }
@@ -68,12 +50,11 @@ namespace CSharpE.Syntax
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
-            syntax = (DeclarationPatternSyntax)newSyntax;
-            Set(ref type, null);
+            syntax = (VarPatternSyntax)newSyntax;
             Set(ref designation, null);
         }
 
-        private protected override SyntaxNode CloneImpl() => new TypePattern(Type, Designation);
+        private protected override SyntaxNode CloneImpl() => new VarPattern(Designation);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) { }
     }
