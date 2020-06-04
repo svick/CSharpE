@@ -252,17 +252,14 @@ namespace CSharpE.Syntax.Internals
                 _ => throw new InvalidOperationException(),
             };
 
-        private static UnaryExpression PostfixUnaryExpression(PostfixUnaryExpressionSyntax syntax, SyntaxNode parent)
-        {
-            switch (syntax.Kind())
+        private static UnaryExpression PostfixUnaryExpression(PostfixUnaryExpressionSyntax syntax, SyntaxNode parent) =>
+            (syntax.Kind()) switch
             {
-                case SyntaxKind.PostIncrementExpression:
-                    return new PostIncrementExpression(syntax, parent);
-                case SyntaxKind.PostDecrementExpression:
-                    return new PostDecrementExpression(syntax, parent);
-            }
-            throw new InvalidOperationException();
-        }
+                SyntaxKind.PostIncrementExpression => new PostIncrementExpression(syntax, parent),
+                SyntaxKind.PostDecrementExpression => new PostDecrementExpression(syntax, parent),
+                SyntaxKind.SuppressNullableWarningExpression => new SuppressNullableWarningExpression(syntax, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
         public static Expression LiteralExpression(LiteralExpressionSyntax syntax, SyntaxNode parent)
         {

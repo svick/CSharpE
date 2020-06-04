@@ -122,4 +122,16 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new IndexExpression(Operand);
     }
+
+    public sealed class SuppressNullableWarningExpression : UnaryExpression
+    {
+        private protected override bool IsPrefix => false;
+
+        internal SuppressNullableWarningExpression(PostfixUnaryExpressionSyntax syntax, SyntaxNode parent)
+            : base(syntax, parent) { }
+
+        public SuppressNullableWarningExpression(Expression operand) : base(operand) { }
+
+        private protected override SyntaxNode CloneImpl() => new SuppressNullableWarningExpression(Operand);
+    }
 }

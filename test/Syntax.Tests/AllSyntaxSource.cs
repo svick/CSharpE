@@ -24,6 +24,7 @@ class C
         _ = delegate (int i) { };
         _ = 1 is 1;
         _ = 1 is int i;
+        _ = null!;
         _ =
             from i in null
             orderby i ascending
