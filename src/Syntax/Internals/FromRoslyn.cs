@@ -127,6 +127,8 @@ namespace CSharpE.Syntax.Internals
                     return new SizeOfExpression(sizeOf, parent);
                 case StackAllocArrayCreationExpressionSyntax stackAllocArrayCreation:
                     return new StackAllocExpression(stackAllocArrayCreation, parent);
+                case SwitchExpressionSyntax @switch:
+                    return new SwitchExpression(@switch, parent);
                 case ThisExpressionSyntax @this:
                     return new ThisExpression(@this, parent);
                 case ThrowExpressionSyntax @throw:
@@ -141,7 +143,7 @@ namespace CSharpE.Syntax.Internals
         }
 
         private static BinaryExpression AssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent) =>
-            (syntax.Kind()) switch
+            syntax.Kind() switch
             {
                 SyntaxKind.SimpleAssignmentExpression => new AssignmentExpression(syntax, parent),
                 SyntaxKind.AddAssignmentExpression => new AddAssignmentExpression(syntax, parent),
@@ -238,7 +240,7 @@ namespace CSharpE.Syntax.Internals
         }
 
         private static UnaryExpression PrefixUnaryExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent) =>
-            (syntax.Kind()) switch
+            syntax.Kind() switch
             {
                 SyntaxKind.UnaryPlusExpression => new UnaryPlusExpression(syntax, parent),
                 SyntaxKind.UnaryMinusExpression => new UnaryMinusExpression(syntax, parent),
@@ -253,7 +255,7 @@ namespace CSharpE.Syntax.Internals
             };
 
         private static UnaryExpression PostfixUnaryExpression(PostfixUnaryExpressionSyntax syntax, SyntaxNode parent) =>
-            (syntax.Kind()) switch
+            syntax.Kind() switch
             {
                 SyntaxKind.PostIncrementExpression => new PostIncrementExpression(syntax, parent),
                 SyntaxKind.PostDecrementExpression => new PostDecrementExpression(syntax, parent),

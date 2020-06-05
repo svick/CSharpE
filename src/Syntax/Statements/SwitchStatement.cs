@@ -24,7 +24,7 @@ namespace CSharpE.Syntax
         public SwitchStatement(Expression expression, IEnumerable<SwitchSection> sections)
         {
             Expression = expression;
-            this.sections = new SyntaxList<SwitchSection, SwitchSectionSyntax>(sections, this);
+            Sections = sections?.ToList();
         }
 
         private Expression expression;
@@ -55,9 +55,7 @@ namespace CSharpE.Syntax
 
         private protected override StatementSyntax GetWrappedStatement(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
             var newSections = sections?.GetWrapped(ref thisChanged) ?? syntax.Sections;

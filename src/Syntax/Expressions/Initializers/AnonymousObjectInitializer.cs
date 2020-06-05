@@ -47,7 +47,7 @@ namespace CSharpE.Syntax
 
                 return expression;
             }
-            set => Set(ref expression, value);
+            set => SetNotNull(ref expression, value);
         }
 
         AnonymousObjectMemberDeclaratorSyntax ISyntaxWrapper<AnonymousObjectMemberDeclaratorSyntax>.GetWrapped(ref bool? changed)

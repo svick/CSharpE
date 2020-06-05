@@ -31,6 +31,7 @@ class C
             group i by i into g
             select i into i
             select i;
+        _ = 42 switch { _ => 0 };
         foreach ((int i, _) in new (int, int)[0])
         {
         }

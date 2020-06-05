@@ -64,9 +64,7 @@ namespace CSharpE.Syntax
 
         private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newCondition = condition?.GetWrapped(ref thisChanged) ?? syntax.Condition;
             var newWhenTrue = whenTrue?.GetWrapped(ref thisChanged) ?? syntax.WhenTrue;
