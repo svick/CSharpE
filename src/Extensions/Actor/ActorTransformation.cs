@@ -37,14 +37,14 @@ namespace CSharpE.Extensions.Actor
                     if (designTime2)
                     {
                         if (needsYield)
-                            method.Body.Statements.Insert(0, Await(NamedType(typeof(Task)).Call(nameof(Task.Yield))));
+                            method.StatementBody.Statements.Insert(0, Await(NamedType(typeof(Task)).Call(nameof(Task.Yield))));
                     }
                     else
                     {
-                        method.Body.Statements = new Statement[]
+                        method.StatementBody.Statements = new Statement[]
                         {
                             Await(asf.Call("WaitAsync")),
-                            TryFinally(method.Body.Statements, new Statement[] { asf.Call("Release") })
+                            TryFinally(method.StatementBody.Statements, new Statement[] { asf.Call("Release") })
                         };
                     }
                 });

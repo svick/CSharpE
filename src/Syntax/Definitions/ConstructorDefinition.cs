@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -30,16 +31,30 @@ namespace CSharpE.Syntax
         }
 
         public ConstructorDefinition(
-            MemberModifiers modifiers, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
-            : this(modifiers, parameters, null, body) { }
+            MemberModifiers modifiers, IEnumerable<Parameter> parameters, BlockStatement statementBody)
+            : this(modifiers, parameters, null, statementBody) { }
 
         public ConstructorDefinition(
-            MemberModifiers modifiers, IEnumerable<Parameter> parameters, ConstructorInitializer initializer, IEnumerable<Statement> body)
+            MemberModifiers modifiers, IEnumerable<Parameter> parameters, ConstructorInitializer initializer, BlockStatement statementBody)
+            : this(modifiers, parameters, initializer, statementBody, null) { }
+
+        public ConstructorDefinition(
+            MemberModifiers modifiers, IEnumerable<Parameter> parameters, Expression expressionBody)
+            : this(modifiers, parameters, null, expressionBody) { }
+
+        public ConstructorDefinition(
+            MemberModifiers modifiers, IEnumerable<Parameter> parameters, ConstructorInitializer initializer, Expression expressionBody)
+            : this(modifiers, parameters, initializer, null, expressionBody) { }
+
+        private ConstructorDefinition(
+            MemberModifiers modifiers, IEnumerable<Parameter> parameters, ConstructorInitializer initializer,
+            BlockStatement statementBody, Expression expressionBody)
         {
             Modifiers = modifiers;
             Parameters = parameters?.ToList();
             Initializer = initializer;
-            Body = new BlockStatement(body?.ToList());
+            StatementBody = statementBody;
+            ExpressionBody = expressionBody;
         }
 
         #region Modifiers
@@ -87,15 +102,14 @@ namespace CSharpE.Syntax
 
         ConstructorDeclarationSyntax ISyntaxWrapper<ConstructorDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
             var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.Initializer;
-            var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
+            var newStatementBody = statementBodySet ? statementBody?.GetWrapped(ref thisChanged) : syntax.Body;
+            var newExpressionBody = expressionBodySet ? expressionBody?.GetWrapped(ref thisChanged) : syntax.ExpressionBody?.Expression;
 
             if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || ShouldAnnotate(syntax, changed))
@@ -103,9 +117,12 @@ namespace CSharpE.Syntax
                 if (Parent == null)
                     throw new InvalidOperationException("Can't create syntax node for constructor with no parent type.");
 
+                var arrowClause = newExpressionBody == null ? null : RoslynSyntaxFactory.ArrowExpressionClause(newExpressionBody);
+                var semicolonToken = newStatementBody == null ? RoslynSyntaxFactory.Token(SyntaxKind.SemicolonToken) : default;
+
                 var newSyntax = RoslynSyntaxFactory.ConstructorDeclaration(
                     newAttributes, newModifiers.GetWrapped(), RoslynSyntaxFactory.Identifier(ParentType.Name),
-                    RoslynSyntaxFactory.ParameterList(newParameters), newInitializer, newBody);
+                    RoslynSyntaxFactory.ParameterList(newParameters), newInitializer, newStatementBody, arrowClause, semicolonToken);
 
                 syntax = Annotate(newSyntax);
 
@@ -126,10 +143,14 @@ namespace CSharpE.Syntax
             SetList(ref parameters, null);
             Set(ref initializer, null);
             initializerSet = false;
-            Set(ref body, null);
+            Set(ref statementBody, null);
+            statementBodySet = false;
+            Set(ref expressionBody, null);
+            expressionBodySet = false;
         }
 
-        private protected override SyntaxNode CloneImpl() => new ConstructorDefinition(Modifiers, Parameters, Initializer, Body.Statements);
+        private protected override SyntaxNode CloneImpl() =>
+            new ConstructorDefinition(Modifiers, Parameters, Initializer, StatementBody, ExpressionBody) { Attributes = Attributes };
 
         protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
@@ -137,5 +158,8 @@ namespace CSharpE.Syntax
 
             base.ReplaceExpressionsImpl(filter, projection);
         }
+
+        public override IEnumerable<SyntaxNode> GetChildren() =>
+            Attributes.Concat<SyntaxNode>(Parameters).Concat(new SyntaxNode[] { Initializer, StatementBody, ExpressionBody });
     }
 }

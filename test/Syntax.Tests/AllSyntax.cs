@@ -178,6 +178,8 @@ namespace N.M
         {
         }
 
+        int M1() => 42;
+        abstract void M2();
         int P1
         {
             get
@@ -233,13 +235,20 @@ namespace N.M
         {
         }
 
+        public static extern C operator !(C c);
+        public static C operator !(C c) => null;
         public static implicit operator S(C c)
         {
         }
 
+        C() => WriteLine();
+        extern C(int i);
         ~C()
         {
         }
+
+        ~C() => WriteLine();
+        extern ~C();
     }
 
     struct S

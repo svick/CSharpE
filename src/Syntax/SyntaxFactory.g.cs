@@ -45,16 +45,6 @@ namespace CSharpE.Syntax
             return new AccessorDefinition();
         }
 
-        public static ConstructorDefinition ConstructorDefinition(MemberModifiers modifiers, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
-        {
-            return new ConstructorDefinition(modifiers, parameters, body);
-        }
-
-        public static ConstructorDefinition ConstructorDefinition(MemberModifiers modifiers, IEnumerable<Parameter> parameters, ConstructorInitializer initializer, IEnumerable<Statement> body)
-        {
-            return new ConstructorDefinition(modifiers, parameters, initializer, body);
-        }
-
         public static ConstructorInitializer ConstructorInitializer(ConstructorInitializerKind kind, params Argument[] arguments)
         {
             return new ConstructorInitializer(kind, arguments);
@@ -95,21 +85,6 @@ namespace CSharpE.Syntax
             return new FieldDefinition(type, name, initializer);
         }
 
-        public static FinalizerDefinition FinalizerDefinition(MemberModifiers modifiers, IEnumerable<Statement> body)
-        {
-            return new FinalizerDefinition(modifiers, body);
-        }
-
-        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
-        {
-            return new MethodDefinition(modifiers, returnType, name, parameters, body);
-        }
-
-        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
-        {
-            return new MethodDefinition(modifiers, returnType, explicitInterface, name, parameters, body);
-        }
-
         public static NamespaceDefinition NamespaceDefinition(string name, params NamespaceOrTypeDefinition[] members)
         {
             return new NamespaceDefinition(name, members);
@@ -118,11 +93,6 @@ namespace CSharpE.Syntax
         public static NamespaceDefinition NamespaceDefinition(string name, IEnumerable<NamespaceOrTypeDefinition> members)
         {
             return new NamespaceDefinition(name, members);
-        }
-
-        public static OperatorDefinition OperatorDefinition(MemberModifiers modifiers, TypeReference returnType, OperatorKind kind, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
-        {
-            return new OperatorDefinition(modifiers, returnType, kind, parameters, body);
         }
 
         public static PropertyDefinition PropertyDefinition(MemberModifiers modifiers, TypeReference type, string name, AccessorDefinition getAccessor, AccessorDefinition setAccessor)

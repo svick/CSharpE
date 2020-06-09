@@ -42,26 +42,53 @@ namespace CSharpE.Syntax
             set => SetList(ref parameters, new SeparatedSyntaxList<Parameter, ParameterSyntax>(value, this));
         }
 
-        // TODO: methods without body and with expression body
-
-        private protected bool bodySet;
-        private protected BlockStatement body;
-        public BlockStatement Body
+        private protected bool statementBodySet;
+        private protected BlockStatement statementBody;
+        public BlockStatement StatementBody
         {
             get
             {
-                if (!bodySet)
+                if (!statementBodySet)
                 {
-                    body = BaseMethodSyntax.Body == null ? null : new BlockStatement(BaseMethodSyntax.Body, this); 
-                    bodySet = true;
+                    statementBody = BaseMethodSyntax.Body == null ? null : new BlockStatement(BaseMethodSyntax.Body, this); 
+                    statementBodySet = true;
                 }
 
-                return body;
+                return statementBody;
             }
             set
             {
-                Set(ref body, value);
-                bodySet = true;
+                Set(ref statementBody, value);
+                statementBodySet = true;
+
+                if (value != null)
+                    ExpressionBody = null;
+            }
+        }
+
+        private protected bool expressionBodySet;
+        private protected Expression expressionBody;
+        public Expression ExpressionBody
+        {
+            get
+            {
+                if (!expressionBodySet)
+                {
+                    expressionBody = BaseMethodSyntax.ExpressionBody == null
+                        ? null
+                        : FromRoslyn.Expression(BaseMethodSyntax.ExpressionBody.Expression, this);
+                    expressionBodySet = true;
+                }
+
+                return expressionBody;
+            }
+            set
+            {
+                Set(ref expressionBody, value);
+                expressionBodySet = true;
+
+                if (value != null)
+                    StatementBody = null;
             }
         }
 
@@ -73,7 +100,10 @@ namespace CSharpE.Syntax
 
         private protected abstract BaseMethodDeclarationSyntax GetWrappedBaseMethod(ref bool? changed);
 
-        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
-            Body.ReplaceExpressions(filter, projection);
+        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            StatementBody?.ReplaceExpressions(filter, projection);
+            ExpressionBody = Expression.ReplaceExpressions(ExpressionBody, filter, projection);
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace CSharpE.Extensions.Json
 
                 type.AddMethod(
                     Public | Static, jsonObjectType, "Parse", new[] { Parameter(typeof(string), "json") },
-                    NotImplementedStatement);
+                    NotImplementedExpression);
             });
 
             if (!designTime)

@@ -28,20 +28,20 @@ namespace CSharpE.Extensions.Record
                     string ParamName(string name) => name.Substring(0, 1).ToLowerInvariant() + name.Substring(1);
 
                     var constructorBody = dt
-                        ? new[] { NotImplementedStatement }
+                        ? new Statement[] { NotImplementedExpression }
                         : fields.Select(f => (Statement)Assignment(This().MemberAccess(f.Name), Identifier(ParamName(f.Name))));
 
-                    type.AddConstructor(Public, fields.Select(f => Parameter(f.Type, ParamName(f.Name))), constructorBody);
+                    type.AddConstructor(Public, fields.Select(f => Parameter(f.Type, ParamName(f.Name))), Block(constructorBody));
 
                     foreach (var field in fields)
                     {
                         type.AddAutoProperty(Public, field.Type, field.Name, getOnly: true);
 
                         var witherBody = dt
-                            ? NotImplementedStatement
-                            : Return(New(
+                            ? NotImplementedExpression
+                            : New(
                                 type.GetReference(),
-                                fields.Select(f => f.Name == field.Name ? (Expression)Identifier(ParamName(f.Name)) : This().MemberAccess(f.Name))));
+                                fields.Select(f => f.Name == field.Name ? (Expression)Identifier(ParamName(f.Name)) : This().MemberAccess(f.Name)));
 
                         type.AddMethod(
                             Public, type.GetReference(), "With" + field.Name,
@@ -54,13 +54,13 @@ namespace CSharpE.Extensions.Record
                     Smart.Segment(typeDefinition, type =>
                     {
                         type.AddMethod(Public, typeof(bool), nameof(IEquatable<object>.Equals),
-                            new[] {Parameter(type.GetReference(), "other")}, NotImplementedStatement);
+                            new[] {Parameter(type.GetReference(), "other")}, Block(NotImplementedExpression));
 
                         type.AddMethod(Public | Override, typeof(bool), nameof(object.Equals),
-                            new[] {Parameter(typeof(object), "obj")}, NotImplementedStatement);
+                            new[] {Parameter(typeof(object), "obj")}, Block(NotImplementedExpression));
 
                         type.AddMethod(Public | Override, typeof(int), nameof(GetHashCode), null,
-                            NotImplementedStatement);
+                            Block(NotImplementedExpression));
                     });
                 }
                 else
@@ -88,16 +88,16 @@ namespace CSharpE.Extensions.Record
 
                     typeDefinition.AddMethod(
                         Public, typeof(bool), nameof(IEquatable<object>.Equals),
-                        new[] { Parameter(typeDefinition.GetReference(), "other") }, equalsStatements);
+                        new[] { Parameter(typeDefinition.GetReference(), "other") }, Block(equalsStatements));
 
                     typeDefinition.AddMethod(
                         Public | Override, typeof(bool), nameof(object.Equals),
                         new[] { Parameter(typeof(object), "obj") },
-                        Return(This().Call("Equals", As(Identifier("obj"), typeDefinition.GetReference()))));
+                        This().Call("Equals", As(Identifier("obj"), typeDefinition.GetReference())));
 
                     typeDefinition.AddMethod(
                         Public | Override, typeof(int), nameof(GetHashCode), null,
-                        Return(Tuple(fieldsList.Select(f => This().MemberAccess(f.Name))).Call(nameof(GetHashCode))));
+                        Tuple(fieldsList.Select(f => This().MemberAccess(f.Name))).Call(nameof(GetHashCode)));
                 }
             });
         }

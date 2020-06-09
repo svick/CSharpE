@@ -12,12 +12,12 @@ namespace CSharpE.Extensions.Logging
         {
             foreach (var method in project.GetMethods())
             {
-                if (method.Body != null)
+                if (method.StatementBody != null)
                 {
                     Statement loggingStatement = NamedType(typeof(Console))
                         .Call(nameof(Console.WriteLine), InterpolatedString(BuildInterpolation(method)));
 
-                    method.Body.Statements.Insert(0, loggingStatement);
+                    method.StatementBody.Statements.Insert(0, loggingStatement);
                 }
             }
         }

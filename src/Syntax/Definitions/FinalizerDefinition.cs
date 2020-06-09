@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -29,10 +30,10 @@ namespace CSharpE.Syntax
             Modifiers = FromRoslyn.MemberModifiers(syntax.Modifiers);
         }
 
-        public FinalizerDefinition(MemberModifiers modifiers, IEnumerable<Statement> body)
+        public FinalizerDefinition(MemberModifiers modifiers, BlockStatement statementBody)
         {
             Modifiers = modifiers;
-            Body = new BlockStatement(body?.ToList());
+            StatementBody = statementBody;
         }
 
         #region Modifiers
@@ -50,13 +51,15 @@ namespace CSharpE.Syntax
 
         DestructorDeclarationSyntax ISyntaxWrapper<DestructorDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
+            if (parameters?.Any() == true)
+                throw new InvalidOperationException("Finalizer can't have parameters.");
 
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
-            var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
+            var newStatementBody = statementBodySet ? statementBody?.GetWrapped(ref thisChanged) : syntax.Body;
+            var newExpressionBody = expressionBodySet ? expressionBody?.GetWrapped(ref thisChanged) : syntax.ExpressionBody?.Expression;
 
             if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || ShouldAnnotate(syntax, changed))
@@ -64,9 +67,13 @@ namespace CSharpE.Syntax
                 if (Parent == null)
                     throw new InvalidOperationException("Can't create syntax node for finalizer with no parent type.");
 
+                var arrowClause = newExpressionBody == null ? null : RoslynSyntaxFactory.ArrowExpressionClause(newExpressionBody);
+                var semicolonToken = newStatementBody == null ? RoslynSyntaxFactory.Token(SyntaxKind.SemicolonToken) : default;
+
                 var newSyntax = RoslynSyntaxFactory.DestructorDeclaration(
                     newAttributes, newModifiers.GetWrapped(), RoslynSyntaxFactory.Identifier(ParentType.Name),
-                    RoslynSyntaxFactory.ParameterList(), newBody);
+                    RoslynSyntaxFactory.ParameterList(), newStatementBody, arrowClause)
+                    .WithSemicolonToken(semicolonToken);
 
                 syntax = Annotate(newSyntax);
 
@@ -85,9 +92,15 @@ namespace CSharpE.Syntax
 
             SetList(ref attributes, null);
             SetList(ref parameters, null);
-            Set(ref body, null);
+            Set(ref statementBody, null);
+            statementBodySet = false;
+            Set(ref expressionBody, null);
+            expressionBodySet = false;
         }
 
-        private protected override SyntaxNode CloneImpl() => new FinalizerDefinition(Modifiers, Body.Statements);
+        private protected override SyntaxNode CloneImpl() =>
+            new FinalizerDefinition(Modifiers, StatementBody) { Attributes = Attributes, ExpressionBody = ExpressionBody };
+
+        public override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat(new SyntaxNode[] { StatementBody, ExpressionBody });
     }
 }

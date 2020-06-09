@@ -20,7 +20,7 @@ namespace CSharpE.Syntax.Tests
         {
             None,
 
-            // won't be supported
+            // not supported
             MakeRefExpression,
             RefTypeExpression,
             RefValueExpression,
@@ -28,7 +28,7 @@ namespace CSharpE.Syntax.Tests
             GlobalStatement,
             ExternAliasDirective,
 
-            // won't have matching type in CSharpE
+            // won't have matching type in CSharpE: they are represented in a different way
             ArrayRankSpecifier,
             OmittedTypeArgument,
             OmittedArraySizeExpression,
@@ -58,7 +58,8 @@ namespace CSharpE.Syntax.Tests
             QueryBody,
             UsingDirective,
             PositionalPatternClause,
-            PropertyPatternClause
+            PropertyPatternClause,
+            ArrowExpressionClause
         };
 
         [Fact]
@@ -89,7 +90,7 @@ namespace CSharpE.Syntax.Tests
             syntaxKinds.ExceptWith(encounteredNodes);
 
             Assert.True(
-                syntaxKinds.Count == 1,
+                syntaxKinds.Count == 0,
                 $"Missed {syntaxKinds.Count} kinds, including {syntaxKinds.FirstOrDefault()}.");
         }
 

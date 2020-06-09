@@ -8,6 +8,6 @@ namespace CSharpE.Transform
     {
         public abstract void Process(Project project, bool designTime);
 
-        protected static Statement NotImplementedStatement { get; } = Throw(New(typeof(NotImplementedException)));
+        protected static Expression NotImplementedExpression { get; } = Throw(New(typeof(NotImplementedException)));
     }
 }

@@ -108,13 +108,24 @@ namespace CSharpE.Syntax
 
         public OperatorDefinition(
             MemberModifiers modifiers, TypeReference returnType, OperatorKind kind, IEnumerable<Parameter> parameters,
-            IEnumerable<Statement> body)
+            BlockStatement statementBody)
+            : this(modifiers, returnType, kind, parameters, statementBody, null) { }
+
+        public OperatorDefinition(
+            MemberModifiers modifiers, TypeReference returnType, OperatorKind kind, IEnumerable<Parameter> parameters,
+            Expression expressionBody)
+            : this(modifiers, returnType, kind, parameters, null, expressionBody) { }
+
+        private OperatorDefinition(
+            MemberModifiers modifiers, TypeReference returnType, OperatorKind kind, IEnumerable<Parameter> parameters,
+            BlockStatement statementBody, Expression expressionBody)
         {
             Modifiers = modifiers;
             ReturnType = returnType;
             Kind = kind;
             Parameters = parameters?.ToList();
-            Body = new BlockStatement(body?.ToList());
+            StatementBody = statementBody;
+            ExpressionBody = expressionBody;
         }
 
 
@@ -162,19 +173,21 @@ namespace CSharpE.Syntax
 
         private protected override BaseMethodDeclarationSyntax GetWrappedBaseMethod(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? GetReturnType(syntax);
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
-            var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
+            var newStatementBody = statementBodySet ? statementBody?.GetWrapped(ref thisChanged) : syntax.Body;
+            var newExpressionBody = expressionBodySet ? expressionBody?.GetWrapped(ref thisChanged) : syntax.ExpressionBody?.Expression;
 
             if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || ShouldAnnotate(syntax, changed))
             {
+                var arrowClause = newExpressionBody == null ? null : RoslynSyntaxFactory.ArrowExpressionClause(newExpressionBody);
+                var semicolonToken = newStatementBody == null ? RoslynSyntaxFactory.Token(SyntaxKind.SemicolonToken) : default;
+
                 BaseMethodDeclarationSyntax newSyntax;
 
                 var token = RoslynSyntaxFactory.Token(GetTokenKind(Kind));
@@ -183,13 +196,15 @@ namespace CSharpE.Syntax
                 {
                     newSyntax = RoslynSyntaxFactory.ConversionOperatorDeclaration(
                         newAttributes, newModifiers.GetWrapped(), token, newReturnType,
-                        RoslynSyntaxFactory.ParameterList(newParameters), newBody, null);
+                        RoslynSyntaxFactory.ParameterList(newParameters), newStatementBody, arrowClause)
+                        .WithSemicolonToken(semicolonToken);
                 }
                 else
                 {
                     newSyntax = RoslynSyntaxFactory.OperatorDeclaration(
                         newAttributes, newModifiers.GetWrapped(), newReturnType, token,
-                        RoslynSyntaxFactory.ParameterList(newParameters), newBody, null);
+                        RoslynSyntaxFactory.ParameterList(newParameters), newStatementBody, arrowClause)
+                        .WithSemicolonToken(semicolonToken);
                 }
 
                 syntax = Annotate(newSyntax);
@@ -207,16 +222,19 @@ namespace CSharpE.Syntax
             SetList(ref attributes, null);
             Set(ref returnType, null);
             SetList(ref parameters, null);
-            Set(ref body, null);
+            Set(ref statementBody, null);
+            statementBodySet = false;
+            Set(ref expressionBody, null);
+            expressionBodySet = false;
         }
 
         private protected override SyntaxNode CloneImpl() =>
-            new OperatorDefinition(Modifiers, ReturnType, Kind, Parameters, Body?.Statements)
+            new OperatorDefinition(Modifiers, ReturnType, Kind, Parameters, StatementBody, ExpressionBody)
             {
                 Attributes = Attributes
             };
 
         public override IEnumerable<SyntaxNode> GetChildren() =>
-            Attributes.Concat<SyntaxNode>(new[] { ReturnType }).Concat(Parameters).Concat(new[] { Body });
+            Attributes.Concat<SyntaxNode>(new[] { ReturnType }).Concat(Parameters).Concat(new SyntaxNode[] { StatementBody, ExpressionBody });
     }
 }

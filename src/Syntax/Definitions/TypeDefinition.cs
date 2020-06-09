@@ -14,7 +14,9 @@ namespace CSharpE.Syntax
     public interface ILimitedTypeDefinition
     {
         NamedTypeReference GetReference();
-        
+
+        // TODO: expand for missing kinds of members and their variations
+
         FieldDefinition AddField(
             MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null);
 
@@ -25,14 +27,14 @@ namespace CSharpE.Syntax
 
         MethodDefinition AddMethod(
             MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
-            params Statement[] body);
+            BlockStatement statementBody);
 
         MethodDefinition AddMethod(
             MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
-            IEnumerable<Statement> body);
+            Expression expressionBody);
 
         ConstructorDefinition AddConstructor(
-            MemberModifiers modifiers, IEnumerable<Parameter> parameters, IEnumerable<Statement> body);
+            MemberModifiers modifiers, IEnumerable<Parameter> parameters, BlockStatement statementBody);
     }
     
     public abstract class TypeDefinition
@@ -218,24 +220,30 @@ namespace CSharpE.Syntax
 
         public MethodDefinition AddMethod(
             MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
-            params Statement[] body) =>
-            AddMethod(modifiers, returnType, name, parameters, body.AsEnumerable());
-
-        public MethodDefinition AddMethod(
-            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
-            IEnumerable<Statement> body)
+            BlockStatement statementBody)
         {
-            var method = new MethodDefinition(modifiers, returnType, name, parameters, body);
+            var method = new MethodDefinition(modifiers, returnType, name, parameters, statementBody);
             
             Members.Add(method);
 
             return method;
         }
 
-        public ConstructorDefinition AddConstructor(
-            MemberModifiers modifiers, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
+        public MethodDefinition AddMethod(
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
+            Expression expressionBody)
         {
-            var constructor = new ConstructorDefinition(modifiers, parameters, body);
+            var method = new MethodDefinition(modifiers, returnType, name, parameters, expressionBody);
+
+            Members.Add(method);
+
+            return method;
+        }
+
+        public ConstructorDefinition AddConstructor(
+            MemberModifiers modifiers, IEnumerable<Parameter> parameters, BlockStatement statementBody)
+        {
+            var constructor = new ConstructorDefinition(modifiers, parameters, statementBody);
             
             Members.Add(constructor);
 

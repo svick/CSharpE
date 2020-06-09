@@ -63,10 +63,9 @@ namespace CSharpE.SyntaxFactory
 
                     syntaxFactory.AddMethod(
                         Public | Static, typeReference, methodName, constructorParameters,
-                        new ReturnStatement(
-                            new NewExpression(
-                                typeReference,
-                                constructorParameters.Select(p => new Argument(new IdentifierExpression(p.Name))))));
+                        new NewExpression(
+                            typeReference,
+                            constructorParameters.Select(p => new Argument(new IdentifierExpression(p.Name)))));
                 }
             }
 

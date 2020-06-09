@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static CSharpE.Syntax.MemberModifiers;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -32,18 +33,52 @@ namespace CSharpE.Syntax
 
         public MethodDefinition(
             MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
-            IEnumerable<Statement> body)
-            : this(modifiers, returnType, null, name, parameters, body) { }
+            BlockStatement statementBody = null)
+            : this(modifiers, returnType, null, name, parameters, statementBody) { }
 
         public MethodDefinition(
             MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name,
-            IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
-            : this(modifiers, returnType, explicitInterface, name, null, parameters, null, body) { }
+            IEnumerable<Parameter> parameters, BlockStatement statementBody = null)
+            : this(modifiers, returnType, explicitInterface, name, null, parameters, null, statementBody) { }
+
+        public MethodDefinition(
+            MemberModifiers modifiers, TypeReference returnType, string name,
+            IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters,
+            IEnumerable<TypeParameterConstraintClause> constraintClauses, BlockStatement statementBody = null)
+            : this(modifiers, returnType, null, name, typeParameters, parameters, constraintClauses, statementBody) { }
 
         public MethodDefinition(
             MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name,
             IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters,
-            IEnumerable<TypeParameterConstraintClause> constraintClauses, IEnumerable<Statement> body)
+            IEnumerable<TypeParameterConstraintClause> constraintClauses, BlockStatement statementBody = null)
+            : this(modifiers, returnType, explicitInterface, name, typeParameters, parameters, constraintClauses, statementBody, null) { }
+
+        public MethodDefinition(
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
+            Expression expressionBody)
+            : this(modifiers, returnType, null, name, parameters, expressionBody) { }
+
+        public MethodDefinition(
+            MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name,
+            IEnumerable<Parameter> parameters, Expression expressionBody)
+            : this(modifiers, returnType, explicitInterface, name, null, parameters, null, expressionBody) { }
+
+        public MethodDefinition(
+            MemberModifiers modifiers, TypeReference returnType, string name,
+            IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters,
+            IEnumerable<TypeParameterConstraintClause> constraintClauses, Expression expressionBody)
+            : this(modifiers, returnType, null, name, typeParameters, parameters, constraintClauses, expressionBody) { }
+
+        public MethodDefinition(
+            MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name,
+            IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters,
+            IEnumerable<TypeParameterConstraintClause> constraintClauses, Expression expressionBody)
+            : this(modifiers, returnType, explicitInterface, name, typeParameters, parameters, constraintClauses, null, expressionBody) { }
+
+        private MethodDefinition(
+            MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name,
+            IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters,
+            IEnumerable<TypeParameterConstraintClause> constraintClauses, BlockStatement statementBody, Expression expressionBody)
         {
             Modifiers = modifiers;
             ReturnType = returnType;
@@ -52,7 +87,8 @@ namespace CSharpE.Syntax
             TypeParameters = typeParameters?.ToList();
             Parameters = parameters?.ToList();
             ConstraintClauses = constraintClauses?.ToList();
-            Body = new BlockStatement(body);
+            StatementBody = statementBody;
+            ExpressionBody = expressionBody;
         }
 
         #region Modifiers
@@ -193,9 +229,7 @@ namespace CSharpE.Syntax
 
         MethodDeclarationSyntax ISyntaxWrapper<MethodDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? syntax.ReturnType;
@@ -206,7 +240,8 @@ namespace CSharpE.Syntax
             var newTypeParameters = typeParameters?.GetWrapped(ref thisChanged) ?? syntax.TypeParameterList?.Parameters ?? default;
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
             var newConstraints = constraintClauses?.GetWrapped(ref thisChanged) ?? syntax.ConstraintClauses;
-            var newBody = bodySet ? body?.GetWrapped(ref thisChanged) : syntax.Body;
+            var newStatementBody = statementBodySet ? statementBody?.GetWrapped(ref thisChanged) : syntax.Body;
+            var newExpressionBody = expressionBodySet ? expressionBody?.GetWrapped(ref thisChanged) : syntax.ExpressionBody?.Expression;
 
             if (syntax == null || thisChanged == true || Modifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 ShouldAnnotate(syntax, changed))
@@ -217,9 +252,12 @@ namespace CSharpE.Syntax
 
                 var typeParameterList = newTypeParameters.Any() ? RoslynSyntaxFactory.TypeParameterList(newTypeParameters) : default;
 
+                var arrowClause = newExpressionBody == null ? null : RoslynSyntaxFactory.ArrowExpressionClause(newExpressionBody);
+                var semicolonToken = newStatementBody == null ? RoslynSyntaxFactory.Token(SyntaxKind.SemicolonToken) : default;
+
                 var newSyntax = RoslynSyntaxFactory.MethodDeclaration(
                     newAttributes, Modifiers.GetWrapped(), newReturnType, explicitInterfaceSpecifier, newName, typeParameterList,
-                    RoslynSyntaxFactory.ParameterList(newParameters), newConstraints, newBody, null);
+                    RoslynSyntaxFactory.ParameterList(newParameters), newConstraints, newStatementBody, arrowClause, semicolonToken);
 
                 syntax = Annotate(newSyntax);
 
@@ -243,18 +281,21 @@ namespace CSharpE.Syntax
             SetList(ref typeParameters, null);
             SetList(ref parameters, null);
             SetList(ref constraintClauses, null);
-            Set(ref body, null);
+            Set(ref statementBody, null);
+            statementBodySet = false;
+            Set(ref expressionBody, null);
+            expressionBodySet = false;
         }
 
         private protected override SyntaxNode CloneImpl() =>
             new MethodDefinition(
-                Modifiers, ReturnType, ExplicitInterface, Name, TypeParameters, Parameters, ConstraintClauses, Body?.Statements)
+                Modifiers, ReturnType, ExplicitInterface, Name, TypeParameters, Parameters, ConstraintClauses, StatementBody, ExpressionBody)
             {
                 Attributes = Attributes
             };
 
         public override IEnumerable<SyntaxNode> GetChildren() =>
             Attributes.Concat<SyntaxNode>(new[] { ReturnType, ExplicitInterface }).Concat(TypeParameters).Concat(Parameters)
-                .Concat(ConstraintClauses).Concat(new[] { Body });
+                .Concat(ConstraintClauses).Concat(new SyntaxNode[] { StatementBody, ExpressionBody });
     }
 }
