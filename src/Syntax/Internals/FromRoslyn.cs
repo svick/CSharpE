@@ -538,7 +538,7 @@ namespace CSharpE.Syntax.Internals
                     case FieldDeclarationSyntax field:
                         return new[] { field.Declaration.Variables.Single().Initializer };
                     case BasePropertyDeclarationSyntax property:
-                        return property.AccessorList.Accessors;
+                        return property.AccessorList?.Accessors ?? default;
                     case EventFieldDeclarationSyntax _:
                         return Array.Empty<Roslyn::SyntaxNode>();
                     case BaseMethodDeclarationSyntax method:

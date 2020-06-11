@@ -70,14 +70,14 @@ namespace CSharpE.Syntax
             get => name.Text;
             set => name.Text = value;
         }
-        
+
+        private protected override ArrowExpressionClauseSyntax GetExpressionBody() => syntax.ExpressionBody;
+
         // TODO: expression body and initializer
 
         PropertyDeclarationSyntax ISyntaxWrapper<PropertyDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;

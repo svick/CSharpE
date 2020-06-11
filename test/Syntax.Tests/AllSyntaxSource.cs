@@ -71,6 +71,8 @@ class C
 
     int I.P2 { get; set; }
 
+    int P3 => 42;
+
     C() : this(42)
     {
     }

@@ -191,6 +191,12 @@ namespace N.M
             }
         }
 
+        int P2
+        {
+            get => f;
+            private set => f = value;
+        }
+
         public int this[int i]
         {
             get

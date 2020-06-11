@@ -4,6 +4,7 @@ using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
@@ -81,9 +82,23 @@ namespace CSharpE.Syntax
             }
         }
 
+        private protected abstract ArrowExpressionClauseSyntax GetExpressionBody();
+
         // TODO: properties with more than one of each kind of accessor should probably be error nodes
-        private protected AccessorDeclarationSyntax FindAccessor(SyntaxKind accessorKind) =>
-            BasePropertySyntax.AccessorList?.Accessors.FirstOrDefault(a => a.IsKind(accessorKind));
+        private protected AccessorDeclarationSyntax FindAccessor(SyntaxKind accessorKind)
+        {
+            // convert expression-bodied properties to properties with expression-bodied get accessor
+            if (accessorKind == SyntaxKind.GetAccessorDeclaration)
+            {
+                var expressionBody = GetExpressionBody();
+
+                if (expressionBody != null)
+                    return RoslynSyntaxFactory.AccessorDeclaration(
+                        accessorKind, default, default, RoslynSyntaxFactory.ArrowExpressionClause(expressionBody.Expression));
+            }
+
+            return BasePropertySyntax.AccessorList?.Accessors.FirstOrDefault(a => a.IsKind(accessorKind));
+        }
 
         private protected bool getAccessorSet;
         private protected AccessorDefinition getAccessor;
@@ -94,7 +109,7 @@ namespace CSharpE.Syntax
                 if (!getAccessorSet)
                 {
                     var declaration = FindAccessor(SyntaxKind.GetAccessorDeclaration);
-                    
+
                     if (declaration != null)
                         getAccessor = new AccessorDefinition(declaration, this);
                     
@@ -120,10 +135,10 @@ namespace CSharpE.Syntax
                 if (!setAccessorSet)
                 {
                     var declaration = FindAccessor(SyntaxKind.SetAccessorDeclaration);
-                    
+
                     if (declaration != null)
                         setAccessor = new AccessorDefinition(declaration, this);
-                    
+
                     setAccessorSet = true;
                 }
                 return setAccessor;

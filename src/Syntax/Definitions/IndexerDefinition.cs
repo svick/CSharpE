@@ -72,13 +72,11 @@ namespace CSharpE.Syntax
             set => SetList(ref parameters, new SeparatedSyntaxList<Parameter, ParameterSyntax>(value, this));
         }
 
-        // TODO: expression body
+        private protected override ArrowExpressionClauseSyntax GetExpressionBody() => syntax.ExpressionBody;
 
         IndexerDeclarationSyntax ISyntaxWrapper<IndexerDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
