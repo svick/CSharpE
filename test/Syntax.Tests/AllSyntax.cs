@@ -171,6 +171,7 @@ namespace N.M
                 return;
             }
 
+            static int F2() => 42;
             return ref this.i;
         }
 

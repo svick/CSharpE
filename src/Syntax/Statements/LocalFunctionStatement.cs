@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -9,7 +10,6 @@ using static CSharpE.Syntax.MemberModifiers;
 
 namespace CSharpE.Syntax
 {
-    // TODO: expression body
     public sealed class LocalFunctionStatement : Statement
     {
         private LocalFunctionStatementSyntax syntax;
@@ -31,33 +31,66 @@ namespace CSharpE.Syntax
         }
 
         public LocalFunctionStatement(
-            TypeReference returnType, string name, IEnumerable<Parameter> parameters, params Statement[] body)
-            : this(returnType, name, parameters, body.AsEnumerable()) { }
+            TypeReference returnType, string name, IEnumerable<Parameter> parameters, BlockStatement statementBody)
+            : this(default, returnType, name, parameters, statementBody) { }
 
         public LocalFunctionStatement(
-            TypeReference returnType, string name, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
-            : this(false, false, returnType, name, parameters, body) { }
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters, BlockStatement statementBody)
+            : this(modifiers, returnType, name, null, parameters, null, statementBody) { }
 
         public LocalFunctionStatement(
-            bool isAsync, bool isUnsafe, TypeReference returnType, string name, IEnumerable<Parameter> parameters,
-            IEnumerable<Statement> body)
-        { }
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<TypeParameter> typeParameters,
+            IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses, BlockStatement statementBody)
+            : this(modifiers, returnType, name, typeParameters, parameters, constraintClauses, statementBody, null) { }
 
         public LocalFunctionStatement(
-            bool isAsync, bool isUnsafe, TypeReference returnType, string name, IEnumerable<TypeParameter> typeParameters,
-            IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses, IEnumerable<Statement> body)
+            TypeReference returnType, string name, IEnumerable<Parameter> parameters, Expression expressionBody)
+            : this(default, returnType, name, parameters, expressionBody) { }
+
+        public LocalFunctionStatement(
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters, Expression expressionBody)
+            : this(modifiers, returnType, name, null, parameters, null, expressionBody) { }
+
+        public LocalFunctionStatement(
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<TypeParameter> typeParameters,
+            IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses, Expression expressionBody)
+            : this(modifiers, returnType, name, typeParameters, parameters, constraintClauses, null, expressionBody) { }
+
+        private LocalFunctionStatement(
+            MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<TypeParameter> typeParameters,
+            IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses,
+            BlockStatement statementBody, Expression expressionBody)
         {
-            IsAsync = isAsync;
-            IsUnsafe = isUnsafe;
+            Modifiers = modifiers;
             ReturnType = returnType;
-            this.name = new Identifier(name);
+            Name = name;
             TypeParameters = typeParameters?.ToList();
             Parameters = parameters?.ToList();
             ConstraintClauses = constraintClauses?.ToList();
-            this.body = new BlockStatement(body);
+            StatementBody = statementBody;
+            ExpressionBody = expressionBody;
         }
 
         private MemberModifiers modifiers;
+        public MemberModifiers Modifiers
+        {
+            get => modifiers;
+            set
+            {
+                ValidateModifiers(value);
+                modifiers = value;
+            }
+        }
+
+        private const MemberModifiers ValidLocalFunctionModifiers = Async | Unsafe | Static;
+
+        private void ValidateModifiers(MemberModifiers value)
+        {
+            var invalidModifiers = value & ~ValidLocalFunctionModifiers;
+            if (invalidModifiers != 0)
+                throw new ArgumentException($"The modifiers {invalidModifiers} are not valid for a local function.", nameof(value));
+        }
+
 
         public bool IsAsync
         {
@@ -69,6 +102,12 @@ namespace CSharpE.Syntax
         {
             get => modifiers.Contains(Unsafe);
             set => modifiers = modifiers.With(Unsafe, value);
+        }
+
+        public bool IsStatic
+        {
+            get => modifiers.Contains(Static);
+            set => modifiers = modifiers.With(Static, value);
         }
 
         private TypeReference returnType;
@@ -135,40 +174,79 @@ namespace CSharpE.Syntax
                 new SyntaxList<TypeParameterConstraintClause, TypeParameterConstraintClauseSyntax>(value, this));
         }
 
-        private BlockStatement body;
-        public BlockStatement Body
+        private bool statementBodySet;
+        private BlockStatement statementBody;
+        public BlockStatement StatementBody
         {
             get
             {
-                if (body == null)
-                    body = new BlockStatement(syntax.Body, this);
+                if (!statementBodySet)
+                {
+                    statementBody = syntax.Body == null ? null : new BlockStatement(syntax.Body, this);
+                    statementBodySet = true;
+                }
 
-                return body;
+                return statementBody;
             }
-            set => SetNotNull(ref body, value);
+            set
+            {
+                Set(ref statementBody, value);
+                statementBodySet = true;
+
+                if (value != null)
+                    ExpressionBody = null;
+            }
+        }
+
+        private bool expressionBodySet;
+        private Expression expressionBody;
+        public Expression ExpressionBody
+        {
+            get
+            {
+                if (!expressionBodySet)
+                {
+                    expressionBody = syntax.ExpressionBody == null
+                        ? null
+                        : FromRoslyn.Expression(syntax.ExpressionBody.Expression, this);
+                    expressionBodySet = true;
+                }
+
+                return expressionBody;
+            }
+            set
+            {
+                Set(ref expressionBody, value);
+                expressionBodySet = true;
+
+                if (value != null)
+                    StatementBody = null;
+            }
         }
 
         private protected override StatementSyntax GetWrappedStatement(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newReturnType = returnType?.GetWrapped(ref thisChanged) ?? syntax.ReturnType;
             var newName = name.GetWrapped(ref thisChanged);
             var newTypeParameters = typeParameters?.GetWrapped(ref thisChanged) ?? syntax.TypeParameterList?.Parameters ?? default;
             var newParameters = parameters?.GetWrapped(ref thisChanged) ?? syntax.ParameterList.Parameters;
             var newConstraints = constraintClauses?.GetWrapped(ref thisChanged) ?? syntax.ConstraintClauses;
-            var newBody = body?.GetWrapped(ref thisChanged) ?? syntax.Body;
+            var newStatementBody = statementBodySet ? statementBody?.GetWrapped(ref thisChanged) : syntax.Body;
+            var newExpressionBody = expressionBodySet ? expressionBody?.GetWrapped(ref thisChanged) : syntax.ExpressionBody?.Expression;
 
             if (syntax == null || thisChanged == true || modifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 ShouldAnnotate(syntax, changed))
             {
                 var typeParameterList = newTypeParameters.Any() ? RoslynSyntaxFactory.TypeParameterList(newTypeParameters) : default;
 
+                var arrowClause = newExpressionBody == null ? null : RoslynSyntaxFactory.ArrowExpressionClause(newExpressionBody);
+                var semicolonToken = newStatementBody == null ? RoslynSyntaxFactory.Token(SyntaxKind.SemicolonToken) : default;
+
                 syntax = RoslynSyntaxFactory.LocalFunctionStatement(
                     modifiers.GetWrapped(), newReturnType, newName, typeParameterList,
-                    RoslynSyntaxFactory.ParameterList(newParameters), newConstraints, newBody, null);
+                    RoslynSyntaxFactory.ParameterList(newParameters), newConstraints, newStatementBody, arrowClause, semicolonToken);
 
                 syntax = Annotate(syntax);
 
@@ -185,16 +263,17 @@ namespace CSharpE.Syntax
             SetList(ref typeParameters, null);
             SetList(ref parameters, null);
             SetList(ref constraintClauses, null);
-            Set(ref body, null);
+            Set(ref statementBody, null);
         }
 
-        private protected override SyntaxNode CloneImpl() =>
-            new LocalFunctionStatement(IsAsync, IsUnsafe, ReturnType, Name, TypeParameters, Parameters, ConstraintClauses, Body.Statements);
+        private protected override SyntaxNode CloneImpl() => new LocalFunctionStatement(
+                Modifiers, ReturnType, Name, TypeParameters, Parameters, ConstraintClauses, StatementBody, ExpressionBody);
 
         public override IEnumerable<SyntaxNode> GetChildren() =>
-            new SyntaxNode[] { ReturnType }.Concat(TypeParameters).Concat(Parameters).Concat(ConstraintClauses).Concat(new[] { Body });
+            new SyntaxNode[] { ReturnType }.Concat(TypeParameters).Concat(Parameters).Concat(ConstraintClauses)
+            .Concat(new SyntaxNode[] { StatementBody, ExpressionBody });
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
-            Body.ReplaceExpressions(filter, projection);
+            StatementBody.ReplaceExpressions(filter, projection);
     }
 }

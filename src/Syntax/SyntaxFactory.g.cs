@@ -1095,21 +1095,6 @@ namespace CSharpE.Syntax
             return new LabelStatement(name, statement);
         }
 
-        public static LocalFunctionStatement LocalFunction(TypeReference returnType, string name, IEnumerable<Parameter> parameters, params Statement[] body)
-        {
-            return new LocalFunctionStatement(returnType, name, parameters, body);
-        }
-
-        public static LocalFunctionStatement LocalFunction(TypeReference returnType, string name, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
-        {
-            return new LocalFunctionStatement(returnType, name, parameters, body);
-        }
-
-        public static LocalFunctionStatement LocalFunction(bool isAsync, bool isUnsafe, TypeReference returnType, string name, IEnumerable<Parameter> parameters, IEnumerable<Statement> body)
-        {
-            return new LocalFunctionStatement(isAsync, isUnsafe, returnType, name, parameters, body);
-        }
-
         public static LockStatement Lock(Expression expression, params Statement[] statements)
         {
             return new LockStatement(expression, statements);
