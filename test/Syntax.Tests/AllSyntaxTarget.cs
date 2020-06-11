@@ -127,6 +127,12 @@ class C
         get => 42;
     }
 
+    int P4
+    {
+        get;
+    }
+
+    = 42;
     C(): this(42)
     {
     }

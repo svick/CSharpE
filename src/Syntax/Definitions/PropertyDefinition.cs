@@ -32,12 +32,12 @@ namespace CSharpE.Syntax
 
         public PropertyDefinition(
             MemberModifiers modifiers, TypeReference type, string name,
-            AccessorDefinition getAccessor, AccessorDefinition setAccessor)
-            : this(modifiers, type, null, name, getAccessor, setAccessor) { }
+            AccessorDefinition getAccessor, AccessorDefinition setAccessor, Expression initializer = null)
+            : this(modifiers, type, null, name, getAccessor, setAccessor, initializer) { }
 
         public PropertyDefinition(
             MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, string name, 
-            AccessorDefinition getAccessor, AccessorDefinition setAccessor)
+            AccessorDefinition getAccessor, AccessorDefinition setAccessor, Expression initializer = null)
         {
             Modifiers = modifiers;
             Type = type;
@@ -45,6 +45,7 @@ namespace CSharpE.Syntax
             Name = name;
             GetAccessor = getAccessor;
             SetAccessor = setAccessor;
+            Initializer = initializer;
         }
 
         private const MemberModifiers ValidModifiers =
@@ -73,7 +74,30 @@ namespace CSharpE.Syntax
 
         private protected override ArrowExpressionClauseSyntax GetExpressionBody() => syntax.ExpressionBody;
 
-        // TODO: expression body and initializer
+        private bool initializerSet;
+        private Expression initializer;
+        public Expression Initializer
+        {
+            get
+            {
+                if (!initializerSet)
+                {
+                    var syntaxInitializer = syntax.Initializer;
+
+                    if (syntaxInitializer != null)
+                        initializer = FromRoslyn.Expression(syntaxInitializer.Value, this);
+
+                    initializerSet = true;
+                }
+
+                return initializer;
+            }
+            set
+            {
+                Set(ref initializer, value);
+                initializerSet = true;
+            }
+        }
 
         PropertyDeclarationSyntax ISyntaxWrapper<PropertyDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
@@ -92,6 +116,7 @@ namespace CSharpE.Syntax
             var newSetAccessor = setAccessorSet
                 ? setAccessor?.GetWrapped(ref thisChanged)
                 : FindAccessor(SyntaxKind.SetAccessorDeclaration);
+            var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.Initializer?.Value;
 
             if (syntax == null || newModifiers != FromRoslyn.MemberModifiers(syntax.Modifiers) ||
                 thisChanged == true || ShouldAnnotate(syntax, changed))
@@ -101,10 +126,13 @@ namespace CSharpE.Syntax
                     : RoslynSyntaxFactory.ExplicitInterfaceSpecifier(newExplicitInterface);
                 var accessors =
                     RoslynSyntaxFactory.List(new[] { newGetAccessor, newSetAccessor }.Where(a => a != null));
+                var equalsValueClause =
+                    newInitializer == null ? null : RoslynSyntaxFactory.EqualsValueClause(newInitializer);
+                var semicolon = equalsValueClause != null ? RoslynSyntaxFactory.Token(SyntaxKind.SemicolonToken) : default;
 
                 var newSyntax = RoslynSyntaxFactory.PropertyDeclaration(
                     newAttributes, newModifiers.GetWrapped(), newType, explicitInterfaceSpecifier, newName,
-                    RoslynSyntaxFactory.AccessorList(accessors));
+                    RoslynSyntaxFactory.AccessorList(accessors), null, equalsValueClause, semicolon);
 
                 syntax = Annotate(newSyntax);
 
@@ -128,12 +156,20 @@ namespace CSharpE.Syntax
             getAccessorSet = false;
             Set(ref setAccessor, null);
             setAccessorSet = false;
+            Set(ref initializer, null);
+            initializerSet = false;
         }
 
         private protected override SyntaxNode CloneImpl() =>
-            new PropertyDefinition(Modifiers, Type, ExplicitInterface, Name, GetAccessor, SetAccessor)
+            new PropertyDefinition(Modifiers, Type, ExplicitInterface, Name, GetAccessor, SetAccessor, Initializer)
             {
                 Attributes = Attributes
             };
+
+        protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            base.ReplaceExpressionsImpl(filter, projection);
+            Initializer = Expression.ReplaceExpressions(Initializer, filter, projection);
+        }
     }
 }

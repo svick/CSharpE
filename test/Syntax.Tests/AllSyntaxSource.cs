@@ -73,6 +73,8 @@ class C
 
     int P3 => 42;
 
+    int P4 { get; } = 42;
+
     C() : this(42)
     {
     }
