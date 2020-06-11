@@ -15,16 +15,6 @@ namespace CSharpE.Syntax
             return new Attribute(type, arguments);
         }
 
-        public static Attribute Attribute(AttributeTarget target, NamedTypeReference type, params AttributeArgument[] arguments)
-        {
-            return new Attribute(target, type, arguments);
-        }
-
-        public static Attribute Attribute(AttributeTarget target, NamedTypeReference type, IEnumerable<AttributeArgument> arguments)
-        {
-            return new Attribute(target, type, arguments);
-        }
-
         public static AttributeArgument AttributeArgument(Expression expression)
         {
             return new AttributeArgument(expression);

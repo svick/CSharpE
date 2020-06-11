@@ -1,5 +1,5 @@
-﻿[A]
-[B]
+﻿[typ: A]
+[typ: B]
 class C
 {
     C[][, ] a;

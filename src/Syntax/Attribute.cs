@@ -26,52 +26,32 @@ namespace CSharpE.Syntax
                     "AttributeListSyntax with more than one attribute is not supported here.", nameof(syntax));
 
             this.syntax = syntax;
-            Target = GetSyntaxTarget();
+            target = new Identifier(syntax.Target?.Identifier);
         }
 
         public Attribute(NamedTypeReference type, params AttributeArgument[] arguments)
             : this(type, arguments.AsEnumerable()) { }
 
         public Attribute(NamedTypeReference type, IEnumerable<AttributeArgument> arguments)
-            : this(AttributeTarget.None, type, arguments) { }
+            : this(null, type, arguments) { }
 
-        public Attribute(AttributeTarget target, NamedTypeReference type, params AttributeArgument[] arguments)
+        public Attribute(string target, NamedTypeReference type, params AttributeArgument[] arguments)
             : this(target, type, arguments.AsEnumerable()) { }
 
-        public Attribute(AttributeTarget target, NamedTypeReference type, IEnumerable<AttributeArgument> arguments)
+        public Attribute(string target, NamedTypeReference type, IEnumerable<AttributeArgument> arguments)
         {
-            Target = target;
+            this.target = new Identifier(target, true);
             Type = type;
-            this.arguments = new SeparatedSyntaxList<AttributeArgument, AttributeArgumentSyntax>(arguments, this);
+            Arguments = arguments?.ToList();
         }
 
-        private static readonly BiDirectionalDictionary<string, AttributeTarget> AttributeTargetMap =
-            new BiDirectionalDictionary<string, AttributeTarget>
-            {
-                { "assembly", AttributeTarget.Assembly },
-                { "module", AttributeTarget.Module },
-                { "type", AttributeTarget.Type },
-                { "return", AttributeTarget.Return },
-                { "method", AttributeTarget.Method },
-                { "field", AttributeTarget.Field },
-                { "event", AttributeTarget.Event },
-                { "param", AttributeTarget.Parameter },
-                { "property", AttributeTarget.Property },
-                // TODO: what is this?
-                { "typevar", AttributeTarget.TypeParameter }
-            };
-
-        private AttributeTarget GetSyntaxTarget()
+        // TODO: Create a tiny type for AttributeTarget
+        private Identifier target;
+        public string Target
         {
-            var text = syntax.Target?.Identifier.ValueText;
-
-            if (text == null)
-                return AttributeTarget.None;
-
-            return AttributeTargetMap[text];
+            get => target.Text;
+            set => target.Text = value;
         }
-
-        public AttributeTarget Target { get; set; }
 
         private NamedTypeReference type;
         public NamedTypeReference Type
@@ -103,21 +83,19 @@ namespace CSharpE.Syntax
 
         AttributeListSyntax ISyntaxWrapper<AttributeListSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
+            GetAndResetChanged(ref changed, out var thisChanged);
 
-            bool? thisChanged = false;
-
+            var newTarget = target.GetWrapped(ref thisChanged);
             var newType = (NameSyntax)type?.GetWrapped(ref thisChanged) ?? syntax.Attributes.Single().Name;
             var newArguments = arguments?.GetWrapped(ref thisChanged) ??
                                syntax.Attributes.Single().ArgumentList?.Arguments ??
                                default;
 
-            if (syntax == null || thisChanged == true || Target != GetSyntaxTarget())
+            if (syntax == null || thisChanged == true)
             {
-                var targetSpecifier = Target == AttributeTarget.None
+                var targetSpecifier = newTarget == default
                     ? null
-                    : RoslynSyntaxFactory.AttributeTargetSpecifier(
-                        RoslynSyntaxFactory.Identifier(AttributeTargetMap[Target]));
+                    : RoslynSyntaxFactory.AttributeTargetSpecifier(newTarget);
 
                 var argumentList = newArguments.Any() ? RoslynSyntaxFactory.AttributeArgumentList(newArguments) : null;
 
@@ -150,20 +128,5 @@ namespace CSharpE.Syntax
                 argument.Expression = Expression.ReplaceExpressions(argument.Expression, filter, projection);
             }
         }
-    }
-
-    public enum AttributeTarget
-    {
-        None,
-        Assembly,
-        Module,
-        Type,
-        Method,
-        Field,
-        Property,
-        Event,
-        Parameter,
-        Return,
-        TypeParameter
     }
 }
