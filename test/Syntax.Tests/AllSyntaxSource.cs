@@ -83,3 +83,9 @@ class C
     {
     }
 }
+
+enum E
+{
+    [A, B]
+    M
+}

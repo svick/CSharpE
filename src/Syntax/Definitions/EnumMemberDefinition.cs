@@ -1,11 +1,12 @@
-﻿using CSharpE.Syntax.Internals;
+﻿using System.Collections.Generic;
+using System.Linq;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Roslyn = Microsoft.CodeAnalysis;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpE.Syntax
 {
-    // TODO: attributes
     public sealed class EnumMemberDefinition : SyntaxNode, ISyntaxWrapper<EnumMemberDeclarationSyntax>
     {
         private EnumMemberDeclarationSyntax syntax;
@@ -28,6 +29,19 @@ namespace CSharpE.Syntax
         {
             Name = name;
             Initializer = initializer;
+        }
+
+        private SyntaxList<Attribute, AttributeListSyntax> attributes;
+        public IList<Attribute> Attributes
+        {
+            get
+            {
+                if (attributes == null)
+                    attributes = new SyntaxList<Attribute, AttributeListSyntax>(syntax.AttributeLists, this);
+
+                return attributes;
+            }
+            set => SetList(ref attributes, new SyntaxList<Attribute, AttributeListSyntax>(value, this));
         }
 
         private Identifier name;
@@ -68,6 +82,7 @@ namespace CSharpE.Syntax
 
             bool? thisChanged = false;
 
+            var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newName = name.GetWrapped(ref thisChanged);
             var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.EqualsValue?.Value;
 
@@ -75,7 +90,7 @@ namespace CSharpE.Syntax
             {
                 var equalsValue = newInitializer == null ? null : RoslynSyntaxFactory.EqualsValueClause(newInitializer);
 
-                syntax = RoslynSyntaxFactory.EnumMemberDeclaration(default, newName, equalsValue);
+                syntax = RoslynSyntaxFactory.EnumMemberDeclaration(newAttributes, newName, equalsValue);
 
                 SetChanged(ref changed);
             }
@@ -86,10 +101,14 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Init((EnumMemberDeclarationSyntax)newSyntax);
+
+            SetList(ref attributes, null);
             Set(ref initializer, null);
             initializerSet = false;
         }
 
-        private protected override SyntaxNode CloneImpl() => new EnumMemberDefinition(Name, Initializer);
+        private protected override SyntaxNode CloneImpl() => new EnumMemberDefinition(Name, Initializer) { Attributes = Attributes };
+
+        public override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat<SyntaxNode>(new[] { Initializer });
     }
 }
