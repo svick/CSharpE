@@ -13,9 +13,17 @@ namespace CSharpE.Syntax.Tests
 
             var file = SyntaxTestUtils.CreateSourceFile(code);
 
-            var type = file.Members.Single().GetTypeDefinition();
+            Assert.IsType<InvalidMemberDefinition>(file.Members.Single().GetTypeDefinition());
+        }
 
-            Assert.IsType<InvalidMemberDefinition>(type);
+        [Fact]
+        public void InvalidEnumBase()
+        {
+            var code = "enum E : {}";
+
+            var file = SyntaxTestUtils.CreateSourceFile(code);
+
+            Assert.IsType<InvalidMemberDefinition>(file.GetTypes().Single());
         }
     }
 }

@@ -17,130 +17,75 @@ namespace CSharpE.Syntax.Internals
     /// </remarks>
     internal static class FromRoslyn
     {
-        private static bool HasUnresolvedErrors(Roslyn::SyntaxNode node, IEnumerable<Roslyn::SyntaxNode> children)
+        private static bool HasUnresolvedErrors(Roslyn::SyntaxNode node)
         {
             var errors = node.GetDiagnostics().Where(d => d.DefaultSeverity == DiagnosticSeverity.Error);
 
-            return errors.Except(children.SelectMany(c => c?.GetDiagnostics() ?? Array.Empty<Diagnostic>())).Any();
+            return errors.Except(GetPossiblyInvalidNodes(node).SelectMany(c => c?.GetDiagnostics() ?? Array.Empty<Diagnostic>())).Any();
         }
 
-        private static IEnumerable<Roslyn::SyntaxNode> ChildExpressionsAndStatements(Roslyn::SyntaxNode syntax)
+        /// <summary>
+        /// Returns descendant nodes that, when converted to CSharpE's object model, can represent their own errors
+        /// (using Invalid* types)
+        /// </summary>
+        private static IEnumerable<Roslyn::SyntaxNode> GetPossiblyInvalidNodes(Roslyn::SyntaxNode syntax)
         {
-            foreach (var childNode in syntax.ChildNodes())
-            {
-                if (childNode is ExpressionSyntax expression)
-                {
-                    yield return expression;
-                }
-                else if (childNode is StatementSyntax statement)
-                {
-                    yield return statement;
-                }
-                else
-                {
-                    foreach (var childExpression in ChildExpressionsAndStatements(childNode))
-                    {
-                        yield return childExpression;
-                    }
-                }
-            }
+            bool IsPossiblyInvalid(Roslyn::SyntaxNode node) =>
+                node is MemberDeclarationSyntax || node is ExpressionSyntax || node is StatementSyntax;
+
+            // find the highest possibly invalid nodes
+            // (further descending into their children would be pointles)
+            return syntax.DescendantNodes(descendIntoChildren: n => !IsPossiblyInvalid(n)).Where(n => IsPossiblyInvalid(n));
         }
 
-        private static IEnumerable<Roslyn::SyntaxNode> ExpressionChildren(ExpressionSyntax syntax) =>
-            ChildExpressionsAndStatements(syntax);
-
-        public static Expression Expression(ExpressionSyntax syntax, SyntaxNode parent)
-        {
-            if (syntax == null)
-                return null;
-
-            if (HasUnresolvedErrors(syntax, ExpressionChildren(syntax)))
-                return new InvalidExpression(syntax, parent);
-
-            switch (syntax)
+        public static Expression Expression(ExpressionSyntax syntax, SyntaxNode parent) =>
+            syntax switch
             {
-                case AnonymousMethodExpressionSyntax anonymousMethod:
-                    return new DelegateExpression(anonymousMethod, parent);
-                case AnonymousObjectCreationExpressionSyntax anonymousObjectCreation:
-                    return new AnonymousNewExpression(anonymousObjectCreation, parent);
-                case ArrayCreationExpressionSyntax arrayCreation:
-                    return new NewArrayExpression(arrayCreation, parent);
-                case AssignmentExpressionSyntax assignment:
-                    return AssignmentExpression(assignment, parent);
-                case AwaitExpressionSyntax await:
-                    return new AwaitExpression(await, parent);
-                case BaseExpressionSyntax @base:
-                    return new BaseExpression(@base, parent);
-                case BinaryExpressionSyntax binary:
-                    return BinaryExpression(binary, parent);
-                case CastExpressionSyntax cast:
-                    return new CastExpression(cast, parent);
-                case ConditionalAccessExpressionSyntax conditionalAccess:
-                    return ConditionalAccessExpression(conditionalAccess, parent);
-                case ConditionalExpressionSyntax conditional:
-                    return new ConditionalExpression(conditional, parent);
-                case CheckedExpressionSyntax @checked:
-                    return new CheckedExpression(@checked, parent);
-                case DeclarationExpressionSyntax declaration:
-                    return new DeclarationExpression(declaration, parent);
-                case DefaultExpressionSyntax @default:
-                    return new DefaultExpression(@default, parent);
-                case ElementAccessExpressionSyntax elementAccess:
-                    return new ElementAccessExpression(elementAccess, parent);
-                case IdentifierNameSyntax identifierName:
-                    return new IdentifierExpression(identifierName, parent);
-                case ImplicitArrayCreationExpressionSyntax implicitArrayCreation:
-                    return new ImplicitNewArrayExpression(implicitArrayCreation, parent);
-                case ImplicitStackAllocArrayCreationExpressionSyntax implicitStackAllocArrayCreation:
-                    return new ImplicitStackAllocExpression(implicitStackAllocArrayCreation, parent);
-                case InterpolatedStringExpressionSyntax interpolatedStringExpression:
-                    return new InterpolatedStringExpression(interpolatedStringExpression, parent);
-                case InvocationExpressionSyntax invocation:
-                    return new InvocationExpression(invocation, parent);
-                case IsPatternExpressionSyntax isPattern:
-                    return new IsPatternExpression(isPattern, parent);
-                case LambdaExpressionSyntax lambda:
-                    return new LambdaExpression(lambda, parent);
-                case LiteralExpressionSyntax literal:
-                    return LiteralExpression(literal, parent);
-                case MemberAccessExpressionSyntax memberAccess:
-                    return MemberAccessExpression(memberAccess, parent);
-                case ObjectCreationExpressionSyntax objectCreation:
-                    return new NewExpression(objectCreation, parent);
-                case OmittedArraySizeExpressionSyntax _:
-                    return null;
-                case ParenthesizedExpressionSyntax parenthesized:
-                    return new ParenthesizedExpression(parenthesized, parent);
-                case PostfixUnaryExpressionSyntax postfixUnary:
-                    return PostfixUnaryExpression(postfixUnary, parent);
-                case PredefinedTypeSyntax predefinedType:
-                    return new NamedTypeReference(predefinedType, parent);
-                case PrefixUnaryExpressionSyntax prefixUnary:
-                    return PrefixUnaryExpression(prefixUnary, parent);
-                case QueryExpressionSyntax query:
-                    return new LinqExpression(query, parent);
-                case RangeExpressionSyntax range:
-                    return new RangeExpression(range, parent);
-                case RefExpressionSyntax @ref:
-                    return new RefExpression(@ref, parent);
-                case SizeOfExpressionSyntax sizeOf:
-                    return new SizeOfExpression(sizeOf, parent);
-                case StackAllocArrayCreationExpressionSyntax stackAllocArrayCreation:
-                    return new StackAllocExpression(stackAllocArrayCreation, parent);
-                case SwitchExpressionSyntax @switch:
-                    return new SwitchExpression(@switch, parent);
-                case ThisExpressionSyntax @this:
-                    return new ThisExpression(@this, parent);
-                case ThrowExpressionSyntax @throw:
-                    return new ThrowExpression(@throw, parent);
-                case TupleExpressionSyntax tuple:
-                    return new TupleExpression(tuple, parent);
-                case TypeOfExpressionSyntax typeOf:
-                    return new TypeOfExpression(typeOf, parent);
-            }
-
-            throw new NotImplementedException(syntax.GetType().Name);
-        }
+                null => null,
+                _ when HasUnresolvedErrors(syntax) => new InvalidExpression(syntax, parent),
+                AnonymousMethodExpressionSyntax anonymousMethod => new DelegateExpression(anonymousMethod, parent),
+                AnonymousObjectCreationExpressionSyntax anonymousObjectCreation => new AnonymousNewExpression(anonymousObjectCreation, parent),
+                ArrayCreationExpressionSyntax arrayCreation => new NewArrayExpression(arrayCreation, parent),
+                AssignmentExpressionSyntax assignment => AssignmentExpression(assignment, parent),
+                AwaitExpressionSyntax await => new AwaitExpression(await, parent),
+                BaseExpressionSyntax @base => new BaseExpression(@base, parent),
+                BinaryExpressionSyntax binary => BinaryExpression(binary, parent),
+                CastExpressionSyntax cast => new CastExpression(cast, parent),
+                ConditionalAccessExpressionSyntax conditionalAccess => ConditionalAccessExpression(conditionalAccess, parent),
+                ConditionalExpressionSyntax conditional => new ConditionalExpression(conditional, parent),
+                CheckedExpressionSyntax @checked => new CheckedExpression(@checked, parent),
+                DeclarationExpressionSyntax declaration => new DeclarationExpression(declaration, parent),
+                DefaultExpressionSyntax @default => new DefaultExpression(@default, parent),
+                ElementAccessExpressionSyntax elementAccess => new ElementAccessExpression(elementAccess, parent),
+                IdentifierNameSyntax identifierName => new IdentifierExpression(identifierName, parent),
+                ImplicitArrayCreationExpressionSyntax implicitArrayCreation => new ImplicitNewArrayExpression(implicitArrayCreation, parent),
+                ImplicitStackAllocArrayCreationExpressionSyntax implicitStackAllocArrayCreation =>
+                    new ImplicitStackAllocExpression(implicitStackAllocArrayCreation, parent),
+                InterpolatedStringExpressionSyntax interpolatedStringExpression =>
+                    new InterpolatedStringExpression(interpolatedStringExpression, parent),
+                InvocationExpressionSyntax invocation => new InvocationExpression(invocation, parent),
+                IsPatternExpressionSyntax isPattern => new IsPatternExpression(isPattern, parent),
+                LambdaExpressionSyntax lambda => new LambdaExpression(lambda, parent),
+                LiteralExpressionSyntax literal => LiteralExpression(literal, parent),
+                MemberAccessExpressionSyntax memberAccess => MemberAccessExpression(memberAccess, parent),
+                ObjectCreationExpressionSyntax objectCreation => new NewExpression(objectCreation, parent),
+                OmittedArraySizeExpressionSyntax _ => null,
+                ParenthesizedExpressionSyntax parenthesized => new ParenthesizedExpression(parenthesized, parent),
+                PostfixUnaryExpressionSyntax postfixUnary => PostfixUnaryExpression(postfixUnary, parent),
+                PredefinedTypeSyntax predefinedType => new NamedTypeReference(predefinedType, parent),
+                PrefixUnaryExpressionSyntax prefixUnary => PrefixUnaryExpression(prefixUnary, parent),
+                QueryExpressionSyntax query => new LinqExpression(query, parent),
+                RangeExpressionSyntax range => new RangeExpression(range, parent),
+                RefExpressionSyntax @ref => new RefExpression(@ref, parent),
+                SizeOfExpressionSyntax sizeOf => new SizeOfExpression(sizeOf, parent),
+                StackAllocArrayCreationExpressionSyntax stackAllocArrayCreation => new StackAllocExpression(stackAllocArrayCreation, parent),
+                SwitchExpressionSyntax @switch => new SwitchExpression(@switch, parent),
+                ThisExpressionSyntax @this => new ThisExpression(@this, parent),
+                ThrowExpressionSyntax @throw => new ThrowExpression(@throw, parent),
+                TupleExpressionSyntax tuple => new TupleExpression(tuple, parent),
+                TypeOfExpressionSyntax typeOf => new TypeOfExpression(typeOf, parent),
+                _ => throw new NotImplementedException(syntax.GetType().Name),
+            };
 
         private static BinaryExpression AssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent) =>
             syntax.Kind() switch
@@ -160,84 +105,48 @@ namespace CSharpE.Syntax.Internals
                 _ => throw new InvalidOperationException(),
             };
 
-        private static BinaryExpression BinaryExpression(BinaryExpressionSyntax syntax, SyntaxNode parent)
-        {
-            switch (syntax.Kind())
+        private static BinaryExpression BinaryExpression(BinaryExpressionSyntax syntax, SyntaxNode parent) =>
+            syntax.Kind() switch
             {
-                case SyntaxKind.AddExpression:
-                    return new AddExpression(syntax, parent);
-                case SyntaxKind.SubtractExpression:
-                    return new SubtractExpression(syntax, parent);
-                case SyntaxKind.MultiplyExpression:
-                    return new MultiplyExpression(syntax, parent);
-                case SyntaxKind.DivideExpression:
-                    return new DivideExpression(syntax, parent);
-                case SyntaxKind.ModuloExpression:
-                    return new ModuloExpression(syntax, parent);
-                case SyntaxKind.LeftShiftExpression:
-                    return new LeftShiftExpression(syntax, parent);
-                case SyntaxKind.RightShiftExpression:
-                    return new RightShiftExpression(syntax, parent);
-                case SyntaxKind.LogicalOrExpression:
-                    return new LogicalOrExpression(syntax, parent);
-                case SyntaxKind.LogicalAndExpression:
-                    return new LogicalAndExpression(syntax, parent);
-                case SyntaxKind.BitwiseOrExpression:
-                    return new BitwiseOrExpression(syntax, parent);
-                case SyntaxKind.BitwiseAndExpression:
-                    return new BitwiseAndExpression(syntax, parent);
-                case SyntaxKind.ExclusiveOrExpression:
-                    return new XorExpression(syntax, parent);
-                case SyntaxKind.EqualsExpression:
-                    return new EqualsExpression(syntax, parent);
-                case SyntaxKind.NotEqualsExpression:
-                    return new NotEqualsExpression(syntax, parent);
-                case SyntaxKind.LessThanExpression:
-                    return new LessThanExpression(syntax, parent);
-                case SyntaxKind.LessThanOrEqualExpression:
-                    return new LessThanOrEqualExpression(syntax, parent);
-                case SyntaxKind.GreaterThanExpression:
-                    return new GreaterThanExpression(syntax, parent);
-                case SyntaxKind.GreaterThanOrEqualExpression:
-                    return new GreaterThanOrEqualExpression(syntax, parent);
-                case SyntaxKind.IsExpression:
-                    return new IsExpression(syntax, parent);
-                case SyntaxKind.AsExpression:
-                    return new AsExpression(syntax, parent);
-                case SyntaxKind.CoalesceExpression:
-                    return new CoalesceExpression(syntax, parent);
-            }
+                SyntaxKind.AddExpression => new AddExpression(syntax, parent),
+                SyntaxKind.SubtractExpression => new SubtractExpression(syntax, parent),
+                SyntaxKind.MultiplyExpression => new MultiplyExpression(syntax, parent),
+                SyntaxKind.DivideExpression => new DivideExpression(syntax, parent),
+                SyntaxKind.ModuloExpression => new ModuloExpression(syntax, parent),
+                SyntaxKind.LeftShiftExpression => new LeftShiftExpression(syntax, parent),
+                SyntaxKind.RightShiftExpression => new RightShiftExpression(syntax, parent),
+                SyntaxKind.LogicalOrExpression => new LogicalOrExpression(syntax, parent),
+                SyntaxKind.LogicalAndExpression => new LogicalAndExpression(syntax, parent),
+                SyntaxKind.BitwiseOrExpression => new BitwiseOrExpression(syntax, parent),
+                SyntaxKind.BitwiseAndExpression => new BitwiseAndExpression(syntax, parent),
+                SyntaxKind.ExclusiveOrExpression => new XorExpression(syntax, parent),
+                SyntaxKind.EqualsExpression => new EqualsExpression(syntax, parent),
+                SyntaxKind.NotEqualsExpression => new NotEqualsExpression(syntax, parent),
+                SyntaxKind.LessThanExpression => new LessThanExpression(syntax, parent),
+                SyntaxKind.LessThanOrEqualExpression => new LessThanOrEqualExpression(syntax, parent),
+                SyntaxKind.GreaterThanExpression => new GreaterThanExpression(syntax, parent),
+                SyntaxKind.GreaterThanOrEqualExpression => new GreaterThanOrEqualExpression(syntax, parent),
+                SyntaxKind.IsExpression => new IsExpression(syntax, parent),
+                SyntaxKind.AsExpression => new AsExpression(syntax, parent),
+                SyntaxKind.CoalesceExpression => new CoalesceExpression(syntax, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
-            throw new InvalidOperationException();
-        }
-
-        private static Expression ConditionalAccessExpression(
-            ConditionalAccessExpressionSyntax syntax, SyntaxNode parent)
-        {
-            switch (syntax.WhenNotNull)
+        private static Expression ConditionalAccessExpression(ConditionalAccessExpressionSyntax syntax, SyntaxNode parent) =>
+            syntax.WhenNotNull switch
             {
-                case MemberBindingExpressionSyntax _:
-                    return new ConditionalMemberAccessExpression(syntax, parent);
-                case ElementBindingExpressionSyntax _:
-                    return new ConditionalElementAccessExpression(syntax, parent);
-            }
+                MemberBindingExpressionSyntax _ => new ConditionalMemberAccessExpression(syntax, parent),
+                ElementBindingExpressionSyntax _ => new ConditionalElementAccessExpression(syntax, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
-            throw new InvalidOperationException();
-        }
-
-        private static BaseMemberAccessExpression MemberAccessExpression(
-            MemberAccessExpressionSyntax syntax, SyntaxNode parent)
-        {
-            switch (syntax.Kind())
+        private static BaseMemberAccessExpression MemberAccessExpression(MemberAccessExpressionSyntax syntax, SyntaxNode parent) =>
+            syntax.Kind() switch
             {
-                case SyntaxKind.SimpleMemberAccessExpression:
-                    return new MemberAccessExpression(syntax, parent);
-                case SyntaxKind.PointerMemberAccessExpression:
-                    return new PointerMemberAccessExpression(syntax, parent);
-            }
-
-            throw new InvalidOperationException();
-        }
+                SyntaxKind.SimpleMemberAccessExpression => new MemberAccessExpression(syntax, parent),
+                SyntaxKind.PointerMemberAccessExpression => new PointerMemberAccessExpression(syntax, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
         private static UnaryExpression PrefixUnaryExpression(PrefixUnaryExpressionSyntax syntax, SyntaxNode parent) =>
             syntax.Kind() switch
@@ -288,31 +197,21 @@ namespace CSharpE.Syntax.Internals
             throw new NotImplementedException(syntax.Kind().ToString());
         }
 
-        public static Initializer Initializer(InitializerExpressionSyntax syntax, SyntaxNode parent)
-        {
-            switch (syntax?.Kind())
+        public static Initializer Initializer(InitializerExpressionSyntax syntax, SyntaxNode parent) =>
+            syntax?.Kind() switch
             {
-                case null:
-                    return null;
-                case SyntaxKind.ObjectInitializerExpression:
-                    return new ObjectInitializer(syntax, parent);
-                case SyntaxKind.CollectionInitializerExpression:
-                    return new CollectionInitializer(syntax, parent);
-            }
+                null => null,
+                SyntaxKind.ObjectInitializerExpression => new ObjectInitializer(syntax, parent),
+                SyntaxKind.CollectionInitializerExpression => new CollectionInitializer(syntax, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
-            throw new InvalidOperationException();
-        }
-
-        public static VariableInitializer VariableInitializer(ExpressionSyntax syntax, SyntaxNode parent)
-        {
-            switch (syntax)
+        public static VariableInitializer VariableInitializer(ExpressionSyntax syntax, SyntaxNode parent) =>
+            syntax switch
             {
-                case InitializerExpressionSyntax initializer:
-                    return new ArrayInitializer(initializer, parent);
-                default:
-                    return new ExpressionVariableInitializer(syntax, parent);
-            }
-        }
+                InitializerExpressionSyntax initializer => new ArrayInitializer(initializer, parent),
+                _ => new ExpressionVariableInitializer(syntax, parent),
+            };
 
         public static VariableDesignation VariableDesignation(VariableDesignationSyntax syntax, SyntaxNode parent)
         {
@@ -330,91 +229,49 @@ namespace CSharpE.Syntax.Internals
             throw new InvalidOperationException(syntax.GetType().Name);
         }
 
-        private static IEnumerable<Roslyn::SyntaxNode> StatementChildren(StatementSyntax syntax) =>
-            ChildExpressionsAndStatements(syntax);
-
-        public static Statement Statement(StatementSyntax syntax, SyntaxNode parent)
-        {
-            if (syntax == null)
-                return null;
-
-            if (HasUnresolvedErrors(syntax, StatementChildren(syntax)))
-                return new InvalidStatement(syntax, parent);
-
-            switch (syntax)
+        public static Statement Statement(StatementSyntax syntax, SyntaxNode parent) =>
+            syntax switch
             {
-                case BlockSyntax block:
-                    return new BlockStatement(block, parent);
-                case BreakStatementSyntax @break:
-                    return new BreakStatement(@break, parent);
-                case CheckedStatementSyntax @checked:
-                    return new CheckedStatement(@checked, parent);
-                case ContinueStatementSyntax @continue:
-                    return new ContinueStatement(@continue, parent);
-                case DoStatementSyntax @do:
-                    return new DoWhileStatement(@do, parent);
-                case EmptyStatementSyntax empty:
-                    return new EmptyStatement(empty, parent);
-                case ExpressionStatementSyntax expression:
-                    return new ExpressionStatement(expression, parent);
-                case FixedStatementSyntax @fixed:
-                    return new FixedStatement(@fixed, parent);
-                case ForEachStatementSyntax forEach:
-                    return new ForEachStatement(forEach, parent);
-                case ForEachVariableStatementSyntax forEachVariable:
-                    return new ForEachPatternStatement(forEachVariable, parent);
-                case ForStatementSyntax @for:
-                    return new ForStatement(@for, parent);
-                case GotoStatementSyntax @goto:
-                    return GotoStatement(@goto, parent);
-                case IfStatementSyntax @if:
-                    return new IfStatement(@if, parent);
-                case LabeledStatementSyntax labeled:
-                    return new LabelStatement(labeled, parent);
-                case LocalFunctionStatementSyntax localFunction:
-                    return new LocalFunctionStatement(localFunction, parent);
-                case LocalDeclarationStatementSyntax localDeclaration:
-                    return new VariableDeclarationStatement(localDeclaration, parent);
-                case LockStatementSyntax @lock:
-                    return new LockStatement(@lock, parent);
-                case ReturnStatementSyntax @return:
-                    return new ReturnStatement(@return, parent);
-                case SwitchStatementSyntax @switch:
-                    return new SwitchStatement(@switch, parent);
-                case ThrowStatementSyntax @throw:
-                    return new ExpressionStatement(@throw, parent);
-                case TryStatementSyntax @try:
-                    return new TryStatement(@try, parent);
-                case UnsafeStatementSyntax @unsafe:
-                    return new UnsafeStatement(@unsafe, parent);
-                case UsingStatementSyntax @using:
-                    return new UsingStatement(@using, parent);
-                case WhileStatementSyntax @while:
-                    return new WhileStatement(@while, parent);
-                case YieldStatementSyntax yield:
-                    if (yield.Kind() == SyntaxKind.YieldBreakStatement)
-                        return new YieldBreakStatement(yield, parent);
-                    else
-                        return new YieldReturnStatement(yield, parent);
-            }
+                null => null,
+                _ when HasUnresolvedErrors(syntax) => new InvalidStatement(syntax, parent),
+                BlockSyntax block => new BlockStatement(block, parent),
+                BreakStatementSyntax @break => new BreakStatement(@break, parent),
+                CheckedStatementSyntax @checked => new CheckedStatement(@checked, parent),
+                ContinueStatementSyntax @continue => new ContinueStatement(@continue, parent),
+                DoStatementSyntax @do => new DoWhileStatement(@do, parent),
+                EmptyStatementSyntax empty => new EmptyStatement(empty, parent),
+                ExpressionStatementSyntax expression => new ExpressionStatement(expression, parent),
+                FixedStatementSyntax @fixed => new FixedStatement(@fixed, parent),
+                ForEachStatementSyntax forEach => new ForEachStatement(forEach, parent),
+                ForEachVariableStatementSyntax forEachVariable => new ForEachPatternStatement(forEachVariable, parent),
+                ForStatementSyntax @for => new ForStatement(@for, parent),
+                GotoStatementSyntax @goto => GotoStatement(@goto, parent),
+                IfStatementSyntax @if => new IfStatement(@if, parent),
+                LabeledStatementSyntax labeled => new LabelStatement(labeled, parent),
+                LocalFunctionStatementSyntax localFunction => new LocalFunctionStatement(localFunction, parent),
+                LocalDeclarationStatementSyntax localDeclaration => new VariableDeclarationStatement(localDeclaration, parent),
+                LockStatementSyntax @lock => new LockStatement(@lock, parent),
+                ReturnStatementSyntax @return => new ReturnStatement(@return, parent),
+                SwitchStatementSyntax @switch => new SwitchStatement(@switch, parent),
+                ThrowStatementSyntax @throw => new ExpressionStatement(@throw, parent),
+                TryStatementSyntax @try => new TryStatement(@try, parent),
+                UnsafeStatementSyntax @unsafe => new UnsafeStatement(@unsafe, parent),
+                UsingStatementSyntax @using => new UsingStatement(@using, parent),
+                WhileStatementSyntax @while => new WhileStatement(@while, parent),
+                YieldStatementSyntax yield => yield.Kind() == SyntaxKind.YieldBreakStatement
+                    ? (Statement)new YieldBreakStatement(yield, parent)
+                    : new YieldReturnStatement(yield, parent),
+                _ => throw new NotImplementedException(syntax.Kind().ToString()),
+            };
 
-            throw new NotImplementedException(syntax.Kind().ToString());
-        }
-
-        private static Statement GotoStatement(GotoStatementSyntax syntax, SyntaxNode parent)
-        {
-            switch (syntax.Kind())
+        private static Statement GotoStatement(GotoStatementSyntax syntax, SyntaxNode parent) =>
+            syntax.Kind() switch
             {
-                case SyntaxKind.GotoStatement:
-                    return new GotoStatement(syntax, parent);
-                case SyntaxKind.GotoCaseStatement:
-                    return new GotoCaseStatement(syntax, parent);
-                case SyntaxKind.GotoDefaultStatement:
-                    return new GotoDefaultStatement(syntax, parent);
-            }
-
-            throw new InvalidOperationException();
-        }
+                SyntaxKind.GotoStatement => new GotoStatement(syntax, parent),
+                SyntaxKind.GotoCaseStatement => new GotoCaseStatement(syntax, parent),
+                SyntaxKind.GotoDefaultStatement => new GotoDefaultStatement(syntax, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
         public static MemberModifiers MemberModifiers(SyntaxTokenList modifiers)
         {
@@ -440,14 +297,15 @@ namespace CSharpE.Syntax.Internals
             return result;
         }
 
-        public static bool IsCompacted(Roslyn::SyntaxNode syntaxNode) => syntaxNode switch
-        {
-            BaseFieldDeclarationSyntax fieldDeclaration => fieldDeclaration.Declaration.Variables.Count > 1,
-            AttributeListSyntax attributeList => attributeList.Attributes.Count > 1,
-            LocalDeclarationStatementSyntax localDeclaration => localDeclaration.Declaration.Variables.Count > 1,
-            ForStatementSyntax forStatement => forStatement.Initializers != default || forStatement.Declaration?.Variables.Count > 1,
-            _ => false,
-        };
+        public static bool IsCompacted(Roslyn::SyntaxNode syntaxNode) =>
+            syntaxNode switch
+            {
+                BaseFieldDeclarationSyntax fieldDeclaration => fieldDeclaration.Declaration.Variables.Count > 1,
+                AttributeListSyntax attributeList => attributeList.Attributes.Count > 1,
+                LocalDeclarationStatementSyntax localDeclaration => localDeclaration.Declaration.Variables.Count > 1,
+                ForStatementSyntax forStatement => forStatement.Initializers != default || forStatement.Declaration?.Variables.Count > 1,
+                _ => false,
+            };
 
         public static IEnumerable<TRoslynSyntax> Expand<TRoslynSyntax>(TRoslynSyntax roslynSyntax)
             where TRoslynSyntax : Roslyn::SyntaxNode
@@ -520,196 +378,87 @@ namespace CSharpE.Syntax.Internals
             }
         }
 
-        private static IEnumerable<ExpressionSyntax> MemberAttributeExpressions(
-            MemberDeclarationSyntax memberDeclarationSyntax) =>
-            Syntax.MemberDefinition.GetAttributeLists(memberDeclarationSyntax)
-                .SelectMany(al => al.Attributes)
-                .SelectMany(a => a.ArgumentList?.Arguments ?? default)
-                .Select(a => a.Expression);
-
-        private static IEnumerable<Roslyn::SyntaxNode> MemberDeclarationChildren(MemberDeclarationSyntax memberDeclarationSyntax)
-        {
-            return MemberAttributeExpressions(memberDeclarationSyntax).Concat(GetChildrenImpl());
-
-            IEnumerable<Roslyn::SyntaxNode> GetChildrenImpl()
+        public static MemberDefinition MemberDefinition(MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType) =>
+            memberDeclarationSyntax switch
             {
-                switch (memberDeclarationSyntax)
-                {
-                    case FieldDeclarationSyntax field:
-                        return new[] { field.Declaration.Variables.Single().Initializer };
-                    case BasePropertyDeclarationSyntax property:
-                        return property.AccessorList?.Accessors ?? default;
-                    case EventFieldDeclarationSyntax _:
-                        return Array.Empty<Roslyn::SyntaxNode>();
-                    case BaseMethodDeclarationSyntax method:
-                        return new[] { method.Body };
-                    case BaseTypeDeclarationSyntax baseType:
-                        return TypeDefinitionChildren(baseType);
-                    case DelegateDeclarationSyntax _:
-                    case IncompleteMemberSyntax _:
-                        return Array.Empty<Roslyn::SyntaxNode>();
-                    default:
-                        throw new NotImplementedException(memberDeclarationSyntax.GetType().Name);
-                }
-            }
-        }
+                _ when HasUnresolvedErrors(memberDeclarationSyntax) => new InvalidMemberDefinition(memberDeclarationSyntax, containingType),
+                FieldDeclarationSyntax field => new FieldDefinition(field, containingType),
+                PropertyDeclarationSyntax property => new PropertyDefinition(property, containingType),
+                IndexerDeclarationSyntax indexer => new IndexerDefinition(indexer, containingType),
+                EventDeclarationSyntax @event => new EventDefinition(@event, containingType),
+                EventFieldDeclarationSyntax eventField => new EventDefinition(eventField, containingType),
+                MethodDeclarationSyntax method => new MethodDefinition(method, containingType),
+                ConstructorDeclarationSyntax constructor => new ConstructorDefinition(constructor, containingType),
+                DestructorDeclarationSyntax destructor => new FinalizerDefinition(destructor, containingType),
+                OperatorDeclarationSyntax @operator => new OperatorDefinition(@operator, containingType),
+                ConversionOperatorDeclarationSyntax conversionOperator => new OperatorDefinition(conversionOperator, containingType),
+                BaseTypeDeclarationSyntax baseType => TypeDefinition(baseType, containingType),
+                DelegateDeclarationSyntax @delegate => new DelegateDefinition(@delegate, containingType),
+                _ => throw new NotImplementedException(memberDeclarationSyntax.GetType().Name),
+            };
 
-        public static MemberDefinition MemberDefinition(
-            MemberDeclarationSyntax memberDeclarationSyntax, TypeDefinition containingType)
-        {
-            if (HasUnresolvedErrors(memberDeclarationSyntax, MemberDeclarationChildren(memberDeclarationSyntax)))
-                return new InvalidMemberDefinition(memberDeclarationSyntax, containingType);
-
-            switch (memberDeclarationSyntax)
+        public static BaseTypeDefinition TypeDefinition(MemberDeclarationSyntax memberDeclarationSyntax, SyntaxNode parent) =>
+            memberDeclarationSyntax switch
             {
-                case FieldDeclarationSyntax field:
-                    return new FieldDefinition(field, containingType);
-                case PropertyDeclarationSyntax property:
-                    return new PropertyDefinition(property, containingType);
-                case IndexerDeclarationSyntax indexer:
-                    return new IndexerDefinition(indexer, containingType);
-                case EventDeclarationSyntax @event:
-                    return new EventDefinition(@event, containingType);
-                case EventFieldDeclarationSyntax eventField:
-                    return new EventDefinition(eventField, containingType);
-                case MethodDeclarationSyntax method:
-                    return new MethodDefinition(method, containingType);
-                case ConstructorDeclarationSyntax constructor:
-                    return new ConstructorDefinition(constructor, containingType);
-                case DestructorDeclarationSyntax destructor:
-                    return new FinalizerDefinition(destructor, containingType);
-                case OperatorDeclarationSyntax @operator:
-                    return new OperatorDefinition(@operator, containingType);
-                case ConversionOperatorDeclarationSyntax conversionOperator:
-                    return new OperatorDefinition(conversionOperator, containingType);
-                case BaseTypeDeclarationSyntax baseType:
-                    return TypeDefinition(baseType, containingType);
-                case DelegateDeclarationSyntax @delegate:
-                    return new DelegateDefinition(@delegate, containingType);
-                default:
-                    throw new NotImplementedException(memberDeclarationSyntax.GetType().Name);
-            }
-        }
+                _ when HasUnresolvedErrors(memberDeclarationSyntax) => new InvalidMemberDefinition(memberDeclarationSyntax, parent),
+                DelegateDeclarationSyntax delegateDeclaration => new DelegateDefinition(delegateDeclaration, parent),
+                BaseTypeDeclarationSyntax baseTypeDeclaration => TypeDefinition(baseTypeDeclaration, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
-        public static BaseTypeDefinition TypeDefinition(
-            MemberDeclarationSyntax memberDeclarationSyntax, SyntaxNode parent)
-        {
-            if (HasUnresolvedErrors(memberDeclarationSyntax, MemberDeclarationChildren(memberDeclarationSyntax)))
-                return new InvalidMemberDefinition(memberDeclarationSyntax, parent);
-
-            switch (memberDeclarationSyntax)
+        private static BaseTypeDefinition TypeDefinition(BaseTypeDeclarationSyntax typeDeclarationSyntax, SyntaxNode parent) =>
+            typeDeclarationSyntax switch
             {
-                case DelegateDeclarationSyntax delegateDeclaration:
-                    return new DelegateDefinition(delegateDeclaration, parent);
-                case BaseTypeDeclarationSyntax baseTypeDeclaration:
-                    return TypeDefinition(baseTypeDeclaration, parent);
-            }
-            throw new InvalidOperationException();
-        }
+                ClassDeclarationSyntax classDeclaration => new ClassDefinition(classDeclaration, parent),
+                StructDeclarationSyntax structDeclaration => new StructDefinition(structDeclaration, parent),
+                InterfaceDeclarationSyntax interfaceDeclaration => new InterfaceDefinition(interfaceDeclaration, parent),
+                EnumDeclarationSyntax enumDeclaration => new EnumDefinition(enumDeclaration, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
-        private static IEnumerable<Roslyn::SyntaxNode> TypeDefinitionChildren(BaseTypeDeclarationSyntax baseTypeDeclarationSyntax)
-        {
-            return MemberAttributeExpressions(baseTypeDeclarationSyntax).Concat(GetChildrenImpl());
-
-            IEnumerable<Roslyn::SyntaxNode> GetChildrenImpl()
+        public static TypeReference TypeReference(TypeSyntax typeSyntax, SyntaxNode parent) =>
+            typeSyntax switch
             {
-                switch (baseTypeDeclarationSyntax)
-                {
-                    case EnumDeclarationSyntax enumDeclaration:
-                        return enumDeclaration.Members.Select(m => m.EqualsValue?.Value);
-                    case TypeDeclarationSyntax typeDeclaration:
-                        return typeDeclaration.Members;
-                }
-                throw new InvalidOperationException();
-            }
-        }
+                null => null,
+                OmittedTypeArgumentSyntax _ => null,
+                NameSyntax _ => new NamedTypeReference(typeSyntax, parent),
+                PredefinedTypeSyntax _ => new NamedTypeReference(typeSyntax, parent),
+                ArrayTypeSyntax array => new ArrayTypeReference(array, parent),
+                NullableTypeSyntax nullable => new NullableTypeReference(nullable, parent),
+                PointerTypeSyntax pointer => new PointerTypeReference(pointer, parent),
+                RefTypeSyntax @ref => new RefTypeReference(@ref, parent),
+                TupleTypeSyntax tuple => new TupleTypeReference(tuple, parent),
+                _ => throw new NotImplementedException(typeSyntax.GetType().Name),
+            };
 
-        private static BaseTypeDefinition TypeDefinition(BaseTypeDeclarationSyntax typeDeclarationSyntax, SyntaxNode parent)
-        {
-            switch (typeDeclarationSyntax)
+        public static TypeReference TypeReference(ITypeSymbol typeSymbol) =>
+            typeSymbol switch
             {
-                case ClassDeclarationSyntax classDeclaration:
-                    return new ClassDefinition(classDeclaration, parent);
-                case StructDeclarationSyntax structDeclaration:
-                    return new StructDefinition(structDeclaration, parent);
-                case InterfaceDeclarationSyntax interfaceDeclaration:
-                    return new InterfaceDefinition(interfaceDeclaration, parent);
-                case EnumDeclarationSyntax enumDeclaration:
-                    return new EnumDefinition(enumDeclaration, parent);
-            }
-            throw new InvalidOperationException();
-        }
-
-        public static TypeReference TypeReference(TypeSyntax typeSyntax, SyntaxNode parent)
-        {
-            switch (typeSyntax)
-            {
-                case null:
-                case OmittedTypeArgumentSyntax _:
-                    return null;
-                case NameSyntax _:
-                case PredefinedTypeSyntax _:
-                    return new NamedTypeReference(typeSyntax, parent);
-                case ArrayTypeSyntax array:
-                    return new ArrayTypeReference(array, parent);
-                case NullableTypeSyntax nullable:
-                    return new NullableTypeReference(nullable, parent);
-                case PointerTypeSyntax pointer:
-                    return new PointerTypeReference(pointer, parent);
-                case RefTypeSyntax @ref:
-                    return new RefTypeReference(@ref, parent);
-                case TupleTypeSyntax tuple:
-                    return new TupleTypeReference(tuple, parent);
-                default:
-                    throw new NotImplementedException(typeSyntax.GetType().Name);
-            }
-        }
-
-        public static TypeReference TypeReference(ITypeSymbol typeSymbol)
-        {
-            switch (typeSymbol)
-            {
-                case null:
-                case IErrorTypeSymbol _:
-                    return null;
-                case INamedTypeSymbol namedType:
-                    return new NamedTypeReference(namedType);
-                case IArrayTypeSymbol arrayType:
-                    return new ArrayTypeReference(arrayType);
-                case IPointerTypeSymbol pointerType:
-                    return new PointerTypeReference(pointerType);
-            }
-
-            throw new NotImplementedException();
-        }
+                null => null,
+                IErrorTypeSymbol _ => null,
+                INamedTypeSymbol namedType => new NamedTypeReference(namedType),
+                IArrayTypeSymbol arrayType => new ArrayTypeReference(arrayType),
+                IPointerTypeSymbol pointerType => new PointerTypeReference(pointerType),
+                _ => throw new NotImplementedException(),
+            };
 
         public static InterpolatedStringContent InterpolatedStringContent(
-            InterpolatedStringContentSyntax contentSyntax, InterpolatedStringExpression parent)
-        {
-            switch (contentSyntax)
+            InterpolatedStringContentSyntax contentSyntax, InterpolatedStringExpression parent) =>
+            contentSyntax switch
             {
-                case InterpolationSyntax interpolation:
-                    return new Interpolation(interpolation, parent);
-                case InterpolatedStringTextSyntax interpolatedStringText:
-                    return new InterpolatedStringText(interpolatedStringText, parent);
-            }
+                InterpolationSyntax interpolation => new Interpolation(interpolation, parent),
+                InterpolatedStringTextSyntax interpolatedStringText => new InterpolatedStringText(interpolatedStringText, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
-            throw new InvalidOperationException();
-        }
-
-        public static SwitchLabel SwitchLabel(SwitchLabelSyntax labelSyntax, SwitchSection parent)
-        {
-            switch (labelSyntax)
+        public static SwitchLabel SwitchLabel(SwitchLabelSyntax labelSyntax, SwitchSection parent) =>
+            labelSyntax switch
             {
-                case CaseSwitchLabelSyntax _:
-                case CasePatternSwitchLabelSyntax _:
-                    return new SwitchCase(labelSyntax, parent);
-                case DefaultSwitchLabelSyntax @default:
-                    return new SwitchDefault(@default, parent);
-            }
-
-            throw new InvalidOperationException();
-        }
+                CaseSwitchLabelSyntax _ => new SwitchCase(labelSyntax, parent),
+                CasePatternSwitchLabelSyntax _ => new SwitchCase(labelSyntax, parent),
+                DefaultSwitchLabelSyntax @default => new SwitchDefault(@default, parent),
+                _ => throw new InvalidOperationException(),
+            };
 
         public static Pattern Pattern(PatternSyntax patternSyntax, SyntaxNode parent) =>
             patternSyntax switch
@@ -724,46 +473,29 @@ namespace CSharpE.Syntax.Internals
                 _ => throw new InvalidOperationException(),
             };
 
-        public static LinqClause LinqClause(Roslyn::SyntaxNode clauseSyntax, LinqExpression parent)
-        {
-            switch (clauseSyntax)
+        public static LinqClause LinqClause(Roslyn::SyntaxNode clauseSyntax, LinqExpression parent) =>
+            clauseSyntax switch
             {
-                case FromClauseSyntax from:
-                    return new FromClause(from, parent);
-                case GroupClauseSyntax group:
-                    return new GroupByClause(group, parent);
-                case JoinClauseSyntax join:
-                    return new JoinClause(join, parent);
-                case LetClauseSyntax let:
-                    return new LetClause(let, parent);
-                case OrderByClauseSyntax orderBy:
-                    return new OrderByClause(orderBy, parent);
-                case SelectClauseSyntax select:
-                    return new SelectClause(select, parent);
-                case WhereClauseSyntax where:
-                    return new WhereClause(where, parent);
-            }
-
-            throw new NotImplementedException(clauseSyntax.GetType().Name);
-        }
+                FromClauseSyntax from => new FromClause(from, parent),
+                GroupClauseSyntax group => new GroupByClause(group, parent),
+                JoinClauseSyntax join => new JoinClause(join, parent),
+                LetClauseSyntax let => new LetClause(let, parent),
+                OrderByClauseSyntax orderBy => new OrderByClause(orderBy, parent),
+                SelectClauseSyntax select => new SelectClause(select, parent),
+                WhereClauseSyntax where => new WhereClause(where, parent),
+                _ => throw new NotImplementedException(clauseSyntax.GetType().Name),
+            };
 
         public static TypeParameterConstraint TypeParameterConstraint(
-            TypeParameterConstraintSyntax constraintSyntax, TypeParameterConstraintClause parent)
-        {
-            switch (constraintSyntax)
+            TypeParameterConstraintSyntax constraintSyntax, TypeParameterConstraintClause parent) =>
+            constraintSyntax switch
             {
-                case ClassOrStructConstraintSyntax classOrStructConstraint:
-                    if (classOrStructConstraint.Kind() == SyntaxKind.ClassConstraint)
-                        return new ClassConstraint(classOrStructConstraint, parent);
-                    else
-                        return new StructConstraint(classOrStructConstraint, parent);
-                case ConstructorConstraintSyntax constructorConstraint:
-                    return new ConstructorConstraint(constructorConstraint, parent);
-                case TypeConstraintSyntax typeConstraint:
-                    return new TypeConstraint(typeConstraint, parent);
-            }
-
-            throw new InvalidOperationException();
-        }
+                ClassOrStructConstraintSyntax classOrStructConstraint => classOrStructConstraint.Kind() == SyntaxKind.ClassConstraint
+                    ? new ClassConstraint(classOrStructConstraint, parent)
+                    : (TypeParameterConstraint)new StructConstraint(classOrStructConstraint, parent),
+                ConstructorConstraintSyntax constructorConstraint => new ConstructorConstraint(constructorConstraint, parent),
+                TypeConstraintSyntax typeConstraint => new TypeConstraint(typeConstraint, parent),
+                _ => throw new InvalidOperationException(),
+            };
     }
 }
