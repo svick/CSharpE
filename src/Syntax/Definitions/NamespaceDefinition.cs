@@ -35,7 +35,7 @@ namespace CSharpE.Syntax
             this.members = new NamespaceOrTypeList(members, this);
         }
 
-        // TODO: cache NameSyntax
+        // PERF: cache NameSyntax
         public string Name { get; set; }
 
         private NamespaceOrTypeList members;
@@ -54,9 +54,7 @@ namespace CSharpE.Syntax
 
         NamespaceDeclarationSyntax ISyntaxWrapper<NamespaceDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newMembers = members?.GetWrapped(ref thisChanged) ?? syntax.Members;
 
