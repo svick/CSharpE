@@ -76,28 +76,7 @@ namespace CSharpE.Syntax.Internals
 
         public void Add(TTarget item) => sourceList.Add(item);
 
-        public void Clear()
-        {
-            // TODO: tests
-            Predicate<TSource> predicate;
-
-            if (typeof(TSource) == typeof(TTarget))
-            {
-                if (filter == null)
-                    predicate = _ => true;
-                else
-                    predicate = ((Func<TSource, bool>)(object)filter).Invoke;
-            }
-            else
-            {
-                if (filter == null)
-                    predicate = item => item is TTarget;
-                else
-                    predicate = item => item is TTarget castedItem && filter(castedItem);
-            }
-            
-            sourceList.RemoveAll(predicate);
-        }
+        public void Clear() => sourceList.RemoveAll(item => item is TTarget castedItem && (filter == null || filter(castedItem)));
 
         public bool Contains(TTarget item) => GetEnumerable().Contains(item);
 

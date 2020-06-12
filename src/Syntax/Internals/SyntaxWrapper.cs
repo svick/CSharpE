@@ -11,30 +11,20 @@ namespace CSharpE.Syntax.Internals
         {
             var param = SystemLinqExpression.Parameter(typeof(TSyntax));
 
-            // TODO: does this step actually ever work?
-            var constructorInfo = typeof(TSyntaxWrapper).GetConstructor(new[] { typeof(TSyntax) });
-            SystemLinqExpression constructorExpression;
-            if (constructorInfo != null)
-            {
-                constructorExpression = SystemLinqExpression.New(constructorInfo, param);
-            }
-            else
-            {
-                constructorInfo =
-                    (from ctor in typeof(TSyntaxWrapper).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
-                        let parameters = ctor.GetParameters()
-                        where parameters.Length == 2 &&
-                              typeof(TSyntax).IsAssignableFrom(parameters[0].ParameterType) &&
-                              typeof(SyntaxNode).IsAssignableFrom(parameters[1].ParameterType)
-                        select ctor).Single();
+            var constructorInfo =
+                (from ctor in typeof(TSyntaxWrapper).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
+                    let parameters = ctor.GetParameters()
+                    where parameters.Length == 2 &&
+                            typeof(TSyntax).IsAssignableFrom(parameters[0].ParameterType) &&
+                            typeof(SyntaxNode).IsAssignableFrom(parameters[1].ParameterType)
+                    select ctor).Single();
 
-                var syntaxType = constructorInfo.GetParameters()[0].ParameterType;
-                var parentType = constructorInfo.GetParameters()[1].ParameterType;
+            var syntaxType = constructorInfo.GetParameters()[0].ParameterType;
+            var parentType = constructorInfo.GetParameters()[1].ParameterType;
 
-                constructorExpression = SystemLinqExpression.New(
-                    constructorInfo, SystemLinqExpression.Convert(param, syntaxType),
-                    SystemLinqExpression.Constant(null, parentType));
-            }
+            var constructorExpression = SystemLinqExpression.New(
+                constructorInfo, SystemLinqExpression.Convert(param, syntaxType),
+                SystemLinqExpression.Constant(null, parentType));
 
             var lambda = SystemLinqExpression.Lambda<Func<TSyntax, TSyntaxWrapper>>(constructorExpression, param);
 
