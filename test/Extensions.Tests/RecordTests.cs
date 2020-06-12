@@ -35,35 +35,16 @@ class Person : IEquatable<Person>
         get;
     }
 
-    public Person WithName(string name)
-    {
-        throw new NotImplementedException();
-    }
-
+    public Person WithName(string name) => throw new NotImplementedException();
     public int Age
     {
         get;
     }
 
-    public Person WithAge(int age)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool Equals(Person other)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override bool Equals(object obj)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override int GetHashCode()
-    {
-        throw new NotImplementedException();
-    }
+    public Person WithAge(int age) => throw new NotImplementedException();
+    public bool Equals(Person other) => throw new NotImplementedException();
+    public override bool Equals(object obj) => throw new NotImplementedException();
+    public override int GetHashCode() => throw new NotImplementedException();
 }";
             
             var transformation = new RecordTransformation();
@@ -93,21 +74,13 @@ class Person : IEquatable<Person>
         get;
     }
 
-    public Person WithName(string name)
-    {
-        return new Person(name, this.Age);
-    }
-
+    public Person WithName(string name) => new Person(name, this.Age);
     public int Age
     {
         get;
     }
 
-    public Person WithAge(int age)
-    {
-        return new Person(this.Name, age);
-    }
-
+    public Person WithAge(int age) => new Person(this.Name, age);
     public bool Equals(Person other)
     {
         if (object.ReferenceEquals(other, null))
@@ -123,15 +96,8 @@ class Person : IEquatable<Person>
         return EqualityComparer<string>.Default.Equals(this.Name, other.Name) && EqualityComparer<int>.Default.Equals(this.Age, other.Age);
     }
 
-    public override bool Equals(object obj)
-    {
-        return this.Equals(obj as Person);
-    }
-
-    public override int GetHashCode()
-    {
-        return (this.Name, this.Age).GetHashCode();
-    }
+    public override bool Equals(object obj) => this.Equals(obj as Person);
+    public override int GetHashCode() => (this.Name, this.Age).GetHashCode();
 }";
             
             var transformation = new RecordTransformation();

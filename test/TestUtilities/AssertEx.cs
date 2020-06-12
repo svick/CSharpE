@@ -6,10 +6,9 @@ namespace CSharpE.TestUtilities
     {
         public static void LinesEqual(string expected, string actual)
         {
-            // PERF: unnecessary allocation
-            string[] Split(string s) => s.Split(new[] {"\r\n", "\n"}, options: default);
+            string NormalizeNewlines(string s) => s.Replace("\r\n", "\n");
         
-            Assert.Equal(Split(expected), Split(actual));
+            Assert.Equal(NormalizeNewlines(expected), NormalizeNewlines(actual));
         }
     }
 }

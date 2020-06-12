@@ -54,13 +54,12 @@ namespace CSharpE.Extensions.Record
                     Smart.Segment(typeDefinition, type =>
                     {
                         type.AddMethod(Public, typeof(bool), nameof(IEquatable<object>.Equals),
-                            new[] {Parameter(type.GetReference(), "other")}, Block(NotImplementedExpression));
+                            new[] {Parameter(type.GetReference(), "other")}, NotImplementedExpression);
 
                         type.AddMethod(Public | Override, typeof(bool), nameof(object.Equals),
-                            new[] {Parameter(typeof(object), "obj")}, Block(NotImplementedExpression));
+                            new[] {Parameter(typeof(object), "obj")}, NotImplementedExpression);
 
-                        type.AddMethod(Public | Override, typeof(int), nameof(GetHashCode), null,
-                            Block(NotImplementedExpression));
+                        type.AddMethod(Public | Override, typeof(int), nameof(GetHashCode), null, NotImplementedExpression);
                     });
                 }
                 else
