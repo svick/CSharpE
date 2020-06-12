@@ -9,7 +9,6 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    // TODO: underlying type
     public sealed class EnumDefinition : BaseTypeDefinition, ISyntaxWrapper<EnumDeclarationSyntax>
     {
         private EnumDeclarationSyntax syntax;
@@ -18,16 +17,28 @@ namespace CSharpE.Syntax
             : base(syntax)
         {
             Init(syntax);
-
             Parent = parent;
         }
 
-        public EnumDefinition(MemberModifiers modifiers, string name, IEnumerable<EnumMemberDefinition> members = null)
+        public EnumDefinition(string name, params EnumMemberDefinition[] members)
+            : this(name, members.AsEnumerable()) { }
+
+        public EnumDefinition(string name, IEnumerable<EnumMemberDefinition> members)
+            : this(default, name, members) { }
+
+        public EnumDefinition(MemberModifiers modifiers, string name, params EnumMemberDefinition[] members)
+            : this(modifiers, name, members.AsEnumerable()) { }
+
+        public EnumDefinition(MemberModifiers modifiers, string name, IEnumerable<EnumMemberDefinition> members)
+            : this(modifiers, name, null, members) { }
+
+        public EnumDefinition(
+            MemberModifiers modifiers, string name, TypeReference underlyingType, IEnumerable<EnumMemberDefinition> members)
         {
             Modifiers = modifiers;
             Name = name;
-
-            this.members = new SeparatedSyntaxList<EnumMemberDefinition, EnumMemberDeclarationSyntax>(members, this);
+            UnderlyingType = underlyingType;
+            Members = members?.ToList();
         }
 
         private void Init(EnumDeclarationSyntax syntax)
@@ -36,6 +47,27 @@ namespace CSharpE.Syntax
 
             name = new Identifier(this.syntax.Identifier);
             Modifiers = FromRoslyn.MemberModifiers(this.syntax.Modifiers);
+        }
+
+        private bool underlyingTypeSet;
+        private TypeReference underlyingType;
+        public TypeReference UnderlyingType
+        {
+            get
+            {
+                if (!underlyingTypeSet)
+                {
+                    underlyingType = FromRoslyn.TypeReference(syntax.BaseList?.Types.Single().Type, this);
+                    underlyingTypeSet = true;
+                }
+
+                return underlyingType;
+            }
+            set
+            {
+                Set(ref underlyingType, value);
+                underlyingTypeSet = true;
+            }
         }
 
         private SeparatedSyntaxList<EnumMemberDefinition, EnumMemberDeclarationSyntax> members;
@@ -57,11 +89,13 @@ namespace CSharpE.Syntax
         {
             Init((EnumDeclarationSyntax)newSyntax);
             SetList(ref attributes, null);
+            Set(ref underlyingType, null);
+            underlyingTypeSet = false;
             SetList(ref members, null);
         }
 
         private protected override SyntaxNode CloneImpl() =>
-            new EnumDefinition(Modifiers, Name, Members) { Attributes = Attributes };
+            new EnumDefinition(Modifiers, Name, UnderlyingType, Members) { Attributes = Attributes };
 
         private protected override MemberDeclarationSyntax MemberSyntax => syntax;
 
@@ -75,20 +109,23 @@ namespace CSharpE.Syntax
 
         EnumDeclarationSyntax ISyntaxWrapper<EnumDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;
             var newName = name.GetWrapped(ref thisChanged);
+            var newUnderlyingType = underlyingTypeSet ? underlyingType?.GetWrapped(ref thisChanged) : syntax.BaseList?.Types.Single().Type;
             var newMembers = members?.GetWrapped(ref thisChanged) ?? syntax.Members;
 
             if (syntax == null || FromRoslyn.MemberModifiers(syntax.Modifiers) != newModifiers ||
                 thisChanged == true || ShouldAnnotate(syntax, changed))
             {
-                var newSyntax = RoslynSyntaxFactory.EnumDeclaration(
-                    newAttributes, newModifiers.GetWrapped(), newName, default, newMembers);
+                var baseList = newUnderlyingType == null
+                    ? null
+                    : RoslynSyntaxFactory.BaseList(
+                        RoslynSyntaxFactory.SingletonSeparatedList<BaseTypeSyntax>(RoslynSyntaxFactory.SimpleBaseType(newUnderlyingType)));
+
+                var newSyntax = RoslynSyntaxFactory.EnumDeclaration(newAttributes, newModifiers.GetWrapped(), newName, baseList, newMembers);
 
                 syntax = Annotate(newSyntax);
 
@@ -101,7 +138,7 @@ namespace CSharpE.Syntax
         private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) =>
             this.GetWrapped<EnumDeclarationSyntax>(ref changed);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat<SyntaxNode>(Members);
+        public override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat<SyntaxNode>(new[] { UnderlyingType }).Concat(Members);
 
         protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {

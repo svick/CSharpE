@@ -266,7 +266,7 @@ namespace N.M
     {
     }
 
-    enum E
+    enum E : short
     {
         M
     }
