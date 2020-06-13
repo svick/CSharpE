@@ -218,10 +218,14 @@ namespace CSharpE.Syntax
 
                 if (additionalNamespaces.Any())
                 {
-                    // TODO: sort usings?
-                    newUsings = newUsings.AddRange(
-                        additionalNamespaces.OrderBy(x => x).Select(
-                            ns => RoslynSyntaxFactory.UsingDirective(RoslynSyntaxFactory.ParseName(ns))));
+                    newUsings = RoslynSyntaxFactory.List(
+                        newUsings
+                            .AddRange(
+                                additionalNamespaces.Select(ns => RoslynSyntaxFactory.UsingDirective(RoslynSyntaxFactory.ParseName(ns))))
+                            .OrderBy(u => u.Alias != null)
+                            .ThenBy(u => u.StaticKeyword != default)
+                            .ThenByDescending(u => u.Name.ToString().StartsWith("System"))
+                            .ThenBy(u => u.Name.ToString()));
                 }
 
                 // Compilation requires the same LanguageVersion on all SyntaxTrees
