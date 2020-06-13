@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -80,8 +79,6 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new DoWhileStatement(Statements, Condition);
-
-        public override IEnumerable<SyntaxNode> GetChildren() => Statements.Concat(new SyntaxNode[] { Condition });
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {

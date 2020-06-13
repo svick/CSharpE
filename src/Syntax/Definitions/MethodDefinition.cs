@@ -293,9 +293,5 @@ namespace CSharpE.Syntax
             {
                 Attributes = Attributes
             };
-
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            Attributes.Concat<SyntaxNode>(new[] { ReturnType, ExplicitInterface }).Concat(TypeParameters).Concat(Parameters)
-                .Concat(ConstraintClauses).Concat(new SyntaxNode[] { StatementBody, ExpressionBody });
     }
 }

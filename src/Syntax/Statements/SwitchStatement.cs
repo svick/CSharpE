@@ -82,8 +82,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new SwitchStatement(Expression, Sections);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Expression }.Concat(Sections);
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             Expression = Expression.ReplaceExpressions(Expression, filter, projection);

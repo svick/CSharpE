@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using SystemLinqExpression = System.Linq.Expressions.Expression;
 using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
@@ -129,13 +131,45 @@ namespace CSharpE.Syntax
 
         private protected abstract SyntaxNode CloneImpl();
 
+        private static ConcurrentDictionary<Type, Func<SyntaxNode, IEnumerable<SyntaxNode>>> getChildrenDictionary =
+            new ConcurrentDictionary<Type, Func<SyntaxNode, IEnumerable<SyntaxNode>>>();
+
         public virtual IEnumerable<SyntaxNode> GetChildren()
         {
-            // TODO: is this a reasonable default implementation?
+            static Func<SyntaxNode, IEnumerable <SyntaxNode>> GenerateGetChildren(Type type)
+            {
+                Func<IEnumerable<SyntaxNode>> enumerableEmpty = Enumerable.Empty<SyntaxNode>;
+                Func<IEnumerable<SyntaxNode>, IEnumerable<SyntaxNode>, IEnumerable<SyntaxNode>> enumerableConcat =
+                    Enumerable.Concat;
 
-            return this.GetType().GetProperties()
-                .Where(p => typeof(SyntaxNode).IsAssignableFrom(p.PropertyType) && p.Name != nameof(Parent))
-                .Select(p => (SyntaxNode)p.GetValue(this));
+                var thisParameter = SystemLinqExpression.Parameter(typeof(SyntaxNode));
+                var thisCasted = SystemLinqExpression.Convert(thisParameter, type);
+
+                var result = SystemLinqExpression.Call(enumerableEmpty.Method);
+
+                foreach (var property in type.GetProperties())
+                {
+                    if (property.Name == nameof(Parent))
+                        continue;
+
+                    var getTheProperty = SystemLinqExpression.Property(thisCasted, property);
+
+                    if (typeof(SyntaxNode).IsAssignableFrom(property.PropertyType))
+                    {
+                        result = SystemLinqExpression.Call(
+                            enumerableConcat.Method, result, SystemLinqExpression.NewArrayInit(typeof(SyntaxNode), getTheProperty));
+                    }
+                    else if (typeof(IEnumerable<SyntaxNode>).IsAssignableFrom(property.PropertyType))
+                    {
+                        result = SystemLinqExpression.Call(
+                            enumerableConcat.Method, result, getTheProperty);
+                    }
+                }
+
+                return SystemLinqExpression.Lambda<Func<SyntaxNode, IEnumerable<SyntaxNode>>>(result, thisParameter).Compile();
+            }
+
+            return getChildrenDictionary.GetOrAdd(this.GetType(), GenerateGetChildren).Invoke(this);
         }
 
         public IEnumerable<SyntaxNode> GetDescendants()

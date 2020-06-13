@@ -83,9 +83,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new FixedStatement(VariableDeclaration, Statements);
 
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            new SyntaxNode[] { VariableDeclaration }.Concat(Statements);
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             VariableDeclaration?.ReplaceExpressions(filter, projection);

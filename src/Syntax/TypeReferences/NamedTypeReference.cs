@@ -407,8 +407,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new NamedTypeReference(Namespace, Container, Name, TypeArguments);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => TypeArguments;
-
         public override bool Equals(TypeReference other)
         {
             if (ReferenceEquals(this, other)) return true;

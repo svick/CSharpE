@@ -233,8 +233,5 @@ namespace CSharpE.Syntax
             {
                 Attributes = Attributes
             };
-
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            Attributes.Concat<SyntaxNode>(new[] { ReturnType }).Concat(Parameters).Concat(new SyntaxNode[] { StatementBody, ExpressionBody });
     }
 }

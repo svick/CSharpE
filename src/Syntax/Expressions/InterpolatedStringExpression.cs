@@ -93,8 +93,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new InterpolatedStringExpression(IsVerbatim, Contents);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => Contents;
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             foreach (var content in Contents)

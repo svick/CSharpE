@@ -92,8 +92,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new InvocationExpression(Expression, Arguments);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Expression }.Concat(Arguments);
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             Expression = ReplaceExpressions(Expression, filter, projection);

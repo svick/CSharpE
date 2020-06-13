@@ -75,8 +75,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new CollectionInitializer(ElementInitializers);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => ElementInitializers;
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             foreach (var initializer in ElementInitializers)

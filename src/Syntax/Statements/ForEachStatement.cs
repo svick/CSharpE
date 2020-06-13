@@ -129,9 +129,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new ForEachStatement(ElementType, ElementName, Expression, Statements);
 
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            new SyntaxNode[] { ElementType, Expression }.Concat(Statements);
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             foreach (var statement in Statements)
@@ -213,9 +210,6 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new ForEachPatternStatement(ElementPattern, Expression, Statements);
-
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            new SyntaxNode[] { ElementPattern, Expression }.Concat(Statements);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {

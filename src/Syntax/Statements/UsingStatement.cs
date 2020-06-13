@@ -137,9 +137,6 @@ namespace CSharpE.Syntax
             ? new UsingStatement(VariableDeclaration, Statements)
             : new UsingStatement(Expression, Statements);
 
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            new[] { VariableDeclaration != null ? (SyntaxNode)VariableDeclaration : Expression }.Concat(Statements);
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             VariableDeclaration?.ReplaceExpressions(filter, projection);

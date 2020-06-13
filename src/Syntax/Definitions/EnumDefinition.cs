@@ -138,8 +138,6 @@ namespace CSharpE.Syntax
         private protected override MemberDeclarationSyntax GetWrappedMember(ref bool? changed) =>
             this.GetWrapped<EnumDeclarationSyntax>(ref changed);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat<SyntaxNode>(new[] { UnderlyingType }).Concat(Members);
-
         protected override void ReplaceExpressionsImpl<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             foreach (var member in Members)

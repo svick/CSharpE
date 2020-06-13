@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -162,7 +161,5 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new Parameter(Modifiers, Type, Name, DefaultValue) { Attributes = Attributes };
-
-        public override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat(new SyntaxNode[] { Type, DefaultValue });
     }
 }

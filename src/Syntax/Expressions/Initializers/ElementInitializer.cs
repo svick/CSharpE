@@ -86,8 +86,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new ElementInitializer(Expressions);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => Expressions;
-
         public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression
         {
             for (int i = 0; i < Expressions.Count; i++)

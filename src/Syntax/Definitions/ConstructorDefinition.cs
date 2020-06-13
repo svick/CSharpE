@@ -158,8 +158,5 @@ namespace CSharpE.Syntax
 
             base.ReplaceExpressionsImpl(filter, projection);
         }
-
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            Attributes.Concat<SyntaxNode>(Parameters).Concat(new SyntaxNode[] { Initializer, StatementBody, ExpressionBody });
     }
 }

@@ -188,8 +188,6 @@ namespace CSharpE.Syntax
             ExpressionBody != null
                 ? new LambdaExpression(IsAsync, Parameters, ExpressionBody)
                 : new LambdaExpression(IsAsync, Parameters, StatementBody);
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            Parameters.Concat(Expression != null ? (IEnumerable<SyntaxNode>)new[] { Expression } : Statements);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {

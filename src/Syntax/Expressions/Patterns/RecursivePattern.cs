@@ -153,9 +153,6 @@ namespace CSharpE.Syntax
                 pattern.ReplaceExpressions(filter, projection);
             }
         }
-
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            new SyntaxNode[] { Type }.Concat(PositionalSubpatterns).Concat(PropertySubpatterns).Concat(new[] { Designation });
     }
 
     public sealed class PositionalPattern : RecursivePattern

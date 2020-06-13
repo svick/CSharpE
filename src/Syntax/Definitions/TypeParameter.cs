@@ -98,8 +98,6 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new TypeParameter(Attributes, Variance, Name);
-
-        public override IEnumerable<SyntaxNode> GetChildren() => Attributes;
     }
 
     public enum VarianceModifier

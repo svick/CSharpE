@@ -113,9 +113,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new IfStatement(Condition, ThenStatements, ElseStatements);
 
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            new SyntaxNode[] { Condition }.Concat(ThenStatements).Concat(ElseStatements);
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             Condition = Expression.ReplaceExpressions(Condition, filter, projection);

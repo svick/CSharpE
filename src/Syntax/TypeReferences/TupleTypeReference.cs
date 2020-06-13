@@ -73,8 +73,6 @@ namespace CSharpE.Syntax
             return syntax;
         }
 
-        public override IEnumerable<SyntaxNode> GetChildren() => Elements;
-
         internal override StringBuilder ComputeFullName(StringBuilder stringBuilder)
         {
             stringBuilder.Append('(');

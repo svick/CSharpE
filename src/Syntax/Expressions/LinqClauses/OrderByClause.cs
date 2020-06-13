@@ -65,8 +65,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new OrderByClause(Orderings);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => Orderings;
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             foreach (var ordering in Orderings)
@@ -144,8 +142,6 @@ namespace CSharpE.Syntax
         }
 
         private protected override SyntaxNode CloneImpl() => new Ordering(Expression, IsDescending);
-
-        public override IEnumerable<SyntaxNode> GetChildren() => new[] { Expression };
 
         public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression =>
             Expression = Expression.ReplaceExpressions(Expression, filter, projection);

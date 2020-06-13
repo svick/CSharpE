@@ -90,8 +90,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new SwitchSection(Labels, Statements);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => Labels.Concat<SyntaxNode>(Statements);
-
         public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression
         {
             foreach (var statement in Statements)

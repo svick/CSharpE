@@ -84,8 +84,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new WhileStatement(Condition, Statements);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => new SyntaxNode[] { Condition }.Concat(Statements);
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             Condition = Expression.ReplaceExpressions(Condition, filter, projection);

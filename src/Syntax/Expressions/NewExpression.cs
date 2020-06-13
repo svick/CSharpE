@@ -114,9 +114,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new NewExpression(Type, Arguments, Initializer);
 
-        public override IEnumerable<SyntaxNode> GetChildren() =>
-            new SyntaxNode[] { Type }.Concat(Arguments).Concat(new[] { Initializer });
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             foreach (var argument in Arguments)

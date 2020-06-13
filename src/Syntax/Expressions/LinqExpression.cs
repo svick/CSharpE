@@ -153,8 +153,6 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() => new LinqExpression(Clauses);
 
-        public override IEnumerable<SyntaxNode> GetChildren() => Clauses;
-
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
             foreach (var clause in Clauses)

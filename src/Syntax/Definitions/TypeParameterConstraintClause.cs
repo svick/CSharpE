@@ -80,7 +80,5 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() =>
             new TypeParameterConstraintClause(TypeParameterName, Constraints);
-
-        public override IEnumerable<SyntaxNode> GetChildren() => Constraints;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp;
@@ -100,7 +99,5 @@ namespace CSharpE.Syntax
 
         private protected override SyntaxNode CloneImpl() =>
             new FinalizerDefinition(Modifiers, StatementBody) { Attributes = Attributes, ExpressionBody = ExpressionBody };
-
-        public override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat(new SyntaxNode[] { StatementBody, ExpressionBody });
     }
 }
