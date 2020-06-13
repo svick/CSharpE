@@ -26,46 +26,37 @@ namespace CSharpE.Syntax
             IsAsync = IsSyntaxAsync();
         }
 
-        public LambdaExpression(IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements)
-            : this(false, parameters, statements) { }
+        public LambdaExpression(IEnumerable<LambdaParameter> parameters, BlockStatement statementBody)
+            : this(false, parameters, statementBody) { }
 
-        public LambdaExpression(bool isAsync, IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements)
+        public LambdaExpression(bool isAsync, IEnumerable<LambdaParameter> parameters, BlockStatement statementBody)
         {
-            if (statements == null)
-                throw new ArgumentNullException(nameof(statements));
-
             IsAsync = isAsync;
-            this.parameters = new SeparatedSyntaxList<LambdaParameter, ParameterSyntax>(parameters, this);
-            this.statements = new StatementList(statements, this);
-            bodySet = true;
+            Parameters = parameters?.ToList();
+            StatementBody = statementBody;
         }
 
-        public LambdaExpression(IEnumerable<LambdaParameter> parameters, Expression expression)
-            : this(false, parameters, expression) { }
+        public LambdaExpression(IEnumerable<LambdaParameter> parameters, Expression expressionBody)
+            : this(false, parameters, expressionBody) { }
 
-        public LambdaExpression(bool isAsync, IEnumerable<LambdaParameter> parameters, Expression expression)
+        public LambdaExpression(bool isAsync, IEnumerable<LambdaParameter> parameters, Expression expressionBody)
         {
             IsAsync = isAsync;
-            this.parameters = new SeparatedSyntaxList<LambdaParameter, ParameterSyntax>(parameters, this);
-            Expression = expression;
+            Parameters = parameters?.ToList();
+            ExpressionBody = expressionBody;
         }
 
         private bool IsSyntaxAsync() => syntax.AsyncKeyword != default;
 
         public bool IsAsync { get; set; }
 
-        private Roslyn::SeparatedSyntaxList<ParameterSyntax> GetSyntaxParameters()
-        {
-            switch (syntax)
+        private Roslyn::SeparatedSyntaxList<ParameterSyntax> GetSyntaxParameters() =>
+            syntax switch
             {
-                case SimpleLambdaExpressionSyntax simple:
-                    return RoslynSyntaxFactory.SingletonSeparatedList(simple.Parameter);
-                case ParenthesizedLambdaExpressionSyntax parenthesized:
-                    return parenthesized.ParameterList.Parameters;
-            }
-
-            throw new InvalidOperationException();
-        }
+                SimpleLambdaExpressionSyntax simple => RoslynSyntaxFactory.SingletonSeparatedList(simple.Parameter),
+                ParenthesizedLambdaExpressionSyntax parenthesized => parenthesized.ParameterList.Parameters,
+                _ => throw new InvalidOperationException(),
+            };
 
         private SeparatedSyntaxList<LambdaParameter, ParameterSyntax> parameters;
         public IList<LambdaParameter> Parameters
@@ -87,10 +78,10 @@ namespace CSharpE.Syntax
             switch (syntax.Body)
             {
                 case ExpressionSyntax e:
-                    expression = FromRoslyn.Expression(e, this);
+                    expressionBody = FromRoslyn.Expression(e, this);
                     break;
                 case BlockSyntax block:
-                    statements = new StatementList(block.Statements, this);
+                    statementBody = new BlockStatement(block, this);
                     break;
                 default:
                     throw new InvalidOperationException();
@@ -99,58 +90,57 @@ namespace CSharpE.Syntax
             bodySet = true;
         }
 
-        private Expression expression;
-        public Expression Expression
+        private Expression expressionBody;
+        public Expression ExpressionBody
         {
             get
             {
                 if (!bodySet)
                     SetBody();
 
-                return expression;
+                return expressionBody;
             }
             set
             {
-                SetNotNull(ref expression, value);
-                SetList(ref statements, null);
+                Set(ref expressionBody, value);
                 bodySet = true;
+
+                if (value != null)
+                    StatementBody = null;
             }
         }
 
-        private StatementList statements;
-        public IList<Statement> Statements
+        private BlockStatement statementBody;
+        public BlockStatement StatementBody
         {
             get
             {
                 if (!bodySet)
                     SetBody();
 
-                return statements;
+                return statementBody;
             }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-
-                SetList(ref statements, new StatementList(value, this));
-                Set(ref expression, null);
+                Set(ref statementBody, value);
                 bodySet = true;
+
+                if (value != null)
+                    ExpressionBody = null;
             }
         }
 
         private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             CSharpSyntaxNode GetBody()
             {
-                if (expression != null)
-                    return expression.GetWrapped(ref thisChanged);
+                if (expressionBody != null)
+                    return expressionBody.GetWrapped(ref thisChanged);
 
-                if (statements != null)
-                    return RoslynSyntaxFactory.Block(statements.GetWrapped(ref thisChanged));
+                if (statementBody != null)
+                    return statementBody.GetWrapped(ref thisChanged);
 
                 return syntax.Body;
             }
@@ -187,31 +177,29 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             SetList(ref parameters, null);
-            Set(ref expression, null);
-            SetList(ref statements, null);
+            Set(ref expressionBody, null);
+            Set(ref statementBody, null);
+            bodySet = false;
+
             Init((LambdaExpressionSyntax)newSyntax);
         }
 
         private protected override SyntaxNode CloneImpl() =>
-            Expression != null
-                ? new LambdaExpression(IsAsync, Parameters, Expression)
-                : new LambdaExpression(IsAsync, Parameters, Statements);
-
+            ExpressionBody != null
+                ? new LambdaExpression(IsAsync, Parameters, ExpressionBody)
+                : new LambdaExpression(IsAsync, Parameters, StatementBody);
         public override IEnumerable<SyntaxNode> GetChildren() =>
             Parameters.Concat(Expression != null ? (IEnumerable<SyntaxNode>)new[] { Expression } : Statements);
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
-            if (Expression != null)
+            if (ExpressionBody != null)
             {
-                Expression = ReplaceExpressions(Expression, filter, projection);
+                ExpressionBody = ReplaceExpressions(ExpressionBody, filter, projection);
             }
             else
             {
-                foreach (var statement in Statements)
-                {
-                    statement.ReplaceExpressions(filter, projection);
-                }
+                StatementBody.ReplaceExpressions(filter, projection);
             }
         }
     }

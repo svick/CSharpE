@@ -615,16 +615,6 @@ namespace CSharpE.Syntax
             return new IsPatternExpression(expression, pattern);
         }
 
-        public static LambdaExpression Lambda(IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements)
-        {
-            return new LambdaExpression(parameters, statements);
-        }
-
-        public static LambdaExpression Lambda(bool isAsync, IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements)
-        {
-            return new LambdaExpression(isAsync, parameters, statements);
-        }
-
         public static LambdaExpression Lambda(IEnumerable<LambdaParameter> parameters, Expression expression)
         {
             return new LambdaExpression(parameters, expression);
