@@ -42,7 +42,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (attributes == null)
-                    attributes = new SyntaxList<Attribute, AttributeListSyntax>(syntax.AttributeLists, this);
+                    attributes = new SyntaxList<Attribute, AttributeListSyntax>(syntax?.AttributeLists ?? default, this);
 
                 return attributes;
             }

@@ -44,7 +44,7 @@ namespace CSharpE.Syntax
             get
             {
                 if (attributes == null)
-                    attributes = new SyntaxList<Attribute, AttributeListSyntax>(syntax.AttributeLists, this);
+                    attributes = new SyntaxList<Attribute, AttributeListSyntax>(syntax?.AttributeLists ?? default, this);
 
                 return attributes;
             }
@@ -76,7 +76,7 @@ namespace CSharpE.Syntax
         {
             GetAndResetChanged(ref changed, out bool? thisChanged);
 
-            var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax.AttributeLists;
+            var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newName = name.GetWrapped(ref thisChanged);
 
             if (syntax == null || thisChanged == true || Variance != GetSyntaxVariance())
