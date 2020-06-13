@@ -23,19 +23,24 @@ namespace CSharpE.Syntax
         {
             get
             {
-                // TODO: if References changed, alter the compilation
-
                 var trees = SourceFiles.Select(file => file.GetSyntaxTree()).ToList();
+                var references = References.Select(r => r.GetMetadataReference()).ToList();
 
                 if (compilation == null)
                 {
-                    compilation = CSharpCompilation.Create(
-                        null, trees, References.Select(r => r.GetMetadataReference()));
+                    compilation = CSharpCompilation.Create(null, trees, references);
                 }
-                else if (!trees.SequenceEqual(compilation.SyntaxTrees))
+                else
                 {
-                    // PERF: only replace trees that changed, but be careful about what happens if order changes
-                    compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(trees);
+                    // PERF: only replace items that changed, but be careful about what happens if order of trees changes
+                    if (!trees.SequenceEqual(compilation.SyntaxTrees))
+                    {
+                        compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(trees);
+                    }
+                    if (!references.SequenceEqual(compilation.References))
+                    {
+                        compilation = compilation.RemoveAllReferences().AddReferences(references);
+                    }
                 }
 
                 return compilation;
