@@ -19,8 +19,8 @@ class Person
         [Fact]
         public void TestDesignTime()
         {
-            string expectedOutput = @"using CSharpE.Extensions.Record;
-using System;
+            string expectedOutput = @"using System;
+using CSharpE.Extensions.Record;
 
 [Record]
 class Person : IEquatable<Person>
@@ -56,9 +56,9 @@ class Person : IEquatable<Person>
         [Fact]
         public void TestBuildTime()
         {
-            string expectedOutput = @"using CSharpE.Extensions.Record;
-using System;
+            string expectedOutput = @"using System;
 using System.Collections.Generic;
+using CSharpE.Extensions.Record;
 
 [Record]
 class Person : IEquatable<Person>

@@ -26,9 +26,9 @@ class C
     }
 }";
 
-            string expectedOutput = @"using CSharpE.Extensions.Actor;
-using System.Threading;
+            string expectedOutput = @"using System.Threading;
 using System.Threading.Tasks;
+using CSharpE.Extensions.Actor;
 
 [Actor]
 class C
@@ -68,9 +68,9 @@ class C
     }
 }";
 
-            string expectedOutput = @"using CSharpE.Extensions.Actor;
-using System.Threading;
+            string expectedOutput = @"using System.Threading;
 using System.Threading.Tasks;
+using CSharpE.Extensions.Actor;
 
 [Actor]
 class C
@@ -117,9 +117,9 @@ class C
     }
 }";
 
-            string expectedOutput = @"using CSharpE.Extensions.Actor;
-using System.Threading;
+            string expectedOutput = @"using System.Threading;
 using System.Threading.Tasks;
+using CSharpE.Extensions.Actor;
 
 [Actor]
 class C
