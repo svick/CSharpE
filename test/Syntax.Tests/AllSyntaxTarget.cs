@@ -137,7 +137,7 @@ class C
     {
     }
 
-    C(int i): base()
+    C([A][B] int i): base()
     {
     }
 }

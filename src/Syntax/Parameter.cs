@@ -1,4 +1,6 @@
-﻿using CSharpE.Syntax.Internals;
+﻿using System.Collections.Generic;
+using System.Linq;
+using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
@@ -34,7 +36,18 @@ namespace CSharpE.Syntax
             DefaultValue = defaultValue;
         }
 
-        // TODO: attributes
+        private SyntaxList<Attribute, AttributeListSyntax> attributes;
+        public IList<Attribute> Attributes
+        {
+            get
+            {
+                if (attributes == null)
+                    attributes = new SyntaxList<Attribute, AttributeListSyntax>(syntax.AttributeLists, this);
+
+                return attributes;
+            }
+            set => SetList(ref attributes, new SyntaxList<Attribute, AttributeListSyntax>(value, this));
+        }
 
         public ParameterModifiers Modifiers { get; set; }
 
@@ -115,19 +128,20 @@ namespace CSharpE.Syntax
             GetAndResetChanged(ref changed);
             
             bool? thisChanged = false;
-            
+
+            var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
             var newName = name.GetWrapped(ref thisChanged);
             var newDefaultValue = defaultValueSet ? defaultValue?.GetWrapped(ref thisChanged) : syntax.Default?.Value;
 
-            if (syntax == null || thisChanged == true || Modifiers != FromRoslyn.ParameterModifiers(syntax.Modifiers) || ShouldAnnotate(syntax, changed))
+            if (syntax == null || thisChanged == true || Modifiers != FromRoslyn.ParameterModifiers(syntax.Modifiers)
+                || ShouldAnnotate(syntax, changed))
             {
                 var defaultClause = newDefaultValue == null
                     ? null
                     : RoslynSyntaxFactory.EqualsValueClause(newDefaultValue);
 
-                var newSyntax = RoslynSyntaxFactory.Parameter(
-                    default, Modifiers.GetWrapped(), newType, newName, defaultClause);
+                var newSyntax = RoslynSyntaxFactory.Parameter(newAttributes, Modifiers.GetWrapped(), newType, newName, defaultClause);
 
                 syntax = Annotate(newSyntax);
 
@@ -140,11 +154,15 @@ namespace CSharpE.Syntax
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
         {
             Init((ParameterSyntax)newSyntax);
+
+            SetList(ref attributes, null);
             Set(ref type, null);
             Set(ref defaultValue, null);
             defaultValueSet = false;
         }
 
-        private protected override SyntaxNode CloneImpl() => new Parameter(Modifiers, Type, Name, DefaultValue);
+        private protected override SyntaxNode CloneImpl() => new Parameter(Modifiers, Type, Name, DefaultValue) { Attributes = Attributes };
+
+        public override IEnumerable<SyntaxNode> GetChildren() => Attributes.Concat(new SyntaxNode[] { Type, DefaultValue });
     }
 }
