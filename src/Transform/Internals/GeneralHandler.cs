@@ -59,17 +59,20 @@ namespace CSharpE.Transform.Internals
             if (input is SyntaxNode syntaxNode)
                 return (T)(object)syntaxNode.Clone();
 
-            if (TupleHandler.IsTuple(input))
-                return TupleHandler.DeepClone(input);
-
             if (CollectionHandler.IsCollection(input))
                 return CollectionHandler.DeepClone(input);
+
+            if (TupleHandler.IsTuple(input))
+                return TupleHandler.DeepClone(input);
 
             throw new InvalidOperationException($"The object {input} cannot be cloned.");
         }
 
         public static bool Equals<T>(T arg1, T arg2)
         {
+            if (arg1 is SyntaxNode node1 && arg2 is SyntaxNode node2)
+                return SyntaxNode.AreEquivalent(node1, node2);
+
             if (CollectionHandler.IsCollection(arg1) && CollectionHandler.IsCollection(arg2))
                 return CollectionHandler.Equals(arg1, arg2);
 

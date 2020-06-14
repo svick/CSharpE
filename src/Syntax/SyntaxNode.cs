@@ -10,7 +10,7 @@ using Roslyn = Microsoft.CodeAnalysis;
 
 namespace CSharpE.Syntax
 {
-    public abstract class SyntaxNode : IEquatable<SyntaxNode>
+    public abstract class SyntaxNode
     {
         private protected SyntaxNode() { }
         private protected SyntaxNode(Roslyn::SyntaxNode syntax) => markerAnnotation = Annotation.Get(syntax);
@@ -192,30 +192,8 @@ namespace CSharpE.Syntax
 
         private ISyntaxWrapper<Roslyn::SyntaxNode> AsWrapper() => (ISyntaxWrapper<Roslyn::SyntaxNode>)this;
 
-        public bool Equals(SyntaxNode other)
-        {
-            if (other is null) return false;
-            if (ReferenceEquals(this, other)) return true;
-            if (other.GetType() != this.GetType()) return false;
-
-            // nodes that are part of a tree are compared by reference
-            if (other.SourceFile != null || this.SourceFile != null)
-                return false;
-
-            return this.AsWrapper().GetWrapped().IsEquivalentTo(other.AsWrapper().GetWrapped());
-        }
-
-        public override bool Equals(object obj) => Equals(obj as SyntaxNode);
-
-        public override int GetHashCode()
-        {
-            // TODO: this whole method is wrong; either fix it or switch Equals to something that guarantees Equals() means the strings are equal
-            if (SourceFile != null)
-                return base.GetHashCode();
-
-            // if nodes are equivalent, their strings should be equal
-            return StringComparer.Ordinal.GetHashCode(this.AsWrapper().GetWrapped().ToString());
-        }
+        public static bool AreEquivalent(SyntaxNode node1, SyntaxNode node2) => 
+            node1.AsWrapper().GetWrapped().IsEquivalentTo(node2.AsWrapper().GetWrapped());
 
         public override string ToString() => this.AsWrapper().GetWrapped().NormalizeWhitespace().ToString();
     }
