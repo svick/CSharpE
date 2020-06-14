@@ -11,6 +11,7 @@ using CSharpE.Transform.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeGen;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Symbols;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Operations;
@@ -20,11 +21,9 @@ using RoslynSemanticModel = Microsoft.CodeAnalysis.SemanticModel;
 using RoslynSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
 using NullableAnnotation = Microsoft.CodeAnalysis.NullableAnnotation;
 using static CSharpE.Transform.VisualStudio.Wrapping;
-using Microsoft.CodeAnalysis.CSharp.Symbols;
 
 namespace CSharpE.Transform.VisualStudio
 {
-    // TODO: Ensure thread-safety
     internal sealed class Compilation : RoslynCompilation
     {
         public CSharpCompilation RoslynCompilation { get; }
@@ -84,7 +83,8 @@ namespace CSharpE.Transform.VisualStudio
                         }
                         catch (Exception ex)
                         {
-                            // TODO: produce error
+                            ReportExceptionAsError(ex);
+
                             return null;
                         }
 
@@ -102,7 +102,9 @@ namespace CSharpE.Transform.VisualStudio
 
                         if (!emitResult.Success)
                         {
-                            // TODO: produce error?
+                            ErrorSource.Instance.AddError(
+                                "CSE002", $"Reference {compilationReference.Display} failed to compile.", AssemblyName);
+
                             return null;
                         }
 
@@ -114,7 +116,8 @@ namespace CSharpE.Transform.VisualStudio
                         }
                         catch (Exception ex)
                         {
-                            // TODO: produce error
+                            ReportExceptionAsError(ex);
+
                             return null;
                         }
                         break;
@@ -163,7 +166,7 @@ namespace CSharpE.Transform.VisualStudio
 
         private bool hasTransformer;
         private ProjectTransformer transformer;
-        internal ProjectTransformer Transformer
+        private ProjectTransformer Transformer
         {
             get
             {
@@ -250,6 +253,24 @@ namespace CSharpE.Transform.VisualStudio
             return newQueue;
         }
 
+        private void ReportExceptionAsError(Exception e)
+        {
+            string TakeLines(string s, int linesCount = 4)
+            {
+                var lines = s.Split('\n').ToList();
+
+                if (lines.Count > linesCount)
+                {
+                    lines.RemoveRange(linesCount, lines.Count - linesCount);
+                    lines.Add("...");
+                }
+
+                return string.Join("\n", lines);
+            }
+
+            ErrorSource.Instance.AddError("CSE001", $"{e.GetType()}: {e.Message}\n{TakeLines(e.StackTrace)}", AssemblyName);
+        }
+
         private CSharpCompilation CreateDesignTimeCompilation()
         {
             ErrorSource.Instance.ClearErrors();
@@ -268,20 +289,7 @@ namespace CSharpE.Transform.VisualStudio
             }
             catch (Exception e)
             {
-                string TakeLines(string s, int linesCount = 4)
-                {
-                    var lines = s.Split('\n').ToList();
-
-                    if (lines.Count > linesCount)
-                    {
-                        lines.RemoveRange(linesCount, lines.Count - linesCount);
-                        lines.Add("...");
-                    }
-
-                    return string.Join("\n", lines);
-                }
-
-                ErrorSource.Instance.AddError("CSE001", $"{e.GetType()}: {e.Message}\n{TakeLines(e.StackTrace)}", AssemblyName);
+                ReportExceptionAsError(e);
 
                 return (CSharpCompilation)RoslynCompilation.WithEventQueue(Adjust(EventQueue));
             }
