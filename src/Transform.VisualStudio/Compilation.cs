@@ -63,7 +63,7 @@ namespace CSharpE.Transform.VisualStudio
 
             foreach (var reference in RoslynCompilation.References)
             {
-                var referenceSymbol = (IAssemblySymbol)RoslynCompilation.GetAssemblyOrModuleSymbol(reference);
+                var referenceSymbol = (IAssemblySymbol)RoslynCompilation.GetAssemblyOrModuleSymbol(reference).GetPublicSymbol();
                 var transformationTypes = GetAllTypesVisitor.FindTypes(
                     referenceSymbol.GlobalNamespace,
                     type => type.TypeKind != TypeKind.Interface && !type.IsAbstract && type.AllInterfaces.Contains(iTransformation.GetPublicSymbol()));

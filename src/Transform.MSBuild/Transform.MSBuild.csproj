@@ -39,6 +39,7 @@
             $(OutputPath)**\*.dll;
             $(OutputPath)**\*.exe;
             $(OutputPath)**\*.dll.config;
+            $(OutputPath)**\*.exe.config;
             $(OutputPath)**\*.json;
             "
             Exclude="

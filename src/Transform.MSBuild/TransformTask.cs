@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -24,7 +25,7 @@ namespace CSharpE.Transform.MSBuild
 
             var psi = new ProcessStartInfo
             {
-#if NET46
+#if NET461
                 FileName = assemblyLocation,
 #else
                 FileName = "dotnet",
@@ -33,6 +34,7 @@ namespace CSharpE.Transform.MSBuild
                 UseShellExecute = false,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true
             };
 
             var process = Process.Start(psi);
@@ -73,6 +75,14 @@ namespace CSharpE.Transform.MSBuild
                             Log.LogWarning(line);
                         break;
                 }
+            }
+
+            var error = process.StandardError.ReadToEnd();
+
+            if (!outputFiles.Any())
+            {
+                Log.LogError(error);
+                return false;
             }
 
             OutputSourceFiles = outputFiles.ToArray();

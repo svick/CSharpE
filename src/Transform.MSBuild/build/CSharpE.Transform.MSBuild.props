@@ -2,7 +2,7 @@
   <PropertyGroup>
     <CSharpEToolsRootPath Condition=" '$(CSharpEToolsRootPath)' == '' ">$(MSBuildThisFileDirectory)</CSharpEToolsRootPath>
     <CSharpEToolsSubPath Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netcoreapp2.0\</CSharpEToolsSubPath>
-    <CSharpEToolsSubPath Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net46\</CSharpEToolsSubPath>
+    <CSharpEToolsSubPath Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net461\</CSharpEToolsSubPath>
     <CSharpEAssemblyExtension Condition=" '$(MSBuildRuntimeType)' == 'Core' ">dll</CSharpEAssemblyExtension>
     <CSharpEAssemblyExtension Condition=" '$(MSBuildRuntimeType)' != 'Core' ">exe</CSharpEAssemblyExtension>
   </PropertyGroup>

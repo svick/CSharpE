@@ -42,7 +42,7 @@ namespace CSharpE.Transform.VisualStudio
 
         public GeneratorDriver CreateGeneratorDriver(
             ParseOptions parseOptions, ImmutableArray<ISourceGenerator> generators, ImmutableArray<AdditionalText> additionalTexts) =>
-                throw new NotSupportedException("Using CSharpE with code generators is not supported.");
+            roslynCompilationFactoryService.CreateGeneratorDriver(parseOptions, generators, additionalTexts);
 
         public RoslynCompilation CreateSubmissionCompilation(string assemblyName, CompilationOptions options, Type hostObjectType) =>
             Wrap(roslynCompilationFactoryService.CreateSubmissionCompilation(assemblyName, options, hostObjectType));
