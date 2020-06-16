@@ -191,14 +191,8 @@ namespace CSharpE.Syntax
 
         public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
         {
-            if (ExpressionBody != null)
-            {
-                ExpressionBody = ReplaceExpressions(ExpressionBody, filter, projection);
-            }
-            else
-            {
-                StatementBody.ReplaceExpressions(filter, projection);
-            }
+            ExpressionBody = ReplaceExpressions(ExpressionBody, filter, projection);
+            StatementBody?.ReplaceExpressions(filter, projection);
         }
     }
 }

@@ -179,7 +179,7 @@ namespace CSharpE.Syntax
 
         public void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) where T : Expression
         {
-            StatementBody.ReplaceExpressions(filter, projection);
+            StatementBody?.ReplaceExpressions(filter, projection);
             ExpressionBody = Expression.ReplaceExpressions(ExpressionBody, filter, projection);
         }
     }

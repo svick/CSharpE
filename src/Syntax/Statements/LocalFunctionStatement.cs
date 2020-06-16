@@ -269,7 +269,10 @@ namespace CSharpE.Syntax
         private protected override SyntaxNode CloneImpl() => new LocalFunctionStatement(
                 Modifiers, ReturnType, Name, TypeParameters, Parameters, ConstraintClauses, StatementBody, ExpressionBody);
 
-        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection) =>
-            StatementBody.ReplaceExpressions(filter, projection);
+        public override void ReplaceExpressions<T>(Func<T, bool> filter, Func<T, Expression> projection)
+        {
+            StatementBody?.ReplaceExpressions(filter, projection);
+            ExpressionBody = Expression.ReplaceExpressions(ExpressionBody, filter, projection);
+        }
     }
 }
