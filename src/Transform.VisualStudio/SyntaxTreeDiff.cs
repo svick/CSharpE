@@ -149,7 +149,9 @@ namespace CSharpE.Transform.VisualStudio
                     return foundNewNode.GetLocation();
 
                 var nodeDiff = new SyntaxDiff(foundOldNode, foundNewNode);
-                adjusted = nodeDiff.AdjustLoose(location.SourceSpan);
+                var locallyAdjusted = nodeDiff.AdjustLoose(location.SourceSpan);
+                var globalChange = foundNewNode.GetLocation().SourceSpan.Start - foundOldNode.GetLocation().SourceSpan.Start;
+                adjusted = TextSpan.FromBounds(locallyAdjusted.Start + globalChange, locallyAdjusted.End + globalChange);
             }
             else
             {

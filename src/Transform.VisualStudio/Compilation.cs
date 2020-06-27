@@ -452,18 +452,25 @@ namespace CSharpE.Transform.VisualStudio
             return DesignTimeCompilation.ClassifyCommonConversion(source, destination);
         }
 
-        // TODO: Adjust diagnostics
+        private Diagnostic Adjust(Diagnostic diagnostic)
+        {
+            if (diagnostic.Location.SourceTree == null)
+                return diagnostic;
+
+            return Diff.ForTreeReverse(diagnostic.Location.SourceTree.FilePath).Adjust(diagnostic);
+        }
+
         public override ImmutableArray<Diagnostic> GetParseDiagnostics(CancellationToken cancellationToken = new CancellationToken()) =>
-            DesignTimeCompilation.GetParseDiagnostics(cancellationToken);
+            ImmutableArray.CreateRange(DesignTimeCompilation.GetParseDiagnostics(cancellationToken), Adjust);
 
         public override ImmutableArray<Diagnostic> GetDeclarationDiagnostics(CancellationToken cancellationToken = new CancellationToken()) =>
-            DesignTimeCompilation.GetDeclarationDiagnostics(cancellationToken);
+            ImmutableArray.CreateRange(DesignTimeCompilation.GetDeclarationDiagnostics(cancellationToken), Adjust);
 
         public override ImmutableArray<Diagnostic> GetMethodBodyDiagnostics(CancellationToken cancellationToken = new CancellationToken()) =>
-            DesignTimeCompilation.GetMethodBodyDiagnostics(cancellationToken);
+            ImmutableArray.CreateRange(DesignTimeCompilation.GetMethodBodyDiagnostics(cancellationToken), Adjust);
 
         public override ImmutableArray<Diagnostic> GetDiagnostics(CancellationToken cancellationToken = new CancellationToken()) =>
-            DesignTimeCompilation.GetDiagnostics(cancellationToken);
+            ImmutableArray.CreateRange(DesignTimeCompilation.GetDiagnostics(cancellationToken), Adjust);
 
         protected override void AppendDefaultVersionResource(Stream resourceStream)
         {
