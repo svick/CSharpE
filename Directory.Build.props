@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>CSharpE.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>CSharpE.$(MSBuildProjectName)</RootNamespace>
-    <Version>0.1.168</Version>
+    <Version>0.1.174</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>TODO</Description>
     <Authors>svick</Authors>

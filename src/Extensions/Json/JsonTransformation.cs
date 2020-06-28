@@ -65,9 +65,7 @@ namespace CSharpE.Extensions.Json
 
                     var jsonTypes = project.GetDescendants().OfType<MemberAccessExpression>()
                         .Where(IsJsonExpression)
-                        .ToDictionary(
-                            e => e, e => GetBuildType(e.GetExpressionType()),
-                            ReferenceEqualityComparer<MemberAccessExpression>.Default);
+                        .ToDictionary(e => e, e => GetBuildType(e.GetExpressionType()));
 
                     // don't do anything here in case of errors
                     // this way errors are guaranteed to stay errors and should have decent error messages
