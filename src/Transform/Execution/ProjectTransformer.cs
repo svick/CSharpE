@@ -38,7 +38,7 @@ namespace CSharpE.Transform.Execution
                 transformer.Transform(transformProject, transformProject);
             }
 
-            return new Project(transformProject.SourceFiles, transformProject.References);
+            return new Project(transformProject.SourceFiles, transformProject.References, project.compilation);
         }
     }
 
