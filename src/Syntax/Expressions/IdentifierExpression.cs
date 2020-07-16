@@ -36,9 +36,7 @@ namespace CSharpE.Syntax
 
         IdentifierNameSyntax ISyntaxWrapper<IdentifierNameSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newIdentifier = identifier.GetWrapped(ref thisChanged);
 

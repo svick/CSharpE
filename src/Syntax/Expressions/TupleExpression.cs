@@ -41,9 +41,7 @@ namespace CSharpE.Syntax
 
         TupleExpressionSyntax ISyntaxWrapper<TupleExpressionSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.Arguments;
 

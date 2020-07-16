@@ -60,9 +60,7 @@ namespace CSharpE.Syntax
 
         TupleElementSyntax ISyntaxWrapper<TupleElementSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
             var newName = name.GetWrapped(ref thisChanged);

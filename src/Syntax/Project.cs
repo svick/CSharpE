@@ -79,7 +79,6 @@ namespace CSharpE.Syntax
         public IEnumerable<ClassDefinition> GetClassesWithAttribute<T>() where T : System.Attribute =>
             NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetClassesWithAttribute<T>());
 
-        // TODO: limit type kind and use in ActorTransformation
         public IEnumerable<BaseTypeDefinition> GetTypesWithAttribute<T>() where T : System.Attribute =>
             NestedCollection.Create(this, SourceFiles, sourceFile => sourceFile.GetTypesWithAttribute<T>());
 

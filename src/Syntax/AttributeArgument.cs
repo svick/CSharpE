@@ -75,9 +75,7 @@ namespace CSharpE.Syntax
 
         AttributeArgumentSyntax ISyntaxWrapper<AttributeArgumentSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newName = name.GetWrapped(ref thisChanged);
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;

@@ -96,9 +96,7 @@ namespace CSharpE.Syntax
 
         private protected override StatementSyntax GetWrappedStatement(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newType = elementType?.GetWrapped(ref thisChanged) ?? syntax.Type;
             var newName = elementName.GetWrapped(ref thisChanged);
@@ -179,9 +177,7 @@ namespace CSharpE.Syntax
 
         private protected override StatementSyntax GetWrappedStatement(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newPattern = elementPattern?.GetWrapped(ref thisChanged) ?? syntax.Variable;
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;

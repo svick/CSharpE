@@ -257,9 +257,7 @@ namespace CSharpE.Syntax
 
         private TypeSyntax GetWrapped(ref bool? changed, bool forceName)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newTypeArguments = typeArguments?.GetWrapped(ref thisChanged) ??
                                     (syntax as GenericNameSyntax)?.TypeArgumentList.Arguments ?? default;

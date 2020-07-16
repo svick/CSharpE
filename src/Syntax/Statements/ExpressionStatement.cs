@@ -52,9 +52,7 @@ namespace CSharpE.Syntax
 
         private protected override StatementSyntax GetWrappedStatement(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             ExpressionSyntax newExpression;
             bool newIsThrow = false;

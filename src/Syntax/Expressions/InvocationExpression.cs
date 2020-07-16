@@ -59,9 +59,7 @@ namespace CSharpE.Syntax
 
         InvocationExpressionSyntax ISyntaxWrapper<InvocationExpressionSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
             var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList.Arguments;

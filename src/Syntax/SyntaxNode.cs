@@ -108,7 +108,6 @@ namespace CSharpE.Syntax
         private ChangeTracker changeTracker = new ChangeTracker();
         private bool thisHasChanged = false;
 
-        // TODO: replace (almost?) everywhere with the next overload
         private protected void GetAndResetChanged(ref bool? changed) => changeTracker.GetAndResetChanged(ref changed);
 
         private protected void GetAndResetChanged(ref bool? changed, out bool? thisChanged)

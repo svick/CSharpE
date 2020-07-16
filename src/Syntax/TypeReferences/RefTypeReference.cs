@@ -48,9 +48,7 @@ namespace CSharpE.Syntax
 
         private protected override TypeSyntax GetWrappedType(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newElementType = elementType?.GetWrapped(ref thisChanged) ?? syntax.Type;
 

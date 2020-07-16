@@ -50,9 +50,7 @@ namespace CSharpE.Syntax
 
         internal override InitializerExpressionSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newMemberInitializers = memberInitializers?.GetWrapped(ref thisChanged) ?? syntax.Expressions;
 

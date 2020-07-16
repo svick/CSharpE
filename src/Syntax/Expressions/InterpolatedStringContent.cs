@@ -87,9 +87,7 @@ namespace CSharpE.Syntax
 
         internal override InterpolatedStringContentSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newExpression = expression?.GetWrapped(ref thisChanged) ?? syntax.Expression;
             var newAlignment = alignmentSet ? alignment?.GetWrapped(ref thisChanged) : syntax.AlignmentClause?.Value;

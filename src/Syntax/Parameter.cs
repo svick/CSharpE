@@ -124,9 +124,7 @@ namespace CSharpE.Syntax
         
         ParameterSyntax ISyntaxWrapper<ParameterSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-            
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;

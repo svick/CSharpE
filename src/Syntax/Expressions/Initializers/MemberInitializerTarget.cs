@@ -50,9 +50,7 @@ namespace CSharpE.Syntax
 
         internal override ExpressionSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newName = name.GetWrapped(ref thisChanged);
 
@@ -103,9 +101,7 @@ namespace CSharpE.Syntax
 
         internal override ExpressionSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList.Arguments;
 

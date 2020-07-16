@@ -188,9 +188,7 @@ namespace CSharpE.Syntax
 
         private SyntaxTree GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var oldCompilationUnit = syntax?.GetCompilationUnitRoot();
             var oldUsings = oldCompilationUnit?.Usings ?? default;

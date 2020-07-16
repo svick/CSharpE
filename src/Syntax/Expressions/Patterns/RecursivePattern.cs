@@ -102,9 +102,7 @@ namespace CSharpE.Syntax
 
         protected override PatternSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newType = typeSet ? type?.GetWrapped(ref thisChanged) : syntax.Type;
             var newPositionalSubpatterns =

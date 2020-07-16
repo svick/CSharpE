@@ -116,9 +116,7 @@ namespace CSharpE.Syntax
 
         CatchClauseSyntax ISyntaxWrapper<CatchClauseSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newExceptionType =
                 exceptionTypeSet ? exceptionType?.GetWrapped(ref thisChanged) : syntax.Declaration?.Type;

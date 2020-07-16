@@ -77,9 +77,7 @@ namespace CSharpE.Syntax
 
         private protected override StatementSyntax GetWrappedStatement(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newTryStatements = tryStatements?.GetWrapped(ref thisChanged) ?? syntax.Block.Statements;
             var newCatchClauses = catchClauses?.GetWrapped(ref thisChanged) ?? syntax.Catches;

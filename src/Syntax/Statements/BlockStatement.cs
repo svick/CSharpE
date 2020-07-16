@@ -39,9 +39,7 @@ namespace CSharpE.Syntax
 
         internal BlockSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newStatements = statements?.GetWrapped(ref thisChanged) ?? syntax.Statements;
 

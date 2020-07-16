@@ -77,9 +77,7 @@ namespace CSharpE.Syntax
 
         AssignmentExpressionSyntax ISyntaxWrapper<AssignmentExpressionSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newTarget = target?.GetWrapped(ref thisChanged) ?? syntax.Left;
             var newValue = value?.GetWrapped(ref thisChanged) ?? syntax.Right;

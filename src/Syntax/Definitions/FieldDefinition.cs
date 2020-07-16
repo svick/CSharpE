@@ -101,11 +101,9 @@ namespace CSharpE.Syntax
 
         FieldDeclarationSyntax ISyntaxWrapper<FieldDeclarationSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var declarator = syntax?.Declaration.Variables.Single();
-
-            bool? thisChanged = false;
 
             var newAttributes = attributes?.GetWrapped(ref thisChanged) ?? syntax?.AttributeLists ?? default;
             var newModifiers = Modifiers;

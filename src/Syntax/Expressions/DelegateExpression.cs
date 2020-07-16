@@ -88,9 +88,7 @@ namespace CSharpE.Syntax
 
         private protected override ExpressionSyntax GetWrappedExpression(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newParameters =
                 parametersSet ? parameters?.GetWrapped(ref thisChanged) : syntax.ParameterList?.Parameters;

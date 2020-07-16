@@ -88,9 +88,7 @@ namespace CSharpE.Syntax
 
         internal LocalDeclarationStatementSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Declaration.Type;
             var newName = name.GetWrapped(ref thisChanged);

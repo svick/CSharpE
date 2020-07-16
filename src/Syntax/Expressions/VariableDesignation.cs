@@ -58,9 +58,7 @@ namespace CSharpE.Syntax
 
         protected override VariableDesignationSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newName = name.GetWrapped(ref thisChanged);
 
@@ -117,9 +115,7 @@ namespace CSharpE.Syntax
 
         protected override VariableDesignationSyntax GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newVariables = variables?.GetWrapped(ref thisChanged) ?? syntax.Variables;
 

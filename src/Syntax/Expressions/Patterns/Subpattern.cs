@@ -49,9 +49,7 @@ namespace CSharpE.Syntax
 
         SubpatternSyntax ISyntaxWrapper<SubpatternSyntax>.GetWrapped(ref bool? changed)
         {
-            GetAndResetChanged(ref changed);
-
-            bool? thisChanged = false;
+            GetAndResetChanged(ref changed, out var thisChanged);
 
             var newPattern = pattern?.GetWrapped(ref thisChanged) ?? syntax.Pattern;
 
