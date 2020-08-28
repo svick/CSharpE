@@ -1,3 +1,18 @@
+Bug:
+
+```c#
+Statement writeLineStatement = SyntaxFactory.Call(NamedType(typeof(Console)), nameof(Console.WriteLine), Literal(0));
+writeLineStatement.ToString().Dump();
+```
+
+```
+Object reference not set to an instance of an object.
+   at CSharpE.Syntax.NamedTypeReference.get_RequiresUsingNamespace()
+   at CSharpE.Syntax.NamedTypeReference.GetWrappedType(Nullable`1& changed)
+ ```
+ 
+ ---
+
 - fix moving `NamedTypeReference`s between files (doesn't update `using`s)
 - make most classes `sealed`
 - consider using limited Roslyn formatting instead of `NormalizeWhitespace`
