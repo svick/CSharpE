@@ -2,12 +2,14 @@
   <PropertyGroup>
     <AssemblyName>CSharpE.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>CSharpE.$(MSBuildProjectName)</RootNamespace>
-    <Version>0.1.174</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>TODO</Description>
     <Authors>svick</Authors>
     <PackageOutputPath>$(MSBuildThisFileDirectory)pkg</PackageOutputPath>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CSharpE.ruleset</CodeAnalysisRuleSet>
+
+    <Version>0.1.174</Version>
+    <RoslynVersion>3.8.0</RoslynVersion>
   </PropertyGroup>
 </Project>

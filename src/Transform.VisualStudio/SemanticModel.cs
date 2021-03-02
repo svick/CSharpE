@@ -136,11 +136,6 @@ namespace CSharpE.Transform.VisualStudio
             throw new NotImplementedException();
         }
 
-        public override void ComputeDeclarationsInNode(SyntaxNode node, bool getSymbol, Roslyn::PooledObjects.ArrayBuilder<DeclarationInfo> builder, CancellationToken cancellationToken, int? levelsToCompute = null)
-        {
-            roslynModel.ComputeDeclarationsInNode(Adjust(node), getSymbol, builder, cancellationToken, levelsToCompute);
-        }
-
         private TInfo GetInfo<TInfo>(CSharpSyntaxNode node, Func<CSharpSyntaxNode, TInfo> getInfo, Func<int, CSharpSyntaxNode, TInfo> getSpeculativeInfo)
         {
             var adjustedNode = Adjust(node);

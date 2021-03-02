@@ -35,7 +35,7 @@ namespace CSharpE.Transform.VisualStudio
             CSharpCompilation roslynCompilation, Compilation previousCompilation, AsyncQueue<CompilationEvent> eventQueue = null)
             : base(
                 roslynCompilation.AssemblyName, roslynCompilation.References.ToImmutableArray(),
-                new Dictionary<string, string>() /* TODO? */, roslynCompilation.IsSubmission, eventQueue)
+                new Dictionary<string, string>() /* TODO? */, roslynCompilation.IsSubmission, roslynCompilation.SemanticModelProvider, eventQueue)
         {
             RoslynCompilation = roslynCompilation;
 
@@ -501,11 +501,6 @@ namespace CSharpE.Transform.VisualStudio
             return DesignTimeCompilation.GetSymbolsWithName(name, filter, cancellationToken);
         }
 
-        public override AnalyzerDriver AnalyzerForLanguage(ImmutableArray<DiagnosticAnalyzer> analyzers, AnalyzerManager analyzerManager)
-        {
-            return DesignTimeCompilation.AnalyzerForLanguage(analyzers, analyzerManager);
-        }
-
         public override RoslynCompilation WithEventQueue(AsyncQueue<CompilationEvent> eventQueue)
         {
             // because most methods delegate to DesignTimeCompilation, eventQueue should be set there
@@ -546,11 +541,6 @@ namespace CSharpE.Transform.VisualStudio
         }
 
         public override bool IsSymbolAccessibleWithinCore(ISymbol symbol, ISymbol within, ITypeSymbol throughType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IConvertibleConversion ClassifyConvertibleConversion(IOperation source, ITypeSymbol destination, out Optional<object> constantValue)
         {
             throw new NotImplementedException();
         }
@@ -663,7 +653,44 @@ namespace CSharpE.Transform.VisualStudio
 
         public override Guid DebugSourceDocumentLanguageId => RoslynCompilation.DebugSourceDocumentLanguageId;
 
+        protected override ITypeSymbol CommonScriptGlobalsType => throw new NotImplementedException();
+
         public override MetadataReference CommonGetMetadataReference(IAssemblySymbol assemblySymbol) => DesignTimeCompilation.GetMetadataReference(assemblySymbol);
+
+        public override AnalyzerDriver CreateAnalyzerDriver(ImmutableArray<DiagnosticAnalyzer> analyzers, AnalyzerManager analyzerManager, SeverityFilter severityFilter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SerializePdbEmbeddedCompilationOptions(BlobBuilder builder)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override RoslynCompilation WithSemanticModelProvider(SemanticModelProvider semanticModelProvider)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override RoslynSemanticModel CreateSemanticModel(RoslynSyntaxTree syntaxTree, bool ignoreAccessibility)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IFunctionPointerTypeSymbol CommonCreateFunctionPointerTypeSymbol(ITypeSymbol returnType, RefKind returnRefKind, ImmutableArray<ITypeSymbol> parameterTypes, ImmutableArray<RefKind> parameterRefKinds, SignatureCallingConvention callingConvention, ImmutableArray<INamedTypeSymbol> callingConventionTypes)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override INamedTypeSymbol CommonCreateNativeIntegerTypeSymbol(bool signed)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IConvertibleConversion ClassifyConvertibleConversion(IOperation source, ITypeSymbol destination, out ConstantValue constantValue)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
     }

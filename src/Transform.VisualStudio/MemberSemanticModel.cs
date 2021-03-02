@@ -66,5 +66,8 @@ namespace CSharpE.Transform.VisualStudio
             BoundNode boundRoot, Binder binder, DiagnosticBag diagnostics, bool takeSnapshots,
             out NullableWalker.SnapshotManager snapshotManager, ref ImmutableDictionary<Symbol, Symbol> remappedSymbols)
             => throw new NotImplementedException();
+
+        public override bool TryGetSpeculativeSemanticModelCore(SyntaxTreeSemanticModel parentModel, int position, PrimaryConstructorBaseTypeSyntax constructorInitializer, out RoslynSemanticModel speculativeModel)
+            => throw new NotImplementedException();
     }
 }

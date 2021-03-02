@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Composition;
 using Microsoft.VisualStudio.Shell.TableManager;
 using RoslynCompilation = Microsoft.CodeAnalysis.Compilation;
 using static CSharpE.Transform.VisualStudio.Wrapping;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CSharpE.Transform.VisualStudio
 {
@@ -41,8 +42,9 @@ namespace CSharpE.Transform.VisualStudio
             Wrap(roslynCompilationFactoryService.CreateCompilation(assemblyName, options));
 
         public GeneratorDriver CreateGeneratorDriver(
-            ParseOptions parseOptions, ImmutableArray<ISourceGenerator> generators, ImmutableArray<AdditionalText> additionalTexts) =>
-            roslynCompilationFactoryService.CreateGeneratorDriver(parseOptions, generators, additionalTexts);
+            ParseOptions parseOptions, ImmutableArray<ISourceGenerator> generators, AnalyzerConfigOptionsProvider optionsProvider,
+            ImmutableArray<AdditionalText> additionalTexts) =>
+            roslynCompilationFactoryService.CreateGeneratorDriver(parseOptions, generators, optionsProvider, additionalTexts);
 
         public RoslynCompilation CreateSubmissionCompilation(string assemblyName, CompilationOptions options, Type hostObjectType) =>
             Wrap(roslynCompilationFactoryService.CreateSubmissionCompilation(assemblyName, options, hostObjectType));

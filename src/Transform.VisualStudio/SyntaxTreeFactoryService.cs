@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Composition;
+﻿using System.Composition;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -42,15 +41,14 @@ namespace CSharpE.Transform.VisualStudio
 
         public RoslynSyntaxTree CreateRecoverableTree(
             ProjectId cacheKey, string filePath, ParseOptions options, ValueSource<TextAndVersion> text,
-            Encoding encoding, SyntaxNode root, ImmutableDictionary<string, ReportDiagnostic> treeDiagnosticReportingOptions)
+            Encoding encoding, SyntaxNode root)
         {
             return Wrap(roslynSyntaxTreeFactoryService.CreateRecoverableTree(
-                cacheKey, filePath, options, text, encoding, root, treeDiagnosticReportingOptions));
+                cacheKey, filePath, options, text, encoding, root));
         }
 
-        public RoslynSyntaxTree CreateSyntaxTree(
-            string filePath, ParseOptions options, Encoding encoding, SyntaxNode root, AnalyzerConfigOptionsResult analyzerConfigOptionsResult)
-            => Wrap(roslynSyntaxTreeFactoryService.CreateSyntaxTree(filePath, options, encoding, root, analyzerConfigOptionsResult));
+        public RoslynSyntaxTree CreateSyntaxTree(string filePath, ParseOptions options, Encoding encoding, SyntaxNode root)
+            => Wrap(roslynSyntaxTreeFactoryService.CreateSyntaxTree(filePath, options, encoding, root));
 
         public SyntaxNode DeserializeNodeFrom(Stream stream, CancellationToken cancellationToken) =>
             Annotate(roslynSyntaxTreeFactoryService.DeserializeNodeFrom(stream, cancellationToken));
@@ -60,13 +58,11 @@ namespace CSharpE.Transform.VisualStudio
         public ParseOptions GetDefaultParseOptionsWithLatestLanguageVersion() =>
             roslynSyntaxTreeFactoryService.GetDefaultParseOptionsWithLatestLanguageVersion();
 
-        public RoslynSyntaxTree ParseSyntaxTree(
-            string filePath, ParseOptions options, SourceText text, AnalyzerConfigOptionsResult? analyzerConfigOptionsResult,
-            CancellationToken cancellationToken)
+        public RoslynSyntaxTree ParseSyntaxTree(string filePath, ParseOptions options, SourceText text, CancellationToken cancellationToken)
         {
             return Wrap(
                 roslynSyntaxTreeFactoryService.ParseSyntaxTree(
-                    filePath, options, text, analyzerConfigOptionsResult, cancellationToken));
+                    filePath, options, text, cancellationToken));
         }
     }
 }
