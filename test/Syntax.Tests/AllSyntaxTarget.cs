@@ -30,24 +30,16 @@ class C
         var(_, x, (y, z)) = t;
         _ = x =>
         {
-        }
-
-        ;
+        };
         _ = async (ref int x) =>
         {
-        }
-
-        ;
+        };
         _ = async delegate
         {
-        }
-
-        ;
+        };
         _ = delegate (int i)
         {
-        }
-
-        ;
+        };
         _ = 1is 1;
         _ = 1is int i;
         _ = null !;
