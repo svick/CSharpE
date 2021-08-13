@@ -49,3 +49,4 @@ Object reference not set to an instance of an object.
   - might require adding an abstraction for dependencies? (node/limited node/data)
 - improve debugging of extensions by using launchSettings.json
 - improve `CollectionTransformer` reuse by allowing different `Data`
+- find out why the `SyntaxFactory` app is so slow

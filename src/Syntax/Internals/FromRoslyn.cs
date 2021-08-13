@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -38,7 +39,10 @@ namespace CSharpE.Syntax.Internals
             return syntax.DescendantNodes(descendIntoChildren: n => !IsPossiblyInvalid(n)).Where(n => IsPossiblyInvalid(n));
         }
 
-        public static Expression Expression(ExpressionSyntax syntax, SyntaxNode parent) =>
+#nullable enable
+
+        [return: NotNullIfNotNull("syntax")]
+        public static Expression? Expression(ExpressionSyntax? syntax, SyntaxNode parent) =>
             syntax switch
             {
                 null => null,
@@ -58,9 +62,10 @@ namespace CSharpE.Syntax.Internals
                 DefaultExpressionSyntax @default => new DefaultExpression(@default, parent),
                 ElementAccessExpressionSyntax elementAccess => new ElementAccessExpression(elementAccess, parent),
                 IdentifierNameSyntax identifierName => new IdentifierExpression(identifierName, parent),
-                ImplicitArrayCreationExpressionSyntax implicitArrayCreation => new ImplicitNewArrayExpression(implicitArrayCreation, parent),
+                ImplicitArrayCreationExpressionSyntax implicitArrayCreation => new NewArrayExpression(implicitArrayCreation, parent),
+                ImplicitObjectCreationExpressionSyntax implicitObjectCreation => new NewExpression(implicitObjectCreation, parent),
                 ImplicitStackAllocArrayCreationExpressionSyntax implicitStackAllocArrayCreation =>
-                    new ImplicitStackAllocExpression(implicitStackAllocArrayCreation, parent),
+                    new StackAllocExpression(implicitStackAllocArrayCreation, parent),
                 InterpolatedStringExpressionSyntax interpolatedStringExpression =>
                     new InterpolatedStringExpression(interpolatedStringExpression, parent),
                 InvocationExpressionSyntax invocation => new InvocationExpression(invocation, parent),
@@ -86,6 +91,8 @@ namespace CSharpE.Syntax.Internals
                 TypeOfExpressionSyntax typeOf => new TypeOfExpression(typeOf, parent),
                 _ => throw new NotImplementedException(syntax.GetType().Name),
             };
+
+#nullable disable
 
         private static BinaryExpression AssignmentExpression(AssignmentExpressionSyntax syntax, SyntaxNode parent) =>
             syntax.Kind() switch

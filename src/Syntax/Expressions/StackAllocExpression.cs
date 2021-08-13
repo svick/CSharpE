@@ -4,64 +4,78 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
+#nullable enable
+
 namespace CSharpE.Syntax
 {
     public sealed class StackAllocExpression : Expression
     {
-        private StackAllocArrayCreationExpressionSyntax syntax;
+        private Union<StackAllocArrayCreationExpressionSyntax, ImplicitStackAllocArrayCreationExpressionSyntax> syntax;
 
-        internal StackAllocExpression(StackAllocArrayCreationExpressionSyntax syntax, SyntaxNode parent)
+        internal StackAllocExpression(ExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax)
         {
             Init(syntax);
             Parent = parent;
         }
 
-        private void Init(StackAllocArrayCreationExpressionSyntax syntax)
+        private void Init(ExpressionSyntax syntax)
         {
-            this.syntax = syntax;
-
-            // violating these conditions is allowed by Roslyn, but does not fit with CSharpE model for this type
-            if (!(syntax.Type is ArrayTypeSyntax arrayType) || arrayType.RankSpecifiers.Count > 1 ||
-                arrayType.RankSpecifiers[0].Sizes.Count > 1)
+            // violating these conditions is allowed by Roslyn, but it's not actually legal
+            if (syntax is StackAllocArrayCreationExpressionSyntax explicitSyntax &&
+                    (explicitSyntax.Type is not ArrayTypeSyntax arrayType || arrayType.RankSpecifiers.Count > 1 || arrayType.RankSpecifiers[0].Sizes.Count > 1))
                 throw new InvalidOperationException();
+
+            this.syntax = Union<StackAllocArrayCreationExpressionSyntax, ImplicitStackAllocArrayCreationExpressionSyntax>.FromEither(syntax);
         }
 
-        public StackAllocExpression(TypeReference elementType, ArrayInitializer initializer = null)
+        public StackAllocExpression(ArrayInitializer initializer)
+            : this(null, null, initializer) { }
+
+        public StackAllocExpression(TypeReference elementType, ArrayInitializer? initializer = null)
             : this(elementType, null, initializer) { }
 
         public StackAllocExpression(
-            TypeReference elementType, Expression length, ArrayInitializer initializer = null)
+            TypeReference? elementType, Expression? length, ArrayInitializer? initializer = null)
         {
             ElementType = elementType;
             Length = length;
             Initializer = initializer;
         }
 
-        private TypeSyntax GetSyntaxElementType() => ArrayTypeReference.GetElementTypeSyntax((ArrayTypeSyntax)syntax.Type);
+        private TypeSyntax? GetSyntaxElementType() =>
+            syntax.SwitchN(explicitSyntax => ((ArrayTypeSyntax)explicitSyntax.Type).ElementType, implicitSyntax => null);
 
-        private TypeReference elementType;
-        public TypeReference ElementType
+        private bool elementTypeSet;
+        private TypeReference? elementType;
+        public TypeReference? ElementType
         {
             get
             {
-                if (elementType == null)
+                if (!elementTypeSet)
+                {
                     elementType = FromRoslyn.TypeReference(GetSyntaxElementType(), this);
+                    elementTypeSet = true;
+                }
 
                 return elementType;
             }
-            set => SetNotNull(ref elementType, value);
+            set
+            {
+                if (value is ArrayTypeReference)
+                    throw new ArgumentException("ElementType can't be array type.");
+
+                Set(ref elementType, value);
+                elementTypeSet = true;
+            }
         }
 
-        private ExpressionSyntax GetSyntaxLength()
-        {
-            var arrayType = (ArrayTypeSyntax)syntax.Type;
-            return arrayType.RankSpecifiers[0].Sizes[0];
-        }
+        private ExpressionSyntax? GetSyntaxLength() =>
+            syntax.SwitchN(explicitSyntax => ((ArrayTypeSyntax)explicitSyntax.Type).RankSpecifiers[0].Sizes[0], implicitSyntax => null);
 
         private bool lengthSet;
-        private Expression length;
-        public Expression Length
+        private Expression? length;
+        public Expression? Length
         {
             get
             {
@@ -80,15 +94,19 @@ namespace CSharpE.Syntax
             }
         }
 
+        private InitializerExpressionSyntax? GetSyntaxInitializer() =>
+            syntax.Switch(explicitSyntax => explicitSyntax.Initializer, implicitSyntax => implicitSyntax.Initializer);
+
         private bool initializerSet;
-        private ArrayInitializer initializer;
-        public ArrayInitializer Initializer
+        private ArrayInitializer? initializer;
+        public ArrayInitializer? Initializer
         {
             get
             {
                 if (!initializerSet)
                 {
-                    initializer = syntax.Initializer == null ? null : new ArrayInitializer(syntax.Initializer, this);
+                    var syntaxInitializer = GetSyntaxInitializer();
+                    initializer = syntaxInitializer is null ? null : new ArrayInitializer(syntaxInitializer, this);
                     initializerSet = true;
                 }
 
@@ -107,25 +125,38 @@ namespace CSharpE.Syntax
 
             var newType = elementType?.GetWrapped(ref thisChanged) ?? GetSyntaxElementType();
             var newLength = lengthSet ? length?.GetWrapped(ref thisChanged) : GetSyntaxLength();
-            var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.Initializer;
+            var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : GetSyntaxInitializer();
 
-            if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
+            var expressionSyntax = syntax.GetBase<ExpressionSyntax>();
+            if (expressionSyntax == null || thisChanged == true || ShouldAnnotate(expressionSyntax, changed))
             {
-                if (newLength == null)
-                    newLength = RoslynSyntaxFactory.OmittedArraySizeExpression();
+                newLength ??= RoslynSyntaxFactory.OmittedArraySizeExpression();
 
-                var arrayType = ArrayTypeReference.AddArrayRankToType(
-                    newType,
-                    RoslynSyntaxFactory.ArrayRankSpecifier(RoslynSyntaxFactory.SingletonSeparatedList(newLength)));
+                if (newType is null)
+                {
+                    if (newInitializer is null)
+                        throw new InvalidOperationException("StackAllocExpression with null ElementType requires Initializer to be set.");
+                    if (newLength is not OmittedArraySizeExpressionSyntax)
+                        throw new InvalidOperationException("StackAllocExpression with null ElementType requires Length to be null.");
 
-                syntax = RoslynSyntaxFactory.StackAllocArrayCreationExpression(arrayType, newInitializer);
+                    var implicitSyntax = RoslynSyntaxFactory.ImplicitStackAllocArrayCreationExpression(newInitializer);
 
-                syntax = Annotate(syntax);
+                    syntax = Annotate(implicitSyntax);
+                }
+                else
+                {
+                    var arrayType = RoslynSyntaxFactory.ArrayType(newType)
+                        .AddRankSpecifiers(RoslynSyntaxFactory.ArrayRankSpecifier().AddSizes(newLength));
+
+                    var explicitSyntax = RoslynSyntaxFactory.StackAllocArrayCreationExpression(arrayType, newInitializer);
+
+                    syntax = Annotate(explicitSyntax);
+                }
 
                 SetChanged(ref changed);
             }
 
-            return syntax;
+            return syntax.GetBase<ExpressionSyntax>()!;
         }
 
         private protected override void SetSyntaxImpl(Roslyn::SyntaxNode newSyntax)
@@ -133,8 +164,11 @@ namespace CSharpE.Syntax
             syntax = (StackAllocArrayCreationExpressionSyntax)newSyntax;
 
             Set(ref elementType, null);
+            elementTypeSet = false;
             Set(ref length, null);
+            lengthSet = false;
             Set(ref initializer, null);
+            initializerSet = false;
         }
 
         private protected override SyntaxNode CloneImpl() => new StackAllocExpression(ElementType, Length, Initializer);

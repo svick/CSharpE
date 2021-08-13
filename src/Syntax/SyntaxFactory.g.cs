@@ -5,1274 +5,320 @@ namespace CSharpE.Syntax
 {
     public static partial class SyntaxFactory
     {
-        public static Attribute Attribute(NamedTypeReference type, params AttributeArgument[] arguments)
-        {
-            return new Attribute(type, arguments);
-        }
-
-        public static Attribute Attribute(NamedTypeReference type, IEnumerable<AttributeArgument> arguments)
-        {
-            return new Attribute(type, arguments);
-        }
-
-        public static AttributeArgument AttributeArgument(Expression expression)
-        {
-            return new AttributeArgument(expression);
-        }
-
-        public static AttributeArgument AttributeArgument(string name, Expression expression)
-        {
-            return new AttributeArgument(name, expression);
-        }
-
-        public static AttributeArgument AttributeArgument(string name, bool isConstructorArgument, Expression expression)
-        {
-            return new AttributeArgument(name, isConstructorArgument, expression);
-        }
-
-        public static AccessorDefinition AccessorDefinition()
-        {
-            return new AccessorDefinition();
-        }
-
-        public static ConstructorInitializer ConstructorInitializer(ConstructorInitializerKind kind, params Argument[] arguments)
-        {
-            return new ConstructorInitializer(kind, arguments);
-        }
-
-        public static ConstructorInitializer ConstructorInitializer(ConstructorInitializerKind kind, IEnumerable<Argument> arguments)
-        {
-            return new ConstructorInitializer(kind, arguments);
-        }
-
-        public static DelegateDefinition DelegateDefinition(TypeReference returnType, string name, params Parameter[] parameters)
-        {
-            return new DelegateDefinition(returnType, name, parameters);
-        }
-
-        public static DelegateDefinition DelegateDefinition(TypeReference returnType, string name, IEnumerable<Parameter> parameters)
-        {
-            return new DelegateDefinition(returnType, name, parameters);
-        }
-
-        public static EnumDefinition EnumDefinition(MemberModifiers modifiers, string name, IEnumerable<EnumMemberDefinition> members = null)
-        {
-            return new EnumDefinition(modifiers, name, members);
-        }
-
-        public static EnumMemberDefinition EnumMemberDefinition(string name, Expression initializer = null)
-        {
-            return new EnumMemberDefinition(name, initializer);
-        }
-
-        public static FieldDefinition FieldDefinition(MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null)
-        {
-            return new FieldDefinition(modifiers, type, name, initializer);
-        }
-
-        public static FieldDefinition FieldDefinition(TypeReference type, string name, Expression initializer = null)
-        {
-            return new FieldDefinition(type, name, initializer);
-        }
-
-        public static NamespaceDefinition NamespaceDefinition(string name, params NamespaceOrTypeDefinition[] members)
-        {
-            return new NamespaceDefinition(name, members);
-        }
-
-        public static NamespaceDefinition NamespaceDefinition(string name, IEnumerable<NamespaceOrTypeDefinition> members)
-        {
-            return new NamespaceDefinition(name, members);
-        }
-
-        public static PropertyDefinition PropertyDefinition(MemberModifiers modifiers, TypeReference type, string name, AccessorDefinition getAccessor, AccessorDefinition setAccessor)
-        {
-            return new PropertyDefinition(modifiers, type, name, getAccessor, setAccessor);
-        }
-
-        public static PropertyDefinition PropertyDefinition(MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, string name, AccessorDefinition getAccessor, AccessorDefinition setAccessor)
-        {
-            return new PropertyDefinition(modifiers, type, explicitInterface, name, getAccessor, setAccessor);
-        }
-
-        public static ClassDefinition ClassDefinition(string name, params MemberDefinition[] members)
-        {
-            return new ClassDefinition(name, members);
-        }
-
-        public static ClassDefinition ClassDefinition(string name, IEnumerable<MemberDefinition> members)
-        {
-            return new ClassDefinition(name, members);
-        }
-
-        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
-        {
-            return new ClassDefinition(modifiers, name, members);
-        }
-
-        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
-        {
-            return new ClassDefinition(modifiers, name, members);
-        }
-
-        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, params MemberDefinition[] members)
-        {
-            return new ClassDefinition(modifiers, name, baseTypes, members);
-        }
-
-        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, IEnumerable<MemberDefinition> members)
-        {
-            return new ClassDefinition(modifiers, name, baseTypes, members);
-        }
-
-        public static StructDefinition StructDefinition(string name, params MemberDefinition[] members)
-        {
-            return new StructDefinition(name, members);
-        }
-
-        public static StructDefinition StructDefinition(string name, IEnumerable<MemberDefinition> members)
-        {
-            return new StructDefinition(name, members);
-        }
-
-        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
-        {
-            return new StructDefinition(modifiers, name, members);
-        }
-
-        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
-        {
-            return new StructDefinition(modifiers, name, members);
-        }
-
-        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, params MemberDefinition[] members)
-        {
-            return new StructDefinition(modifiers, name, baseTypes, members);
-        }
-
-        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, IEnumerable<MemberDefinition> members)
-        {
-            return new StructDefinition(modifiers, name, baseTypes, members);
-        }
-
-        public static InterfaceDefinition InterfaceDefinition(string name, params MemberDefinition[] members)
-        {
-            return new InterfaceDefinition(name, members);
-        }
-
-        public static InterfaceDefinition InterfaceDefinition(string name, IEnumerable<MemberDefinition> members)
-        {
-            return new InterfaceDefinition(name, members);
-        }
-
-        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members)
-        {
-            return new InterfaceDefinition(modifiers, name, members);
-        }
-
-        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members)
-        {
-            return new InterfaceDefinition(modifiers, name, members);
-        }
-
-        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, params MemberDefinition[] members)
-        {
-            return new InterfaceDefinition(modifiers, name, baseTypes, members);
-        }
-
-        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, IEnumerable<MemberDefinition> members)
-        {
-            return new InterfaceDefinition(modifiers, name, baseTypes, members);
-        }
-
-        public static TypeParameter TypeParameter(string name)
-        {
-            return new TypeParameter(name);
-        }
-
-        public static TypeParameter TypeParameter(VarianceModifier variance, string name)
-        {
-            return new TypeParameter(variance, name);
-        }
-
-        public static TypeParameter TypeParameter(IEnumerable<Attribute> attributes, VarianceModifier variance, string name)
-        {
-            return new TypeParameter(attributes, variance, name);
-        }
-
-        public static ClassConstraint ClassConstraint()
-        {
-            return new ClassConstraint();
-        }
-
-        public static StructConstraint StructConstraint()
-        {
-            return new StructConstraint();
-        }
-
-        public static ConstructorConstraint ConstructorConstraint()
-        {
-            return new ConstructorConstraint();
-        }
-
-        public static TypeConstraint TypeConstraint(TypeReference type)
-        {
-            return new TypeConstraint(type);
-        }
-
-        public static TypeParameterConstraintClause TypeParameterConstraint(string typeParameterName, params TypeParameterConstraint[] constraints)
-        {
-            return new TypeParameterConstraintClause(typeParameterName, constraints);
-        }
-
-        public static TypeParameterConstraintClause TypeParameterConstraint(string typeParameterName, IEnumerable<TypeParameterConstraint> constraints)
-        {
-            return new TypeParameterConstraintClause(typeParameterName, constraints);
-        }
-
-        public static AnonymousNewExpression AnonymousNew(params AnonymousObjectInitializer[] initializers)
-        {
-            return new AnonymousNewExpression(initializers);
-        }
-
-        public static AnonymousNewExpression AnonymousNew(IEnumerable<AnonymousObjectInitializer> initializers)
-        {
-            return new AnonymousNewExpression(initializers);
-        }
-
-        public static AwaitExpression Await(Expression operand)
-        {
-            return new AwaitExpression(operand);
-        }
-
-        public static BaseExpression Base()
-        {
-            return new BaseExpression();
-        }
-
-        public static AddExpression Add(Expression left, Expression right)
-        {
-            return new AddExpression(left, right);
-        }
-
-        public static SubtractExpression Subtract(Expression left, Expression right)
-        {
-            return new SubtractExpression(left, right);
-        }
-
-        public static MultiplyExpression Multiply(Expression left, Expression right)
-        {
-            return new MultiplyExpression(left, right);
-        }
-
-        public static DivideExpression Divide(Expression left, Expression right)
-        {
-            return new DivideExpression(left, right);
-        }
-
-        public static ModuloExpression Modulo(Expression left, Expression right)
-        {
-            return new ModuloExpression(left, right);
-        }
-
-        public static LeftShiftExpression LeftShift(Expression left, Expression right)
-        {
-            return new LeftShiftExpression(left, right);
-        }
-
-        public static RightShiftExpression RightShift(Expression left, Expression right)
-        {
-            return new RightShiftExpression(left, right);
-        }
-
-        public static LogicalOrExpression LogicalOr(Expression left, Expression right)
-        {
-            return new LogicalOrExpression(left, right);
-        }
-
-        public static LogicalAndExpression LogicalAnd(Expression left, Expression right)
-        {
-            return new LogicalAndExpression(left, right);
-        }
-
-        public static BitwiseOrExpression BitwiseOr(Expression left, Expression right)
-        {
-            return new BitwiseOrExpression(left, right);
-        }
-
-        public static BitwiseAndExpression BitwiseAnd(Expression left, Expression right)
-        {
-            return new BitwiseAndExpression(left, right);
-        }
-
-        public static XorExpression Xor(Expression left, Expression right)
-        {
-            return new XorExpression(left, right);
-        }
-
-        public static EqualsExpression Equals(Expression left, Expression right)
-        {
-            return new EqualsExpression(left, right);
-        }
-
-        public static NotEqualsExpression NotEquals(Expression left, Expression right)
-        {
-            return new NotEqualsExpression(left, right);
-        }
-
-        public static LessThanExpression LessThan(Expression left, Expression right)
-        {
-            return new LessThanExpression(left, right);
-        }
-
-        public static LessThanOrEqualExpression LessThanOrEqual(Expression left, Expression right)
-        {
-            return new LessThanOrEqualExpression(left, right);
-        }
-
-        public static GreaterThanExpression GreaterThan(Expression left, Expression right)
-        {
-            return new GreaterThanExpression(left, right);
-        }
-
-        public static GreaterThanOrEqualExpression GreaterThanOrEqual(Expression left, Expression right)
-        {
-            return new GreaterThanOrEqualExpression(left, right);
-        }
-
-        public static IsExpression Is(Expression left, TypeReference right)
-        {
-            return new IsExpression(left, right);
-        }
-
-        public static AsExpression As(Expression left, TypeReference right)
-        {
-            return new AsExpression(left, right);
-        }
-
-        public static CoalesceExpression Coalesce(Expression left, Expression right)
-        {
-            return new CoalesceExpression(left, right);
-        }
-
-        public static AssignmentExpression Assignment(Expression left, Expression right)
-        {
-            return new AssignmentExpression(left, right);
-        }
-
-        public static AddAssignmentExpression AddAssignment(Expression left, Expression right)
-        {
-            return new AddAssignmentExpression(left, right);
-        }
-
-        public static SubtractAssignmentExpression SubtractAssignment(Expression left, Expression right)
-        {
-            return new SubtractAssignmentExpression(left, right);
-        }
-
-        public static MultiplyAssignmentExpression MultiplyAssignment(Expression left, Expression right)
-        {
-            return new MultiplyAssignmentExpression(left, right);
-        }
-
-        public static DivideAssignmentExpression DivideAssignment(Expression left, Expression right)
-        {
-            return new DivideAssignmentExpression(left, right);
-        }
-
-        public static ModuloAssignmentExpression ModuloAssignment(Expression left, Expression right)
-        {
-            return new ModuloAssignmentExpression(left, right);
-        }
-
-        public static AndAssignmentExpression AndAssignment(Expression left, Expression right)
-        {
-            return new AndAssignmentExpression(left, right);
-        }
-
-        public static XorAssignmentExpression XorAssignment(Expression left, Expression right)
-        {
-            return new XorAssignmentExpression(left, right);
-        }
-
-        public static OrAssignmentExpression OrAssignment(Expression left, Expression right)
-        {
-            return new OrAssignmentExpression(left, right);
-        }
-
-        public static LeftShiftAssignmentExpression LeftShiftAssignment(Expression left, Expression right)
-        {
-            return new LeftShiftAssignmentExpression(left, right);
-        }
-
-        public static RightShiftAssignmentExpression RightShiftAssignment(Expression left, Expression right)
-        {
-            return new RightShiftAssignmentExpression(left, right);
-        }
-
-        public static CastExpression Cast(TypeReference type, Expression expression)
-        {
-            return new CastExpression(type, expression);
-        }
-
-        public static CheckedExpression Checked(bool isChecked, Expression expression)
-        {
-            return new CheckedExpression(isChecked, expression);
-        }
-
-        public static ConditionalExpression Conditional(Expression condition, Expression whenTrue, Expression whenFalse)
-        {
-            return new ConditionalExpression(condition, whenTrue, whenFalse);
-        }
-
-        public static DeclarationExpression Declaration(TypeReference type, VariableDesignation designation)
-        {
-            return new DeclarationExpression(type, designation);
-        }
-
-        public static DefaultExpression Default(TypeReference type = null)
-        {
-            return new DefaultExpression(type);
-        }
-
-        public static DelegateExpression Delegate(IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements)
-        {
-            return new DelegateExpression(parameters, statements);
-        }
-
-        public static DelegateExpression Delegate(bool isAsync, IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements)
-        {
-            return new DelegateExpression(isAsync, parameters, statements);
-        }
-
-        public static ElementAccessExpression ElementAccess(this Expression expression, params Argument[] arguments)
-        {
-            return new ElementAccessExpression(expression, arguments);
-        }
-
-        public static ElementAccessExpression ElementAccess(this Expression expression, IEnumerable<Argument> arguments)
-        {
-            return new ElementAccessExpression(expression, arguments);
-        }
-
-        public static ConditionalElementAccessExpression ConditionalElementAccess(Expression expression, params Argument[] arguments)
-        {
-            return new ConditionalElementAccessExpression(expression, arguments);
-        }
-
-        public static ConditionalElementAccessExpression ConditionalElementAccess(Expression expression, IEnumerable<Argument> arguments)
-        {
-            return new ConditionalElementAccessExpression(expression, arguments);
-        }
-
-        public static IdentifierExpression Identifier(string identifier)
-        {
-            return new IdentifierExpression(identifier);
-        }
-
-        public static ImplicitNewArrayExpression ImplicitNewArray(ArrayInitializer initializer)
-        {
-            return new ImplicitNewArrayExpression(initializer);
-        }
-
-        public static ImplicitNewArrayExpression ImplicitNewArray(int rank, ArrayInitializer initializer)
-        {
-            return new ImplicitNewArrayExpression(rank, initializer);
-        }
-
-        public static ImplicitStackAllocExpression ImplicitStackAlloc(ArrayInitializer initializer)
-        {
-            return new ImplicitStackAllocExpression(initializer);
-        }
-
-        public static AnonymousObjectInitializer AnonymousObjectInitializer(Expression expression)
-        {
-            return new AnonymousObjectInitializer(expression);
-        }
-
-        public static AnonymousObjectInitializer AnonymousObjectInitializer(string name, Expression expression)
-        {
-            return new AnonymousObjectInitializer(name, expression);
-        }
-
-        public static ArrayInitializer ArrayInitializer(params VariableInitializer[] variableInitializers)
-        {
-            return new ArrayInitializer(variableInitializers);
-        }
-
-        public static ArrayInitializer ArrayInitializer(IEnumerable<VariableInitializer> variableInitializers)
-        {
-            return new ArrayInitializer(variableInitializers);
-        }
-
-        public static ExpressionVariableInitializer ExpressionVariableInitializer(Expression expression)
-        {
-            return new ExpressionVariableInitializer(expression);
-        }
-
-        public static CollectionInitializer CollectionInitializer(params ElementInitializer[] elementInitializers)
-        {
-            return new CollectionInitializer(elementInitializers);
-        }
-
-        public static CollectionInitializer CollectionInitializer(IEnumerable<ElementInitializer> elementInitializers)
-        {
-            return new CollectionInitializer(elementInitializers);
-        }
-
-        public static ElementInitializer ElementInitializer(params Expression[] expressions)
-        {
-            return new ElementInitializer(expressions);
-        }
-
-        public static ElementInitializer ElementInitializer(IEnumerable<Expression> expressions)
-        {
-            return new ElementInitializer(expressions);
-        }
-
-        public static MemberInitializer MemberInitializer(MemberInitializerTarget target, MemberInitializerValue value)
-        {
-            return new MemberInitializer(target, value);
-        }
-
-        public static NameMemberInitializerTarget NameMemberInitializerTarget(string name)
-        {
-            return new NameMemberInitializerTarget(name);
-        }
-
-        public static ElementAccessMemberInitializerTarget ElementAccessMemberInitializerTarget(IEnumerable<Argument> arguments)
-        {
-            return new ElementAccessMemberInitializerTarget(arguments);
-        }
-
-        public static ExpressionMemberInitializerValue ExpressionMemberInitializerValue(Expression expression)
-        {
-            return new ExpressionMemberInitializerValue(expression);
-        }
-
-        public static InitializerMemberInitializerValue InitializerMemberInitializerValue(Initializer initializer)
-        {
-            return new InitializerMemberInitializerValue(initializer);
-        }
-
-        public static ObjectInitializer ObjectInitializer(params MemberInitializer[] memberInitializers)
-        {
-            return new ObjectInitializer(memberInitializers);
-        }
-
-        public static ObjectInitializer ObjectInitializer(IEnumerable<MemberInitializer> memberInitializers)
-        {
-            return new ObjectInitializer(memberInitializers);
-        }
-
-        public static Interpolation Interpolation(Expression expression, Expression alignment = null, string format = null)
-        {
-            return new Interpolation(expression, alignment, format);
-        }
-
-        public static InterpolatedStringText InterpolatedStringText(string text)
-        {
-            return new InterpolatedStringText(text);
-        }
-
-        public static InterpolatedStringExpression InterpolatedString(params InterpolatedStringContent[] contents)
-        {
-            return new InterpolatedStringExpression(contents);
-        }
-
-        public static InterpolatedStringExpression InterpolatedString(IEnumerable<InterpolatedStringContent> contents)
-        {
-            return new InterpolatedStringExpression(contents);
-        }
-
-        public static InterpolatedStringExpression InterpolatedString(bool isVerbatim, params InterpolatedStringContent[] contents)
-        {
-            return new InterpolatedStringExpression(isVerbatim, contents);
-        }
-
-        public static InterpolatedStringExpression InterpolatedString(bool isVerbatim, IEnumerable<InterpolatedStringContent> contents)
-        {
-            return new InterpolatedStringExpression(isVerbatim, contents);
-        }
-
-        public static InvocationExpression Invocation(Expression expression, IEnumerable<Argument> arguments = null)
-        {
-            return new InvocationExpression(expression, arguments);
-        }
-
-        public static InvocationExpression Invocation(Expression expression, IEnumerable<Expression> arguments = null)
-        {
-            return new InvocationExpression(expression, arguments);
-        }
-
-        public static InvocationExpression Invocation(Expression expression, params Argument[] arguments)
-        {
-            return new InvocationExpression(expression, arguments);
-        }
-
-        public static IsPatternExpression IsPattern(Expression expression, Pattern pattern)
-        {
-            return new IsPatternExpression(expression, pattern);
-        }
-
-        public static LambdaExpression Lambda(IEnumerable<LambdaParameter> parameters, Expression expression)
-        {
-            return new LambdaExpression(parameters, expression);
-        }
-
-        public static LambdaExpression Lambda(bool isAsync, IEnumerable<LambdaParameter> parameters, Expression expression)
-        {
-            return new LambdaExpression(isAsync, parameters, expression);
-        }
-
-        public static LambdaParameter LambdaParameter(string name)
-        {
-            return new LambdaParameter(name);
-        }
-
-        public static LambdaParameter LambdaParameter(TypeReference type, string name)
-        {
-            return new LambdaParameter(type, name);
-        }
-
-        public static LambdaParameter LambdaParameter(LambdaParameterModifier modifier, TypeReference type, string name)
-        {
-            return new LambdaParameter(modifier, type, name);
-        }
-
-        public static FromClause From(string name, Expression expression)
-        {
-            return new FromClause(name, expression);
-        }
-
-        public static FromClause From(TypeReference type, string name, Expression expression)
-        {
-            return new FromClause(type, name, expression);
-        }
-
-        public static GroupByClause GroupBy(Expression groupExpression, Expression byExpression, string into = null)
-        {
-            return new GroupByClause(groupExpression, byExpression, into);
-        }
-
-        public static JoinClause Join(string name, Expression inExpression, Expression leftExpression, Expression rightExpression, string into = null)
-        {
-            return new JoinClause(name, inExpression, leftExpression, rightExpression, into);
-        }
-
-        public static JoinClause Join(TypeReference type, string name, Expression inExpression, Expression leftExpression, Expression rightExpression, string into = null)
-        {
-            return new JoinClause(type, name, inExpression, leftExpression, rightExpression, into);
-        }
-
-        public static LetClause Let(string name, Expression expression)
-        {
-            return new LetClause(name, expression);
-        }
-
-        public static OrderByClause OrderBy(Expression expression, bool isDescending = false)
-        {
-            return new OrderByClause(expression, isDescending);
-        }
-
-        public static OrderByClause OrderBy(params Ordering[] orderings)
-        {
-            return new OrderByClause(orderings);
-        }
-
-        public static OrderByClause OrderBy(IEnumerable<Ordering> orderings)
-        {
-            return new OrderByClause(orderings);
-        }
-
-        public static Ordering Ordering(Expression expression, bool isDescending = false)
-        {
-            return new Ordering(expression, isDescending);
-        }
-
-        public static SelectClause Select(Expression expression, string into = null)
-        {
-            return new SelectClause(expression, into);
-        }
-
-        public static WhereClause Where(Expression condition)
-        {
-            return new WhereClause(condition);
-        }
-
-        public static LinqExpression Linq(params LinqClause[] clauses)
-        {
-            return new LinqExpression(clauses);
-        }
-
-        public static LinqExpression Linq(IEnumerable<LinqClause> clauses)
-        {
-            return new LinqExpression(clauses);
-        }
-
-        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName)
-        {
-            return new MemberAccessExpression(expression, memberName);
-        }
-
-        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName, params TypeReference[] typeArguments)
-        {
-            return new MemberAccessExpression(expression, memberName, typeArguments);
-        }
-
-        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName, IEnumerable<TypeReference> typeArguments)
-        {
-            return new MemberAccessExpression(expression, memberName, typeArguments);
-        }
-
-        public static MemberAccessExpression MemberAccess(this Expression expression, FieldDefinition fieldDefinition)
-        {
-            return new MemberAccessExpression(expression, fieldDefinition);
-        }
-
-        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, string memberName)
-        {
-            return new PointerMemberAccessExpression(expression, memberName);
-        }
-
-        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, string memberName, params TypeReference[] typeArguments)
-        {
-            return new PointerMemberAccessExpression(expression, memberName, typeArguments);
-        }
-
-        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, string memberName, IEnumerable<TypeReference> typeArguments)
-        {
-            return new PointerMemberAccessExpression(expression, memberName, typeArguments);
-        }
-
-        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, FieldDefinition fieldDefinition)
-        {
-            return new PointerMemberAccessExpression(expression, fieldDefinition);
-        }
-
-        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, string memberName)
-        {
-            return new ConditionalMemberAccessExpression(expression, memberName);
-        }
-
-        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, string memberName, params TypeReference[] typeArguments)
-        {
-            return new ConditionalMemberAccessExpression(expression, memberName, typeArguments);
-        }
-
-        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, string memberName, IEnumerable<TypeReference> typeArguments)
-        {
-            return new ConditionalMemberAccessExpression(expression, memberName, typeArguments);
-        }
-
-        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, FieldDefinition fieldDefinition)
-        {
-            return new ConditionalMemberAccessExpression(expression, fieldDefinition);
-        }
-
-        public static NewArrayExpression NewArray(TypeReference elementType, ArrayInitializer initializer = null)
-        {
-            return new NewArrayExpression(elementType, initializer);
-        }
-
-        public static NewArrayExpression NewArray(TypeReference elementType, params Expression[] lengths)
-        {
-            return new NewArrayExpression(elementType, lengths);
-        }
-
-        public static NewArrayExpression NewArray(TypeReference elementType, IEnumerable<Expression> lengths, ArrayInitializer initializer = null)
-        {
-            return new NewArrayExpression(elementType, lengths, initializer);
-        }
-
-        public static NewExpression New(TypeReference type, IEnumerable<Argument> arguments, Initializer initializer = null)
-        {
-            return new NewExpression(type, arguments, initializer);
-        }
-
-        public static NewExpression New(TypeReference type, IEnumerable<Expression> arguments, Initializer initializer = null)
-        {
-            return new NewExpression(type, arguments, initializer);
-        }
-
-        public static NewExpression New(TypeReference type, params Argument[] arguments)
-        {
-            return new NewExpression(type, arguments);
-        }
-
-        public static NullExpression Null()
-        {
-            return new NullExpression();
-        }
-
-        public static ParenthesizedExpression Parenthesized(Expression expression)
-        {
-            return new ParenthesizedExpression(expression);
-        }
-
-        public static ConstantPattern ConstantPattern(Expression expression)
-        {
-            return new ConstantPattern(expression);
-        }
-
-        public static RefExpression Ref(Expression expression)
-        {
-            return new RefExpression(expression);
-        }
-
-        public static SizeOfExpression SizeOf(TypeReference type)
-        {
-            return new SizeOfExpression(type);
-        }
-
-        public static StackAllocExpression StackAlloc(TypeReference elementType, ArrayInitializer initializer = null)
-        {
-            return new StackAllocExpression(elementType, initializer);
-        }
-
-        public static StackAllocExpression StackAlloc(TypeReference elementType, Expression length, ArrayInitializer initializer = null)
-        {
-            return new StackAllocExpression(elementType, length, initializer);
-        }
-
-        public static ThisExpression This()
-        {
-            return new ThisExpression();
-        }
-
-        public static ThrowExpression Throw(Expression operand)
-        {
-            return new ThrowExpression(operand);
-        }
-
-        public static TupleExpression Tuple(params Expression[] expressions)
-        {
-            return new TupleExpression(expressions);
-        }
-
-        public static TupleExpression Tuple(IEnumerable<Expression> expressions)
-        {
-            return new TupleExpression(expressions);
-        }
-
-        public static TupleExpression Tuple(IEnumerable<Argument> arguments)
-        {
-            return new TupleExpression(arguments);
-        }
-
-        public static TypeOfExpression TypeOf(TypeReference type)
-        {
-            return new TypeOfExpression(type);
-        }
-
-        public static UnaryPlusExpression UnaryPlus(Expression operand)
-        {
-            return new UnaryPlusExpression(operand);
-        }
-
-        public static UnaryMinusExpression UnaryMinus(Expression operand)
-        {
-            return new UnaryMinusExpression(operand);
-        }
-
-        public static ComplementExpression Complement(Expression operand)
-        {
-            return new ComplementExpression(operand);
-        }
-
-        public static NegateExpression Negate(Expression operand)
-        {
-            return new NegateExpression(operand);
-        }
-
-        public static PreIncrementExpression PreIncrement(Expression operand)
-        {
-            return new PreIncrementExpression(operand);
-        }
-
-        public static PreDecrementExpression PreDecrement(Expression operand)
-        {
-            return new PreDecrementExpression(operand);
-        }
-
-        public static AddressOfExpression AddressOf(Expression operand)
-        {
-            return new AddressOfExpression(operand);
-        }
-
-        public static PointerIndirectionExpression PointerIndirection(Expression operand)
-        {
-            return new PointerIndirectionExpression(operand);
-        }
-
-        public static PostIncrementExpression PostIncrement(Expression operand)
-        {
-            return new PostIncrementExpression(operand);
-        }
-
-        public static PostDecrementExpression PostDecrement(Expression operand)
-        {
-            return new PostDecrementExpression(operand);
-        }
-
-        public static SingleVariableDesignation SingleVariableDesignation(string name)
-        {
-            return new SingleVariableDesignation(name);
-        }
-
-        public static MultiVariableDesignation MultiVariableDesignation(params VariableDesignation[] variables)
-        {
-            return new MultiVariableDesignation(variables);
-        }
-
-        public static MultiVariableDesignation MultiVariableDesignation(IEnumerable<VariableDesignation> variables)
-        {
-            return new MultiVariableDesignation(variables);
-        }
-
-        public static Parameter Parameter(TypeReference type, string name)
-        {
-            return new Parameter(type, name);
-        }
-
-        public static Parameter Parameter(ParameterModifiers modifiers, TypeReference type, string name, Expression defaultValue = null)
-        {
-            return new Parameter(modifiers, type, name, defaultValue);
-        }
-
-        public static SourceFile SourceFile(string path, string text)
-        {
-            return new SourceFile(path, text);
-        }
-
-        public static SourceFile SourceFile(string path)
-        {
-            return new SourceFile(path);
-        }
-
-        public static BlockStatement Block(params Statement[] statements)
-        {
-            return new BlockStatement(statements);
-        }
-
-        public static BlockStatement Block(IEnumerable<Statement> statements)
-        {
-            return new BlockStatement(statements);
-        }
-
-        public static BreakStatement Break()
-        {
-            return new BreakStatement();
-        }
-
-        public static CatchClause Catch(TypeReference exceptionType, string exceptionName, params Statement[] statements)
-        {
-            return new CatchClause(exceptionType, exceptionName, statements);
-        }
-
-        public static CatchClause Catch(TypeReference exceptionType, string exceptionName, IEnumerable<Statement> statements)
-        {
-            return new CatchClause(exceptionType, exceptionName, statements);
-        }
-
-        public static CatchClause Catch(TypeReference exceptionType, string exceptionName, Expression filter, IEnumerable<Statement> statements)
-        {
-            return new CatchClause(exceptionType, exceptionName, filter, statements);
-        }
-
-        public static CheckedStatement Checked(bool isChecked, params Statement[] statements)
-        {
-            return new CheckedStatement(isChecked, statements);
-        }
-
-        public static CheckedStatement Checked(bool isChecked, IEnumerable<Statement> statements)
-        {
-            return new CheckedStatement(isChecked, statements);
-        }
-
-        public static ContinueStatement Continue()
-        {
-            return new ContinueStatement();
-        }
-
-        public static DoWhileStatement DoWhile(IEnumerable<Statement> statements, Expression condition)
-        {
-            return new DoWhileStatement(statements, condition);
-        }
-
-        public static EmptyStatement Empty()
-        {
-            return new EmptyStatement();
-        }
-
-        public static ExpressionStatement Expression(Expression expression)
-        {
-            return new ExpressionStatement(expression);
-        }
-
-        public static FixedStatement Fixed(VariableDeclarationStatement variableDeclaration, params Statement[] statements)
-        {
-            return new FixedStatement(variableDeclaration, statements);
-        }
-
-        public static FixedStatement Fixed(VariableDeclarationStatement variableDeclaration, IEnumerable<Statement> statements)
-        {
-            return new FixedStatement(variableDeclaration, statements);
-        }
-
-        public static ForEachStatement ForEach(TypeReference elementType, string elementName, Expression expression, params Statement[] statements)
-        {
-            return new ForEachStatement(elementType, elementName, expression, statements);
-        }
-
-        public static ForEachStatement ForEach(TypeReference elementType, string elementName, Expression expression, IEnumerable<Statement> statements)
-        {
-            return new ForEachStatement(elementType, elementName, expression, statements);
-        }
-
-        public static ForEachPatternStatement ForEachPattern(Expression elementPattern, Expression expression, params Statement[] statements)
-        {
-            return new ForEachPatternStatement(elementPattern, expression, statements);
-        }
-
-        public static ForEachPatternStatement ForEachPattern(Expression elementPattern, Expression expression, IEnumerable<Statement> statements)
-        {
-            return new ForEachPatternStatement(elementPattern, expression, statements);
-        }
-
-        public static ForStatement For(VariableDeclarationStatement variableDeclaration, Expression condition, Expression incrementor, params Statement[] statements)
-        {
-            return new ForStatement(variableDeclaration, condition, incrementor, statements);
-        }
-
-        public static ForStatement For(VariableDeclarationStatement variableDeclaration, Expression condition, IEnumerable<Expression> incrementors, IEnumerable<Statement> statements)
-        {
-            return new ForStatement(variableDeclaration, condition, incrementors, statements);
-        }
-
-        public static GotoStatement Goto(string label)
-        {
-            return new GotoStatement(label);
-        }
-
-        public static IfStatement If(Expression condition, params Statement[] thenStatements)
-        {
-            return new IfStatement(condition, thenStatements);
-        }
-
-        public static IfStatement If(Expression condition, IEnumerable<Statement> thenStatements)
-        {
-            return new IfStatement(condition, thenStatements);
-        }
-
-        public static IfStatement If(Expression condition, IEnumerable<Statement> thenStatements, IEnumerable<Statement> elseStatements)
-        {
-            return new IfStatement(condition, thenStatements, elseStatements);
-        }
-
-        public static LabelStatement Label(string name, Statement statement)
-        {
-            return new LabelStatement(name, statement);
-        }
-
-        public static LockStatement Lock(Expression expression, params Statement[] statements)
-        {
-            return new LockStatement(expression, statements);
-        }
-
-        public static LockStatement Lock(Expression expression, IEnumerable<Statement> statements)
-        {
-            return new LockStatement(expression, statements);
-        }
-
-        public static ReturnStatement Return(Expression expression)
-        {
-            return new ReturnStatement(expression);
-        }
-
-        public static ReturnStatement Return()
-        {
-            return new ReturnStatement();
-        }
-
-        public static SwitchCase SwitchCase(Expression constantPatternValue)
-        {
-            return new SwitchCase(constantPatternValue);
-        }
-
-        public static SwitchCase SwitchCase(Pattern pattern, Expression whenCondition = null)
-        {
-            return new SwitchCase(pattern, whenCondition);
-        }
-
-        public static SwitchDefault SwitchDefault()
-        {
-            return new SwitchDefault();
-        }
-
-        public static SwitchSection SwitchSection(SwitchLabel label, params Statement[] statements)
-        {
-            return new SwitchSection(label, statements);
-        }
-
-        public static SwitchSection SwitchSection(SwitchLabel label, IEnumerable<Statement> statements)
-        {
-            return new SwitchSection(label, statements);
-        }
-
-        public static SwitchSection SwitchSection(IEnumerable<SwitchLabel> labels, params Statement[] statements)
-        {
-            return new SwitchSection(labels, statements);
-        }
-
-        public static SwitchSection SwitchSection(IEnumerable<SwitchLabel> labels, IEnumerable<Statement> statements)
-        {
-            return new SwitchSection(labels, statements);
-        }
-
-        public static SwitchStatement Switch(Expression expression, params SwitchSection[] sections)
-        {
-            return new SwitchStatement(expression, sections);
-        }
-
-        public static SwitchStatement Switch(Expression expression, IEnumerable<SwitchSection> sections)
-        {
-            return new SwitchStatement(expression, sections);
-        }
-
-        public static UnsafeStatement Unsafe(params Statement[] statements)
-        {
-            return new UnsafeStatement(statements);
-        }
-
-        public static UnsafeStatement Unsafe(IEnumerable<Statement> statements)
-        {
-            return new UnsafeStatement(statements);
-        }
-
-        public static UsingStatement Using(VariableDeclarationStatement variableDeclaration, params Statement[] statements)
-        {
-            return new UsingStatement(variableDeclaration, statements);
-        }
-
-        public static UsingStatement Using(VariableDeclarationStatement variableDeclaration, IEnumerable<Statement> statements)
-        {
-            return new UsingStatement(variableDeclaration, statements);
-        }
-
-        public static UsingStatement Using(Expression expression, params Statement[] statements)
-        {
-            return new UsingStatement(expression, statements);
-        }
-
-        public static UsingStatement Using(Expression expression, IEnumerable<Statement> statements)
-        {
-            return new UsingStatement(expression, statements);
-        }
-
-        public static VariableDeclarationStatement VariableDeclaration(TypeReference type, string name, Expression initializer = null)
-        {
-            return new VariableDeclarationStatement(type, name, initializer);
-        }
-
-        public static VariableDeclarationStatement VariableDeclaration(bool isConst, TypeReference type, string name, Expression initializer = null)
-        {
-            return new VariableDeclarationStatement(isConst, type, name, initializer);
-        }
-
-        public static WhileStatement While(Expression condition, params Statement[] statements)
-        {
-            return new WhileStatement(condition, statements);
-        }
-
-        public static WhileStatement While(Expression condition, IEnumerable<Statement> statements)
-        {
-            return new WhileStatement(condition, statements);
-        }
-
-        public static YieldBreakStatement YieldBreak()
-        {
-            return new YieldBreakStatement();
-        }
-
-        public static YieldReturnStatement YieldReturn(Expression expression)
-        {
-            return new YieldReturnStatement(expression);
-        }
-
-        public static ArrayTypeReference ArrayType(TypeReference elementType)
-        {
-            return new ArrayTypeReference(elementType);
-        }
-
-        public static ArrayTypeReference ArrayType(TypeReference elementType, int rank)
-        {
-            return new ArrayTypeReference(elementType, rank);
-        }
-
-        public static NamedTypeReference NamedType(NamedTypeReference openGenericType, params TypeReference[] typeArguments)
-        {
-            return new NamedTypeReference(openGenericType, typeArguments);
-        }
-
-        public static NamedTypeReference NamedType(string ns, string name, params TypeReference[] typeArguments)
-        {
-            return new NamedTypeReference(ns, name, typeArguments);
-        }
-
-        public static NamedTypeReference NamedType(string ns, string name, IEnumerable<TypeReference> typeArguments = null)
-        {
-            return new NamedTypeReference(ns, name, typeArguments);
-        }
-
-        public static NamedTypeReference NamedType(string ns, NamedTypeReference container, string name, IEnumerable<TypeReference> typeArguments = null)
-        {
-            return new NamedTypeReference(ns, container, name, typeArguments);
-        }
-
-        public static NamedTypeReference NamedType(Type type)
-        {
-            return new NamedTypeReference(type);
-        }
-
-        public static NullableTypeReference NullableType(TypeReference elementType)
-        {
-            return new NullableTypeReference(elementType);
-        }
-
-        public static PointerTypeReference PointerType(TypeReference elementType)
-        {
-            return new PointerTypeReference(elementType);
-        }
-
-        public static RefTypeReference RefType(TypeReference elementType)
-        {
-            return new RefTypeReference(elementType);
-        }
-
-        public static TupleElement TupleElement(TypeReference type, string name = null)
-        {
-            return new TupleElement(type, name);
-        }
-
-        public static TupleTypeReference TupleType(params TypeReference[] elementTypes)
-        {
-            return new TupleTypeReference(elementTypes);
-        }
-
-        public static TupleTypeReference TupleType(IEnumerable<TypeReference> elementTypes)
-        {
-            return new TupleTypeReference(elementTypes);
-        }
-
-        public static TupleTypeReference TupleType(params TupleElement[] elements)
-        {
-            return new TupleTypeReference(elements);
-        }
-
-        public static TupleTypeReference TupleType(IEnumerable<TupleElement> elements)
-        {
-            return new TupleTypeReference(elements);
-        }
+        public static Attribute Attribute(NamedTypeReference type, params AttributeArgument[] arguments) => new Attribute(type, arguments);
+        public static Attribute Attribute(NamedTypeReference type, IEnumerable<AttributeArgument> arguments) => new Attribute(type, arguments);
+        public static Attribute Attribute(string target, NamedTypeReference type, params AttributeArgument[] arguments) => new Attribute(target, type, arguments);
+        public static Attribute Attribute(string target, NamedTypeReference type, IEnumerable<AttributeArgument> arguments) => new Attribute(target, type, arguments);
+        public static AttributeArgument AttributeArgument(Expression expression) => new AttributeArgument(expression);
+        public static AttributeArgument AttributeArgument(string name, Expression expression) => new AttributeArgument(name, expression);
+        public static AttributeArgument AttributeArgument(string name, bool isConstructorArgument, Expression expression) => new AttributeArgument(name, isConstructorArgument, expression);
+        public static AccessorDefinition AccessorDefinition(BlockStatement statementBody = null) => new AccessorDefinition(statementBody);
+        public static AccessorDefinition AccessorDefinition(MemberModifiers accessibility, BlockStatement statementBody = null) => new AccessorDefinition(accessibility, statementBody);
+        public static AccessorDefinition AccessorDefinition(Expression expressionBody) => new AccessorDefinition(expressionBody);
+        public static AccessorDefinition AccessorDefinition(MemberModifiers accessibility, Expression expressionBody) => new AccessorDefinition(accessibility, expressionBody);
+        public static ConstructorDefinition ConstructorDefinition(MemberModifiers modifiers, IEnumerable<Parameter> parameters, BlockStatement statementBody) => new ConstructorDefinition(modifiers, parameters, statementBody);
+        public static ConstructorDefinition ConstructorDefinition(MemberModifiers modifiers, IEnumerable<Parameter> parameters, ConstructorInitializer initializer, BlockStatement statementBody) => new ConstructorDefinition(modifiers, parameters, initializer, statementBody);
+        public static ConstructorDefinition ConstructorDefinition(MemberModifiers modifiers, IEnumerable<Parameter> parameters, Expression expressionBody) => new ConstructorDefinition(modifiers, parameters, expressionBody);
+        public static ConstructorDefinition ConstructorDefinition(MemberModifiers modifiers, IEnumerable<Parameter> parameters, ConstructorInitializer initializer, Expression expressionBody) => new ConstructorDefinition(modifiers, parameters, initializer, expressionBody);
+        public static ConstructorInitializer ConstructorInitializer(ConstructorInitializerKind kind, params Argument[] arguments) => new ConstructorInitializer(kind, arguments);
+        public static ConstructorInitializer ConstructorInitializer(ConstructorInitializerKind kind, IEnumerable<Argument> arguments) => new ConstructorInitializer(kind, arguments);
+        public static DelegateDefinition DelegateDefinition(TypeReference returnType, string name, params Parameter[] parameters) => new DelegateDefinition(returnType, name, parameters);
+        public static DelegateDefinition DelegateDefinition(TypeReference returnType, string name, IEnumerable<Parameter> parameters) => new DelegateDefinition(returnType, name, parameters);
+        public static DelegateDefinition DelegateDefinition(TypeReference returnType, string name, IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses = null) => new DelegateDefinition(returnType, name, typeParameters, parameters, constraintClauses);
+        public static EnumDefinition EnumDefinition(string name, params EnumMemberDefinition[] members) => new EnumDefinition(name, members);
+        public static EnumDefinition EnumDefinition(string name, IEnumerable<EnumMemberDefinition> members) => new EnumDefinition(name, members);
+        public static EnumDefinition EnumDefinition(MemberModifiers modifiers, string name, params EnumMemberDefinition[] members) => new EnumDefinition(modifiers, name, members);
+        public static EnumDefinition EnumDefinition(MemberModifiers modifiers, string name, IEnumerable<EnumMemberDefinition> members) => new EnumDefinition(modifiers, name, members);
+        public static EnumDefinition EnumDefinition(MemberModifiers modifiers, string name, TypeReference underlyingType, IEnumerable<EnumMemberDefinition> members) => new EnumDefinition(modifiers, name, underlyingType, members);
+        public static EnumMemberDefinition EnumMemberDefinition(string name, Expression initializer = null) => new EnumMemberDefinition(name, initializer);
+        public static EventDefinition EventDefinition(MemberModifiers modifiers, TypeReference type, string name) => new EventDefinition(modifiers, type, name);
+        public static EventDefinition EventDefinition(MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, string name) => new EventDefinition(modifiers, type, explicitInterface, name);
+        public static EventDefinition EventDefinition(MemberModifiers modifiers, TypeReference type, string name, AccessorDefinition addAccessor, AccessorDefinition removeAccessor) => new EventDefinition(modifiers, type, name, addAccessor, removeAccessor);
+        public static EventDefinition EventDefinition(MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, string name, AccessorDefinition addAccessor, AccessorDefinition removeAccessor) => new EventDefinition(modifiers, type, explicitInterface, name, addAccessor, removeAccessor);
+        public static FieldDefinition FieldDefinition(MemberModifiers modifiers, TypeReference type, string name, Expression initializer = null) => new FieldDefinition(modifiers, type, name, initializer);
+        public static FieldDefinition FieldDefinition(TypeReference type, string name, Expression initializer = null) => new FieldDefinition(type, name, initializer);
+        public static FinalizerDefinition FinalizerDefinition(MemberModifiers modifiers, BlockStatement statementBody) => new FinalizerDefinition(modifiers, statementBody);
+        public static IndexerDefinition IndexerDefinition(MemberModifiers modifiers, TypeReference type, IEnumerable<Parameter> parameters, AccessorDefinition getAccessor, AccessorDefinition setAccessor) => new IndexerDefinition(modifiers, type, parameters, getAccessor, setAccessor);
+        public static IndexerDefinition IndexerDefinition(MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, IEnumerable<Parameter> parameters, AccessorDefinition getAccessor, AccessorDefinition setAccessor) => new IndexerDefinition(modifiers, type, explicitInterface, parameters, getAccessor, setAccessor);
+        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters, BlockStatement statementBody = null) => new MethodDefinition(modifiers, returnType, name, parameters, statementBody);
+        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name, IEnumerable<Parameter> parameters, BlockStatement statementBody = null) => new MethodDefinition(modifiers, returnType, explicitInterface, name, parameters, statementBody);
+        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses, BlockStatement statementBody = null) => new MethodDefinition(modifiers, returnType, name, typeParameters, parameters, constraintClauses, statementBody);
+        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name, IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses, BlockStatement statementBody = null) => new MethodDefinition(modifiers, returnType, explicitInterface, name, typeParameters, parameters, constraintClauses, statementBody);
+        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters, Expression expressionBody) => new MethodDefinition(modifiers, returnType, name, parameters, expressionBody);
+        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name, IEnumerable<Parameter> parameters, Expression expressionBody) => new MethodDefinition(modifiers, returnType, explicitInterface, name, parameters, expressionBody);
+        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses, Expression expressionBody) => new MethodDefinition(modifiers, returnType, name, typeParameters, parameters, constraintClauses, expressionBody);
+        public static MethodDefinition MethodDefinition(MemberModifiers modifiers, TypeReference returnType, NamedTypeReference explicitInterface, string name, IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses, Expression expressionBody) => new MethodDefinition(modifiers, returnType, explicitInterface, name, typeParameters, parameters, constraintClauses, expressionBody);
+        public static NamespaceDefinition NamespaceDefinition(string name, params NamespaceOrTypeDefinition[] members) => new NamespaceDefinition(name, members);
+        public static NamespaceDefinition NamespaceDefinition(string name, IEnumerable<NamespaceOrTypeDefinition> members) => new NamespaceDefinition(name, members);
+        public static OperatorDefinition OperatorDefinition(MemberModifiers modifiers, TypeReference returnType, OperatorKind kind, IEnumerable<Parameter> parameters, BlockStatement statementBody) => new OperatorDefinition(modifiers, returnType, kind, parameters, statementBody);
+        public static OperatorDefinition OperatorDefinition(MemberModifiers modifiers, TypeReference returnType, OperatorKind kind, IEnumerable<Parameter> parameters, Expression expressionBody) => new OperatorDefinition(modifiers, returnType, kind, parameters, expressionBody);
+        public static PropertyDefinition PropertyDefinition(MemberModifiers modifiers, TypeReference type, string name, AccessorDefinition getAccessor, AccessorDefinition setAccessor, Expression initializer = null) => new PropertyDefinition(modifiers, type, name, getAccessor, setAccessor, initializer);
+        public static PropertyDefinition PropertyDefinition(MemberModifiers modifiers, TypeReference type, NamedTypeReference explicitInterface, string name, AccessorDefinition getAccessor, AccessorDefinition setAccessor, Expression initializer = null) => new PropertyDefinition(modifiers, type, explicitInterface, name, getAccessor, setAccessor, initializer);
+        public static ClassDefinition ClassDefinition(string name, params MemberDefinition[] members) => new ClassDefinition(name, members);
+        public static ClassDefinition ClassDefinition(string name, IEnumerable<MemberDefinition> members) => new ClassDefinition(name, members);
+        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members) => new ClassDefinition(modifiers, name, members);
+        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members) => new ClassDefinition(modifiers, name, members);
+        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, params MemberDefinition[] members) => new ClassDefinition(modifiers, name, baseTypes, members);
+        public static ClassDefinition ClassDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, IEnumerable<MemberDefinition> members) => new ClassDefinition(modifiers, name, baseTypes, members);
+        public static StructDefinition StructDefinition(string name, params MemberDefinition[] members) => new StructDefinition(name, members);
+        public static StructDefinition StructDefinition(string name, IEnumerable<MemberDefinition> members) => new StructDefinition(name, members);
+        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members) => new StructDefinition(modifiers, name, members);
+        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members) => new StructDefinition(modifiers, name, members);
+        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, params MemberDefinition[] members) => new StructDefinition(modifiers, name, baseTypes, members);
+        public static StructDefinition StructDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, IEnumerable<MemberDefinition> members) => new StructDefinition(modifiers, name, baseTypes, members);
+        public static InterfaceDefinition InterfaceDefinition(string name, params MemberDefinition[] members) => new InterfaceDefinition(name, members);
+        public static InterfaceDefinition InterfaceDefinition(string name, IEnumerable<MemberDefinition> members) => new InterfaceDefinition(name, members);
+        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, params MemberDefinition[] members) => new InterfaceDefinition(modifiers, name, members);
+        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<MemberDefinition> members) => new InterfaceDefinition(modifiers, name, members);
+        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, params MemberDefinition[] members) => new InterfaceDefinition(modifiers, name, baseTypes, members);
+        public static InterfaceDefinition InterfaceDefinition(MemberModifiers modifiers, string name, IEnumerable<TypeReference> baseTypes, IEnumerable<MemberDefinition> members) => new InterfaceDefinition(modifiers, name, baseTypes, members);
+        public static TypeParameter TypeParameter(string name) => new TypeParameter(name);
+        public static TypeParameter TypeParameter(VarianceModifier variance, string name) => new TypeParameter(variance, name);
+        public static TypeParameter TypeParameter(IEnumerable<Attribute> attributes, VarianceModifier variance, string name) => new TypeParameter(attributes, variance, name);
+        public static ClassConstraint ClassConstraint() => new ClassConstraint();
+        public static StructConstraint StructConstraint() => new StructConstraint();
+        public static ConstructorConstraint ConstructorConstraint() => new ConstructorConstraint();
+        public static TypeConstraint TypeConstraint(TypeReference type) => new TypeConstraint(type);
+        public static TypeParameterConstraintClause TypeParameterConstraint(string typeParameterName, params TypeParameterConstraint[] constraints) => new TypeParameterConstraintClause(typeParameterName, constraints);
+        public static TypeParameterConstraintClause TypeParameterConstraint(string typeParameterName, IEnumerable<TypeParameterConstraint> constraints) => new TypeParameterConstraintClause(typeParameterName, constraints);
+        public static AnonymousNewExpression AnonymousNew(params AnonymousObjectInitializer[] initializers) => new AnonymousNewExpression(initializers);
+        public static AnonymousNewExpression AnonymousNew(IEnumerable<AnonymousObjectInitializer> initializers) => new AnonymousNewExpression(initializers);
+        public static Argument Argument(Expression expression) => new Argument(expression);
+        public static Argument Argument(string name, Expression expression) => new Argument(name, expression);
+        public static Argument Argument(ArgumentRefKind refKind, Expression expression) => new Argument(refKind, expression);
+        public static Argument Argument(string name, ArgumentRefKind refKind, Expression expression) => new Argument(name, refKind, expression);
+        public static AwaitExpression Await(Expression operand) => new AwaitExpression(operand);
+        public static BaseExpression Base() => new BaseExpression();
+        public static AddExpression Add(Expression left, Expression right) => new AddExpression(left, right);
+        public static SubtractExpression Subtract(Expression left, Expression right) => new SubtractExpression(left, right);
+        public static MultiplyExpression Multiply(Expression left, Expression right) => new MultiplyExpression(left, right);
+        public static DivideExpression Divide(Expression left, Expression right) => new DivideExpression(left, right);
+        public static ModuloExpression Modulo(Expression left, Expression right) => new ModuloExpression(left, right);
+        public static LeftShiftExpression LeftShift(Expression left, Expression right) => new LeftShiftExpression(left, right);
+        public static RightShiftExpression RightShift(Expression left, Expression right) => new RightShiftExpression(left, right);
+        public static LogicalOrExpression LogicalOr(Expression left, Expression right) => new LogicalOrExpression(left, right);
+        public static LogicalAndExpression LogicalAnd(Expression left, Expression right) => new LogicalAndExpression(left, right);
+        public static BitwiseOrExpression BitwiseOr(Expression left, Expression right) => new BitwiseOrExpression(left, right);
+        public static BitwiseAndExpression BitwiseAnd(Expression left, Expression right) => new BitwiseAndExpression(left, right);
+        public static XorExpression Xor(Expression left, Expression right) => new XorExpression(left, right);
+        public static EqualsExpression Equals(Expression left, Expression right) => new EqualsExpression(left, right);
+        public static NotEqualsExpression NotEquals(Expression left, Expression right) => new NotEqualsExpression(left, right);
+        public static LessThanExpression LessThan(Expression left, Expression right) => new LessThanExpression(left, right);
+        public static LessThanOrEqualExpression LessThanOrEqual(Expression left, Expression right) => new LessThanOrEqualExpression(left, right);
+        public static GreaterThanExpression GreaterThan(Expression left, Expression right) => new GreaterThanExpression(left, right);
+        public static GreaterThanOrEqualExpression GreaterThanOrEqual(Expression left, Expression right) => new GreaterThanOrEqualExpression(left, right);
+        public static IsExpression Is(Expression left, TypeReference right) => new IsExpression(left, right);
+        public static AsExpression As(Expression left, TypeReference right) => new AsExpression(left, right);
+        public static CoalesceExpression Coalesce(Expression left, Expression right) => new CoalesceExpression(left, right);
+        public static AssignmentExpression Assignment(Expression left, Expression right) => new AssignmentExpression(left, right);
+        public static AddAssignmentExpression AddAssignment(Expression left, Expression right) => new AddAssignmentExpression(left, right);
+        public static SubtractAssignmentExpression SubtractAssignment(Expression left, Expression right) => new SubtractAssignmentExpression(left, right);
+        public static MultiplyAssignmentExpression MultiplyAssignment(Expression left, Expression right) => new MultiplyAssignmentExpression(left, right);
+        public static DivideAssignmentExpression DivideAssignment(Expression left, Expression right) => new DivideAssignmentExpression(left, right);
+        public static ModuloAssignmentExpression ModuloAssignment(Expression left, Expression right) => new ModuloAssignmentExpression(left, right);
+        public static AndAssignmentExpression AndAssignment(Expression left, Expression right) => new AndAssignmentExpression(left, right);
+        public static XorAssignmentExpression XorAssignment(Expression left, Expression right) => new XorAssignmentExpression(left, right);
+        public static OrAssignmentExpression OrAssignment(Expression left, Expression right) => new OrAssignmentExpression(left, right);
+        public static LeftShiftAssignmentExpression LeftShiftAssignment(Expression left, Expression right) => new LeftShiftAssignmentExpression(left, right);
+        public static RightShiftAssignmentExpression RightShiftAssignment(Expression left, Expression right) => new RightShiftAssignmentExpression(left, right);
+        public static CoalesceAssignmentExpression CoalesceAssignment(Expression left, Expression right) => new CoalesceAssignmentExpression(left, right);
+        public static CastExpression Cast(TypeReference type, Expression expression) => new CastExpression(type, expression);
+        public static CheckedExpression Checked(bool isChecked, Expression expression) => new CheckedExpression(isChecked, expression);
+        public static ConditionalExpression Conditional(Expression condition, Expression whenTrue, Expression whenFalse) => new ConditionalExpression(condition, whenTrue, whenFalse);
+        public static DeclarationExpression Declaration(TypeReference type, VariableDesignation designation) => new DeclarationExpression(type, designation);
+        public static DefaultExpression Default(TypeReference type = null) => new DefaultExpression(type);
+        public static DelegateExpression Delegate(IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements) => new DelegateExpression(parameters, statements);
+        public static DelegateExpression Delegate(bool isAsync, IEnumerable<LambdaParameter> parameters, IEnumerable<Statement> statements) => new DelegateExpression(isAsync, parameters, statements);
+        public static ElementAccessExpression ElementAccess(this Expression expression, params Argument[] arguments) => new ElementAccessExpression(expression, arguments);
+        public static ElementAccessExpression ElementAccess(this Expression expression, IEnumerable<Argument> arguments) => new ElementAccessExpression(expression, arguments);
+        public static ConditionalElementAccessExpression ConditionalElementAccess(Expression expression, params Argument[] arguments) => new ConditionalElementAccessExpression(expression, arguments);
+        public static ConditionalElementAccessExpression ConditionalElementAccess(Expression expression, IEnumerable<Argument> arguments) => new ConditionalElementAccessExpression(expression, arguments);
+        public static IdentifierExpression Identifier(string identifier) => new IdentifierExpression(identifier);
+        public static AnonymousObjectInitializer AnonymousObjectInitializer(Expression expression) => new AnonymousObjectInitializer(expression);
+        public static AnonymousObjectInitializer AnonymousObjectInitializer(string name, Expression expression) => new AnonymousObjectInitializer(name, expression);
+        public static ArrayInitializer ArrayInitializer(params VariableInitializer[] variableInitializers) => new ArrayInitializer(variableInitializers);
+        public static ArrayInitializer ArrayInitializer(IEnumerable<VariableInitializer> variableInitializers) => new ArrayInitializer(variableInitializers);
+        public static ExpressionVariableInitializer ExpressionVariableInitializer(Expression expression) => new ExpressionVariableInitializer(expression);
+        public static CollectionInitializer CollectionInitializer(params ElementInitializer[] elementInitializers) => new CollectionInitializer(elementInitializers);
+        public static CollectionInitializer CollectionInitializer(IEnumerable<ElementInitializer> elementInitializers) => new CollectionInitializer(elementInitializers);
+        public static ElementInitializer ElementInitializer(params Expression[] expressions) => new ElementInitializer(expressions);
+        public static ElementInitializer ElementInitializer(IEnumerable<Expression> expressions) => new ElementInitializer(expressions);
+        public static MemberInitializer MemberInitializer(MemberInitializerTarget target, MemberInitializerValue value) => new MemberInitializer(target, value);
+        public static NameMemberInitializerTarget NameMemberInitializerTarget(string name) => new NameMemberInitializerTarget(name);
+        public static ElementAccessMemberInitializerTarget ElementAccessMemberInitializerTarget(IEnumerable<Argument> arguments) => new ElementAccessMemberInitializerTarget(arguments);
+        public static ExpressionMemberInitializerValue ExpressionMemberInitializerValue(Expression expression) => new ExpressionMemberInitializerValue(expression);
+        public static InitializerMemberInitializerValue InitializerMemberInitializerValue(Initializer initializer) => new InitializerMemberInitializerValue(initializer);
+        public static ObjectInitializer ObjectInitializer(params MemberInitializer[] memberInitializers) => new ObjectInitializer(memberInitializers);
+        public static ObjectInitializer ObjectInitializer(IEnumerable<MemberInitializer> memberInitializers) => new ObjectInitializer(memberInitializers);
+        public static Interpolation Interpolation(Expression expression, Expression alignment = null, string format = null) => new Interpolation(expression, alignment, format);
+        public static InterpolatedStringText InterpolatedStringText(string text) => new InterpolatedStringText(text);
+        public static InterpolatedStringExpression InterpolatedString(params InterpolatedStringContent[] contents) => new InterpolatedStringExpression(contents);
+        public static InterpolatedStringExpression InterpolatedString(IEnumerable<InterpolatedStringContent> contents) => new InterpolatedStringExpression(contents);
+        public static InterpolatedStringExpression InterpolatedString(bool isVerbatim, params InterpolatedStringContent[] contents) => new InterpolatedStringExpression(isVerbatim, contents);
+        public static InterpolatedStringExpression InterpolatedString(bool isVerbatim, IEnumerable<InterpolatedStringContent> contents) => new InterpolatedStringExpression(isVerbatim, contents);
+        public static InvocationExpression Invocation(Expression expression, IEnumerable<Argument> arguments = null) => new InvocationExpression(expression, arguments);
+        public static InvocationExpression Invocation(Expression expression, IEnumerable<Expression> arguments = null) => new InvocationExpression(expression, arguments);
+        public static InvocationExpression Invocation(Expression expression, params Argument[] arguments) => new InvocationExpression(expression, arguments);
+        public static IsPatternExpression IsPattern(Expression expression, Pattern pattern) => new IsPatternExpression(expression, pattern);
+        public static LambdaExpression Lambda(IEnumerable<LambdaParameter> parameters, BlockStatement statementBody) => new LambdaExpression(parameters, statementBody);
+        public static LambdaExpression Lambda(bool isAsync, IEnumerable<LambdaParameter> parameters, BlockStatement statementBody) => new LambdaExpression(isAsync, parameters, statementBody);
+        public static LambdaExpression Lambda(IEnumerable<LambdaParameter> parameters, Expression expressionBody) => new LambdaExpression(parameters, expressionBody);
+        public static LambdaExpression Lambda(bool isAsync, IEnumerable<LambdaParameter> parameters, Expression expressionBody) => new LambdaExpression(isAsync, parameters, expressionBody);
+        public static LambdaParameter LambdaParameter(string name) => new LambdaParameter(name);
+        public static LambdaParameter LambdaParameter(TypeReference type, string name) => new LambdaParameter(type, name);
+        public static LambdaParameter LambdaParameter(LambdaParameterModifier modifier, TypeReference type, string name) => new LambdaParameter(modifier, type, name);
+        public static FromClause From(string name, Expression expression) => new FromClause(name, expression);
+        public static FromClause From(TypeReference type, string name, Expression expression) => new FromClause(type, name, expression);
+        public static GroupByClause GroupBy(Expression groupExpression, Expression byExpression, string into = null) => new GroupByClause(groupExpression, byExpression, into);
+        public static JoinClause Join(string name, Expression inExpression, Expression leftExpression, Expression rightExpression, string into = null) => new JoinClause(name, inExpression, leftExpression, rightExpression, into);
+        public static JoinClause Join(TypeReference type, string name, Expression inExpression, Expression leftExpression, Expression rightExpression, string into = null) => new JoinClause(type, name, inExpression, leftExpression, rightExpression, into);
+        public static LetClause Let(string name, Expression expression) => new LetClause(name, expression);
+        public static OrderByClause OrderBy(Expression expression, bool isDescending = false) => new OrderByClause(expression, isDescending);
+        public static OrderByClause OrderBy(params Ordering[] orderings) => new OrderByClause(orderings);
+        public static OrderByClause OrderBy(IEnumerable<Ordering> orderings) => new OrderByClause(orderings);
+        public static Ordering Ordering(Expression expression, bool isDescending = false) => new Ordering(expression, isDescending);
+        public static SelectClause Select(Expression expression, string into = null) => new SelectClause(expression, into);
+        public static WhereClause Where(Expression condition) => new WhereClause(condition);
+        public static LinqExpression Linq(params LinqClause[] clauses) => new LinqExpression(clauses);
+        public static LinqExpression Linq(IEnumerable<LinqClause> clauses) => new LinqExpression(clauses);
+        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName) => new MemberAccessExpression(expression, memberName);
+        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName, params TypeReference[] typeArguments) => new MemberAccessExpression(expression, memberName, typeArguments);
+        public static MemberAccessExpression MemberAccess(this Expression expression, string memberName, IEnumerable<TypeReference> typeArguments) => new MemberAccessExpression(expression, memberName, typeArguments);
+        public static MemberAccessExpression MemberAccess(this Expression expression, FieldDefinition fieldDefinition) => new MemberAccessExpression(expression, fieldDefinition);
+        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, string memberName) => new PointerMemberAccessExpression(expression, memberName);
+        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, string memberName, params TypeReference[] typeArguments) => new PointerMemberAccessExpression(expression, memberName, typeArguments);
+        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, string memberName, IEnumerable<TypeReference> typeArguments) => new PointerMemberAccessExpression(expression, memberName, typeArguments);
+        public static PointerMemberAccessExpression PointerMemberAccess(this Expression expression, FieldDefinition fieldDefinition) => new PointerMemberAccessExpression(expression, fieldDefinition);
+        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, string memberName) => new ConditionalMemberAccessExpression(expression, memberName);
+        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, string memberName, params TypeReference[] typeArguments) => new ConditionalMemberAccessExpression(expression, memberName, typeArguments);
+        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, string memberName, IEnumerable<TypeReference> typeArguments) => new ConditionalMemberAccessExpression(expression, memberName, typeArguments);
+        public static ConditionalMemberAccessExpression ConditionalMemberAccess(this Expression expression, FieldDefinition fieldDefinition) => new ConditionalMemberAccessExpression(expression, fieldDefinition);
+        public static NewArrayExpression NewArray(TypeReference elementType, ArrayInitializer? initializer = null) => new NewArrayExpression(elementType, initializer);
+        public static NewArrayExpression NewArray(TypeReference elementType, params Expression? [] lengths) => new NewArrayExpression(elementType, lengths);
+        public static NewArrayExpression NewArray(ArrayInitializer initializer) => new NewArrayExpression(initializer);
+        public static NewArrayExpression NewArray(int rank, ArrayInitializer initializer) => new NewArrayExpression(rank, initializer);
+        public static NewArrayExpression NewArray(TypeReference? elementType, IEnumerable<Expression?> lengths, ArrayInitializer? initializer = null) => new NewArrayExpression(elementType, lengths, initializer);
+        public static NewExpression New(TypeReference? type, IEnumerable<Argument> arguments, Initializer? initializer = null) => new NewExpression(type, arguments, initializer);
+        public static NewExpression New(TypeReference? type, IEnumerable<Expression> arguments, Initializer? initializer = null) => new NewExpression(type, arguments, initializer);
+        public static NewExpression New(TypeReference? type, params Argument[] arguments) => new NewExpression(type, arguments);
+        public static NewExpression New(IEnumerable<Expression> arguments, Initializer? initializer = null) => new NewExpression(arguments, initializer);
+        public static NewExpression New(params Argument[] arguments) => new NewExpression(arguments);
+        public static NullExpression Null() => new NullExpression();
+        public static ParenthesizedExpression Parenthesized(Expression expression) => new ParenthesizedExpression(expression);
+        public static ConstantPattern ConstantPattern(Expression expression) => new ConstantPattern(expression);
+        public static DiscardPattern DiscardPattern() => new DiscardPattern();
+        public static PositionalPattern PositionalPattern(IEnumerable<Subpattern> positionalSubpatterns, IEnumerable<Subpattern> propertySubpatterns = null, VariableDesignation designation = null) => new PositionalPattern(positionalSubpatterns, propertySubpatterns, designation);
+        public static PositionalPattern PositionalPattern(TypeReference type, IEnumerable<Subpattern> positionalSubpatterns, IEnumerable<Subpattern> propertySubpatterns = null, VariableDesignation designation = null) => new PositionalPattern(type, positionalSubpatterns, propertySubpatterns, designation);
+        public static PropertyPattern PropertyPattern(IEnumerable<Subpattern> propertySubpatterns, VariableDesignation designation = null) => new PropertyPattern(propertySubpatterns, designation);
+        public static PropertyPattern PropertyPattern(TypeReference type, IEnumerable<Subpattern> propertySubpatterns, VariableDesignation designation = null) => new PropertyPattern(type, propertySubpatterns, designation);
+        public static Subpattern Subpattern(Pattern pattern) => new Subpattern(pattern);
+        public static Subpattern Subpattern(string name, Pattern pattern) => new Subpattern(name, pattern);
+        public static TypePattern TypePattern(TypeReference type, VariableDesignation designation) => new TypePattern(type, designation);
+        public static VarPattern VarPattern(VariableDesignation designation) => new VarPattern(designation);
+        public static RefExpression Ref(Expression expression) => new RefExpression(expression);
+        public static SizeOfExpression SizeOf(TypeReference type) => new SizeOfExpression(type);
+        public static StackAllocExpression StackAlloc(ArrayInitializer initializer) => new StackAllocExpression(initializer);
+        public static StackAllocExpression StackAlloc(TypeReference elementType, ArrayInitializer? initializer = null) => new StackAllocExpression(elementType, initializer);
+        public static StackAllocExpression StackAlloc(TypeReference? elementType, Expression? length, ArrayInitializer? initializer = null) => new StackAllocExpression(elementType, length, initializer);
+        public static SwitchArm SwitchArm(Pattern pattern, Expression expression) => new SwitchArm(pattern, expression);
+        public static SwitchArm SwitchArm(Pattern pattern, Expression whenCondition, Expression expression) => new SwitchArm(pattern, whenCondition, expression);
+        public static SwitchExpression Switch(Expression expression, params SwitchArm[] arms) => new SwitchExpression(expression, arms);
+        public static SwitchExpression Switch(Expression expression, IEnumerable<SwitchArm> arms) => new SwitchExpression(expression, arms);
+        public static ThisExpression This() => new ThisExpression();
+        public static ThrowExpression Throw(Expression operand) => new ThrowExpression(operand);
+        public static TupleExpression Tuple(params Expression[] expressions) => new TupleExpression(expressions);
+        public static TupleExpression Tuple(IEnumerable<Expression> expressions) => new TupleExpression(expressions);
+        public static TupleExpression Tuple(IEnumerable<Argument> arguments) => new TupleExpression(arguments);
+        public static TypeOfExpression TypeOf(TypeReference type) => new TypeOfExpression(type);
+        public static UnaryPlusExpression UnaryPlus(Expression operand) => new UnaryPlusExpression(operand);
+        public static UnaryMinusExpression UnaryMinus(Expression operand) => new UnaryMinusExpression(operand);
+        public static ComplementExpression Complement(Expression operand) => new ComplementExpression(operand);
+        public static NegateExpression Negate(Expression operand) => new NegateExpression(operand);
+        public static PreIncrementExpression PreIncrement(Expression operand) => new PreIncrementExpression(operand);
+        public static PreDecrementExpression PreDecrement(Expression operand) => new PreDecrementExpression(operand);
+        public static AddressOfExpression AddressOf(Expression operand) => new AddressOfExpression(operand);
+        public static PointerIndirectionExpression PointerIndirection(Expression operand) => new PointerIndirectionExpression(operand);
+        public static PostIncrementExpression PostIncrement(Expression operand) => new PostIncrementExpression(operand);
+        public static PostDecrementExpression PostDecrement(Expression operand) => new PostDecrementExpression(operand);
+        public static IndexExpression Index(Expression operand) => new IndexExpression(operand);
+        public static SuppressNullableWarningExpression SuppressNullableWarning(Expression operand) => new SuppressNullableWarningExpression(operand);
+        public static SingleVariableDesignation SingleVariableDesignation(string name) => new SingleVariableDesignation(name);
+        public static MultiVariableDesignation MultiVariableDesignation(params VariableDesignation[] variables) => new MultiVariableDesignation(variables);
+        public static MultiVariableDesignation MultiVariableDesignation(IEnumerable<VariableDesignation> variables) => new MultiVariableDesignation(variables);
+        public static Parameter Parameter(TypeReference type, string name) => new Parameter(type, name);
+        public static Parameter Parameter(ParameterModifiers modifiers, TypeReference type, string name, Expression defaultValue = null) => new Parameter(modifiers, type, name, defaultValue);
+        public static SourceFile SourceFile(string path, string text) => new SourceFile(path, text);
+        public static SourceFile SourceFile(string path) => new SourceFile(path);
+        public static BlockStatement Block(params Statement[] statements) => new BlockStatement(statements);
+        public static BlockStatement Block(IEnumerable<Statement> statements) => new BlockStatement(statements);
+        public static BreakStatement Break() => new BreakStatement();
+        public static CatchClause Catch(TypeReference exceptionType, string exceptionName, params Statement[] statements) => new CatchClause(exceptionType, exceptionName, statements);
+        public static CatchClause Catch(TypeReference exceptionType, string exceptionName, IEnumerable<Statement> statements) => new CatchClause(exceptionType, exceptionName, statements);
+        public static CatchClause Catch(TypeReference exceptionType, string exceptionName, Expression filter, IEnumerable<Statement> statements) => new CatchClause(exceptionType, exceptionName, filter, statements);
+        public static CheckedStatement Checked(bool isChecked, params Statement[] statements) => new CheckedStatement(isChecked, statements);
+        public static CheckedStatement Checked(bool isChecked, IEnumerable<Statement> statements) => new CheckedStatement(isChecked, statements);
+        public static ContinueStatement Continue() => new ContinueStatement();
+        public static DoWhileStatement DoWhile(IEnumerable<Statement> statements, Expression condition) => new DoWhileStatement(statements, condition);
+        public static EmptyStatement Empty() => new EmptyStatement();
+        public static ExpressionStatement Expression(Expression expression) => new ExpressionStatement(expression);
+        public static FixedStatement Fixed(VariableDeclarationStatement variableDeclaration, params Statement[] statements) => new FixedStatement(variableDeclaration, statements);
+        public static FixedStatement Fixed(VariableDeclarationStatement variableDeclaration, IEnumerable<Statement> statements) => new FixedStatement(variableDeclaration, statements);
+        public static ForEachStatement ForEach(TypeReference elementType, string elementName, Expression expression, params Statement[] statements) => new ForEachStatement(elementType, elementName, expression, statements);
+        public static ForEachStatement ForEach(TypeReference elementType, string elementName, Expression expression, IEnumerable<Statement> statements) => new ForEachStatement(elementType, elementName, expression, statements);
+        public static ForEachPatternStatement ForEachPattern(Expression elementPattern, Expression expression, params Statement[] statements) => new ForEachPatternStatement(elementPattern, expression, statements);
+        public static ForEachPatternStatement ForEachPattern(Expression elementPattern, Expression expression, IEnumerable<Statement> statements) => new ForEachPatternStatement(elementPattern, expression, statements);
+        public static ForStatement For(VariableDeclarationStatement variableDeclaration, Expression condition, Expression incrementor, params Statement[] statements) => new ForStatement(variableDeclaration, condition, incrementor, statements);
+        public static ForStatement For(VariableDeclarationStatement variableDeclaration, Expression condition, IEnumerable<Expression> incrementors, IEnumerable<Statement> statements) => new ForStatement(variableDeclaration, condition, incrementors, statements);
+        public static GotoStatement Goto(string label) => new GotoStatement(label);
+        public static IfStatement If(Expression condition, params Statement[] thenStatements) => new IfStatement(condition, thenStatements);
+        public static IfStatement If(Expression condition, IEnumerable<Statement> thenStatements) => new IfStatement(condition, thenStatements);
+        public static IfStatement If(Expression condition, IEnumerable<Statement> thenStatements, IEnumerable<Statement> elseStatements) => new IfStatement(condition, thenStatements, elseStatements);
+        public static LabelStatement Label(string name, Statement statement) => new LabelStatement(name, statement);
+        public static LocalFunctionStatement LocalFunction(TypeReference returnType, string name, IEnumerable<Parameter> parameters, BlockStatement statementBody) => new LocalFunctionStatement(returnType, name, parameters, statementBody);
+        public static LocalFunctionStatement LocalFunction(MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters, BlockStatement statementBody) => new LocalFunctionStatement(modifiers, returnType, name, parameters, statementBody);
+        public static LocalFunctionStatement LocalFunction(MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses, BlockStatement statementBody) => new LocalFunctionStatement(modifiers, returnType, name, typeParameters, parameters, constraintClauses, statementBody);
+        public static LocalFunctionStatement LocalFunction(TypeReference returnType, string name, IEnumerable<Parameter> parameters, Expression expressionBody) => new LocalFunctionStatement(returnType, name, parameters, expressionBody);
+        public static LocalFunctionStatement LocalFunction(MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<Parameter> parameters, Expression expressionBody) => new LocalFunctionStatement(modifiers, returnType, name, parameters, expressionBody);
+        public static LocalFunctionStatement LocalFunction(MemberModifiers modifiers, TypeReference returnType, string name, IEnumerable<TypeParameter> typeParameters, IEnumerable<Parameter> parameters, IEnumerable<TypeParameterConstraintClause> constraintClauses, Expression expressionBody) => new LocalFunctionStatement(modifiers, returnType, name, typeParameters, parameters, constraintClauses, expressionBody);
+        public static LockStatement Lock(Expression expression, params Statement[] statements) => new LockStatement(expression, statements);
+        public static LockStatement Lock(Expression expression, IEnumerable<Statement> statements) => new LockStatement(expression, statements);
+        public static ReturnStatement Return(Expression expression) => new ReturnStatement(expression);
+        public static ReturnStatement Return() => new ReturnStatement();
+        public static SwitchCase SwitchCase(Expression constantPatternValue) => new SwitchCase(constantPatternValue);
+        public static SwitchCase SwitchCase(Pattern pattern, Expression whenCondition = null) => new SwitchCase(pattern, whenCondition);
+        public static SwitchDefault SwitchDefault() => new SwitchDefault();
+        public static SwitchSection SwitchSection(SwitchLabel label, params Statement[] statements) => new SwitchSection(label, statements);
+        public static SwitchSection SwitchSection(SwitchLabel label, IEnumerable<Statement> statements) => new SwitchSection(label, statements);
+        public static SwitchSection SwitchSection(IEnumerable<SwitchLabel> labels, params Statement[] statements) => new SwitchSection(labels, statements);
+        public static SwitchSection SwitchSection(IEnumerable<SwitchLabel> labels, IEnumerable<Statement> statements) => new SwitchSection(labels, statements);
+        public static SwitchStatement Switch(Expression expression, params SwitchSection[] sections) => new SwitchStatement(expression, sections);
+        public static SwitchStatement Switch(Expression expression, IEnumerable<SwitchSection> sections) => new SwitchStatement(expression, sections);
+        public static UnsafeStatement Unsafe(params Statement[] statements) => new UnsafeStatement(statements);
+        public static UnsafeStatement Unsafe(IEnumerable<Statement> statements) => new UnsafeStatement(statements);
+        public static UsingStatement Using(VariableDeclarationStatement variableDeclaration, params Statement[] statements) => new UsingStatement(variableDeclaration, statements);
+        public static UsingStatement Using(VariableDeclarationStatement variableDeclaration, IEnumerable<Statement> statements) => new UsingStatement(variableDeclaration, statements);
+        public static UsingStatement Using(Expression expression, params Statement[] statements) => new UsingStatement(expression, statements);
+        public static UsingStatement Using(Expression expression, IEnumerable<Statement> statements) => new UsingStatement(expression, statements);
+        public static VariableDeclarationStatement VariableDeclaration(TypeReference type, string name, Expression initializer = null) => new VariableDeclarationStatement(type, name, initializer);
+        public static VariableDeclarationStatement VariableDeclaration(bool isConst, TypeReference type, string name, Expression initializer = null) => new VariableDeclarationStatement(isConst, type, name, initializer);
+        public static WhileStatement While(Expression condition, params Statement[] statements) => new WhileStatement(condition, statements);
+        public static WhileStatement While(Expression condition, IEnumerable<Statement> statements) => new WhileStatement(condition, statements);
+        public static YieldBreakStatement YieldBreak() => new YieldBreakStatement();
+        public static YieldReturnStatement YieldReturn(Expression expression) => new YieldReturnStatement(expression);
+        public static ArrayTypeReference ArrayType(TypeReference elementType) => new ArrayTypeReference(elementType);
+        public static ArrayTypeReference ArrayType(TypeReference elementType, int rank) => new ArrayTypeReference(elementType, rank);
+        public static NamedTypeReference NamedType(NamedTypeReference openGenericType, params TypeReference[] typeArguments) => new NamedTypeReference(openGenericType, typeArguments);
+        public static NamedTypeReference NamedType(string ns, string name, params TypeReference[] typeArguments) => new NamedTypeReference(ns, name, typeArguments);
+        public static NamedTypeReference NamedType(string ns, string name, IEnumerable<TypeReference> typeArguments = null) => new NamedTypeReference(ns, name, typeArguments);
+        public static NamedTypeReference NamedType(string ns, NamedTypeReference container, string name, IEnumerable<TypeReference> typeArguments = null) => new NamedTypeReference(ns, container, name, typeArguments);
+        public static NamedTypeReference NamedType(Type type) => new NamedTypeReference(type);
+        public static NullableTypeReference NullableType(TypeReference elementType) => new NullableTypeReference(elementType);
+        public static PointerTypeReference PointerType(TypeReference elementType) => new PointerTypeReference(elementType);
+        public static RefTypeReference RefType(TypeReference elementType) => new RefTypeReference(elementType);
+        public static TupleElement TupleElement(TypeReference type, string name = null) => new TupleElement(type, name);
+        public static TupleTypeReference TupleType(params TypeReference[] elementTypes) => new TupleTypeReference(elementTypes);
+        public static TupleTypeReference TupleType(IEnumerable<TypeReference> elementTypes) => new TupleTypeReference(elementTypes);
+        public static TupleTypeReference TupleType(params TupleElement[] elements) => new TupleTypeReference(elements);
+        public static TupleTypeReference TupleType(IEnumerable<TupleElement> elements) => new TupleTypeReference(elements);
     }
 }

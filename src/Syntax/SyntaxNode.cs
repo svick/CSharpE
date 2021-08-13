@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using CSharpE.Syntax.Internals;
 using Microsoft.CodeAnalysis;
@@ -51,6 +52,8 @@ namespace CSharpE.Syntax
         // there is no need to recreate the syntax node because of a missing annotation if we're not building a tree
         private protected bool ShouldAnnotate(Roslyn::SyntaxNode syntax, bool? changed) => changed != null && !syntax.HasAnnotation(MarkerAnnotation);
 
+#nullable enable
+
         private protected T Annotate<T>(T syntax) where T : Roslyn::SyntaxNode =>
             syntax.WithAdditionalAnnotations(MarkerAnnotation);
 
@@ -59,10 +62,10 @@ namespace CSharpE.Syntax
             if (value == null)
                 throw new ArgumentNullException();
 
-            Set(ref field, value);
+            Set(ref field!, value);
         }
 
-        private protected void Set<T>(ref T field, T value) where T : SyntaxNode
+        private protected void Set<T>([AllowNull, MaybeNull] ref T field, T? value) where T : SyntaxNode?
         {
             if (ReferenceEquals(field, value))
                 return;
@@ -75,7 +78,7 @@ namespace CSharpE.Syntax
             thisHasChanged = true;
         }
 
-        private protected void SetList<T>(ref T field, T value) where T : SyntaxListBase
+        private protected void SetList<T>([MaybeNull] ref T field, [AllowNull] T value) where T : SyntaxListBase?
         {
             if (field != null)
                 field.Parent = null;
@@ -84,6 +87,8 @@ namespace CSharpE.Syntax
 
             thisHasChanged = true;
         }
+
+#nullable disable
 
         internal static T WithParent<T>(T node, SyntaxNode parent) where T : SyntaxNode
         {

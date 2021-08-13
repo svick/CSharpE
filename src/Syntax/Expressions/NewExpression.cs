@@ -6,46 +6,66 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RoslynSyntaxFactory = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Roslyn = Microsoft.CodeAnalysis;
 
+#nullable enable
+
 namespace CSharpE.Syntax
 {
     public sealed class NewExpression : Expression
     {
-        private ObjectCreationExpressionSyntax syntax;
+        private BaseObjectCreationExpressionSyntax syntax = null!;
 
-        internal NewExpression(ObjectCreationExpressionSyntax syntax, SyntaxNode parent)
+        internal NewExpression(BaseObjectCreationExpressionSyntax syntax, SyntaxNode parent)
             : base(syntax)
         {
             this.syntax = syntax;
             Parent = parent;
         }
 
-        public NewExpression(TypeReference type, IEnumerable<Argument> arguments, Initializer initializer = null)
+        public NewExpression(TypeReference? type, IEnumerable<Argument> arguments, Initializer? initializer = null)
         {
             this.Type = type;
             this.arguments = new SeparatedSyntaxList<Argument, ArgumentSyntax>(arguments, this);
             this.Initializer = initializer;
         }
 
-        public NewExpression(TypeReference type, IEnumerable<Expression> arguments, Initializer initializer = null)
+        public NewExpression(TypeReference? type, IEnumerable<Expression> arguments, Initializer? initializer = null)
             : this(type, arguments.Select(a => (Argument)a), initializer) { }
 
-        public NewExpression(TypeReference type, params Argument[] arguments)
+        public NewExpression(TypeReference? type, params Argument[] arguments)
             : this(type, (IEnumerable<Argument>)arguments) { }
 
-        private TypeReference type;
-        public TypeReference Type
+        public NewExpression(IEnumerable<Expression> arguments, Initializer? initializer = null)
+            : this(null, arguments.Select(a => (Argument)a), initializer) { }
+
+        public NewExpression(params Argument[] arguments)
+            : this(null, arguments) { }
+
+        private bool typeSet;
+        private TypeReference? type;
+        public TypeReference? Type
         {
             get
             {
-                if (type == null)
-                    type = new NamedTypeReference(syntax.Type, this);
+                if (!typeSet)
+                {
+                    var syntaxType = GetSyntaxType();
+                    type = syntaxType == null ? null : new NamedTypeReference(syntaxType, this);
+                    typeSet = true;
+                }
 
                 return type;
             }
-            set => SetNotNull(ref type, value);
+            set
+            {
+                Set(ref type, value);
+                typeSet = true;
+            }
         }
 
-        private SeparatedSyntaxList<Argument, ArgumentSyntax> arguments;
+        private TypeSyntax? GetSyntaxType() =>
+            syntax is ObjectCreationExpressionSyntax oce ? oce.Type : null;
+
+        private SeparatedSyntaxList<Argument, ArgumentSyntax>? arguments;
         public IList<Argument> Arguments
         {
             get
@@ -60,8 +80,8 @@ namespace CSharpE.Syntax
         }
 
         private bool initializerSet;
-        private Initializer initializer;
-        public Initializer Initializer
+        private Initializer? initializer;
+        public Initializer? Initializer
         {
             get
             {
@@ -84,14 +104,17 @@ namespace CSharpE.Syntax
         {
             GetAndResetChanged(ref changed, out var thisChanged);
 
-            var newType = type?.GetWrapped(ref thisChanged) ?? syntax.Type;
+            var newType = type?.GetWrapped(ref thisChanged) ?? GetSyntaxType();
             var newArguments = arguments?.GetWrapped(ref thisChanged) ?? syntax.ArgumentList?.Arguments ?? default;
             var newInitializer = initializerSet ? initializer?.GetWrapped(ref thisChanged) : syntax.Initializer;
 
             if (syntax == null || thisChanged == true || ShouldAnnotate(syntax, changed))
             {
-                syntax = RoslynSyntaxFactory.ObjectCreationExpression(
-                    newType, RoslynSyntaxFactory.ArgumentList(newArguments), newInitializer);
+                syntax = newType == null
+                    ? RoslynSyntaxFactory.ImplicitObjectCreationExpression(
+                        RoslynSyntaxFactory.ArgumentList(newArguments), newInitializer)
+                    : RoslynSyntaxFactory.ObjectCreationExpression(
+                        newType, RoslynSyntaxFactory.ArgumentList(newArguments), newInitializer);
 
                 syntax = Annotate(syntax);
 

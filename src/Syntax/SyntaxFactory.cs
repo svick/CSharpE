@@ -54,16 +54,16 @@ namespace CSharpE.Syntax
         #endregion
 
         public static ConstructorInitializer ThisInitializer(params Argument[] arguments) =>
-            ConstructorInitializer(ConstructorInitializerKind.This, arguments);
+            new ConstructorInitializer(ConstructorInitializerKind.This, arguments);
 
         public static ConstructorInitializer ThisInitializer(IEnumerable<Argument> arguments) =>
-            ConstructorInitializer(ConstructorInitializerKind.This, arguments);
+            new ConstructorInitializer(ConstructorInitializerKind.This, arguments);
 
         public static ConstructorInitializer BaseInitializer(params Argument[] arguments) =>
-            ConstructorInitializer(ConstructorInitializerKind.Base, arguments);
+            new ConstructorInitializer(ConstructorInitializerKind.Base, arguments);
 
         public static ConstructorInitializer BaseInitializer(IEnumerable<Argument> arguments) =>
-            ConstructorInitializer(ConstructorInitializerKind.Base, arguments);
+            new ConstructorInitializer (ConstructorInitializerKind.Base, arguments);
     }
 }
  

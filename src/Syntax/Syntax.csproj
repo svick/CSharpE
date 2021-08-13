@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\NullableAttributes.cs" Link="NullableAttributes.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Ben.Demystifier" Version="0.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
     <!--

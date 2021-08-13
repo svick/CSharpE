@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 
+#nullable enable
+
 namespace CSharpE.Syntax.Internals
 {
     internal interface ISyntaxWrapper<out TSyntax>

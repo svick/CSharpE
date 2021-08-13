@@ -75,6 +75,7 @@ namespace N.M
             _ = c1?.M;
             _ = c1[0];
             _ = c1?[0];
+            object o = new();
             _ = new int[10];
             _ = stackalloc int[10];
             _ = stackalloc int[]{42};

@@ -44,9 +44,11 @@ namespace CSharpE.SyntaxFactory
 
                 var typeReference = classDefinition.GetReference();
 
+                Console.WriteLine(typeReference);
+
                 foreach (var constructor in classDefinition.Constructors)
                 {
-                    if (constructor.IsInternal)
+                    if (constructor.IsInternal || constructor.IsPrivate)
                         continue;
 
                     string methodName = typeReference.Name
